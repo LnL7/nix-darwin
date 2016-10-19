@@ -8,29 +8,27 @@ let
       modules =
         [ config
           ./modules/system.nix
+          ./modules/environment.nix
           <nixpkgs/nixos/modules/system/etc/etc.nix>
         ];
     };
 
   config =
     {
-      system.build.path = pkgs.buildEnv {
-        name = "system-path";
-        paths =
-          [ pkgs.lnl.vim
-            pkgs.curl
-            pkgs.fzf
-            pkgs.gettext
-            pkgs.git
-            pkgs.jq
-            pkgs.silver-searcher
-            pkgs.tmux
+      environment.systemPackages =
+        [ pkgs.lnl.vim
+          pkgs.curl
+          pkgs.fzf
+          pkgs.gettext
+          pkgs.git
+          pkgs.jq
+          pkgs.silver-searcher
+          pkgs.tmux
 
-            pkgs.nix-prefetch-scripts
-            pkgs.nix-repl
-            pkgs.nox
-          ];
-      };
+          pkgs.nix-prefetch-scripts
+          pkgs.nix-repl
+          pkgs.nox
+        ];
 
       environment.etc."profile".text = ''
         export HOMEBREW_CASK_OPTS="--appdir=/Applications/cask"
@@ -38,8 +36,8 @@ let
         conf=$HOME/src/nixpkgs-config
         pkgs=$HOME/.nix-defexpr/nixpkgs
 
-        alias ls="ls -G"
-        alias l="ls -hl"
+        alias ls='ls -G'
+        alias l='ls -hl'
       '';
 
       environment.etc."tmux.conf".text = ''
@@ -76,8 +74,8 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            'switch') nix-env -iA nixpkgs.nixdarwin.toplevel ;;
-            ''')      return 1 ;;
+            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;;
+            ''')       return 1 ;;
           esac
         }
       '';
@@ -85,6 +83,8 @@ let
 
 
 in {
+  inherit eval;
+
   packageOverrides = self: {
 
     nixdarwin = eval.config.system.build;
@@ -104,6 +104,17 @@ in {
 
         set list
         set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨
+        set fillchars+=vert:\ ,stl:\ ,stlnc:\ 
+
+        set clipboard=unnamed
+
+        let mapleader = " "
+        nnoremap <Leader>p :FZF<cr>
+
+        set hlsearch
+        nnoremap // :nohlsearch<cr>
+
+        nnoremap K ht lr<cr>k$
       '';
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "surround" "vim-nix" "colors-solarized" ]; }

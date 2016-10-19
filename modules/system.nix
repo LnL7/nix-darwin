@@ -11,16 +11,23 @@ in {
 
     system.build = mkOption {
       internal = true;
+      type = types.attrsOf types.package;
       default = {};
       description = ''
         Attribute set of derivation used to setup the system.
       '';
     };
 
-    system.activationScripts = mkOption {
+    system.path = mkOption {
       internal = true;
-      default = {};
+      type = types.package;
+      description = ''
+        The packages you want in the system environment.
+      '';
     };
+
+    # Used by <nixos/modules/system/etc/etc.nix>
+    system.activationScripts = mkOption { internal = true; };
 
   };
 
@@ -28,7 +35,7 @@ in {
 
     system.build.toplevel = pkgs.buildEnv {
       name = "nixdarwin-system";
-      paths = [ cfg.build.path cfg.build.etc ];
+      paths = [ cfg.path cfg.build.etc ];
     };
 
   };
