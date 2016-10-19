@@ -14,6 +14,7 @@ let
     };
 
   config =
+    { config, lib, pkgs, ... }:
     {
       environment.systemPackages =
         [ pkgs.lnl.vim
@@ -30,14 +31,16 @@ let
           pkgs.nox
         ];
 
-      environment.etc."profile".text = ''
-        export HOMEBREW_CASK_OPTS="--appdir=/Applications/cask"
+      environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
+      environment.etc."profile".text = ''
         conf=$HOME/src/nixpkgs-config
         pkgs=$HOME/.nix-defexpr/nixpkgs
 
         alias ls='ls -G'
         alias l='ls -hl'
+
+        source ${config.system.build.setEnvironment}
       '';
 
       environment.etc."tmux.conf".text = ''
@@ -48,6 +51,8 @@ let
 
         set -g base-index 1
         set -g renumber-windows on
+
+        setw -g mode-keys vi
 
         bind c new-window -c '#{pane_current_path}'
         bind % split-window -v -c '#{pane_current_path}'
@@ -101,6 +106,8 @@ in {
 
         set et sw=2 ts=2
         set bs=indent,start
+
+        set nowrap
 
         set list
         set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨

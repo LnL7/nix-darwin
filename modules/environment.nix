@@ -6,6 +6,12 @@ let
 
   cfg = config.environment;
 
+  exportVariables =
+    mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
+
+  exportedEnvVars =
+    concatStringsSep "\n" exportVariables;
+
 in {
   options = {
 
@@ -31,9 +37,27 @@ in {
       description = "List of additional package outputs to be symlinked into <filename>/run/current-system/sw</filename>.";
     };
 
+    environment.variables = mkOption {
+      default = {};
+      description = ''
+        A set of environment variables used in the global environment.
+        These variables will be set on shell initialisation.
+        The value of each variable can be either a string or a list of
+        strings.  The latter is concatenated, interspersed with colon
+        characters.
+      '';
+      type = types.attrsOf (types.loeOf types.str);
+      apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
+    };
+
+
   };
 
   config = {
+
+    system.build.setEnvironment = pkgs.writeText "set-environment" ''
+      ${exportedEnvVars}
+    '';
 
     system.path = pkgs.buildEnv {
       name = "system-path";
