@@ -79,8 +79,7 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;;
-            ''')       return 1 ;;
+            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;; ''')       return 1 ;;
           esac
         }
       '';
@@ -115,13 +114,17 @@ in {
 
         set clipboard=unnamed
 
-        let mapleader = " "
-        nnoremap <Leader>p :FZF<cr>
+        cmap <C-g> <Esc>
+        imap <C-g> <Esc>
+        nmap <C-g> <Esc>
+        omap <C-g> <Esc>
+        vmap <C-g> <Esc>
 
         set hlsearch
         nnoremap // :nohlsearch<cr>
 
-        nnoremap K ht lr<cr>k$
+        let mapleader = " "
+        nnoremap <Leader>p :FZF<cr>
       '';
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "surround" "vim-nix" "colors-solarized" ]; }
