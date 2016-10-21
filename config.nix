@@ -26,22 +26,26 @@ let
           pkgs.silver-searcher
           pkgs.tmux
 
-          pkgs.nix-prefetch-scripts
           pkgs.nix-repl
           pkgs.nox
         ];
 
+      environment.variables.EDITOR = "vim";
       environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
+      environment.variables.GIT_SSL_CAINFO = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+      environment.variables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+
       environment.etc."profile".text = ''
+        source ${config.system.build.setEnvironment}
+        source ${config.system.build.setAliases}
+
         conf=$HOME/src/nixpkgs-config
         pkgs=$HOME/.nix-defexpr/nixpkgs
-
-        alias ls='ls -G'
-        alias l='ls -hl'
-
-        source ${config.system.build.setEnvironment}
       '';
+
+      environment.shellAliases.l = "ls -lh";
+      environment.shellAliases.ls = "ls -G";
 
       environment.etc."tmux.conf".text = ''
         set -g default-command "reattach-to-user-namespace -l $SHELL"
@@ -68,9 +72,6 @@ let
         export PROMPT='%B%(?..[%?] )%b> '
         export RPROMPT='%F{green}%~%f'
 
-        export SSL_CERT_FILE=/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt
-        export GIT_SSL_CAINFO=/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt
-
         export PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin''${PATH:+:$PATH}
         export PATH=$HOME/.nix-profile/bin:$HOME/.nix-profile/bin''${PATH:+:$PATH}
 
@@ -79,7 +80,8 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;; ''')       return 1 ;;
+            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;;
+            ''')       return 1 ;;
           esac
         }
       '';
@@ -127,7 +129,7 @@ in {
         nnoremap <Leader>p :FZF<cr>
       '';
       vimrcConfig.vam.pluginDictionaries = [
-        { names = [ "fzfWrapper" "youcompleteme" "surround" "vim-nix" "colors-solarized" ]; }
+        { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
       ];
     };
 

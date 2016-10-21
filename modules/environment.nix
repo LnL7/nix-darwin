@@ -9,8 +9,9 @@ let
   exportVariables =
     mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
 
-  exportedEnvVars =
-    concatStringsSep "\n" exportVariables;
+  aliasCommands =
+    mapAttrsFlatten (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
+
 
 in {
   options = {
@@ -50,14 +51,26 @@ in {
       apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
     };
 
+    environment.shellAliases = mkOption {
+      type = types.attrsOf types.str;
+      default = {};
+      example = { ll = "ls -l"; };
+      description = ''
+        An attribute set that maps aliases (the top level attribute names in
+        this option) to command strings or directly to build outputs. The
+        alises are added to all users' shells.
+      '';
+    };
 
   };
 
   config = {
 
-    system.build.setEnvironment = pkgs.writeText "set-environment" ''
-      ${exportedEnvVars}
-    '';
+    system.build.setEnvironment = pkgs.writeText "set-environment"
+      (concatStringsSep "\n" exportVariables);
+
+    system.build.setAliases = pkgs.writeText "set-aliases"
+      (concatStringsSep "\n" aliasCommands);
 
     system.path = pkgs.buildEnv {
       name = "system-path";
