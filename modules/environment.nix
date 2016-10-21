@@ -39,6 +39,7 @@ in {
     };
 
     environment.variables = mkOption {
+      type = types.attrsOf (types.loeOf types.str);
       default = {};
       description = ''
         A set of environment variables used in the global environment.
@@ -47,7 +48,6 @@ in {
         strings.  The latter is concatenated, interspersed with colon
         characters.
       '';
-      type = types.attrsOf (types.loeOf types.str);
       apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
     };
 

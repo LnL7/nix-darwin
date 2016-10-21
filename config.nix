@@ -9,6 +9,7 @@ let
         [ config
           ./modules/system.nix
           ./modules/environment.nix
+          ./modules/tmux.nix
           <nixpkgs/nixos/modules/system/etc/etc.nix>
         ];
     };
@@ -48,20 +49,14 @@ let
       environment.shellAliases.ls = "ls -G";
 
       environment.etc."tmux.conf".text = ''
-        set -g default-command "reattach-to-user-namespace -l $SHELL"
-        set -g default-terminal "screen-256color"
+        source-file ${config.system.build.setTmuxOptions}
+
         set -g status-bg black
         set -g status-fg white
-
-        set -g base-index 1
-        set -g renumber-windows on
-
-        setw -g mode-keys vi
-
-        bind c new-window -c '#{pane_current_path}'
-        bind % split-window -v -c '#{pane_current_path}'
-        bind '"' split-window -h -c '#{pane_current_path}'
       '';
+
+      programs.tmux.enableSensible = true;
+      programs.tmux.enableVim = true;
 
       environment.etc."zshrc".text = ''
         autoload -U compinit && compinit
