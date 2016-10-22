@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs ? import <nixpkgs> {} }:
 
 let
 
@@ -62,6 +62,7 @@ let
         autoload -U compinit && compinit
         autoload -U promptinit && promptinit
 
+        bindkey -e
         setopt autocd
 
         export PROMPT='%B%(?..[%?] )%b> '
@@ -75,8 +76,11 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel ;;
-            ''')       return 1 ;;
+            "build")  nix-build --no-out-link "<nixpkgs>" -A nixdarwin.toplevel ;;
+            "repl")   nix-repl "$HOME/.nixpkgs/config.nix" ;;
+            "shell")  nix-shell "<nixpkgs>" -p nixdarwin.toplevel --run "zsh -l" ;;
+            "switch") nix-env -f "<nixpkgs>" -iA nixdarwin.toplevel && exec zsh -l ;;
+            "")       return 1 ;;
           esac
         }
       '';
