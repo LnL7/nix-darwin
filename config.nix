@@ -51,6 +51,8 @@ let
       environment.etc."tmux.conf".text = ''
         source-file ${config.system.build.setTmuxOptions}
 
+        bind 0 set status
+
         set -g status-bg black
         set -g status-fg white
       '';
@@ -65,9 +67,10 @@ let
         bindkey -e
         setopt autocd
 
-        export PROMPT='%B%(?..[%?] )%b> '
+        export PROMPT='%B%(?..[%?] )%b⇒ '
         export RPROMPT='%F{green}%~%f'
 
+        export PATH=/var/run/current-system/sw/bin:/var/run/current-system/sw/bin''${PATH:+:$PATH}
         export PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin''${PATH:+:$PATH}
         export PATH=$HOME/.nix-profile/bin:$HOME/.nix-profile/bin''${PATH:+:$PATH}
 
@@ -76,10 +79,10 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            "build")  nix-build --no-out-link "<nixpkgs>" -A nixdarwin.toplevel ;;
+            "build")  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
             "repl")   nix-repl "$HOME/.nixpkgs/config.nix" ;;
-            "shell")  nix-shell "<nixpkgs>" -p nixdarwin.toplevel --run "zsh -l" ;;
-            "switch") nix-env -f "<nixpkgs>" -iA nixdarwin.toplevel && exec zsh -l ;;
+            "shell")  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "zsh -l" ;;
+            "switch") nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec zsh -l ;;
             "")       return 1 ;;
           esac
         }
