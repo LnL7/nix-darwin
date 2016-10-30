@@ -23,6 +23,15 @@ in {
       '';
     };
 
+    programs.tmux.enableMouse = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = ''
+        Enable mouse support.
+      '';
+    };
+
     programs.tmux.enableVim = mkOption {
       type = types.bool;
       default = false;
@@ -43,7 +52,7 @@ in {
   config = {
 
     system.build.setTmuxOptions = pkgs.writeText "set-tmux-options"
-      (concatStringsSep "\n" tmuxConfigs);
+      (lib.concatStringsSep "\n" tmuxConfigs);
 
     programs.tmux.text.sensible = mkIf cfg.enableSensible (''
       set -g default-terminal "screen-256color"
@@ -51,7 +60,6 @@ in {
 
       set -g base-index 1
       set -g renumber-windows on
-      bind 0 set -g status
 
       set -g status-keys emacs
       set -s escape-time 0
@@ -66,11 +74,17 @@ in {
 
       # set -g status-utf8 on
       # set -g utf8 on
-    '' + optionalString stdenv.isDarwin ''
+    '' + lib.optionalString stdenv.isDarwin ''
       set -g default-command "reattach-to-user-namespace -l $SHELL"
     '');
 
-    programs.tmux.text.vim = mkIf cfg.enableVim ''
+    programs.tmux.text.mouse = mkIf cfg.enableMouse ''
+      set -g mouse on
+      setw -g mouse on
+      set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+    '';
+
+    programs.tmux.text.vim = mkIf cfg.enableVim (''
       setw -g mode-keys vi
 
       bind h select-pane -L
@@ -79,7 +93,13 @@ in {
       bind l select-pane -R
       bind s split-window -v -c '#{pane_current_path}'
       bind v split-window -h -c '#{pane_current_path}'
-    '';
+
+      bind -t vi-copy v begin-selection
+    '' + lib.optionalString stdenv.isLinux ''
+      bind -t vi-copy y copy-selection
+    '' + lib.optionalString stdenv.isDarwin ''
+      bind -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
+    '');
 
   };
 }

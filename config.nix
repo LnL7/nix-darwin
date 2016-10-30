@@ -58,6 +58,7 @@ let
       '';
 
       programs.tmux.enableSensible = true;
+      programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
 
       environment.etc."zshrc".text = ''
