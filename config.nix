@@ -9,6 +9,7 @@ let
         [ config
           ./modules/system.nix
           ./modules/environment.nix
+          ./modules/launchd
           ./modules/tmux.nix
           <nixpkgs/nixos/modules/system/etc/etc.nix>
         ];
@@ -57,6 +58,16 @@ let
         set -g status-fg white
       '';
 
+      launchd.daemons.nix-daemon =
+        { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
+          serviceConfig.KeepAlive = true;
+          serviceConfig.RunAtLoad = true;
+          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+          serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
+          serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
+          serviceConfig.ProcessType = "Background";
+        };
+
       programs.tmux.enableSensible = true;
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
@@ -68,7 +79,7 @@ let
         bindkey -e
         setopt autocd
 
-        export PROMPT='%B%(?..[%?] )%b⇒ '
+        export PROMPT='%B%(?..%? )%b⇒ '
         export RPROMPT='%F{green}%~%f'
 
         export PATH=/var/run/current-system/sw/bin:/var/run/current-system/sw/bin''${PATH:+:$PATH}
@@ -80,10 +91,10 @@ let
 
         nixdarwin-rebuild () {
           case $1 in
-            "build")  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
-            "repl")   nix-repl "$HOME/.nixpkgs/config.nix" ;;
-            "shell")  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "zsh -l" ;;
-            "switch") nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec zsh -l ;;
+            'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
+            'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
+            'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "zsh -l" ;;
+            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec zsh -l ;;
             "")       return 1 ;;
           esac
         }
@@ -125,11 +136,16 @@ in {
         omap <C-g> <Esc>
         vmap <C-g> <Esc>
 
-        set hlsearch
-        nnoremap // :nohlsearch<cr>
+        vmap s S
 
-        let mapleader = " "
-        nnoremap <Leader>p :FZF<cr>
+        cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+
+        set hlsearch
+        nnoremap // :nohlsearch<CR>
+
+        let mapleader = ' '
+        nnoremap <Leader>p :FZF<CR>
+        nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
       '';
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
