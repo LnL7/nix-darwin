@@ -79,9 +79,14 @@ let
 
         bindkey -e
         setopt autocd
+        setopt inc_append_history
+        setopt share_history
 
-        export PROMPT='%B%(?..%? )%b⇒ '
-        export RPROMPT='%F{green}%~%f'
+        HISTFILE=$HOME/.zhistory
+        HISTSIZE=4096
+        SAVEHIST=$HISTSIZE
+        PROMPT='%B%(?..%? )%b⇒ '
+        RPROMPT='%F{green}%~%f'
 
         export PATH=/var/run/current-system/sw/bin:/var/run/current-system/sw/bin''${PATH:+:$PATH}
         export PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin''${PATH:+:$PATH}
