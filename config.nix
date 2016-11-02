@@ -51,11 +51,12 @@ let
 
       environment.etc."tmux.conf".text = ''
         source-file ${config.system.build.setTmuxOptions}
-
         bind 0 set status
 
         set -g status-bg black
         set -g status-fg white
+
+        source-file $HOME/.tmux.conf.local
       '';
 
       launchd.daemons.nix-daemon =
@@ -87,7 +88,12 @@ let
         export PATH=$HOME/.nix-profile/bin:$HOME/.nix-profile/bin''${PATH:+:$PATH}
 
         export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
-        export NIX_REMOTE=daemon
+
+        # Set up secure multi-user builds: non-root users build through the
+        # Nix daemon.
+        if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
+            export NIX_REMOTE=daemon
+        fi
 
         nixdarwin-rebuild () {
           case $1 in
@@ -98,6 +104,8 @@ let
             "")       return 1 ;;
           esac
         }
+
+        source $HOME/.zshrc.local
       '';
     };
 
@@ -146,6 +154,8 @@ in {
         let mapleader = ' '
         nnoremap <Leader>p :FZF<CR>
         nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
+
+        source $HOME/.vimrc.local
       '';
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
