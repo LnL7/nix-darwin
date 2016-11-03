@@ -32,33 +32,6 @@ let
           pkgs.nox
         ];
 
-      environment.variables.EDITOR = "vim";
-      environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
-
-      environment.variables.GIT_SSL_CAINFO = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
-      environment.variables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
-
-      environment.etc."profile".text = ''
-        source ${config.system.build.setEnvironment}
-        source ${config.system.build.setAliases}
-
-        conf=$HOME/src/nixpkgs-config
-        pkgs=$HOME/.nix-defexpr/nixpkgs
-      '';
-
-      environment.shellAliases.l = "ls -lh";
-      environment.shellAliases.ls = "ls -G";
-
-      environment.etc."tmux.conf".text = ''
-        source-file ${config.system.build.setTmuxOptions}
-        bind 0 set status
-
-        set -g status-bg black
-        set -g status-fg white
-
-        source-file $HOME/.tmux.conf.local
-      '';
-
       launchd.daemons.nix-daemon =
         { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
           serviceConfig.KeepAlive = true;
@@ -73,7 +46,36 @@ let
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
 
-      environment.etc."zshrc".text = ''
+      environment.variables.EDITOR = "vim";
+      environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
+
+      environment.variables.GIT_SSL_CAINFO = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+      environment.variables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+
+      environment.shellAliases.l = "ls -lh";
+      environment.shellAliases.ls = "ls -G";
+
+      environment.etc."tmux.conf".text = ''
+        source-file ${config.system.build.setTmuxOptions}
+        bind 0 set status
+
+        set -g status-bg black
+        set -g status-fg white
+
+        source-file $HOME/.tmux.conf.local
+      '';
+
+      environment.etc."profile".text = ''
+        source ${config.system.build.setEnvironment}
+        source ${config.system.build.setAliases}
+
+        conf=$HOME/src/nixpkgs-config
+        pkgs=$HOME/.nix-defexpr/nixpkgs
+
+        source $HOME/.profile.local
+      '';
+
+      environment.etc."zshenv".text = ''
         autoload -U compinit && compinit
         autoload -U promptinit && promptinit
 
@@ -88,6 +90,10 @@ let
         PROMPT='%B%(?..%? )%b⇒ '
         RPROMPT='%F{green}%~%f'
 
+        source $HOME/.zshenv.local
+      '';
+
+      environment.etc."zshrc".text = ''
         export PATH=/var/run/current-system/sw/bin:/var/run/current-system/sw/bin''${PATH:+:$PATH}
         export PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin''${PATH:+:$PATH}
         export PATH=$HOME/.nix-profile/bin:$HOME/.nix-profile/bin''${PATH:+:$PATH}
@@ -162,6 +168,12 @@ in {
 
         source $HOME/.vimrc.local
       '';
+      vimrcConfig.vam.knownPlugins = with pkgs.vimUtils; (pkgs.vimPlugins // {
+        vim-nix = buildVimPluginFrom2Nix {
+          name = "vim-nix-unstable";
+          src = ../vim-nix;
+        };
+      });
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
       ];
