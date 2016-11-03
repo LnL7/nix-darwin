@@ -14,6 +14,14 @@ let
 in {
   options = {
 
+    programs.tmux.loginShell = mkOption {
+      type = types.path;
+      default = "$SHELL";
+      description = ''
+        Configure default login shell.
+      '';
+    };
+
     programs.tmux.enableSensible = mkOption {
       type = types.bool;
       default = false;
@@ -41,9 +49,16 @@ in {
       '';
     };
 
+    programs.tmux.config = mkOption {
+      type = types.lines;
+      description = ''
+        Configuration options.
+      '';
+    };
+
     programs.tmux.text = mkOption {
       internal = true;
-      type = types.attrsOf types.str;
+      type = types.attrsOf types.lines;
       default = {};
     };
 
@@ -51,8 +66,13 @@ in {
 
   config = {
 
-    system.build.setTmuxOptions = pkgs.writeText "set-tmux-options"
-      (lib.concatStringsSep "\n" tmuxConfigs);
+    programs.tmux.config = lib.concatStringsSep "\n" tmuxConfigs;
+
+    programs.tmux.text.login-shell = if stdenv.isDarwin then ''
+      set -g default-command "reattach-to-user-namespace -l ${cfg.loginShell}"
+    '' else ''
+      set -g default-command "${cfg.loginShell}"
+    '';
 
     programs.tmux.text.sensible = mkIf cfg.enableSensible (''
       set -g default-terminal "screen-256color"

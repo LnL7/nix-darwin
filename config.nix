@@ -33,15 +33,16 @@ let
         ];
 
       launchd.daemons.nix-daemon =
-        { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
+        { serviceConfig.Program = "${pkgs.nix}/bin/nix-daemon";
           serviceConfig.KeepAlive = true;
           serviceConfig.RunAtLoad = true;
-          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
           serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
           serviceConfig.ProcessType = "Background";
         };
 
+      programs.tmux.loginShell = "${pkgs.zsh}/bin/zsh";
       programs.tmux.enableSensible = true;
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
@@ -49,14 +50,16 @@ let
       environment.variables.EDITOR = "vim";
       environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
-      environment.variables.GIT_SSL_CAINFO = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
-      environment.variables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
+      environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+      environment.variables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
       environment.shellAliases.l = "ls -lh";
       environment.shellAliases.ls = "ls -G";
+      environment.shellAliases.tmux = "${pkgs.tmux}/bin/tmux -f ${config.environment.etc."tmux.conf".source}";
+      environment.shellAliases.zsh = "${pkgs.zsh}/bin/zsh";
 
       environment.etc."tmux.conf".text = ''
-        source-file ${config.system.build.setTmuxOptions}
+        ${config.programs.tmux.config}
         bind 0 set status
 
         set -g status-bg black
@@ -100,6 +103,9 @@ let
 
         export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
 
+        typeset -U NIX_PATH
+        typeset -U PATH
+
         # Set up secure multi-user builds: non-root users build through the
         # Nix daemon.
         if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
@@ -107,13 +113,13 @@ let
         fi
 
         nixdarwin-rebuild () {
-          case $1 in
-            'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
-            'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
-            'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "zsh -l" ;;
-            'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec zsh -l ;;
-            "")       return 1 ;;
-          esac
+            case $1 in
+                'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
+                'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
+                'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "${pkgs.zsh}/bin/zsh -l" ;;
+                'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec ${pkgs.zsh}/bin/zsh -l ;;
+                "")       return 1 ;;
+            esac
         }
 
         source $HOME/.zshrc.local
