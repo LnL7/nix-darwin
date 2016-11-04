@@ -42,7 +42,7 @@ let
           serviceConfig.ProcessType = "Background";
         };
 
-      programs.tmux.loginShell = "${pkgs.zsh}/bin/zsh";
+      programs.tmux.loginShell = "${pkgs.zsh}/bin/zsh -l";
       programs.tmux.enableSensible = true;
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
@@ -148,10 +148,11 @@ in {
         set bs=indent,start
 
         set nowrap
-
         set list
         set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨
         set fillchars+=vert:\ ,stl:\ ,stlnc:\ 
+
+        set lazyredraw
 
         set clipboard=unnamed
 

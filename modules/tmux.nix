@@ -69,7 +69,7 @@ in {
     programs.tmux.config = lib.concatStringsSep "\n" tmuxConfigs;
 
     programs.tmux.text.login-shell = if stdenv.isDarwin then ''
-      set -g default-command "reattach-to-user-namespace -l ${cfg.loginShell}"
+      set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"
     '' else ''
       set -g default-command "${cfg.loginShell}"
     '';
@@ -94,8 +94,6 @@ in {
 
       # set -g status-utf8 on
       # set -g utf8 on
-    '' + lib.optionalString stdenv.isDarwin ''
-      set -g default-command "reattach-to-user-namespace -l $SHELL"
     '');
 
     programs.tmux.text.mouse = mkIf cfg.enableMouse ''
