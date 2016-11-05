@@ -8,10 +8,11 @@ let
       modules =
         [ config
           ./modules/system.nix
+          ./modules/system/activation-scripts.nix
+          ./modules/system/etc.nix
           ./modules/environment.nix
           ./modules/launchd
           ./modules/tmux.nix
-          <nixpkgs/nixos/modules/system/etc/etc.nix>
         ];
     };
 
