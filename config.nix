@@ -55,7 +55,7 @@ let
 
       environment.shellAliases.l = "ls -lh";
       environment.shellAliases.ls = "ls -G";
-      environment.shellAliases.tmux = "${pkgs.tmux}/bin/tmux -f ${config.environment.etc."tmux.conf".source}";
+      environment.shellAliases.tmux = "${pkgs.tmux}/bin/tmux";
       environment.shellAliases.zsh = "${pkgs.zsh}/bin/zsh";
 
       environment.etc."tmux.conf".text = ''
@@ -68,49 +68,22 @@ let
         source-file $HOME/.tmux.conf.local
       '';
 
-      environment.etc."profile".text = ''
-        source ${config.system.build.setEnvironment}
-        source ${config.system.build.setAliases}
+      environment.etc."zprofile".text = ''
+        # /etc/zprofile: DO NOT EDIT -- this file has been generated automatically.
+        # This file is read for login shells.
 
-        conf=$HOME/src/nixpkgs-config
-        pkgs=$HOME/.nix-defexpr/nixpkgs
+        # Only execute this file once per shell.
+        if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
+        __ETC_ZPROFILE_SOURCED=1
 
-        source $HOME/.profile.local
-      '';
-
-      environment.etc."zshenv".text = ''
-        autoload -U compinit && compinit
         autoload -U promptinit && promptinit
-
-        bindkey -e
-        setopt autocd
-        setopt inc_append_history
-        setopt share_history
-
-        HISTFILE=$HOME/.zhistory
-        HISTSIZE=4096
-        SAVEHIST=$HISTSIZE
         PROMPT='%B%(?..%? )%b⇒ '
         RPROMPT='%F{green}%~%f'
 
-        source $HOME/.zshenv.local
-      '';
+        bindkey -e
+        setopt autocd
 
-      environment.etc."zshrc".text = ''
-        export PATH=/var/run/current-system/sw/bin:/var/run/current-system/sw/bin''${PATH:+:$PATH}
-        export PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin''${PATH:+:$PATH}
-        export PATH=$HOME/.nix-profile/bin:$HOME/.nix-profile/bin''${PATH:+:$PATH}
-
-        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
-
-        typeset -U NIX_PATH
-        typeset -U PATH
-
-        # Set up secure multi-user builds: non-root users build through the
-        # Nix daemon.
-        if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
-            export NIX_REMOTE=daemon
-        fi
+        autoload -U compinit && compinit
 
         nixdarwin-rebuild () {
             case $1 in
@@ -122,7 +95,65 @@ let
             esac
         }
 
-        source $HOME/.zshrc.local
+        conf=$HOME/src/nixpkgs-config
+        pkgs=$HOME/.nix-defexpr/nixpkgs
+
+        # Read system-wide modifications.
+        if test -f /etc/zprofile.local; then
+          . /etc/zprofile.local
+        fi
+      '';
+
+      environment.etc."zshenv".text = ''
+        # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
+        # This file is read for all shells.
+
+        # Only execute this file once per shell.
+        # But don't clobber the environment of interactive non-login children!
+
+        if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
+        export __ETC_ZSHENV_SOURCED=1
+
+        # Read system-wide modifications.
+        if test -f /etc/zshenv.local; then
+          . /etc/zshenv.local
+        fi
+
+        export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+        typeset -U PATH
+
+        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
+
+        # Set up secure multi-user builds: non-root users build through the
+        # Nix daemon.
+        if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
+            export NIX_REMOTE=daemon
+        fi
+
+      '';
+
+      environment.etc."zshrc".text = ''
+        # /etc/zshrc: DO NOT EDIT -- this file has been generated automatically.
+        # This file is read for interactive shells.
+
+        # Only execute this file once per shell.
+        if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
+        __ETC_ZSHRC_SOURCED=1
+
+        # history defaults
+        SAVEHIST=2000
+        HISTSIZE=2000
+        HISTFILE=$HOME/.zsh_history
+
+        setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
+
+        ${config.system.build.setEnvironment}
+        ${config.system.build.setAliases}
+
+        # Read system-wide modifications.
+        if test -f /etc/zshrc.local; then
+          . /etc/zshrc.local
+        fi
       '';
     };
 

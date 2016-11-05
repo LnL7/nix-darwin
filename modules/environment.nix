@@ -31,6 +31,15 @@ in {
       '';
     };
 
+    environment.systemPath = mkOption {
+      type = types.loeOf types.path;
+      default = [ "$HOME/.nix-profile" "/run/current-system/sw" "/nix/var/nix/profiles/default" "/usr/local" ];
+      description = ''
+        The set of paths that are added to PATH
+      '';
+      apply = x: if isList x then makeBinPath x else x;
+    };
+
     environment.extraOutputsToInstall = mkOption {
       type = types.listOf types.str;
       default = [ ];
@@ -66,11 +75,8 @@ in {
 
   config = {
 
-    system.build.setEnvironment = pkgs.writeText "set-environment"
-      (concatStringsSep "\n" exportVariables);
-
-    system.build.setAliases = pkgs.writeText "set-aliases"
-      (concatStringsSep "\n" aliasCommands);
+    system.build.setEnvironment = concatStringsSep "\n" exportVariables;
+    system.build.setAliases = concatStringsSep "\n" aliasCommands;
 
     system.path = pkgs.buildEnv {
       name = "system-path";

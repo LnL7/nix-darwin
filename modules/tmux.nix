@@ -66,7 +66,7 @@ in {
 
   config = {
 
-    programs.tmux.config = lib.concatStringsSep "\n" tmuxConfigs;
+    programs.tmux.config = concatStringsSep "\n" tmuxConfigs;
 
     programs.tmux.text.login-shell = if stdenv.isDarwin then ''
       set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"
@@ -113,9 +113,9 @@ in {
       bind v split-window -h -c '#{pane_current_path}'
 
       bind -t vi-copy v begin-selection
-    '' + lib.optionalString stdenv.isLinux ''
+    '' + optionalString stdenv.isLinux ''
       bind -t vi-copy y copy-selection
-    '' + lib.optionalString stdenv.isDarwin ''
+    '' + optionalString stdenv.isDarwin ''
       bind -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
     '');
 

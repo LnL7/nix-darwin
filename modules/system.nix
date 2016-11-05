@@ -39,7 +39,6 @@ in {
 
     system.build = mkOption {
       internal = true;
-      type = types.attrsOf types.package;
       default = {};
       description = ''
         Attribute set of derivation used to setup the system.
@@ -96,6 +95,8 @@ in {
 
       # Prevent the current configuration from being garbage-collected.
       ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
+
+      ${cfg.activationScripts.etc.text}
 
       exit $_status
     '';
