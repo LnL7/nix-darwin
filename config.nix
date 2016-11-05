@@ -20,14 +20,15 @@ let
     { config, lib, pkgs, ... }:
     {
       environment.systemPackages =
-        [ pkgs.lnl.vim
+        [ pkgs.lnl.zsh
+          pkgs.lnl.tmux
+          pkgs.lnl.vim
           pkgs.curl
           pkgs.fzf
           pkgs.gettext
           pkgs.git
           pkgs.jq
           pkgs.silver-searcher
-          pkgs.tmux
 
           pkgs.nix-repl
           pkgs.nox
@@ -43,7 +44,7 @@ let
           serviceConfig.ProcessType = "Background";
         };
 
-      programs.tmux.loginShell = "${pkgs.zsh}/bin/zsh -l";
+      programs.tmux.loginShell = "${pkgs.lnl.zsh}/bin/zsh -l";
       programs.tmux.enableSensible = true;
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
@@ -56,8 +57,8 @@ let
 
       environment.shellAliases.l = "ls -lh";
       environment.shellAliases.ls = "ls -G";
-      environment.shellAliases.tmux = "${pkgs.tmux}/bin/tmux";
-      environment.shellAliases.zsh = "${pkgs.zsh}/bin/zsh";
+      environment.shellAliases.g = "git log --graph --oneline";
+      environment.shellAliases.gd = "git diff --minimal -p";
 
       environment.etc."tmux.conf".text = ''
         ${config.programs.tmux.config}
@@ -90,8 +91,8 @@ let
             case $1 in
                 'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
                 'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
-                'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "${pkgs.zsh}/bin/zsh -l" ;;
-                'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec ${pkgs.zsh}/bin/zsh -l ;;
+                'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "${pkgs.lnl.zsh}/bin/zsh -l" ;;
+                'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
                 "")       return 1 ;;
             esac
         }
@@ -115,14 +116,6 @@ let
         if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
         export __ETC_ZSHENV_SOURCED=1
 
-        # Read system-wide modifications.
-        if test -f /etc/zshenv.local; then
-          . /etc/zshenv.local
-        fi
-
-        export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-        typeset -U PATH
-
         export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
 
         # Set up secure multi-user builds: non-root users build through the
@@ -131,6 +124,10 @@ let
             export NIX_REMOTE=daemon
         fi
 
+        # Read system-wide modifications.
+        if test -f /etc/zshenv.local; then
+          . /etc/zshenv.local
+        fi
       '';
 
       environment.etc."zshrc".text = ''
@@ -147,6 +144,9 @@ let
         HISTFILE=$HOME/.zsh_history
 
         setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
+
+        export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+        typeset -U PATH
 
         ${config.system.build.setEnvironment}
         ${config.system.build.setAliases}
@@ -165,6 +165,25 @@ in {
   packageOverrides = self: {
 
     nixdarwin = eval.config.system.build;
+
+    lnl.zsh = pkgs.runCommand pkgs.zsh.name
+      { buildInputs = [ pkgs.makeWrapper ]; }
+      ''
+        source $stdenv/setup
+
+        mkdir -p $out/bin
+        makeWrapper "${pkgs.zsh}/bin/zsh" "$out/bin/zsh"
+      '';
+
+    lnl.tmux = pkgs.runCommand pkgs.tmux.name
+      { buildInputs = [ pkgs.makeWrapper ]; }
+      ''
+        source $stdenv/setup
+
+        mkdir -p $out/bin
+        makeWrapper "${pkgs.tmux}/bin/tmux" "$out/bin/tmux" \
+          --add-flags -f --add-flags "/run/current-system/etc/tmux.conf" \
+      '';
 
     lnl.vim = pkgs.vim_configurable.customize {
       name = "vim";
