@@ -8,8 +8,12 @@ let
 
   cfg = config.programs.tmux;
 
-  tmuxConfigs =
-    mapAttrsToList (n: v: "${v}") cfg.text;
+  text = import ../system/write-text.nix {
+    inherit lib;
+    mkTextDerivation = name: text: pkgs.writeText "tmux-options-${name}" text;
+  };
+
+  tmuxOptions = concatMapStringsSep "\n" (attr: attr.text) (attrValues cfg.tmuxOptions);
 
 in {
   options = {
@@ -49,16 +53,14 @@ in {
       '';
     };
 
-    programs.tmux.config = mkOption {
+    programs.tmux.tmuxConfig = mkOption {
       type = types.lines;
-      description = ''
-        Configuration options.
-      '';
+      default = "";
     };
 
-    programs.tmux.text = mkOption {
+    programs.tmux.tmuxOptions = mkOption {
       internal = true;
-      type = types.attrsOf types.lines;
+      type = types.attrsOf (types.submodule text);
       default = {};
     };
 
@@ -66,15 +68,13 @@ in {
 
   config = {
 
-    programs.tmux.config = concatStringsSep "\n" tmuxConfigs;
-
-    programs.tmux.text.login-shell = if stdenv.isDarwin then ''
+    programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
       set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"
     '' else ''
       set -g default-command "${cfg.loginShell}"
     '';
 
-    programs.tmux.text.sensible = mkIf cfg.enableSensible (''
+    programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible (''
       set -g default-terminal "screen-256color"
       setw -g aggressive-resize on
 
@@ -96,13 +96,13 @@ in {
       # set -g utf8 on
     '');
 
-    programs.tmux.text.mouse = mkIf cfg.enableMouse ''
+    programs.tmux.tmuxOptions.mouse.text = mkIf cfg.enableMouse ''
       set -g mouse on
       setw -g mouse on
       set -g terminal-overrides 'xterm*:smcup@:rmcup@'
     '';
 
-    programs.tmux.text.vim = mkIf cfg.enableVim (''
+    programs.tmux.tmuxOptions.vim.text = mkIf cfg.enableVim (''
       setw -g mode-keys vi
 
       bind h select-pane -L
@@ -118,6 +118,14 @@ in {
     '' + optionalString stdenv.isDarwin ''
       bind -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
     '');
+
+    environment.etc."tmux.conf".text = ''
+      ${tmuxOptions}
+
+      ${cfg.tmuxConfig}
+
+      source-file -q /etc/tmux.conf.local
+    '';
 
   };
 }

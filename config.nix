@@ -49,6 +49,13 @@ let
       programs.tmux.enableMouse = true;
       programs.tmux.enableVim = true;
 
+      programs.tmux.tmuxConfig = ''
+        bind 0 set status
+
+        set -g status-bg black
+        set -g status-fg white
+      '';
+
       environment.variables.EDITOR = "vim";
       environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
@@ -59,16 +66,6 @@ let
       environment.shellAliases.ls = "ls -G";
       environment.shellAliases.g = "git log --graph --oneline";
       environment.shellAliases.gd = "git diff --minimal -p";
-
-      environment.etc."tmux.conf".text = ''
-        ${config.programs.tmux.config}
-        bind 0 set status
-
-        set -g status-bg black
-        set -g status-fg white
-
-        source-file $HOME/.tmux.conf.local
-      '';
 
       environment.etc."zprofile".text = ''
         # /etc/zprofile: DO NOT EDIT -- this file has been generated automatically.
