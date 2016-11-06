@@ -55,6 +55,7 @@ in
       ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
 
       ${cfg.activationScripts.etc.text}
+      ${cfg.activationScripts.launchd.text}
 
       exit $_status
     '';

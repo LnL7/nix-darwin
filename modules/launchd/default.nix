@@ -115,8 +115,11 @@ in {
     system.activationScripts.launchd.text = ''
       # Set up launchd services in /Library/LaunchAgents, /Library/LaunchDaemons and ~/Library/LaunchAgents
       echo "setting up launchd services..."
-      echo "TODO"
-      exit 2
+
+      launchctl unload '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
+      ln -sfn '${cfg.daemons.nix-daemon.plist}' '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
+      launchctl load '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
+
     '';
 
   };
