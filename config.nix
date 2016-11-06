@@ -7,12 +7,12 @@ let
       args = { pkgs = import <nixpkgs> {}; };
       modules =
         [ config
-          ./modules/system.nix
+          ./modules/system
           ./modules/system/activation-scripts.nix
           ./modules/system/etc.nix
-          ./modules/environment.nix
+          ./modules/environment
           ./modules/launchd
-          ./modules/tmux.nix
+          ./modules/programs/tmux.nix
         ];
     };
 
