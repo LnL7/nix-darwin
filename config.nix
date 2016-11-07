@@ -159,6 +159,8 @@ let
 in {
   inherit eval;
 
+  allowUnfree = true;
+
   packageOverrides = self: {
 
     nixdarwin = eval.config.system.build;
