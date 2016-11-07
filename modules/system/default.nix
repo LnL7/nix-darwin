@@ -49,6 +49,9 @@ in
         ln -s ${cfg.build.etc}/etc $out/etc
         ln -s ${cfg.path} $out/sw
 
+        mkdir -p $out/Library
+        ln -s ${cfg.build.launchd}/Library/LaunchDaemons $out/Library/LaunchDaemons
+
         echo "$activationScript" > $out/activate
         substituteInPlace $out/activate --subst-var out
         chmod u+x $out/activate

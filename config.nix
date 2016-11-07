@@ -86,7 +86,7 @@ let
 
         nixdarwin-rebuild () {
             case $1 in
-                'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel ;;
+                'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel --show-trace ;;
                 'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
                 'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "${pkgs.lnl.zsh}/bin/zsh -l" ;;
                 'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
