@@ -47,6 +47,7 @@ let
       programs.tmux.loginShell = "${pkgs.lnl.zsh}/bin/zsh -l";
       programs.tmux.enableSensible = true;
       programs.tmux.enableMouse = true;
+      programs.tmux.enableFzf = true;
       programs.tmux.enableVim = true;
 
       programs.tmux.tmuxConfig = ''

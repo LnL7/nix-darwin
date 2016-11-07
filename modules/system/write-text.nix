@@ -22,8 +22,8 @@ in
     };
 
     text = mkOption {
-      default = null;
-      type = types.nullOr types.lines;
+      type = types.lines;
+      default = "";
       description = ''
         Text of the file.
       '';
@@ -50,7 +50,7 @@ in
 
   config = {
 
-    source = mkIf (config.text != null) (mkDefault sourceDrv);
+    source = mkIf (config.text != "") (mkDefault sourceDrv);
 
   };
 }

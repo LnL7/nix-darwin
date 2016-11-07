@@ -15,6 +15,14 @@ let
 
   tmuxOptions = concatMapStringsSep "\n" (attr: attr.text) (attrValues cfg.tmuxOptions);
 
+  fzfTmuxSession = pkgs.writeScript "fzf-tmux-session" ''
+    #! ${stdenv.shell}
+    set -e
+
+    session=$(tmux list-sessions -F '#{session_name}' | fzf --query="$1" --exit-0)
+    tmux switch-client -t "$session"
+  '';
+
 in {
   options = {
 
@@ -41,6 +49,15 @@ in {
       example = true;
       description = ''
         Enable mouse support.
+      '';
+    };
+
+    programs.tmux.enableFzf = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = ''
+        Enable fzf keybindings for selecting sessions and panes.
       '';
     };
 
@@ -100,6 +117,11 @@ in {
       set -g mouse on
       setw -g mouse on
       set -g terminal-overrides 'xterm*:smcup@:rmcup@'
+    '';
+
+    programs.tmux.tmuxOptions.fzf.text = mkIf cfg.enableFzf ''
+      bind-key -n M-p run "tmux split-window -p 40 -c '#{pane_current_path}' 'tmux send-keys -t #{pane_id} \"$(fzf -m | paste -sd\\  -)\"'"
+      bind-key -n M-s run "tmux split-window -p 40 'tmux send-keys -t #{pane_id} \"$(${fzfTmuxSession})\"'"
     '';
 
     programs.tmux.tmuxOptions.vim.text = mkIf cfg.enableVim (''
