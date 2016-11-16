@@ -85,14 +85,31 @@ let
 
         autoload -U compinit && compinit
 
+        nix () {
+          cmd=$1
+          shift
+
+          case $cmd in
+            'b'|'build')        nix-build --no-out-link -E "with import <nixpkgs> {}; $@" ;;
+            'e'|'eval')         nix-instantiate --eval -E "with import  <nixpkgs> {}; $@" ;;
+            'i'|'instantiate')  nix-instantiate -E "with import  <nixpkgs> {}; $@" ;;
+            'r'|'repl')         nix-repl '<nixpkgs>' ;;
+            's'|'shell')        nix-shell -E "with import <nixpkgs> {}; $@" ;;
+            'x'|'exec')         nix-shell '<nixpkgs>' -p "$@" --run zsh ;;
+            'z'|'zsh')          nix-shell '<nixpkgs>' -A "$@" --run zsh ;;
+          esac
+        }
+
         nixdarwin-rebuild () {
-            case $1 in
-                'build')  nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel --show-trace ;;
-                'repl')   nix-repl "$HOME/.nixpkgs/config.nix" ;;
-                'shell')  nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run "${pkgs.lnl.zsh}/bin/zsh -l" ;;
-                'switch') nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate'  && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
-                "")       return 1 ;;
-            esac
+          cmd=$1
+          shift
+
+          case $cmd in
+            'build')   nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel "$@" ;;
+            'repl')    nix-repl "$HOME/.nixpkgs/config.nix" "$@" ;;
+            'shell')   nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run '${pkgs.lnl.zsh}/bin/zsh -l' "$@" ;;
+            'switch')  nix-env -f '<nixpkgs>' -iA nixdarwin.toplevel "$@" && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
+          esac
         }
 
         conf=$HOME/src/nixpkgs-config
