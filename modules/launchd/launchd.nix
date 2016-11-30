@@ -52,18 +52,25 @@ with lib;
       '';
     };
 
-    # TODO
     inetdCompatibility = mkOption {
-      type = types.nullOr (types.attrsOf types.bool);
       default = null;
       example = { Wait = true; };
       description = ''
         The presence of this key specifies that the daemon expects to be run as if it were launched from inetd.
-
-        This flag corresponds to the "wait" or "nowait" option of inetd. If true, then the listening
-        socket is passed via the standard in/out/error file descriptors. If false, then accept(2) is
-        called on behalf of the job, and the result is passed via the standard in/out/error descriptors.
       '';
+      type = types.nullOr (types.submodule {
+        options = {
+          Wait = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              This flag corresponds to the "wait" or "nowait" option of inetd. If true, then the listening
+              socket is passed via the standard in/out/error file descriptors. If false, then accept(2) is
+              called on behalf of the job, and the result is passed via the standard in/out/error descriptors.
+            '';
+          };
+        };
+      });
     };
 
     LimitLoadToHosts = mkOption {
@@ -274,9 +281,7 @@ with lib;
       '';
     };
 
-    # TODO
     StartCalendarInterval = mkOption {
-      type = types.nullOr (types.attrsOf types.int);
       default = null;
       example = { Hour = 2; Minute = 30; };
       description = ''
@@ -285,22 +290,50 @@ with lib;
         invocations when the computer is asleep, launchd will start the job the next time the computer wakes
         up.  If multiple intervals transpire before the computer is woken, those events will be coalesced into
         one event upon wake from sleep.
-
-           Minute <integer>
-           The minute on which this job will be run.
-
-           Hour <integer>
-           The hour on which this job will be run.
-
-           Day <integer>
-           The day on which this job will be run.
-
-           Weekday <integer>
-           The weekday on which this job will be run (0 and 7 are Sunday).
-
-           Month <integer>
-           The month on which this job will be run.
       '';
+      type = types.nullOr (types.listOf (types.submodule {
+        options = {
+          Minute = mkOption {
+            type = types.nullOr types.integer;
+            default = null;
+            description = ''
+              The minute on which this job will be run.
+            '';
+          };
+
+          Hour = mkOption {
+            type = types.nullOr types.integer;
+            default = null;
+            description = ''
+              The hour on which this job will be run.
+            '';
+          };
+
+          Day = mkOption {
+            type = types.nullOr types.integer;
+            default = null;
+            description = ''
+              The day on which this job will be run.
+            '';
+          };
+
+          Weekday = mkOption {
+            type = types.nullOr types.integer;
+            default = null;
+            description = ''
+              The weekday on which this job will be run (0 and 7 are Sunday).
+            '';
+          };
+
+          Month = mkOption {
+            type = types.nullOr types.integer;
+            default = null;
+            description = ''
+              The month on which this job will be run.
+            '';
+          };
+        };
+      }));
     };
 
     StandardInPath = mkOption {
@@ -346,56 +379,187 @@ with lib;
       '';
     };
 
-    # TODO
     SoftResourceLimits = mkOption {
-      type = types.nullOr (types.attrsOf types.int);
       default = null;
+      description = ''
+        Resource limits to be imposed on the job. These adjust variables set with setrlimit(2).  The following
+        keys apply:
+      '';
+      type = types.nullOr (types.submodule {
+        options = {
+          Core = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The largest size (in bytes) core file that may be created.
+            '';
+          };
+
+          CPU = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum amount of cpu time (in seconds) to be used by each process.
+            '';
+          };
+
+          Data = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) of the data segment for a process; this defines how far a program may
+              extend its break with the sbrk(2) system call.
+            '';
+          };
+
+          FileSize = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The largest size (in bytes) file that may be created.
+            '';
+          };
+
+          MemoryLock = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) which a process may lock into memory using the mlock(2) function.
+            '';
+          };
+
+          NumberOfFiles = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum number of open files for this process.  Setting this value in a system wide daemon
+              will set the sysctl(3) kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResource-Limits) (HardResourceLimits)
+              Limits) value in addition to the setrlimit(2) values.
+            '';
+          };
+
+          NumberOfProcesses = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum number of simultaneous processes for this user id.  Setting this value in a system
+              wide daemon will set the sysctl(3) kern.maxproc (SoftResourceLimits) or kern.maxprocperuid
+              (HardResourceLimits) value in addition to the setrlimit(2) values.
+            '';
+          };
+
+          ResidentSetSize = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) to which a process's resident set size may grow.  This imposes a
+              limit on the amount of physical memory to be given to a process; if memory is tight, the system
+              will prefer to take memory from processes that are exceeding their declared resident set size.
+            '';
+          };
+
+          Stack = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) of the stack segment for a process; this defines how far a program's
+              stack segment may be extended.  Stack extension is performed automatically by the system.
+            '';
+          };
+        };
+      });
     };
 
-    # TODO
     HardResourceLimits = mkOption {
-      type = types.nullOr (types.attrsOf types.int);
       default = null;
       example = { NumberOfFiles = 4096; };
       description = ''
         Resource limits to be imposed on the job. These adjust variables set with setrlimit(2).  The following
         keys apply:
-
-           Core <integer>
-           The largest size (in bytes) core file that may be created.
-
-           CPU <integer>
-           The maximum amount of cpu time (in seconds) to be used by each process.
-
-           Data <integer>
-           The maximum size (in bytes) of the data segment for a process; this defines how far a program may
-           extend its break with the sbrk(2) system call.
-
-           FileSize <integer>
-           The largest size (in bytes) file that may be created.
-
-           MemoryLock <integer>
-           The maximum size (in bytes) which a process may lock into memory using the mlock(2) function.
-
-           NumberOfFiles <integer>
-           The maximum number of open files for this process.  Setting this value in a system wide daemon
-           will set the sysctl(3) kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResource-Limits) (HardResourceLimits)
-           Limits) value in addition to the setrlimit(2) values.
-
-           NumberOfProcesses <integer>
-           The maximum number of simultaneous processes for this user id.  Setting this value in a system
-           wide daemon will set the sysctl(3) kern.maxproc (SoftResourceLimits) or kern.maxprocperuid
-           (HardResourceLimits) value in addition to the setrlimit(2) values.
-
-           ResidentSetSize <integer>
-           The maximum size (in bytes) to which a process's resident set size may grow.  This imposes a
-           limit on the amount of physical memory to be given to a process; if memory is tight, the system
-           will prefer to take memory from processes that are exceeding their declared resident set size.
-
-           Stack <integer>
-           The maximum size (in bytes) of the stack segment for a process; this defines how far a program's
-           stack segment may be extended.  Stack extension is performed automatically by the system.
       '';
+      type = types.nullOr (types.submodule {
+        options = {
+          Core = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The largest size (in bytes) core file that may be created.
+            '';
+          };
+
+          CPU = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum amount of cpu time (in seconds) to be used by each process.
+            '';
+          };
+
+          Data = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) of the data segment for a process; this defines how far a program may
+              extend its break with the sbrk(2) system call.
+            '';
+          };
+
+          FileSize = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The largest size (in bytes) file that may be created.
+            '';
+          };
+
+          MemoryLock = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) which a process may lock into memory using the mlock(2) function.
+            '';
+          };
+
+          NumberOfFiles = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum number of open files for this process.  Setting this value in a system wide daemon
+              will set the sysctl(3) kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResource-Limits) (HardResourceLimits)
+              Limits) value in addition to the setrlimit(2) values.
+            '';
+          };
+
+          NumberOfProcesses = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum number of simultaneous processes for this user id.  Setting this value in a system
+              wide daemon will set the sysctl(3) kern.maxproc (SoftResourceLimits) or kern.maxprocperuid
+              (HardResourceLimits) value in addition to the setrlimit(2) values.
+            '';
+          };
+
+          ResidentSetSize = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) to which a process's resident set size may grow.  This imposes a
+              limit on the amount of physical memory to be given to a process; if memory is tight, the system
+              will prefer to take memory from processes that are exceeding their declared resident set size.
+            '';
+          };
+
+          Stack = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              The maximum size (in bytes) of the stack segment for a process; this defines how far a program's
+              stack segment may be extended.  Stack extension is performed automatically by the system.
+            '';
+          };
+        };
+      });
     };
 
     Nice = mkOption {
@@ -406,9 +570,8 @@ with lib;
       '';
     };
 
-    # TODO
     ProcessType = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr (types.enum [ "Background" "Standard" "Adaptive" "Interactive" ]);
       default = null;
       example = "Background";
       description = ''
@@ -462,9 +625,7 @@ with lib;
       '';
     };
 
-    # TODO
     MachServices = mkOption {
-      type = types.nullOr (types.attrsOf types.bool);
       default = null;
       example = { ResetAtClose = true; };
       description = ''
@@ -472,26 +633,37 @@ with lib;
         Each key in this dictionary should be the name of service to be advertised. The value of the key must
         be a boolean and set to true.  Alternatively, a dictionary can be used instead of a simple true value.
 
-           ResetAtClose <boolean>
-           If this boolean is false, the port is recycled, thus leaving clients to remain oblivious to the
-           demand nature of job. If the value is set to true, clients receive port death notifications when
-           the job lets go of the receive right. The port will be recreated atomically with respect to boot-strap_look_up() bootstrap_look_up()
-           strap_look_up() calls, so that clients can trust that after receiving a port death notification,
-           the new port will have already been recreated. Setting the value to true should be done with
-           care. Not all clients may be able to handle this behavior. The default value is false.
-
-           HideUntilCheckIn <boolean>
-           Reserve the name in the namespace, but cause bootstrap_look_up() to fail until the job has
-           checked in with launchd.
-
         Finally, for the job itself, the values will be replaced with Mach ports at the time of check-in with
         launchd.
       '';
+      type = types.nullOr (types.submodule {
+        options = {
+          ResetAtClose = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              If this boolean is false, the port is recycled, thus leaving clients to remain oblivious to the
+              demand nature of job. If the value is set to true, clients receive port death notifications when
+              the job lets go of the receive right. The port will be recreated atomically with respect to boot-strap_look_up() bootstrap_look_up()
+              strap_look_up() calls, so that clients can trust that after receiving a port death notification,
+              the new port will have already been recreated. Setting the value to true should be done with
+              care. Not all clients may be able to handle this behavior. The default value is false.
+            '';
+          };
+
+          HideUntilCheckIn = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              Reserve the name in the namespace, but cause bootstrap_look_up() to fail until the job has
+              checked in with launchd.
+            '';
+          };
+        };
+      });
     };
 
-    # TODO
     Sockets = mkOption {
-      type = types.nullOr types.attrs;
       default = null;
       description = ''
         This optional key is used to specify launch on demand sockets that can be used to let launchd know when
@@ -504,52 +676,110 @@ with lib;
         protocol which conforms to the criteria specified in the job configuration file.
 
         The parameters below are used as inputs to call getaddrinfo(3).
-
-           SockType <string>
-           This optional key tells launchctl what type of socket to create. The default is "stream" and
-           other valid values for this key are "dgram" and "seqpacket" respectively.
-
-           SockPassive <boolean>
-           This optional key specifies whether listen(2) or connect(2) should be called on the created file
-           descriptor. The default is true ("to listen").
-
-           SockNodeName <string>
-           This optional key specifies the node to connect(2) or bind(2) to.
-
-           SockServiceName <string>
-           This optional key specifies the service on the node to connect(2) or bind(2) to.
-
-           SockFamily <string>
-           This optional key can be used to specifically request that "IPv4" or "IPv6" socket(s) be created.
-
-           SockProtocol <string>
-           This optional key specifies the protocol to be passed to socket(2).  The only value understood by
-           this key at the moment is "TCP".
-
-           SockPathName <string>
-           This optional key implies SockFamily is set to "Unix". It specifies the path to connect(2) or
-           bind(2) to.
-
-           SecureSocketWithKey <string>
-           This optional key is a variant of SockPathName. Instead of binding to a known path, a securely
-           generated socket is created and the path is assigned to the environment variable that is inher-ited inherited
-           ited by all jobs spawned by launchd.
-
-           SockPathMode <integer>
-           This optional key specifies the mode of the socket. Known bug: Property lists don't support
-           octal, so please convert the value to decimal.
-
-           Bonjour <boolean or string or array of strings>
-           This optional key can be used to request that the service be registered with the
-           mDNSResponder(8).  If the value is boolean, the service name is inferred from the SockService-Name. SockServiceName.
-           Name.
-
-           MulticastGroup <string>
-           This optional key can be used to request that the datagram socket join a multicast group.  If the
-           value is a hostname, then getaddrinfo(3) will be used to join the correct multicast address for a
-           given socket family.  If an explicit IPv4 or IPv6 address is given, it is required that the Sock-Family SockFamily
-           Family family also be set, otherwise the results are undefined.
       '';
+      type = types.nullOr (types.loaOf (types.submodule {
+        options = {
+          SockType = mkOption {
+            type = types.nullOr (types.enum [ "stream" "dgram" "seqpacket" ]);
+            default = null;
+            description = ''
+              This optional key tells launchctl what type of socket to create. The default is "stream" and
+              other valid values for this key are "dgram" and "seqpacket" respectively.
+            '';
+          };
+
+          SockPassive = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              This optional key specifies whether listen(2) or connect(2) should be called on the created file
+              descriptor. The default is true ("to listen").
+            '';
+          };
+
+          SockNodeName = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              This optional key specifies the node to connect(2) or bind(2) to.
+            '';
+          };
+
+          SockServiceName = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              This optional key specifies the service on the node to connect(2) or bind(2) to.
+            '';
+          };
+
+          SockFamily = mkOption {
+            type = types.nullOr (types.enum [ "IPv4" "IPv6" ]);
+            default = null;
+            description = ''
+              This optional key can be used to specifically request that "IPv4" or "IPv6" socket(s) be created.
+            '';
+          };
+
+          SockProtocol = mkOption {
+            type = types.nullOr (types.enum [ "TCP" ]);
+            default = null;
+            description = ''
+              This optional key specifies the protocol to be passed to socket(2).  The only value understood by
+              this key at the moment is "TCP".
+            '';
+          };
+
+          SockPathName = mkOption {
+            type = types.nullOr types.path;
+            default = null;
+            description = ''
+              This optional key implies SockFamily is set to "Unix". It specifies the path to connect(2) or
+              bind(2) to.
+            '';
+          };
+
+          SecureSocketWithKey = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              This optional key is a variant of SockPathName. Instead of binding to a known path, a securely
+              generated socket is created and the path is assigned to the environment variable that is inher-ited inherited
+              ited by all jobs spawned by launchd.
+            '';
+          };
+
+          SockPathMode = mkOption {
+            type = types.nullOr types.int;
+            default = null;
+            description = ''
+              This optional key specifies the mode of the socket. Known bug: Property lists don't support
+              octal, so please convert the value to decimal.
+            '';
+          };
+
+          Bonjour = mkOption {
+            type = types.nullOr (types.either types.bool (types.listOf types.str));
+            default = null;
+            description = ''
+              This optional key can be used to request that the service be registered with the
+              mDNSResponder(8).  If the value is boolean, the service name is inferred from the SockService-Name. SockServiceName.
+              Name.
+            '';
+          };
+
+          MulticastGroup = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              This optional key can be used to request that the datagram socket join a multicast group.  If the
+              value is a hostname, then getaddrinfo(3) will be used to join the correct multicast address for a
+              given socket family.  If an explicit IPv4 or IPv6 address is given, it is required that the Sock-Family SockFamily
+              Family family also be set, otherwise the results are undefined.
+            '';
+          };
+        };
+      }));
     };
   };
 
