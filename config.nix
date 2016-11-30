@@ -40,6 +40,9 @@ let
           serviceConfig.RunAtLoad = true;
           serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
+          serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="/nix/var/nix/profiles/default/libexec/nix/build-remote.pl";
+          serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="/etc/nix/machines";
+          serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="/nix/tmp/current-load";
           serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
           serviceConfig.ProcessType = "Background";
         };
@@ -65,8 +68,9 @@ let
 
       environment.shellAliases.l = "ls -lh";
       environment.shellAliases.ls = "ls -G";
-      environment.shellAliases.g = "git log --graph --oneline";
-      environment.shellAliases.gd = "git diff --minimal -p";
+      environment.shellAliases.g = "git log  --oneline --max-count 42";
+      environment.shellAliases.gl = "git log --graph --oneline";
+      environment.shellAliases.gd = "git diff --minimal --patch";
 
       environment.etc."zprofile".text = ''
         # /etc/zprofile: DO NOT EDIT -- this file has been generated automatically.
@@ -131,7 +135,7 @@ let
         if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
         export __ETC_ZSHENV_SOURCED=1
 
-        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs
+        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:$NIX_PATH/.nix-defexpr/channels_root
 
         # Set up secure multi-user builds: non-root users build through the
         # Nix daemon.
