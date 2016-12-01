@@ -1,8 +1,9 @@
 { lib, mkTextDerivation }:
 
+{ config, name, ... }:
+
 with lib;
 
-{ config, name, ... }:
 let
 
   sourceDrv = mkTextDerivation name config.text;
@@ -16,8 +17,8 @@ in
       type = types.bool;
       default = true;
       description = ''
-        Whether this /etc file should be generated.  This
-        option allows specific /etc files to be disabled.
+        Whether this file should be generated.
+        This option allows specific files to be disabled.
       '';
     };
 
@@ -33,9 +34,7 @@ in
       type = types.str;
       default = name;
       description = ''
-        Name of symlink (relative to
-        <filename>/etc</filename>).  Defaults to the attribute
-        name.
+        Name of symlink.  Defaults to the attribute name.
       '';
     };
 

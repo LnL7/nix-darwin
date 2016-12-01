@@ -7,17 +7,16 @@ let
 
   cfg = config.launchd;
 
+  toEnvironmentText = name: value: {
+    name = "${value.serviceConfig.Label}.plist";
+    value.text = toPLIST value.serviceConfig;
+  };
+
   launchdConfig = import ./launchd.nix;
 
   serviceOptions =
     { config, name, ... }:
     { options = {
-        plist = mkOption {
-          internal = true;
-          type = types.path;
-          description = "The generated plist.";
-        };
-
         serviceConfig = mkOption {
           type = types.submodule launchdConfig;
           example =
@@ -34,12 +33,12 @@ let
 
       config = {
         serviceConfig.Label = mkDefault "org.nixos.${name}";
-
-        plist = pkgs.writeText "${config.serviceConfig.Label}.plist" (toPLIST config.serviceConfig);
       };
     };
 
-in {
+in
+
+{
   options = {
 
     launchd.agents = mkOption {
@@ -54,35 +53,12 @@ in {
       description = "Definition of launchd daemons.";
     };
 
-    launchd.user.agents = mkOption {
-      default = {};
-      type = types.attrsOf (types.submodule serviceOptions);
-      description = "Definition of launchd per-user agents.";
-    };
-
   };
 
   config = {
 
-    system.build.launchd = pkgs.stdenvNoCC.mkDerivation {
-      name = "launchd-library";
-      preferLocalBuild = true;
-
-      buildCommand = ''
-        mkdir -p $out/Library/LaunchDaemons
-        ln -s ${cfg.daemons.nix-daemon.plist} $out/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist
-      '';
-    };
-
-    system.activationScripts.launchd.text = ''
-      # Set up launchd services in /Library/LaunchAgents, /Library/LaunchDaemons and ~/Library/LaunchAgents
-      echo "setting up launchd services..."
-
-      launchctl unload '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
-      ln -sfn '${cfg.daemons.nix-daemon.plist}' '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
-      launchctl load '/Library/LaunchDaemons/${cfg.daemons.nix-daemon.serviceConfig.Label}.plist'
-
-    '';
+    environment.launchAgents = mapAttrs' toEnvironmentText cfg.agents;
+    environment.launchDaemons = mapAttrs' toEnvironmentText cfg.daemons;
 
   };
 }

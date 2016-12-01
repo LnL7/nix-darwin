@@ -11,6 +11,7 @@ let
           ./modules/system/activation-scripts.nix
           ./modules/system/defaults
           ./modules/system/etc.nix
+          ./modules/system/launchd.nix
           ./modules/environment
           ./modules/launchd
           ./modules/programs/tmux.nix
