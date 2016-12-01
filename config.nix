@@ -9,6 +9,7 @@ let
         [ config
           ./modules/system
           ./modules/system/activation-scripts.nix
+          ./modules/system/defaults
           ./modules/system/etc.nix
           ./modules/environment
           ./modules/launchd
@@ -38,14 +39,17 @@ let
         { serviceConfig.Program = "${pkgs.nix}/bin/nix-daemon";
           serviceConfig.KeepAlive = true;
           serviceConfig.RunAtLoad = true;
+          serviceConfig.ProcessType = "Background";
+          serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
+          serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="/nix/var/nix/profiles/default/libexec/nix/build-remote.pl";
+          serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="/nix/tmp/current-load";
+          serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="/etc/nix/machines";
           serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
-          serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="/nix/var/nix/profiles/default/libexec/nix/build-remote.pl";
-          serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="/etc/nix/machines";
-          serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="/nix/tmp/current-load";
-          serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
-          serviceConfig.ProcessType = "Background";
         };
+
+      system.defaults.global.InitialKeyRepeat = 10;
+      system.defaults.global.KeyRepeat = 1;
 
       programs.tmux.loginShell = "${pkgs.lnl.zsh}/bin/zsh -l";
       programs.tmux.enableSensible = true;
@@ -227,12 +231,6 @@ in {
         set lazyredraw
 
         set clipboard=unnamed
-
-        cmap <C-g> <Esc>
-        imap <C-g> <Esc>
-        nmap <C-g> <Esc>
-        omap <C-g> <Esc>
-        vmap <C-g> <Esc>
 
         vmap s S
 
