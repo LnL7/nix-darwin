@@ -46,6 +46,8 @@ in
       buildCommand = ''
         mkdir $out
 
+        systemConfig=$out
+
         ln -s ${cfg.build.etc}/etc $out/etc
         ln -s ${cfg.path} $out/sw
 
@@ -56,6 +58,8 @@ in
         substituteInPlace $out/activate --subst-var out
         chmod u+x $out/activate
         unset activationScript
+
+        echo -n "$systemConfig" > $out/systemConfig
 
         echo -n "$nixdarwinLabel" > $out/nixdarwin-version
         echo -n "$system" > $out/system

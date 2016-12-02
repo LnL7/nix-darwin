@@ -34,6 +34,19 @@ in
 
   config = {
 
+    system.build.activate = pkgs.writeText "activate-system" ''
+      #! ${pkgs.stdenv.shell}
+
+      # Make this configuration the current configuration.
+      # The readlink is there to ensure that when $systemConfig = /system
+      # (which is a symlink to the store), /run/current-system is still
+      # used as a garbage collection root.
+      ln -sfn $(cat /nix/var/nix/profiles/system/systemConfig) /run/current-system
+
+      # Prevent the current configuration from being garbage-collected.
+      ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
+    '';
+
     system.activationScripts.script.text = ''
       #! ${pkgs.stdenv.shell}
 

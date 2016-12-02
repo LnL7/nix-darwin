@@ -36,17 +36,21 @@ let
           pkgs.nox
         ];
 
-      launchd.daemons.nix-daemon =
-        { serviceConfig.Program = "${pkgs.nix}/bin/nix-daemon";
-          serviceConfig.KeepAlive = true;
+      launchd.agents.activate-system =
+        { serviceConfig.Program = "${config.system.build.activate}";
           serviceConfig.RunAtLoad = true;
+        };
+
+      launchd.daemons.nix-daemon =
+        { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
+          serviceConfig.KeepAlive = true;
           serviceConfig.ProcessType = "Background";
           serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
+          serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
+          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
           serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="/nix/var/nix/profiles/default/libexec/nix/build-remote.pl";
           serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="/nix/tmp/current-load";
           serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="/etc/nix/machines";
-          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-          serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
         };
 
       system.defaults.global.InitialKeyRepeat = 10;
@@ -114,7 +118,7 @@ let
           shift
 
           case $cmd in
-            'build')   nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel "$@" ;;
+            'build')   nix-build '<nixpkgs>' -A nixdarwin.toplevel "$@" ;;
             'repl')    nix-repl "$HOME/.nixpkgs/config.nix" "$@" ;;
             'shell')   nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run '${pkgs.lnl.zsh}/bin/zsh -l' "$@" ;;
             'switch')  sudo nix-env --profile /nix/var/nix/profiles/system --set $(nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel) && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
