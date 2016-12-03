@@ -34,7 +34,7 @@ in
 
   config = {
 
-    system.build.activate = pkgs.writeText "activate-system" ''
+    system.build.activate = pkgs.writeScript "activate-system" ''
       #! ${pkgs.stdenv.shell}
 
       # Make this configuration the current configuration.

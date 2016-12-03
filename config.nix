@@ -36,7 +36,7 @@ let
           pkgs.nox
         ];
 
-      launchd.agents.activate-system =
+      launchd.daemons.activate-system =
         { serviceConfig.Program = "${config.system.build.activate}";
           serviceConfig.RunAtLoad = true;
         };
@@ -144,7 +144,7 @@ let
         if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
         export __ETC_ZSHENV_SOURCED=1
 
-        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:$NIX_PATH/.nix-defexpr/channels_root
+        export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:$HOME/.nix-defexpr/channels_root
 
         # Set up secure multi-user builds: non-root users build through the
         # Nix daemon.
