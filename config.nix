@@ -15,6 +15,7 @@ let
           ./modules/environment
           ./modules/launchd
           ./modules/services/activate-system.nix
+          ./modules/services/nix-daemon.nix
           ./modules/programs/tmux.nix
         ];
     };
@@ -37,19 +38,10 @@ let
           pkgs.nox
         ];
 
-      services.activate-system.enable = true;
+      services.nix-daemon.enable = true;
+      services.nix-daemon.tempDir = "/nix/tmp";
 
-      launchd.daemons.nix-daemon =
-        { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
-          serviceConfig.KeepAlive = true;
-          serviceConfig.ProcessType = "Background";
-          serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
-          serviceConfig.EnvironmentVariables.TMPDIR = "/nix/tmp";
-          serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt";
-          serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="/nix/var/nix/profiles/default/libexec/nix/build-remote.pl";
-          serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="/nix/tmp/current-load";
-          serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="/etc/nix/machines";
-        };
+      services.activate-system.enable = true;
 
       system.defaults.global.InitialKeyRepeat = 10;
       system.defaults.global.KeyRepeat = 1;
