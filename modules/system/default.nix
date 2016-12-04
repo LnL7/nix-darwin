@@ -27,6 +27,14 @@ in
       '';
     };
 
+    system.profile = mkOption {
+      type = types.path;
+      default = "/nix/var/nix/profiles/system";
+      description = ''
+        Profile to use for the system.
+      '';
+    };
+
     system.nixdarwinLabel = mkOption {
       type = types.str;
       default = "16.09";

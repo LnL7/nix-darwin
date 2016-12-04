@@ -14,6 +14,7 @@ let
           ./modules/system/launchd.nix
           ./modules/environment
           ./modules/launchd
+          ./modules/services/activate-system.nix
           ./modules/programs/tmux.nix
         ];
     };
@@ -36,10 +37,7 @@ let
           pkgs.nox
         ];
 
-      launchd.daemons.activate-system =
-        { serviceConfig.Program = "${config.system.build.activate}";
-          serviceConfig.RunAtLoad = true;
-        };
+      services.activate-system.enable = true;
 
       launchd.daemons.nix-daemon =
         { serviceConfig.Program = "/nix/var/nix/profiles/default/bin/nix-daemon";
@@ -121,7 +119,7 @@ let
             'build')   nix-build '<nixpkgs>' -A nixdarwin.toplevel "$@" ;;
             'repl')    nix-repl "$HOME/.nixpkgs/config.nix" "$@" ;;
             'shell')   nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run '${pkgs.lnl.zsh}/bin/zsh -l' "$@" ;;
-            'switch')  sudo nix-env --profile /nix/var/nix/profiles/system --set $(nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel) && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
+            'switch')  sudo nix-env --profile ${config.system.profile} --set $(nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel) && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
           esac
         }
 
