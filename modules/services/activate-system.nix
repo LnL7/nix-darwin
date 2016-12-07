@@ -4,10 +4,12 @@ with lib;
 
 let
 
+  inherit (pkgs) stdenv;
+
   cfg = config.services.activate-system;
 
   activateScript = pkgs.writeScript "activate-system" ''
-    #! ${pkgs.stdenv.shell}
+    #! ${stdenv.shell}
 
     # Make this configuration the current configuration.
     # The readlink is there to ensure that when $systemConfig = /system

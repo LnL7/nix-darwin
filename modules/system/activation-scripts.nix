@@ -4,6 +4,8 @@ with lib;
 
 let
 
+  inherit (pkgs) stdenv;
+
   cfg = config.system;
 
   script = import ./write-text.nix {
@@ -35,7 +37,7 @@ in
   config = {
 
     system.activationScripts.script.text = ''
-      #! ${pkgs.stdenv.shell}
+      #! ${stdenv.shell}
 
       systemConfig=@out@
 

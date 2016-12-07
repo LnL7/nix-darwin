@@ -62,6 +62,8 @@ let
       environment.variables.EDITOR = "vim";
       environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
+      environment.variables.SHELL = "${pkgs.lnl.zsh}/bin/zsh";
+
       environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       environment.variables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
@@ -95,11 +97,11 @@ let
           case $cmd in
             'b'|'build')        nix-build --no-out-link -E "with import <nixpkgs> {}; $@" ;;
             'e'|'eval')         nix-instantiate --eval -E "with import  <nixpkgs> {}; $@" ;;
-            'i'|'instantiate')  nix-instantiate -E "with import  <nixpkgs> {}; $@" ;;
+            'i'|'instantiate')  nix-instantiate -E "with import <nixpkgs> {}; $@" ;;
             'r'|'repl')         nix-repl '<nixpkgs>' ;;
             's'|'shell')        nix-shell -E "with import <nixpkgs> {}; $@" ;;
-            'x'|'exec')         nix-shell '<nixpkgs>' -p "$@" --run zsh ;;
-            'z'|'zsh')          nix-shell '<nixpkgs>' -A "$@" --run zsh ;;
+            'p'|'package')      nix-shell '<nixpkgs>' -p "$@" --run ${pkgs.lnl.zsh} ;;
+            'z'|'zsh')          nix-shell '<nixpkgs>' -E "with import <nixpkgs> {}; $@" --run ${pkgs.lnl.zsh} ;;
           esac
         }
 
@@ -110,8 +112,9 @@ let
           case $cmd in
             'build')   nix-build '<nixpkgs>' -A nixdarwin.toplevel "$@" ;;
             'repl')    nix-repl "$HOME/.nixpkgs/config.nix" "$@" ;;
-            'shell')   nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run '${pkgs.lnl.zsh}/bin/zsh -l' "$@" ;;
-            'switch')  sudo nix-env --profile ${config.system.profile} --set $(nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel) && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
+            'shell')   nix-shell '<nixpkgs>' -p nixdarwin.toplevel --run ${pkgs.lnl.zsh}/bin/zsh "$@" ;;
+            'exec')    __ETC_ZSHRC_SOURCED= __ETC_ZSHENV_SOURCED= __ETC_ZPROFILE_SOURCED= exec ${pkgs.lnl.zsh}/bin/zsh -l ;;
+            'switch')  systemConfig=$(nix-build --no-out-link '<nixpkgs>' -A nixdarwin.toplevel) && nix-shell '<nixpkgs>' -A nixdarwin.toplevel --run 'sudo $out/activate' && sudo nix-env --profile ${config.system.profile} --set $systemConfig ;;
           esac
         }
 

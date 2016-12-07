@@ -4,6 +4,8 @@ with lib;
 
 let
 
+  inherit (pkgs) stdenvNoCC;
+
   cfg = config.system;
 
 in
@@ -44,7 +46,7 @@ in
 
   config = {
 
-    system.build.toplevel = pkgs.stdenvNoCC.mkDerivation {
+    system.build.toplevel = stdenvNoCC.mkDerivation {
       name = "nixdarwin-system-${cfg.nixdarwinLabel}";
       preferLocalBuild = true;
 
