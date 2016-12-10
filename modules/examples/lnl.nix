@@ -82,8 +82,8 @@ let
             'i'|'instantiate')  nix-instantiate -E "with import <nixpkgs> {}; $@" ;;
             'r'|'repl')         nix-repl '<nixpkgs>' ;;
             's'|'shell')        nix-shell -E "with import <nixpkgs> {}; $@" ;;
-            'p'|'package')      nix-shell '<nixpkgs>' -p "$@" --run ${pkgs.lnl.zsh} ;;
-            'z'|'zsh')          nix-shell '<nixpkgs>' -E "with import <nixpkgs> {}; $@" --run ${pkgs.lnl.zsh} ;;
+            'p'|'package')      nix-shell '<nixpkgs>' -p "with import <nixpkgs> {}; $@" --run ${pkgs.lnl.zsh}/bin/zsh ;;
+            'z'|'zsh')          nix-shell '<nixpkgs>' -E "with import <nixpkgs> {}; $@" --run ${pkgs.lnl.zsh}/bin/zsh ;;
           esac
         }
 
