@@ -2,24 +2,6 @@
 
 let
 
-  eval = pkgs.lib.evalModules
-    { check = true;
-      args = { pkgs = import <nixpkgs> {}; };
-      modules =
-        [ config
-          ./modules/system
-          ./modules/system/activation-scripts.nix
-          ./modules/system/defaults
-          ./modules/system/etc.nix
-          ./modules/system/launchd.nix
-          ./modules/environment
-          ./modules/launchd
-          ./modules/services/activate-system.nix
-          ./modules/services/nix-daemon.nix
-          ./modules/programs/tmux.nix
-        ];
-    };
-
   config =
     { config, lib, pkgs, ... }:
     {
@@ -179,14 +161,15 @@ let
       '';
     };
 
+  eval = import ../.. { inherit config; };
 
-in {
-  inherit eval;
+in
 
-  allowUnfree = true;
+{
+  inherit (eval) config;
+  inherit (eval.config.system) build;
 
   packageOverrides = self: {
-
     nixdarwin = eval.config.system.build;
 
     lnl.zsh = pkgs.runCommand pkgs.zsh.name
@@ -243,16 +226,17 @@ in {
 
         source $HOME/.vimrc.local
       '';
-      vimrcConfig.vam.knownPlugins = with pkgs.vimUtils; (pkgs.vimPlugins // {
-        vim-nix = buildVimPluginFrom2Nix {
-          name = "vim-nix-unstable";
-          src = ../vim-nix;
-        };
-      });
+      # vimrcConfig.vam.knownPlugins = with pkgs.vimUtils; (pkgs.vimPlugins // {
+      #   vim-nix = buildVimPluginFrom2Nix {
+      #     name = "vim-nix-unstable";
+      #     src = ../../../vim-nix;
+      #   };
+      # });
       vimrcConfig.vam.pluginDictionaries = [
         { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
       ];
     };
-
   };
+
+  allowUnfree = true;
 }
