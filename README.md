@@ -27,10 +27,11 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 
 ```bash
 git clone git@github.com:LnL7/nix-darwin.git
-export NIX_PATH=darwin=$PWD/nix-darwin:darwin-config=$PWD/config.nix:$NIX_PATH
-nix-build '<darwin>' -A system
-result/bin/darwin-rebuild build
-result/bin/darwin-rebuild switch
+nix-build -I darwin=$PWD/nix-darwin -I darwin-config=$PWD/config.nix '<darwin>' -A system
+source result/etc/bashrc
+
+result/sw/bin/darwin-rebuild build
+result/sw/bin/darwin-rebuild switch
 ```
 
 ## Example configuration
