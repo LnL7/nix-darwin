@@ -12,14 +12,20 @@ let
         ./modules/system/defaults
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
+        ./modules/nix
         ./modules/environment
         ./modules/launchd
         ./modules/services/activate-system.nix
         ./modules/services/nix-daemon.nix
         ./modules/programs/tmux.nix
-        ./modules/programs/nix-darwin.nix
       ];
   };
 
+  system = eval.config.system.build.toplevel;
+
 in
-  eval
+
+{
+  inherit (eval) config;
+  inherit system;
+}
