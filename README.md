@@ -19,3 +19,44 @@ warning: /etc/zshrc is a file, skipping...
 setting up launchd services...
 $ 
 ```
+
+## Install
+
+```bash
+git clone git@github.com:LnL7/nix-darwin.git
+export NIX_PATH=darwin=$PWD/nix-darwin:darwin-config=$PWD/config.nix:$NIX_PATH
+nix-build '<darwin>' -A system
+result/bin/darwin-rebuild build
+result/bin/darwin-rebuild switch
+```
+
+## Example configuration
+
+```nix
+{ config, lib, pkgs, ... }:
+{
+
+  # List packages installed in system profile. To search by name, run:
+  # $ nix-env -qaP | grep wget
+  environment.systemPackages =
+    [ # Include nix-tools
+      config.system.build.nix
+
+      pkgs.nix-repl
+    ];
+
+  environment.etc."bashrc".text = ''
+    # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
+    # This file is read for interactive shells.
+
+    # Only execute this file once per shell.
+    if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
+    __ETC_BASHRC_SOURCED=1
+
+    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+
+    ${config.system.build.setEnvironment}
+    ${config.system.build.setAliases}
+  '';
+}
+```
