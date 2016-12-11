@@ -91,7 +91,7 @@
       esac
     }
 
-    conf=$HOME/src/nixpkgs-config
+    conf=$HOME/.nixpkgs/darwin-config.nix
     pkgs=$HOME/.nix-defexpr/nixpkgs
 
     # Read system-wide modifications.
