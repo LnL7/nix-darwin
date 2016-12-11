@@ -35,6 +35,8 @@ result/bin/darwin-rebuild switch
 
 ## Example configuration
 
+Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+
 ```nix
 { config, lib, pkgs, ... }:
 {
