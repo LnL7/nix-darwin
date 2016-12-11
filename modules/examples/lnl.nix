@@ -1,11 +1,10 @@
 { config, lib, pkgs, ... }:
 {
   environment.systemPackages =
-    [ config.system.build.nix
-
-      pkgs.lnl.zsh
+    [ pkgs.lnl.zsh
       pkgs.lnl.tmux
       pkgs.lnl.vim
+
       pkgs.curl
       pkgs.fzf
       pkgs.gettext

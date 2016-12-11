@@ -15,5 +15,10 @@ in
       ln -s ${tools.darwin-rebuild} $out/bin/darwin-rebuild
     '';
 
+    environment.systemPackages =
+      [ # Include nix-tools by default
+        config.system.build.nix
+      ];
+
   };
 }

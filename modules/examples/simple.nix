@@ -4,10 +4,7 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages =
-    [ # Include nix-tools
-      config.system.build.nix
-
-      pkgs.nix-repl
+    [ pkgs.nix-repl
     ];
 
   environment.etc."bashrc".text = ''
@@ -25,4 +22,7 @@
     ${config.system.build.setEnvironment}
     ${config.system.build.setAliases}
   '';
+
+  services.activate-system.enable = true;
+
 }

@@ -48,10 +48,7 @@ Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modul
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages =
-    [ # Include nix-tools
-      config.system.build.nix
-
-      pkgs.nix-repl
+    [ pkgs.nix-repl
     ];
 
   environment.etc."bashrc".text = ''
@@ -69,5 +66,8 @@ Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modul
     ${config.system.build.setEnvironment}
     ${config.system.build.setAliases}
   '';
+
+  services.activate-system.enable = true;
+
 }
 ```

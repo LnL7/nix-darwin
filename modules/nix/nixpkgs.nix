@@ -66,8 +66,10 @@ in
   };
 
   config = {
+
     _module.args.pkgs = import <nixpkgs> {
       inherit (config.nixpkgs) config;
     };
+
   };
 }
