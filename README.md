@@ -22,6 +22,9 @@ $
 
 ## Install
 
+This will link the system profile to `/run/current-system`, you have to create `/run` or symlink it to `private/var/run`.
+If you use a symlink you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
+
 > NOTE: the system activation scripts don't overrwrite existing etc files, etc files like `/etc/bashrc` won't be used by default.
 Either modify the existing file to source/import the one from `/etc/static` or remove the file.
 
