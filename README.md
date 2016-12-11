@@ -22,8 +22,7 @@ $
 
 ## Install
 
-> NOTE: the system activation scripts don't overrwrite existing etc files,
-existing etc files like `/etc/bashrc` won't be used by default.
+> NOTE: the system activation scripts don't overrwrite existing etc files, etc files like `/etc/bashrc` won't be used by default.
 Either modify the existing file to source/import the one from `/etc/static` or remove the file.
 
 ```bash
