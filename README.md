@@ -22,6 +22,10 @@ $
 
 ## Install
 
+> NOTE: the system activation scripts don't overrwrite existing etc files,
+existing etc files like `/etc/bashrc` won't be used by default.
+Either modify the existing file to source/import the one from `/etc/static` or remove the file.
+
 ```bash
 git clone git@github.com:LnL7/nix-darwin.git
 export NIX_PATH=darwin=$PWD/nix-darwin:darwin-config=$PWD/config.nix:$NIX_PATH
@@ -52,6 +56,8 @@ result/bin/darwin-rebuild switch
     # Only execute this file once per shell.
     if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
     __ETC_BASHRC_SOURCED=1
+
+    export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$NIX_PATH
 
     export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
 
