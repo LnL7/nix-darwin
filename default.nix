@@ -4,7 +4,6 @@ let
 
   eval = pkgs.lib.evalModules {
     check = true;
-    args = { inherit pkgs; };
     modules =
       [ config
         ./modules/system
@@ -12,7 +11,8 @@ let
         ./modules/system/defaults
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
-        ./modules/nix
+        ./modules/nix/nix-tools.nix
+        ./modules/nix/nixpkgs.nix
         ./modules/environment
         ./modules/launchd
         ./modules/services/activate-system.nix

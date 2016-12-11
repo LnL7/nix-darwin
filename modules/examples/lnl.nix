@@ -150,4 +150,73 @@
       . /etc/zshrc.local
     fi
   '';
+
+  nixpkgs.config.allowUnfree = true;
+
+  nixpkgs.config.packageOverrides = self: {
+    lnl.zsh = pkgs.runCommand pkgs.zsh.name
+      { buildInputs = [ pkgs.makeWrapper ]; }
+      ''
+        source $stdenv/setup
+
+        mkdir -p $out/bin
+        makeWrapper ${pkgs.zsh}/bin/zsh $out/bin/zsh
+      '';
+
+    lnl.tmux = pkgs.runCommand pkgs.tmux.name
+      { buildInputs = [ pkgs.makeWrapper ]; }
+      ''
+        source $stdenv/setup
+
+        mkdir -p $out/bin
+        makeWrapper ${pkgs.tmux}/bin/tmux $out/bin/tmux \
+          --add-flags -f --add-flags /run/current-system/etc/tmux.conf
+      '';
+
+    lnl.vim = pkgs.vim_configurable.customize {
+      name = "vim";
+      vimrcConfig.customRC = ''
+        set nocompatible
+        filetype plugin indent on
+        syntax on
+
+        colorscheme solarized
+        set bg=dark
+
+        set et sw=2 ts=2
+        set bs=indent,start
+
+        set nowrap
+        set list
+        set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨
+        set fillchars+=vert:\ ,stl:\ ,stlnc:\ 
+
+        set lazyredraw
+
+        set clipboard=unnamed
+
+        vmap s S
+
+        cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+
+        set hlsearch
+        nnoremap // :nohlsearch<CR>
+
+        let mapleader = ' '
+        nnoremap <Leader>p :FZF<CR>
+        nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
+
+        source $HOME/.vimrc.local
+      '';
+      # vimrcConfig.vam.knownPlugins = with pkgs.vimUtils; (pkgs.vimPlugins // {
+      #   vim-nix = buildVimPluginFrom2Nix {
+      #     name = "vim-nix-unstable";
+      #     src = ../../../vim-nix;
+      #   };
+      # });
+      vimrcConfig.vam.pluginDictionaries = [
+        { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
+      ];
+    };
+  };
 }
