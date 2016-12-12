@@ -1,7 +1,7 @@
-{ stdenv, writeScript, coreutils, nix }:
+{ stdenv, writeScriptBin, coreutils, nix }:
 
 {
-  darwin-option = writeScript "darwin-option" ''
+  darwin-option = writeScriptBin "darwin-option" ''
     #! ${stdenv.shell}
     set -e
 
@@ -9,7 +9,7 @@
     exit 1
   '';
 
-  darwin-rebuild = writeScript "darwin-rebuild" ''
+  darwin-rebuild = writeScriptBin "darwin-rebuild" ''
     #! ${stdenv.shell}
     set -e
 
