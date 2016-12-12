@@ -18,6 +18,7 @@ let
         ./modules/services/activate-system.nix
         ./modules/services/nix-daemon.nix
         ./modules/programs/tmux.nix
+        ./modules/programs/zsh.nix
       ];
   };
 

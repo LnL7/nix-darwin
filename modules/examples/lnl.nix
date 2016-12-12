@@ -37,10 +37,11 @@
     set -g status-fg white
   '';
 
+  programs.zsh.enable = true;
+  programs.zsh.shell = "${pkgs.lnl.zsh}/bin/zsh";
+
   environment.variables.EDITOR = "vim";
   environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
-
-  environment.variables.SHELL = "${pkgs.lnl.zsh}/bin/zsh";
 
   environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
   environment.variables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
