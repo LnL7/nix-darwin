@@ -64,6 +64,11 @@ in
 
   config = mkIf cfg.enable {
 
+    environment.systemPackages =
+      [ # Include zsh package
+        pkgs.zsh
+      ];
+
     environment.variables.SHELL = "${cfg.shell}";
 
     environment.etc."zshenv".text = ''

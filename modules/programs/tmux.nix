@@ -26,6 +26,14 @@ let
 in {
   options = {
 
+    programs.tmux.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to configure tmux.
+      '';
+    };
+
     programs.tmux.loginShell = mkOption {
       type = types.path;
       default = "$SHELL";
@@ -83,7 +91,7 @@ in {
 
   };
 
-  config = {
+  config = mkIf cfg.enable {
 
     programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
       set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"

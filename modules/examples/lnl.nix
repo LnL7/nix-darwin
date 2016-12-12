@@ -1,8 +1,7 @@
 { config, lib, pkgs, ... }:
 {
   environment.systemPackages =
-    [ pkgs.lnl.zsh
-      pkgs.lnl.tmux
+    [ pkgs.lnl.tmux
       pkgs.lnl.vim
 
       pkgs.curl
@@ -24,7 +23,8 @@
   system.defaults.global.InitialKeyRepeat = 10;
   system.defaults.global.KeyRepeat = 1;
 
-  programs.tmux.loginShell = "${pkgs.lnl.zsh}/bin/zsh -l";
+  programs.tmux.enable = true;
+  programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
   programs.tmux.enableSensible = true;
   programs.tmux.enableMouse = true;
   programs.tmux.enableFzf = true;
@@ -38,7 +38,6 @@
   '';
 
   programs.zsh.enable = true;
-  programs.zsh.shell = "${pkgs.lnl.zsh}/bin/zsh";
 
   programs.zsh.shellInit = ''
     export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$HOME/.nix-defexpr/channels_root
@@ -121,15 +120,6 @@
   nixpkgs.config.allowUnfree = true;
 
   nixpkgs.config.packageOverrides = self: {
-    lnl.zsh = pkgs.runCommand pkgs.zsh.name
-      { buildInputs = [ pkgs.makeWrapper ]; }
-      ''
-        source $stdenv/setup
-
-        mkdir -p $out/bin
-        makeWrapper ${pkgs.zsh}/bin/zsh $out/bin/zsh
-      '';
-
     lnl.tmux = pkgs.runCommand pkgs.tmux.name
       { buildInputs = [ pkgs.makeWrapper ]; }
       ''
