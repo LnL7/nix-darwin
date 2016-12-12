@@ -40,26 +40,17 @@
   programs.zsh.enable = true;
   programs.zsh.shell = "${pkgs.lnl.zsh}/bin/zsh";
 
-  environment.variables.EDITOR = "vim";
-  environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
+  programs.zsh.shellInit = ''
+    export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$HOME/.nix-defexpr/channels_root
 
-  environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-  environment.variables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    # Set up secure multi-user builds: non-root users build through the
+    # Nix daemon.
+    if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
+        export NIX_REMOTE=daemon
+    fi
+  '';
 
-  environment.shellAliases.l = "ls -lh";
-  environment.shellAliases.ls = "ls -G";
-  environment.shellAliases.g = "git log  --oneline --max-count 42";
-  environment.shellAliases.gl = "git log --graph --oneline";
-  environment.shellAliases.gd = "git diff --minimal --patch";
-
-  environment.etc."zprofile".text = ''
-    # /etc/zprofile: DO NOT EDIT -- this file has been generated automatically.
-    # This file is read for login shells.
-
-    # Only execute this file once per shell.
-    if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
-    __ETC_ZPROFILE_SOURCED=1
-
+  programs.zsh.loginShellInit = ''
     autoload -U promptinit && promptinit
     PROMPT='%B%(?..%? )%b⇒ '
     RPROMPT='%F{green}%~%f'
@@ -100,38 +91,7 @@
     fi
   '';
 
-  environment.etc."zshenv".text = ''
-    # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
-    # This file is read for all shells.
-
-    # Only execute this file once per shell.
-    # But don't clobber the environment of interactive non-login children!
-
-    if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
-    export __ETC_ZSHENV_SOURCED=1
-
-    export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$HOME/.nix-defexpr/channels_root
-
-    # Set up secure multi-user builds: non-root users build through the
-    # Nix daemon.
-    if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
-        export NIX_REMOTE=daemon
-    fi
-
-    # Read system-wide modifications.
-    if test -f /etc/zshenv.local; then
-      . /etc/zshenv.local
-    fi
-  '';
-
-  environment.etc."zshrc".text = ''
-    # /etc/zshrc: DO NOT EDIT -- this file has been generated automatically.
-    # This file is read for interactive shells.
-
-    # Only execute this file once per shell.
-    if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
-    __ETC_ZSHRC_SOURCED=1
-
+  programs.zsh.interactiveShellInit = ''
     # history defaults
     SAVEHIST=2000
     HISTSIZE=2000
@@ -144,12 +104,19 @@
 
     ${config.system.build.setEnvironment}
     ${config.system.build.setAliases}
-
-    # Read system-wide modifications.
-    if test -f /etc/zshrc.local; then
-      . /etc/zshrc.local
-    fi
   '';
+
+  environment.variables.EDITOR = "vim";
+  environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
+
+  environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+  environment.variables.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+
+  environment.shellAliases.l = "ls -lh";
+  environment.shellAliases.ls = "ls -G";
+  environment.shellAliases.g = "git log  --oneline --max-count 42";
+  environment.shellAliases.gl = "git log --graph --oneline";
+  environment.shellAliases.gd = "git diff --minimal --patch";
 
   nixpkgs.config.allowUnfree = true;
 
