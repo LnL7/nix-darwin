@@ -1,4 +1,4 @@
-# nixdarwin-rebuild
+# nix-darwin
 
 Nix modules for darwin.
 
