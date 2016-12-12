@@ -112,6 +112,10 @@ in
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
 
+      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+      ${config.system.build.setEnvironment}
+      ${config.system.build.setAliases}
+
       ${cfg.interactiveShellInit}
 
       # Read system-wide modifications.
