@@ -11,7 +11,7 @@ let
         ./modules/system/defaults
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
-        ./modules/nix/nix-tools.nix
+        ./modules/nix/nix-darwin.nix
         ./modules/nix/nixpkgs.nix
         ./modules/environment
         ./modules/launchd
