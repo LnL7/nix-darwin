@@ -169,6 +169,9 @@
 
         mkdir -p $out/bin
         makeWrapper ${pkgs.tmux}/bin/tmux $out/bin/tmux \
+          --set __ETC_ZPROFILE_SOURCED  "" \
+          --set __ETC_ZSHENV_SOURCED "" \
+          --set __ETC_ZSHRC_SOURCED "" \
           --add-flags -f --add-flags /run/current-system/etc/tmux.conf
       '';
 
