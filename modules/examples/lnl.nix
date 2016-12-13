@@ -83,11 +83,6 @@
 
     conf=$HOME/.nixpkgs/darwin-config.nix
     pkgs=$HOME/.nix-defexpr/nixpkgs
-
-    # Read system-wide modifications.
-    if test -f /etc/zprofile.local; then
-      . /etc/zprofile.local
-    fi
   '';
 
   programs.zsh.interactiveShellInit = ''
@@ -97,12 +92,6 @@
     HISTFILE=$HOME/.zsh_history
 
     setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
-
-    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-    typeset -U PATH
-
-    ${config.system.build.setEnvironment}
-    ${config.system.build.setAliases}
   '';
 
   environment.variables.EDITOR = "vim";
