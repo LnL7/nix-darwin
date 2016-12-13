@@ -40,8 +40,8 @@ result/sw/bin/darwin-rebuild switch
 ## Example configuration
 
 Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-
 ```nix
+
 { config, lib, pkgs, ... }:
 {
 
@@ -51,20 +51,12 @@ Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modul
     [ pkgs.nix-repl
     ];
 
-  environment.etc."bashrc".text = ''
-    # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
-    # This file is read for interactive shells.
+  programs.bash.enable = true;
+  programs.bash.interactiveShellInit = ''
+    # Edit the NIX_PATH entries below or put the nix-darwin repository in
+    # ~/.nix-defexpr/darwin and your configuration in ~/.nixpkgs/darwin-config.nix
 
-    # Only execute this file once per shell.
-    if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
-    __ETC_BASHRC_SOURCED=1
-
-    export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$NIX_PATH
-
-    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-
-    ${config.system.build.setEnvironment}
-    ${config.system.build.setAliases}
+    export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$NIX_PATH
   '';
 
   services.activate-system.enable = true;
