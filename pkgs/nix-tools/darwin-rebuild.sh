@@ -39,4 +39,5 @@ fi
 if [ "$action" = switch ]; then
     sudo nix-env -p @profile@ --set $systemConfig
     sudo $systemConfig/activate
+    $systemConfig/activate-user
 fi

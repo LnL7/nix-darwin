@@ -81,7 +81,8 @@
       esac
     }
 
-    conf=$HOME/.nixpkgs/darwin-config.nix
+    cfg=$HOME/.nixpkgs/darwin-config.nix
+    darwin=$HOME/.nix-defexpr/darwin
     pkgs=$HOME/.nix-defexpr/nixpkgs
   '';
 

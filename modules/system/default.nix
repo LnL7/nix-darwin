@@ -51,6 +51,7 @@ in
       preferLocalBuild = true;
 
       activationScript = cfg.activationScripts.script.text;
+      activationUserScript = cfg.activationScripts.userScript.text;
       inherit (cfg) nixdarwinLabel;
 
       buildCommand = ''
@@ -68,6 +69,11 @@ in
         substituteInPlace $out/activate --subst-var out
         chmod u+x $out/activate
         unset activationScript
+
+        echo "$activationUserScript" > $out/activate-user
+        substituteInPlace $out/activate-user --subst-var out
+        chmod u+x $out/activate-user
+        unset activationUserScript
 
         echo -n "$systemConfig" > $out/systemConfig
 
