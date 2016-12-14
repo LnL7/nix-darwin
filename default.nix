@@ -8,7 +8,12 @@ let
       [ config
         ./modules/system
         ./modules/system/activation-scripts.nix
-        ./modules/system/defaults
+        ./modules/system/defaults-write.nix
+        ./modules/system/defaults/NSGlobalDomain.nix
+        ./modules/system/defaults/LaunchServices.nix
+        ./modules/system/defaults/dock.nix
+        ./modules/system/defaults/finder.nix
+        ./modules/system/defaults/trackpad.nix
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
         ./modules/nix/nix-darwin.nix
