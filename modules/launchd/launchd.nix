@@ -150,7 +150,53 @@ with lib;
     };
 
     KeepAlive = mkOption {
-      type = types.nullOr types.bool;
+      type = types.nullOr (types.either types.bool (types.submodule {
+        options = {
+
+          SuccessfulExit = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              If true, the job will be restarted as long as the program exits and with an exit status of zero.
+              If false, the job will be restarted in the inverse condition.  This key implies that "RunAtLoad"
+              is set to true, since the job needs to run at least once before we can get an exit status.
+            '';
+          };
+
+          NetworkState = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              If true, the job will be kept alive as long as the network is up, where up is defined as at least
+              one non-loopback interface being up and having IPv4 or IPv6 addresses assigned to them.  If
+              false, the job will be kept alive in the inverse condition.
+            '';
+          };
+
+          PathState = mkOption {
+            type = types.nullOr (types.attrsOf types.bool);
+            default = null;
+            description = ''
+              Each key in this dictionary is a file-system path. If the value of the key is true, then the job
+              will be kept alive as long as the path exists.  If false, the job will be kept alive in the
+              inverse condition. The intent of this feature is that two or more jobs may create semaphores in
+              the file-system namespace.
+            '';
+          };
+
+          OtherJobEnabled = mkOption {
+            type = types.nullOr (types.attrsOf types.bool);
+            default = null;
+            description = ''
+              Each key in this dictionary is the label of another job. If the value of the key is true, then
+              this job is kept alive as long as that other job is enabled. Otherwise, if the value is false,
+              then this job is kept alive as long as the other job is disabled.  This feature should not be
+              considered a substitute for the use of IPC.
+            '';
+          };
+
+        };
+      }));
       default = null;
       description = ''
         This optional key is used to control whether your job is to be kept continuously running or to let
