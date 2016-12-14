@@ -39,6 +39,8 @@
   system.defaults.finder.QuitMenuItem = true;
   system.defaults.finder.FXEnableExtensionChangeWarning = false;
 
+  system.defaults.trackpad.Clicking = true;
+
   programs.tmux.enable = true;
   programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
   programs.tmux.enableSensible = true;

@@ -93,6 +93,14 @@ with lib;
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.trackpad.enableSecondaryClick" = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable trackpad secondary click.  The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = mkOption {
       type = types.nullOr types.bool;
       default = null;
@@ -106,6 +114,14 @@ with lib;
       default = null;
       description = ''
         Configures the trackpad tap behavior.  Mode 1 enables tap to click.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain."com.apple.trackpad.trackpadCornerClickBehavior" = mkOption {
+      type = types.nullOr (types.enum [ 1 ]);
+      default = null;
+      description = ''
+        Configures the trackpad corner click behavior.  Mode 1 enables right click.
       '';
     };
 
