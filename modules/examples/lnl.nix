@@ -35,6 +35,10 @@
   system.defaults.dock.showhidden = true;
   system.defaults.dock.mru-spaces = false;
 
+  system.defaults.finder.AppleShowAllExtensions = true;
+  system.defaults.finder.QuitMenuItem = true;
+  system.defaults.finder.FXEnableExtensionChangeWarning = false;
+
   programs.tmux.enable = true;
   programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
   programs.tmux.enableSensible = true;
