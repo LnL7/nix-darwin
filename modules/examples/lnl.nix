@@ -20,8 +20,8 @@
 
   services.activate-system.enable = true;
 
-  system.defaults.global.InitialKeyRepeat = 10;
-  system.defaults.global.KeyRepeat = 1;
+  system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
+  system.defaults.NSGlobalDomain.KeyRepeat = 1;
 
   programs.tmux.enable = true;
   programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
