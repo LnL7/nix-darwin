@@ -26,7 +26,7 @@ This will link the system profile to `/run/current-system`, you have to create `
 If you use a symlink you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
 
 > NOTE: the system activation scripts don't overrwrite existing etc files, etc files like `/etc/bashrc` won't be used by default.
-Either modify the existing file to source/import the one from `/etc/static` or remove the file.
+Either modify the existing file to source/import the one from `/etc/static` or remove it.
 
 ```bash
 git clone git@github.com:LnL7/nix-darwin.git
@@ -40,8 +40,8 @@ result/sw/bin/darwin-rebuild switch
 ## Example configuration
 
 Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-```nix
 
+```nix
 { config, lib, pkgs, ... }:
 {
 
@@ -61,5 +61,104 @@ Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modul
 
   services.activate-system.enable = true;
 
+}
+```
+
+## Modules
+
+### system.defaults
+
+A set of [modules](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults) to manage macOS settings.
+
+```nix
+{
+  system.defaults.dock.autohide = true;
+  system.defaults.dock.orientation = "left";
+  system.defaults.dock.showhidden = true;
+}
+```
+
+> NOTE: you have to restart the dock in order for these changes to apply. `killall Dock`
+
+### environment.etc
+
+Set of files to be linked in `/etc`, this won't overwrite any existing files.
+Either modify the existing file to source/import the one from `/etc/static` or remove it.
+
+```nix
+{
+  environment.etc."foorc".text = ''
+    export FOO=1
+
+    if test -f /etc/foorc.local; then
+      . /etc/foorc.local
+    fi
+  '';
+}
+```
+
+### launchd.daemons
+
+Definition of launchd agents/daemons. The [serviceConfig](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix) options are used to generate the launchd plist file.
+
+```nix
+{
+  launchd.daemons.foo = {
+    serviceConfig.ProgramArguments = [ "/usr/bin/touch" "/tmp/foo.lock" ];
+    serviceConfig.RunAtLoad = true;
+  };
+}
+```
+
+### services
+
+A set of modules for predefined services, these generate the appropriate launchd daemons for you.
+
+```nix
+{
+  services.nix-daemon.enable = true;
+  services.nix-daemon.tempDir = "/nix/tmp";
+}
+```
+
+### programs
+
+A set of modules to manage configuration of certain programs.
+
+```nix
+{
+  environment.shellAliases.tm = "${pkgs}/bin/tmux";
+
+  programs.bash.enable = true;
+
+  programs.tmux.enable = true;
+  programs.tmux.enableSensible = true;
+  programs.tmux.loginShell = "${config.programs.bash.shell} -l";
+}
+```
+
+### nixpkgs.config
+
+This attribute set is used as nixpkgs configuration when using nix-darwin.
+
+```nix
+{
+  environment.systemPackages =
+    [ # Use vim_configurable from packageOverrides
+      lnl.vim
+    ];
+
+  nixpkgs.config.allowUnfree = true;
+
+  nixpkgs.config.packageOverrides = self: {
+    lnl.vim = pkgs.vim_configurable.customize {
+      name = "vim";
+      vimrcConfig.customRC = ''
+        set nocompatible
+        filetype plugin indent on
+        syntax on
+      '';
+    };
+  };
 }
 ```

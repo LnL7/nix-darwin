@@ -138,7 +138,7 @@
           --set __ETC_ZPROFILE_SOURCED  "" \
           --set __ETC_ZSHENV_SOURCED "" \
           --set __ETC_ZSHRC_SOURCED "" \
-          --add-flags -f --add-flags /run/current-system/etc/tmux.conf
+          --add-flags -f --add-flags /etc/tmux.conf
       '';
 
     lnl.vim = pkgs.vim_configurable.customize {
