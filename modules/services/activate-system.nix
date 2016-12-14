@@ -38,10 +38,11 @@ in
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
 
-    launchd.daemons.activate-system = mkIf cfg.enable {
+    launchd.daemons.activate-system = {
       serviceConfig.Program = "${activateScript}";
+      serviceConfig.KeepAlive.SuccessfulExit = false;
       serviceConfig.RunAtLoad = true;
     };
 

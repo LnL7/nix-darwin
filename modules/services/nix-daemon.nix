@@ -39,9 +39,9 @@ in
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
 
-    launchd.daemons.nix-daemon = mkIf cfg.enable {
+    launchd.daemons.nix-daemon = {
       serviceConfig.Program = "${cfg.profile}/bin/nix-daemon";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Background";
