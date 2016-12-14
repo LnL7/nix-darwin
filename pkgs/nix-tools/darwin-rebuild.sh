@@ -36,8 +36,25 @@ if [ "$action" = switch -o "$action" = build ]; then
     systemConfig="$(nix-build '<darwin>' --no-out-link -A system)"
 fi
 
+if [ "$action" = build ]; then
+    echo $systemConfig
+fi
+
+
 if [ "$action" = switch ]; then
-    sudo nix-env -p @profile@ --set $systemConfig
-    sudo $systemConfig/activate
+    profileDir=$(dirname @profile@)
+
+    if [ "$USER" != root -a ! -w $profileDir ]; then
+        sudo nix-env -p @profile@ --set $systemConfig
+    else
+        nix-env -p @profile@ --set $systemConfig
+    fi
+
+    if [ "$USER" != root ]; then
+      sudo $systemConfig/activate
+    else
+      $systemConfig/activate
+    fi
+
     $systemConfig/activate-user
 fi
