@@ -150,7 +150,7 @@ This attribute set is used as nixpkgs configuration when using nix-darwin.
 
   nixpkgs.config.allowUnfree = true;
 
-  nixpkgs.config.packageOverrides = self: {
+  nixpkgs.config.packageOverrides = pkgs: {
     lnl.vim = pkgs.vim_configurable.customize {
       name = "vim";
       vimrcConfig.customRC = ''
