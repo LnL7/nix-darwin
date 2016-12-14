@@ -30,6 +30,11 @@
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
 
+  system.defaults.dock.autohide = true;
+  system.defaults.dock.orientation = "left";
+  system.defaults.dock.showhidden = true;
+  system.defaults.dock.mru-spaces = false;
+
   programs.tmux.enable = true;
   programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
   programs.tmux.enableSensible = true;

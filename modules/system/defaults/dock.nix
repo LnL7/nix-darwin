@@ -8,6 +8,41 @@ with lib;
     system.defaults.dock.autohide = mkOption {
       type = types.nullOr types.bool;
       default = null;
+      description = ''
+        Whether to automatically hide and show the dock.  The default is false.
+      '';
+    };
+
+    system.defaults.dock.orientation = mkOption {
+      type = types.nullOr (types.enum [ "bottom" "left" "right" ]);
+      default = null;
+      description = ''
+        Position of the dock on screen.  The default is "bottom".
+      '';
+    };
+
+    system.defaults.dock.showhidden = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to make icons of hidden applications tranclucent.  The default is false.
+      '';
+    };
+
+    system.defaults.dock.minimize-to-application = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to minimize windows into their application icon.  The default is false.
+      '';
+    };
+
+    system.defaults.dock.mru-spaces = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to automatically rearrange spaces based on most recent use.  The default is true.
+      '';
     };
 
   };
