@@ -9,7 +9,10 @@ let
     mkTextDerivation = name: text: pkgs.writeText "etc-${name}" text;
   };
 
+  hasDir = path: length (splitString "/" path) > 1;
+
   etc = filter (f: f.enable) (attrValues config.environment.etc);
+  etcDirs = filter (attr: hasDir attr.target) (attrValues config.environment.etc);
 
 in
 
@@ -31,6 +34,7 @@ in
     system.build.etc = pkgs.runCommand "etc" {} ''
       mkdir -p $out/etc
       cd $out/etc
+      ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
     '';
 
@@ -43,7 +47,7 @@ in
       for link in $(ls /etc/static/); do
         if [ -e "/etc/$link" ]; then
           if [ ! -L "/etc/$link" ]; then
-            echo "warning: /etc/$link is a file, skipping..." >&2
+            echo "warning: /etc/$link exists, skipping..." >&2
           fi
         else
           ln -sfn "/etc/static/$link" "/etc/$link"
