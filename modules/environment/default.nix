@@ -48,7 +48,7 @@ in {
     };
 
     environment.variables = mkOption {
-      type = types.attrsOf (types.loeOf types.str);
+      type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
       description = ''
         A set of environment variables used in the global environment.
@@ -68,6 +68,17 @@ in {
         An attribute set that maps aliases (the top level attribute names in
         this option) to command strings or directly to build outputs. The
         alises are added to all users' shells.
+      '';
+    };
+
+    environment.extraInit = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Shell script code called during global environment initialisation
+        after all variables and profileVariables have been set.
+        This code is asumed to be shell-independent, which means you should
+        stick to pure sh without sh word split.
       '';
     };
 

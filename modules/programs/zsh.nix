@@ -117,6 +117,7 @@ in
       ${config.system.build.setAliases}
 
       ${cfg.interactiveShellInit}
+      ${config.environment.extraInit}
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then

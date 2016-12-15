@@ -18,18 +18,6 @@ in
         description = "Whether to activate system at boot time.";
       };
 
-      profile = mkOption {
-        type = types.path;
-        default = "/nix/var/nix/profiles/default";
-        description = "Profile to use for nix and cacert.";
-      };
-
-      buildMachinesFile = mkOption {
-        type = types.path;
-        default = "/etc/nix/machines";
-        description = "File containing build machines.";
-      };
-
       tempDir = mkOption {
         type = types.path;
         default = "/tmp";
@@ -41,17 +29,25 @@ in
 
   config = mkIf cfg.enable {
 
+    environment.extraInit = ''
+      # Set up secure multi-user builds: non-root users build through the
+      # Nix daemon.
+      if [ "$USER" != root -o ! -w /nix/var/nix/db ]; then
+          export NIX_REMOTE=daemon
+      fi
+    '';
+
     launchd.daemons.nix-daemon = {
-      serviceConfig.Program = "${cfg.profile}/bin/nix-daemon";
+      serviceConfig.Program = "${config.nix.package}/bin/nix-daemon";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Background";
+      serviceConfig.LowPriorityIO = config.nix.daemonIONice;
+      serviceConfig.Nice = config.nix.daemonNiceLevel;
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
-      serviceConfig.EnvironmentVariables.TMPDIR = "${cfg.tempDir}";
-      serviceConfig.EnvironmentVariables.SSL_CERT_FILE = "${cfg.profile}/etc/ssl/certs/ca-bundle.crt";
-      serviceConfig.EnvironmentVariables.NIX_BUILD_HOOK="${cfg.profile}/libexec/nix/build-remote.pl";
-      serviceConfig.EnvironmentVariables.NIX_CURRENT_LOAD="${cfg.tempDir}/current-load";
-      serviceConfig.EnvironmentVariables.NIX_REMOTE_SYSTEMS="${cfg.buildMachinesFile}";
-    };
 
+      serviceConfig.EnvironmentVariables = config.nix.envVars
+        // { CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"; }
+        // { TMPDIR = "${cfg.tempDir}"; };
+    };
   };
 }
