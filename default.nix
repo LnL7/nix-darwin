@@ -34,6 +34,6 @@ let
 in
 
 {
-  inherit (eval) config;
+  inherit (eval) options config;
   inherit system;
 }
