@@ -3,6 +3,9 @@
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 This will creates and manages a system profile in `/run/current-system`, just like nixos.
 
+The default `NIX_PATH` in nix-darwin will look for this repository in `~/.nix-defexpr/darwin` and for your configuration in `~/.nixpkgs/darwin-configuration.nix`.
+If you want to change these you can set your own with `nix.nixPath = [ ];`.
+
 ```
 $ darwin-rebuild switch
 building the system configuration...
@@ -13,11 +16,9 @@ these derivations will be built:
 building path(s) ‘/nix/store/wlq89shja597ip7mrmjv7yzk2lwyh8n0-etc-zprofile’
 building path(s) ‘/nix/store/m8kcm1pa5j570h3indp71a439wsh9lzq-etc’
 building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system-16.09’
-writing defaults...
 setting up /etc...
-warning: /etc/zprofile is a file, skipping...
-warning: /etc/zshrc is a file, skipping...
 setting up launchd services...
+writing defaults...
 $ 
 ```
 
@@ -30,17 +31,14 @@ If you use a symlink you'll probably also want to add `services.activate-system.
 Either modify the existing file to source/import the one from `/etc/static` or remove it.
 
 ```bash
-git clone git@github.com:LnL7/nix-darwin.git
-nix-build -I darwin=$PWD/nix-darwin -I darwin-config=$PWD/config.nix '<darwin>' -A system
-source result/etc/bashrc
+git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
 
-result/sw/bin/darwin-rebuild build
-result/sw/bin/darwin-rebuild switch
-```
+# bootstrap build using default nix.nixPath
+export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
 
-If you already configured your `NIX_PATH` you can just (re)bootstrap nix-darwin
-
-```bash
+# you can also use this to rebootstrap nix-darwin in case
+# darwin-rebuild is to old to activate the system.
+$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
 $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
 ```
 
@@ -49,7 +47,7 @@ $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
 Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
 
 ```nix
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 {
 
   # List packages installed in system profile. To search by name, run:
@@ -58,14 +56,10 @@ Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modul
     [ pkgs.nix-repl
     ];
 
+  # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
-  programs.bash.interactiveShellInit = ''
-    # Edit the NIX_PATH entries below or put the nix-darwin repository in
-    # ~/.nix-defexpr/darwin and your configuration in ~/.nixpkgs/darwin-config.nix
 
-    export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$NIX_PATH
-  '';
-
+  # Recreate /run/current-system symlink after boot.
   services.activate-system.enable = true;
 
 }

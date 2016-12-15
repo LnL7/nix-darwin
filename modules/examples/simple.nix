@@ -7,14 +7,10 @@
     [ pkgs.nix-repl
     ];
 
+  # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
-  programs.bash.interactiveShellInit = ''
-    # Edit the NIX_PATH entries below or put the nix-darwin repository in
-    # ~/.nix-defexpr/darwin and your configuration in ~/.nixpkgs/darwin-config.nix
 
-    export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$NIX_PATH
-  '';
-
+  # Recreate /run/current-system symlink after boot.
   services.activate-system.enable = true;
 
 }
