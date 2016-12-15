@@ -117,8 +117,6 @@
   environment.shellAliases.gl = "git log --graph --oneline";
   environment.shellAliases.gd = "git diff --minimal --patch";
 
-  nix.distributedBuilds = true;
-
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
       "darwin=$HOME/.nix-defexpr/darwin"
