@@ -38,7 +38,7 @@ in
     '';
 
     launchd.daemons.nix-daemon = {
-      serviceConfig.Program = "${config.nix.package}/bin/nix-daemon";
+      serviceConfig.Program = "${config.nix.profile}/bin/nix-daemon";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Background";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
@@ -46,7 +46,8 @@ in
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
 
       serviceConfig.EnvironmentVariables = config.nix.envVars
-        // { CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"; }
+        # // { CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"; }
+        // { SSL_CERT_FILE = "${config.nix.profile}/etc/ssl/certs/ca-bundle.crt"; }
         // { TMPDIR = "${cfg.tempDir}"; };
     };
   };

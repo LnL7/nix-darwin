@@ -46,12 +46,12 @@ in
 
     nix = {
 
-      package = mkOption {
+      profile = mkOption {
         type = types.path;
         default = "/nix/var/nix/profiles/default";
         defaultText = "pkgs.nix";
         description = ''
-          This option specifies the profile or Nix package instance to use throughout the system.
+          This option specifies the profile that contains the Nix package instance to use throughout the system.
         '';
       };
 
@@ -335,7 +335,7 @@ in
       }
 
       // optionalAttrs cfg.distributedBuilds {
-        NIX_BUILD_HOOK = "${cfg.package}/libexec/nix/build-remote.pl";
+        NIX_BUILD_HOOK = "${cfg.profile}/libexec/nix/build-remote.pl";
         NIX_REMOTE_SYSTEMS = "/etc/nix/machines";
         NIX_CURRENT_LOAD = "/run/nix/current-load";
       };
