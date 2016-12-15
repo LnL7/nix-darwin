@@ -5,6 +5,7 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
+  echo "$0: {build|switch}"
   exec man darwin-rebuild
   exit 1
 }

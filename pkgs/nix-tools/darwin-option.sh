@@ -5,7 +5,8 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "$0: not implemented" >&2
+  echo "$0: <option>" >&2
+  exec man darwin-option
   exit 1
 }
 
@@ -18,7 +19,7 @@ evalAttrs() {
 }
 
 evalOpt() {
-  evalNix "options.$option.$@" || true
+  evalNix "options.$option.$@" 2>/dev/null
 }
 
 # Parse the command line.
@@ -39,18 +40,18 @@ done
 
 if [ -z "$option" ]; then showSyntax; fi
 
-if [ "$(evalOpt "_type" 2> /dev/null)" = '"option"' ]; then
+if [ "$(evalOpt "_type")" = '"option"' ]; then
   echo "Value:"
-  evalOpt "value"
+  evalOpt "value" || echo "no value"
   echo
   echo "Default:"
-  evalOpt "default"
+  evalOpt "default" || echo "no default"
   echo
   echo "Example:"
-  evalOpt "example"
+  evalOpt "example" || echo "no example"
   echo
   echo "Description:"
-  eval printf $(evalOpt "description")
+  eval printf $(evalOpt "description") || echo "no description"
   echo
 else
   eval printf $(evalAttrs "options.$option")

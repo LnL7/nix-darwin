@@ -22,6 +22,21 @@ writing defaults...
 $ 
 ```
 
+```
+$ darwin-option services.activate-system.enable                                                                                                                                            ~/src/nix-darwin
+Value:
+true
+
+Default:
+false
+
+Example:
+no example
+
+Description:
+Whether to activate system at boot time.
+```
+
 ## Install
 
 This will link the system profile to `/run/current-system`, you have to create `/run` or symlink it to `private/var/run`.
