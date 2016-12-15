@@ -58,13 +58,9 @@
   programs.zsh.enable = true;
 
   programs.zsh.shellInit = ''
-    export NIX_PATH=nixpkgs=$HOME/.nix-defexpr/nixpkgs:darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-config.nix:$HOME/.nix-defexpr/channels_root
-
-    # Set up secure multi-user builds: non-root users build through the
-    # Nix daemon.
-    if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
-        export NIX_REMOTE=daemon
-    fi
+    cfg=$HOME/.nixpkgs/darwin-config.nix
+    darwin=$HOME/.nix-defexpr/darwin
+    pkgs=$HOME/.nix-defexpr/nixpkgs
   '';
 
   programs.zsh.loginShellInit = ''
@@ -98,10 +94,6 @@
           ;;
       esac
     }
-
-    cfg=$HOME/.nixpkgs/darwin-config.nix
-    darwin=$HOME/.nix-defexpr/darwin
-    pkgs=$HOME/.nix-defexpr/nixpkgs
   '';
 
   programs.zsh.interactiveShellInit = ''
@@ -124,6 +116,16 @@
   environment.shellAliases.g = "git log  --oneline --max-count 42";
   environment.shellAliases.gl = "git log --graph --oneline";
   environment.shellAliases.gd = "git diff --minimal --patch";
+
+  nix.distributedBuilds = true;
+
+  nix.nixPath =
+    [ # Use local nixpkgs checkout instead of channels.
+      "darwin=$HOME/.nix-defexpr/darwin"
+      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+      "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
+      "/nix/var/nix/profiles/per-user/root/channels"
+    ];
 
   nixpkgs.config.allowUnfree = true;
 

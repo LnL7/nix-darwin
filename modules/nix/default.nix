@@ -284,10 +284,11 @@ in
       nixPath = mkOption {
         type = types.listOf types.str;
         default =
-          [ "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixpkgs"
-            "/nix/var/nix/profiles/per-user/root/channels"
+          [ # Incldue default paths for <darwin> and <darwin-config>.
             "darwin=$HOME/.nix-defexpr/darwin"
             "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+            "nixpkgs=$HOME/.nix-defexpr/channels/nixpkgs"
+            "$HOME/.nix-defexpr/channels"
           ];
         description = ''
           The default Nix expression search path, used by the Nix
