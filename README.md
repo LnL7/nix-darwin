@@ -1,6 +1,7 @@
 # nix-darwin
 
-Nix modules for darwin.
+Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
+This will creates and manages a system profile in `/run/current-system`, just like nixos.
 
 ```
 $ darwin-rebuild switch
@@ -35,6 +36,12 @@ source result/etc/bashrc
 
 result/sw/bin/darwin-rebuild build
 result/sw/bin/darwin-rebuild switch
+```
+
+If you already configured your `NIX_PATH` you can just (re)bootstrap nix-darwin
+
+```bash
+$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
 ```
 
 ## Example configuration
