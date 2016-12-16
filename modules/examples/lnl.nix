@@ -1,25 +1,5 @@
 { config, lib, pkgs, ... }:
 {
-  environment.systemPackages =
-    [ pkgs.lnl.tmux
-      pkgs.lnl.vim
-
-      pkgs.curl
-      pkgs.fzf
-      pkgs.gettext
-      pkgs.git
-      pkgs.jq
-      pkgs.silver-searcher
-
-      pkgs.nix-repl
-      pkgs.nox
-    ];
-
-  services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/nix/tmp";
-
-  services.activate-system.enable = true;
-
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
@@ -41,6 +21,26 @@
 
   system.defaults.trackpad.Clicking = true;
 
+  environment.systemPackages =
+    [ pkgs.lnl.tmux
+      pkgs.lnl.vim
+
+      pkgs.curl
+      pkgs.fzf
+      pkgs.gettext
+      pkgs.git
+      pkgs.jq
+      pkgs.silver-searcher
+
+      pkgs.nix-repl
+      pkgs.nox
+    ];
+
+  services.nix-daemon.enable = true;
+  services.nix-daemon.tempDir = "/nix/tmp";
+
+  services.activate-system.enable = true;
+
   programs.tmux.enable = true;
   programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
   programs.tmux.enableSensible = true;
@@ -56,6 +56,14 @@
   '';
 
   programs.zsh.enable = true;
+  programs.zsh.enableBashCompletion = true;
+
+  programs.zsh.promptInit = ''
+    autoload -U promptinit && promptinit
+
+    PROMPT='%B%(?..%? )%b⇒ '
+    RPROMPT='%F{green}%~%f'
+  '';
 
   programs.zsh.shellInit = ''
     cfg=$HOME/.nixpkgs/darwin-config.nix
@@ -64,9 +72,6 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    autoload -U promptinit && promptinit
-    PROMPT='%B%(?..%? )%b⇒ '
-    RPROMPT='%F{green}%~%f'
 
     bindkey -e
     setopt autocd
