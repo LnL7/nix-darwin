@@ -76,6 +76,14 @@ in
       '';
     };
 
+    programs.zsh.enableBashCompletion = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Enable bash completion for all interactive zsh shells.
+      '';
+    };
+
   };
 
   config = mkIf cfg.enable {
@@ -136,6 +144,7 @@ in
 
       ${cfg.promptInit}
       ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
+      ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
 
       ${config.environment.extraInit}
 
