@@ -61,6 +61,7 @@ in
 
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
+      ${cfg.activationScripts.time.text}
 
       exit $_status
     '';

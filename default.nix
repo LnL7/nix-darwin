@@ -16,6 +16,7 @@ let
         ./modules/system/defaults/trackpad.nix
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
+        ./modules/time
         ./modules/nix
         ./modules/nix/nix-darwin.nix
         ./modules/nix/nixpkgs.nix
