@@ -37,27 +37,43 @@ in
     };
 
     programs.zsh.shellInit = mkOption {
+      type = types.lines;
       default = "";
       description = ''
         Shell script code called during zsh shell initialisation.
       '';
-      type = types.lines;
     };
 
     programs.zsh.loginShellInit = mkOption {
+      type = types.lines;
       default = "";
       description = ''
         Shell script code called during zsh login shell initialisation.
       '';
-      type = types.lines;
     };
 
     programs.zsh.interactiveShellInit = mkOption {
+      type = types.lines;
       default = "";
       description = ''
         Shell script code called during interactive zsh shell initialisation.
       '';
+    };
+
+    programs.zsh.promptInit = mkOption {
       type = types.lines;
+      default = "autoload -U promptinit && promptinit && prompt walters";
+      description = ''
+        Shell script code used to initialise the zsh prompt.
+      '';
+    };
+
+    programs.zsh.enableCompletion = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Enable zsh completion for all interactive zsh shells.
+      '';
     };
 
   };
@@ -117,6 +133,10 @@ in
       ${config.system.build.setAliases}
 
       ${cfg.interactiveShellInit}
+
+      ${cfg.promptInit}
+      ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
+
       ${config.environment.extraInit}
 
       # Read system-wide modifications.
