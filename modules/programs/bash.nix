@@ -15,6 +15,17 @@ let
       makeWrapper ${pkgs.bash}/bin/bash $out/bin/bash
     '';
 
+
+  interactiveShellInit = ''
+    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+    ${config.system.build.setEnvironment}
+    ${config.system.build.setAliases}
+
+    ${config.environment.extraInit}
+    ${config.environment.interactiveShellInit}
+    ${cfg.interactiveShellInit}
+  '';
+
 in
 
 {
@@ -53,7 +64,7 @@ in
         pkgs.bash
       ];
 
-    environment.variables.SHELL = "${cfg.shell}";
+    environment.variables.SHELL = mkDefault "${cfg.shell}";
 
     environment.etc."bashrc".text = ''
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
@@ -63,12 +74,7 @@ in
       if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
       __ETC_BASHRC_SOURCED=1
 
-      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-      ${config.system.build.setEnvironment}
-      ${config.system.build.setAliases}
-
-      ${cfg.interactiveShellInit}
-      ${config.environment.extraInit}
+      ${interactiveShellInit}
 
       # Read system-wide modifications.
       if test -f /etc/bash.local; then

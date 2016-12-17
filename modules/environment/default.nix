@@ -33,11 +33,24 @@ in {
 
     environment.systemPath = mkOption {
       type = types.loeOf types.path;
-      default = [ "$HOME/.nix-profile" "/run/current-system/sw" "/nix/var/nix/profiles/default" "/usr/local" ];
+      default = (reverseList cfg.profiles) ++ [ "/usr/local" "/usr" "" ];
       description = ''
         The set of paths that are added to PATH
       '';
       apply = x: if isList x then makeBinPath x else x;
+    };
+
+    environment.profiles = mkOption {
+      type = types.listOf types.path;
+      default =
+        [ # Use user, default and system profiles.
+          "$HOME/.nix-profile"
+          "/nix/var/nix/profiles/default"
+          "/run/current-system/sw"
+        ];
+      description = ''
+        A list of profiles used to setup the global environment.
+      '';
     };
 
     environment.extraOutputsToInstall = mkOption {
@@ -82,6 +95,16 @@ in {
       '';
     };
 
+    environment.interactiveShellInit = mkOption {
+      default = "";
+      description = ''
+        Shell script code called during interactive shell initialisation.
+        This code is asumed to be shell-independent, which means you should
+        stick to pure sh without sh word split.
+      '';
+      type = types.lines;
+    };
+
   };
 
   config = {
@@ -94,6 +117,19 @@ in {
       paths = cfg.systemPackages;
       inherit (cfg) extraOutputsToInstall;
     };
+
+    environment.extraInit = ''
+       # reset TERM with new TERMINFO available (if any)
+       export TERM=$TERM
+
+       export NIX_USER_PROFILE_DIR="/nix/var/nix/profiles/per-user/$USER"
+       export NIX_PROFILES="${concatStringsSep " " (reverseList cfg.profiles)}"
+    '';
+
+    environment.variables =
+      { EDITOR = mkDefault "nano";
+        PAGER = mkDefault "less -R";
+      };
 
   };
 }
