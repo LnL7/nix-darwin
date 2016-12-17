@@ -6,7 +6,7 @@ let
 
   cfg = config.programs.bash;
 
-  bash = pkgs.runCommand pkgs.zsh.name
+  shell = pkgs.runCommand pkgs.zsh.name
     { buildInputs = [ pkgs.makeWrapper ]; }
     ''
       source $stdenv/setup
@@ -39,14 +39,6 @@ in
       '';
     };
 
-    programs.bash.shell = mkOption {
-      type = types.path;
-      default = "${bash}/bin/bash";
-      description = ''
-        Zsh shell to use.
-      '';
-    };
-
     programs.bash.interactiveShellInit = mkOption {
       default = "";
       description = ''
@@ -64,7 +56,7 @@ in
         pkgs.bash
       ];
 
-    environment.variables.SHELL = mkDefault "${cfg.shell}";
+    environment.variables.SHELL = mkDefault "${shell}/bin/bash";
 
     environment.etc."bashrc".text = ''
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.

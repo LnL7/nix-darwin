@@ -42,7 +42,7 @@
   services.activate-system.enable = true;
 
   programs.tmux.enable = true;
-  programs.tmux.loginShell = "${config.programs.zsh.shell} -l";
+  programs.tmux.loginShell = "$SHELL -l";
   programs.tmux.enableSensible = true;
   programs.tmux.enableMouse = true;
   programs.tmux.enableFzf = true;
@@ -58,6 +58,11 @@
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
 
+  programs.zsh.variables.cfg = "$HOME/.nixpkgs/darwin-config.nix";
+  programs.zsh.variables.darwin = "$HOME/.nix-defexpr/darwin";
+  programs.zsh.variables.pkgs = "$HOME/.nix-defexpr/nixpkgs";
+
+
   programs.zsh.promptInit = ''
     autoload -U promptinit && promptinit
 
@@ -65,19 +70,7 @@
     RPROMPT='%F{green}%~%f'
   '';
 
-  programs.zsh.shellInit = ''
-    cfg=$HOME/.nixpkgs/darwin-config.nix
-    darwin=$HOME/.nix-defexpr/darwin
-    pkgs=$HOME/.nix-defexpr/nixpkgs
-  '';
-
   programs.zsh.loginShellInit = ''
-
-    bindkey -e
-    setopt autocd
-
-    autoload -U compinit && compinit
-
     nix () {
       cmd=$1
       shift
@@ -102,12 +95,8 @@
   '';
 
   programs.zsh.interactiveShellInit = ''
-    # history defaults
-    SAVEHIST=2000
-    HISTSIZE=2000
-    HISTFILE=$HOME/.zsh_history
-
-    setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
+    bindkey -e
+    setopt AUTOCD
   '';
 
   environment.variables.EDITOR = "vim";
@@ -140,6 +129,7 @@
 
         mkdir -p $out/bin
         makeWrapper ${pkgs.tmux}/bin/tmux $out/bin/tmux \
+          --set __ETC_BASHRC_SOURCED "" \
           --set __ETC_ZPROFILE_SOURCED  "" \
           --set __ETC_ZSHENV_SOURCED "" \
           --set __ETC_ZSHRC_SOURCED "" \

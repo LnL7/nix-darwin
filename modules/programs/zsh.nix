@@ -6,7 +6,10 @@ let
 
   cfg = config.programs.zsh;
 
-  zsh = pkgs.runCommand pkgs.zsh.name
+  zshVariables =
+    mapAttrsToList (n: v: ''${n}="${v}"'') cfg.variables;
+
+  shell = pkgs.runCommand pkgs.zsh.name
     { buildInputs = [ pkgs.makeWrapper ]; }
     ''
       source $stdenv/setup
@@ -55,12 +58,17 @@ in
       '';
     };
 
-    programs.zsh.shell = mkOption {
-      type = types.path;
-      default = "${zsh}/bin/zsh";
+    programs.zsh.variables = mkOption {
+      type = types.attrsOf (types.either types.str (types.listOf types.str));
+      default = {};
       description = ''
-        Zsh shell to use.
+        A set of environment variables used in the global environment.
+        These variables will be set on shell initialisation.
+        The value of each variable can be either a string or a list of
+        strings.  The latter is concatenated, interspersed with colon
+        characters.
       '';
+      apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
     };
 
     programs.zsh.shellInit = mkOption {
@@ -120,7 +128,7 @@ in
         pkgs.zsh
       ];
 
-    environment.variables.SHELL = mkDefault "${cfg.shell}";
+    environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
 
     environment.etc."zshenv".text = ''
       # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
@@ -146,6 +154,8 @@ in
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
       __ETC_ZPROFILE_SOURCED=1
+
+      ${concatStringsSep "\n" zshVariables}
 
       ${cfg.loginShellInit}
 
