@@ -41,7 +41,7 @@ in {
     };
 
     environment.profiles = mkOption {
-      type = types.listOf types.path;
+      type = types.listOf types.str;
       default =
         [ # Use user, default and system profiles.
           "$HOME/.nix-profile"

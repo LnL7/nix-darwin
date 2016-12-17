@@ -35,7 +35,7 @@ in {
     };
 
     programs.tmux.loginShell = mkOption {
-      type = types.path;
+      type = types.str;
       default = "$SHELL";
       description = ''
         Configure default login shell.
