@@ -46,7 +46,10 @@ If you use a symlink you'll probably also want to add `services.activate-system.
 Either modify the existing file to source/import the one from `/etc/static` or remove it.
 
 ```bash
+sudo ln -s private/var/run /run
+
 git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
+cp ~/.nix-defexpr/darwin/modules/examples/simple.nix ~/.nixpkgs/darwin-configuration.nix
 
 # bootstrap build using default nix.nixPath
 export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
