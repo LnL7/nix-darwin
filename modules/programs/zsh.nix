@@ -126,7 +126,7 @@ in
     environment.systemPackages =
       [ # Include zsh package
         pkgs.zsh
-      ];
+      ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions;
 
     environment.loginShell = mkDefault "${shell}/bin/zsh -l";
     environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
