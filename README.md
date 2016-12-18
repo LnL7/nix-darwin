@@ -142,14 +142,15 @@ A set of modules for predefined services, these generate the appropriate launchd
 A set of modules to manage configuration of certain programs.
 
 ```nix
+{ pkgs, ... }:
+
 {
-  environment.shellAliases.tm = "${pkgs}/bin/tmux";
+  environment.shellAliases.ls = "${pkgs.coreutils}/bin/ls";
 
   programs.bash.enable = true;
 
-  programs.tmux.enable = true;
-  programs.tmux.enableSensible = true;
-  programs.tmux.loginShell = "${config.programs.bash.shell} -l";
+  programs.vim.enable = true;
+  programs.vim.enableSensible = true;
 }
 ```
 
