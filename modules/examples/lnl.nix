@@ -71,6 +71,24 @@
     let mapleader = ' '
     nnoremap <Leader>p :FZF<CR>
     nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
+
+    set backup
+    set backupdir=~/.vim/tmp/backup//
+    set backupskip=/tmp/*,/private/tmp/*
+    set directory=~/.vim/tmp/swap/
+    set noswapfile
+    set undodir=~/.vim/tmp/undo//
+    set undofile
+
+    if !isdirectory(expand(&undodir))
+      call mkdir(expand(&undodir), "p")
+    endif
+    if !isdirectory(expand(&backupdir))
+      call mkdir(expand(&backupdir), "p")
+    endif
+    if !isdirectory(expand(&directory))
+      call mkdir(expand(&directory), "p")
+    endif
   '';
 
   programs.zsh.enable = true;
