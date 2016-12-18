@@ -22,10 +22,7 @@
   system.defaults.trackpad.Clicking = true;
 
   environment.systemPackages =
-    [ pkgs.lnl.tmux
-      pkgs.lnl.vim
-
-      pkgs.curl
+    [ pkgs.curl
       pkgs.fzf
       pkgs.gettext
       pkgs.git
@@ -42,7 +39,6 @@
   services.activate-system.enable = true;
 
   programs.tmux.enable = true;
-  programs.tmux.loginShell = "$SHELL -l";
   programs.tmux.enableSensible = true;
   programs.tmux.enableMouse = true;
   programs.tmux.enableFzf = true;
@@ -53,6 +49,28 @@
 
     set -g status-bg black
     set -g status-fg white
+  '';
+
+  programs.vim.enable = true;
+  programs.vim.enableSensible = true;
+
+  programs.vim.plugins = [
+    { names = [ "fzfWrapper" "youcompleteme" "colors-solarized" ]; }
+  ];
+
+  programs.vim.vimConfig =  ''
+    colorscheme solarized
+    set bg=dark
+
+    set clipboard=unnamed
+
+    vmap s S
+
+    cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+
+    let mapleader = ' '
+    nnoremap <Leader>p :FZF<CR>
+    nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
   '';
 
   programs.zsh.enable = true;
@@ -99,7 +117,6 @@
     setopt AUTOCD
   '';
 
-  environment.variables.EDITOR = "vim";
   environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
   environment.variables.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
@@ -122,64 +139,5 @@
   nixpkgs.config.allowUnfree = true;
 
   nixpkgs.config.packageOverrides = self: {
-    lnl.tmux = pkgs.runCommand pkgs.tmux.name
-      { buildInputs = [ pkgs.makeWrapper ]; }
-      ''
-        source $stdenv/setup
-
-        mkdir -p $out/bin
-        makeWrapper ${pkgs.tmux}/bin/tmux $out/bin/tmux \
-          --set __ETC_BASHRC_SOURCED "" \
-          --set __ETC_ZPROFILE_SOURCED  "" \
-          --set __ETC_ZSHENV_SOURCED "" \
-          --set __ETC_ZSHRC_SOURCED "" \
-          --add-flags -f --add-flags /etc/tmux.conf
-      '';
-
-    lnl.vim = pkgs.vim_configurable.customize {
-      name = "vim";
-      vimrcConfig.customRC = ''
-        set nocompatible
-        filetype plugin indent on
-        syntax on
-
-        colorscheme solarized
-        set bg=dark
-
-        set et sw=2 ts=2
-        set bs=indent,start
-
-        set nowrap
-        set list
-        set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨
-        set fillchars+=vert:\ ,stl:\ ,stlnc:\ 
-
-        set lazyredraw
-
-        set clipboard=unnamed
-
-        vmap s S
-
-        cnoremap %% <C-r>=expand('%:h') . '/'<CR>
-
-        set hlsearch
-        nnoremap // :nohlsearch<CR>
-
-        let mapleader = ' '
-        nnoremap <Leader>p :FZF<CR>
-        nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
-
-        source $HOME/.vimrc.local
-      '';
-      # vimrcConfig.vam.knownPlugins = with pkgs.vimUtils; (pkgs.vimPlugins // {
-      #   vim-nix = buildVimPluginFrom2Nix {
-      #     name = "vim-nix-unstable";
-      #     src = ../../../vim-nix;
-      #   };
-      # });
-      vimrcConfig.vam.pluginDictionaries = [
-        { names = [ "fzfWrapper" "youcompleteme" "fugitive" "surround" "vim-nix" "colors-solarized" ]; }
-      ];
-    };
   };
 }
