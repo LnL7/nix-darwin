@@ -38,7 +38,7 @@ in {
       type = types.str;
       default = "$SHELL";
       description = ''
-        Configure default login shell.
+        Configure default login shell for tmux.
       '';
     };
 
@@ -47,7 +47,7 @@ in {
       default = false;
       example = true;
       description = ''
-        Enable sensible configuration options.
+        Enable sensible configuration options for tmux.
       '';
     };
 
@@ -56,7 +56,7 @@ in {
       default = false;
       example = true;
       description = ''
-        Enable mouse support.
+        Enable mouse support for tmux.
       '';
     };
 
@@ -65,7 +65,7 @@ in {
       default = false;
       example = true;
       description = ''
-        Enable fzf keybindings for selecting sessions and panes.
+        Enable fzf keybindings for selecting tmux sessions and panes.
       '';
     };
 
@@ -74,13 +74,8 @@ in {
       default = false;
       example = true;
       description = ''
-        Enable vim style keybindings for copy mode, and navigation of panes.
+        Enable vim style keybindings for copy mode, and navigation of tmux panes.
       '';
-    };
-
-    programs.tmux.tmuxConfig = mkOption {
-      type = types.lines;
-      default = "";
     };
 
     programs.tmux.tmuxOptions = mkOption {
@@ -89,9 +84,21 @@ in {
       default = {};
     };
 
+    programs.tmux.tmuxConfig = mkOption {
+      type = types.lines;
+      default = "";
+    };
+
   };
 
   config = mkIf cfg.enable {
+
+    environment.etc."tmux.conf".text = ''
+      ${tmuxOptions}
+      ${cfg.tmuxConfig}
+
+      source-file -q /etc/tmux.conf.local
+    '';
 
     programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
       set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"
@@ -99,7 +106,7 @@ in {
       set -g default-command "${cfg.loginShell}"
     '';
 
-    programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible (''
+    programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible ''
       set -g default-terminal "screen-256color"
       setw -g aggressive-resize on
 
@@ -119,7 +126,7 @@ in {
 
       # set -g status-utf8 on
       # set -g utf8 on
-    '');
+    '';
 
     programs.tmux.tmuxOptions.mouse.text = mkIf cfg.enableMouse ''
       set -g mouse on
@@ -148,14 +155,6 @@ in {
     '' + optionalString stdenv.isDarwin ''
       bind -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
     '');
-
-    environment.etc."tmux.conf".text = ''
-      ${tmuxOptions}
-
-      ${cfg.tmuxConfig}
-
-      source-file -q /etc/tmux.conf.local
-    '';
 
   };
 }

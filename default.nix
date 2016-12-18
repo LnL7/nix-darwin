@@ -26,6 +26,7 @@ let
         ./modules/services/nix-daemon.nix
         ./modules/programs/bash.nix
         ./modules/programs/tmux.nix
+        ./modules/programs/vim.nix
         ./modules/programs/zsh.nix
       ];
   };
