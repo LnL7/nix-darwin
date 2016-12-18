@@ -95,16 +95,19 @@ in {
       set bs=indent,start
 
       set hlsearch
+      set incsearch
       nnoremap // :nohlsearch<CR>
-
-      set nowrap
-      set number
 
       set list
       set listchars=tab:»·,trail:·,extends:⟩,precedes:⟨
       set fillchars+=vert:\ ,stl:\ ,stlnc:\ 
 
+      set number
+
       set lazyredraw
+      set nowrap
+      set showcmd
+      set showmatch
     '';
 
   };
