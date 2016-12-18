@@ -56,6 +56,7 @@ in
         pkgs.bash
       ];
 
+    environment.loginShell = mkDefault "${shell}/bin/bash -l";
     environment.variables.SHELL = mkDefault "${shell}/bin/bash";
 
     environment.etc."bashrc".text = ''

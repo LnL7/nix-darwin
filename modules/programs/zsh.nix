@@ -128,6 +128,7 @@ in
         pkgs.zsh
       ];
 
+    environment.loginShell = mkDefault "${shell}/bin/zsh -l";
     environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
 
     environment.etc."zshenv".text = ''

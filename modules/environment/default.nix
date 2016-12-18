@@ -60,6 +60,14 @@ in {
       description = "List of additional package outputs to be symlinked into <filename>/run/current-system/sw</filename>.";
     };
 
+    environment.loginShell = mkOption {
+      type = types.str;
+      default = "$SHELL";
+      description = ''
+        Configure default login shell.
+      '';
+    };
+
     environment.variables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};

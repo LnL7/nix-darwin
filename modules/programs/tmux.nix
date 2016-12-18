@@ -8,6 +8,20 @@ let
 
   cfg = config.programs.tmux;
 
+  tmux = pkgs.runCommand pkgs.tmux.name
+    { buildInputs = [ pkgs.makeWrapper ]; }
+    ''
+      source $stdenv/setup
+
+      mkdir -p $out/bin
+      makeWrapper ${pkgs.tmux}/bin/tmux $out/bin/tmux \
+        --set __ETC_BASHRC_SOURCED "" \
+        --set __ETC_ZPROFILE_SOURCED  "" \
+        --set __ETC_ZSHENV_SOURCED "" \
+        --set __ETC_ZSHRC_SOURCED "" \
+        --add-flags -f --add-flags /etc/tmux.conf
+    '';
+
   text = import ../system/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeText "tmux-options-${name}" text;
@@ -31,14 +45,6 @@ in {
       default = false;
       description = ''
         Whether to configure tmux.
-      '';
-    };
-
-    programs.tmux.loginShell = mkOption {
-      type = types.str;
-      default = "$SHELL";
-      description = ''
-        Configure default login shell for tmux.
       '';
     };
 
@@ -93,6 +99,11 @@ in {
 
   config = mkIf cfg.enable {
 
+    environment.systemPackages =
+      [ # Include wrapped tmux package.
+        tmux
+      ];
+
     environment.etc."tmux.conf".text = ''
       ${tmuxOptions}
       ${cfg.tmuxConfig}
@@ -101,9 +112,9 @@ in {
     '';
 
     programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
-      set -g default-command "reattach-to-user-namespace ${cfg.loginShell}"
+      set -g default-command "reattach-to-user-namespace ${config.environment.loginShell}"
     '' else ''
-      set -g default-command "${cfg.loginShell}"
+      set -g default-command "${config.environment.loginShell}"
     '';
 
     programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible ''
