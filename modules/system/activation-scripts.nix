@@ -62,6 +62,7 @@ in
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.time.text}
+      ${cfg.activationScripts.extraActivation.text}
 
       exit $_status
     '';
@@ -81,9 +82,15 @@ in
       umask 0022
 
       ${cfg.activationScripts.defaults.text}
+      ${cfg.activationScripts.extraUserActivation.text}
 
       exit $_status
     '';
+
+    # Extra activation scripts, that can be customized by users
+    # don't use this unless you know what you are doing.
+    system.activationScripts.extraActivation.text = mkDefault "";
+    system.activationScripts.extraUserActivation.text = mkDefault "";
 
   };
 }
