@@ -37,9 +37,9 @@ in
       '';
     };
 
-    system.nixdarwinLabel = mkOption {
+    system.darwinLabel = mkOption {
       type = types.str;
-      default = "16.09";
+      default = pkgs.lib.nixpkgsVersion;
     };
 
   };
@@ -47,12 +47,12 @@ in
   config = {
 
     system.build.toplevel = stdenvNoCC.mkDerivation {
-      name = "nixdarwin-system-${cfg.nixdarwinLabel}";
+      name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
 
       activationScript = cfg.activationScripts.script.text;
       activationUserScript = cfg.activationScripts.userScript.text;
-      inherit (cfg) nixdarwinLabel;
+      inherit (cfg) darwinLabel;
 
       buildCommand = ''
         mkdir $out
@@ -77,7 +77,7 @@ in
 
         echo -n "$systemConfig" > $out/systemConfig
 
-        echo -n "$nixdarwinLabel" > $out/nixdarwin-version
+        echo -n "$darwinLabel" > $out/darwin-version
         echo -n "$system" > $out/system
       '';
     };
