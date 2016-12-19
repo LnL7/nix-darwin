@@ -47,7 +47,7 @@ in
       for link in $(ls /etc/static/); do
         if [ -e "/etc/$link" ]; then
           if [ ! -L "/etc/$link" ]; then
-            echo "warning: /etc/$link exists, skipping..." >&2
+            echo "warning: not linking /etc/static/$link because /etc/$link exists, skipping..." >&2
           fi
         else
           ln -sfn "/etc/static/$link" "/etc/$link"
