@@ -11,6 +11,14 @@ let
     mkTextDerivation = pkgs.writeText;
   };
 
+  launchdActivation = basedir: target: ''
+    if test -f '/Library/${basedir}/${target}'; then
+      launchctl unload '/Library/${basedir}/${target}'
+    fi
+    cp -f '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}'
+    launchctl load '/Library/${basedir}/${target}'
+  '';
+
   launchAgents = filter (f: f.enable) (attrValues config.environment.launchAgents);
   launchDaemons = filter (f: f.enable) (attrValues config.environment.launchDaemons);
 
@@ -51,12 +59,8 @@ in
       # Set up launchd services in /Library/LaunchAgents and /Library/LaunchDaemons
       echo "setting up launchd services..."
 
-      ${concatMapStringsSep "\n" (attr: "launchctl unload '/Library/LaunchAgents/${attr.target}'") launchAgents}
-      ${concatMapStringsSep "\n" (attr: "launchctl unload '/Library/LaunchDaemons/${attr.target}'") launchDaemons}
-      ${concatMapStringsSep "\n" (attr: "cp -f '${cfg.build.launchd}/Library/LaunchAgents/${attr.target}' '/Library/LaunchAgents/${attr.target}'") launchAgents}
-      ${concatMapStringsSep "\n" (attr: "cp -f '${cfg.build.launchd}/Library/LaunchDaemons/${attr.target}' '/Library/LaunchDaemons/${attr.target}'") launchDaemons}
-      ${concatMapStringsSep "\n" (attr: "launchctl load '/Library/LaunchAgents/${attr.target}'") launchAgents}
-      ${concatMapStringsSep "\n" (attr: "launchctl load '/Library/LaunchDaemons/${attr.target}'") launchDaemons}
+      ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchAgents" attr.target) launchAgents}
+      ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchDaemons" attr.target) launchDaemons}
     '';
 
   };
