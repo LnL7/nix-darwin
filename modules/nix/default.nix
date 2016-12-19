@@ -6,8 +6,6 @@ let
 
   cfg = config.nix;
 
-  nixbldUsers = map makeNixBuildUser (range 1 cfg.nrBuildUsers);
-
   nixConf =
     let
       # If we're using sandbox for builds, then provide /bin/sh in
