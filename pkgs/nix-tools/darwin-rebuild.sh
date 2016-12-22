@@ -7,7 +7,7 @@ export PATH=@path@:$PATH
 showSyntax() {
   echo "darwin-rebuild [--help] {build | switch} [{--profile-name | -p} name]" >&2
   echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
-  echo "               [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
+  echo "               [--dry-run] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
   echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
   exec man darwin-rebuild
   exit 1
