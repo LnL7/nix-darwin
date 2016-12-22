@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
     switch|build)
       action="$i"
       ;;
-    --show-trace|--no-build-hook|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
+    --show-trace|--no-build-hook|--dry-run|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
       ;;
     --max-jobs|-j|--cores|-I)
@@ -72,6 +72,8 @@ echo "building the system configuration..." >&2
 if [ "$action" = switch -o "$action" = build ]; then
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} --no-out-link -A system)"
 fi
+
+if [ -z "$systemConfig" ]; then exit 0; fi
 
 if [ "$action" = build ]; then
   echo $systemConfig
