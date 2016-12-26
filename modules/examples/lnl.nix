@@ -22,7 +22,8 @@
   system.defaults.trackpad.Clicking = true;
 
   environment.systemPackages =
-    [ pkgs.curl
+    [ pkgs.lnl.nix-script
+      pkgs.curl
       pkgs.fzf
       pkgs.gettext
       pkgs.git
@@ -133,7 +134,7 @@
   environment.shellAliases.gl = "git log --graph --oneline";
   environment.shellAliases.gd = "git diff --minimal --patch";
 
-  environment.shellAliases.nix = "${pkgs.lnl.nix-script}/bin/nix";
+  # environment.shellAliases.nix = "${pkgs.lnl.nix-script}/bin/nix";
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.

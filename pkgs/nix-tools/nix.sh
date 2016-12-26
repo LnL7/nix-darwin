@@ -104,6 +104,7 @@ while [ "$#" -gt 0 ]; do
       extraNixFlags+=("$i" "$j")
       ;;
     --option|--arg|--argstr)
+      # nix-build
       if [ -z "$1" -o -z "$2" ]; then
         echo "$0: \`$i' requires two arguments"
         exit 1
@@ -112,8 +113,24 @@ while [ "$#" -gt 0 ]; do
       k="$1"; shift 1
       extraNixFlags+=("$i" "$j" "$k")
       ;;
+    --gc|--print-roots|--print-live|--print-dead)
+      # nix-store
+      extraNixFlags+=("$i")
+      ;;
+    -r|--max-freed)
+      # nix-store
+      if [ -z "$1" ]; then
+        echo "$0: \`$i' requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraNixFlags+=("$i" "$j")
+      ;;
     --)
       break
+      ;;
+    *'.drv')
+      src=$(readlink "$i")
       ;;
     './'*|'<'*'>')
       src="$i"
@@ -173,7 +190,7 @@ if [ "$action" = hash ]; then
 fi
 
 if [ "$action" = store ]; then
-  exec nix-store ${extraNixFlags[@]} "$exprArg"
+  exec nix-store ${extraNixFlags[@]}
 fi
 
 if [ "$action" = repl ]; then
