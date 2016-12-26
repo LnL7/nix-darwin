@@ -36,6 +36,7 @@ let
 in
 
 {
+  inherit (eval.config._module.args) pkgs;
   inherit (eval) options config;
   inherit system;
 }
