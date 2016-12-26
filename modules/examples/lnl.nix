@@ -27,6 +27,7 @@
       pkgs.gettext
       pkgs.git
       pkgs.jq
+      pkgs.mosh
       pkgs.silver-searcher
 
       pkgs.nix-repl
@@ -107,26 +108,12 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    nix () {
-      cmd=$1
-      shift
-
-      case $cmd in
-        'b'|'build')        nix-build --no-out-link -E "with import <nixpkgs> {}; $@" ;;
-        'e'|'eval')         nix-instantiate --eval -E "with import  <nixpkgs> {}; $@" ;;
-        'i'|'instantiate')  nix-instantiate -E "with import <nixpkgs> {}; $@" ;;
-        'r'|'repl')         nix-repl '<nixpkgs>' ;;
-        's'|'shell')        nix-shell -E "with import <nixpkgs> {}; $@" ;;
-        'p'|'package')      nix-shell '<nixpkgs>' -p "with import <nixpkgs> {}; $@" --run $SHELL ;;
-        'z'|'zsh')          nix-shell '<nixpkgs>' -E "with import <nixpkgs> {}; $@" --run $SHELL ;;
-        'exec')
-          echo "reexecuting shell: $SHELL" >&2
-          __ETC_ZSHRC_SOURCED= \
-          __ETC_ZSHENV_SOURCED= \
-          __ETC_ZPROFILE_SOURCED= \
-            exec $SHELL -l
-          ;;
-      esac
+    reexec() {
+      echo "reexecuting shell: $SHELL" >&2
+      __ETC_ZSHRC_SOURCED= \
+      __ETC_ZSHENV_SOURCED= \
+      __ETC_ZPROFILE_SOURCED= \
+        exec $SHELL -l
     }
   '';
 
@@ -146,6 +133,8 @@
   environment.shellAliases.gl = "git log --graph --oneline";
   environment.shellAliases.gd = "git diff --minimal --patch";
 
+  environment.shellAliases.nix = "${pkgs.lnl.nix-script}/bin/nix";
+
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
       "darwin=$HOME/.nix-defexpr/darwin"
@@ -156,6 +145,12 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  nixpkgs.config.packageOverrides = self: {
+  nixpkgs.config.packageOverrides = pkgs: {
+    lnl.nix-script = pkgs.substituteAll {
+      name = "nix";
+      src = ../../pkgs/nix-tools/nix.sh;
+      dir = "bin";
+      isExecutable = true;
+    };
   };
 }
