@@ -10,15 +10,9 @@ showUsage() {
   echo "           {b | build | out}" >&2
   echo "           {s | shell | zsh}" >&2
   echo "           {h | hash}" >&2
-  echo "           {store | gc}" >&2
+  echo "           {store | r | realise | gc | add | del}" >&2
   echo "           {r | repl}" >&2
   exit ${@:-1}
-}
-
-showVersion() {
-  version=$(nix-env --version | awk '{print $3}')
-  echo "$0 (Nix) $version"
-  exit 0
 }
 
 # Parse the command line.
@@ -31,11 +25,11 @@ src=
 while [ "$#" -gt 0 ]; do
   i="$1"; shift 1
   case "$i" in
-    --help)
+    -h|--help)
       showUsage 0
       ;;
     --version|v|version)
-      showVersion
+      action='version'
       ;;
     i|instantiate)
       action='instantiate'
@@ -70,16 +64,24 @@ while [ "$#" -gt 0 ]; do
     store)
       action='store'
       ;;
+    r|realise)
+      action='store'
+      extraNixFlags+=('--realise')
+      ;;
     gc)
       action='store'
       extraNixFlags+=('--gc' '--max-freed' '32G')
       ;;
+    add)
+      action='store'
+      extraNixFlags+=('--add')
+      ;;
+    delete)
+      action='store'
+      extraNixFlags+=('--delete')
+      ;;
     r|repl)
       action='repl'
-      ;;
-    --strict|--xml|--json|--indirect)
-      # nix-instantiate
-      extraNixFlags+=("$i")
       ;;
     --add-root)
       # nix-instantiate
@@ -90,21 +92,8 @@ while [ "$#" -gt 0 ]; do
       j="$1"; shift 1
       extraNixFlags+=("$i" "$j")
       ;;
-    --verbose|-v|--no-build-output|-Q|--keep-going|-k|--keep-failed|-K|--fallback|--readonly-mode|--show-trace)
-      # nix-build
-      extraNixFlags+=("$i")
-      ;;
-    --max-jobs|-j|--cores|-A|-I|--drv-link|--out-link|-o)
-      # nix-build
-      if [ -z "$1" ]; then
-        echo "$0: \`$i' requires an argument"
-        exit 1
-      fi
-      j="$1"; shift 1
-      extraNixFlags+=("$i" "$j")
-      ;;
     --option|--arg|--argstr)
-      # nix-build
+      # nix-instantiate
       if [ -z "$1" -o -z "$2" ]; then
         echo "$0: \`$i' requires two arguments"
         exit 1
@@ -113,9 +102,14 @@ while [ "$#" -gt 0 ]; do
       k="$1"; shift 1
       extraNixFlags+=("$i" "$j" "$k")
       ;;
-    --gc|--print-roots|--print-live|--print-dead)
-      # nix-store
-      extraNixFlags+=("$i")
+    --max-jobs|-j|--cores|--attr|-A|-I|--drv-link|--out-link|-o)
+      # nix-build
+      if [ -z "$1" ]; then
+        echo "$0: \`$i' requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraNixFlags+=("$i" "$j")
       ;;
     -r|--max-freed)
       # nix-store
@@ -129,10 +123,13 @@ while [ "$#" -gt 0 ]; do
     --)
       break
       ;;
+    -*)
+      extraNixFlags+=("$i")
+      ;;
     *'.drv')
       src=$(readlink "$i")
       ;;
-    './'*|'<'*'>')
+    './'*|'/'*|'<'*'>')
       src="$i"
       ;;
     *)
@@ -142,9 +139,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ -z "$action" ]; then showUsage; fi
-
-if [ "$action" = version ]; then showVersion; fi
+if [ -z "$action" ]; then action='repl'; fi
 
 if [ -z "$src" -a -f ./default.nix ]; then
   src='./.'
@@ -173,16 +168,34 @@ if [ -n "$exprArg" ]; then
   fi
 fi
 
+if [ "$action" = version ]; then
+  version=$(nix-env --version | awk '{print $3}')
+  echo "$0 (Nix) $version"
+  exit 0
+fi
+
 if [ "$action" = instantiate ]; then
-  exec nix-instantiate ${extraNixFlags[@]} "$exprArg"
+  if [ -z "$exprArg" ]; then
+    exec nix-instantiate ${extraNixFlags[@]}
+  else
+    exec nix-instantiate ${extraNixFlags[@]} "$exprArg"
+  fi
 fi
 
 if [ "$action" = build ]; then
-  exec nix-build ${extraNixFlags[@]} "$exprArg"
+  if [ -z "$exprArg" ]; then
+    exec nix-build ${extraNixFlags[@]}
+  else
+    exec nix-build ${extraNixFlags[@]} "$exprArg"
+  fi
 fi
 
 if [ "$action" = shell ]; then
-  exec nix-shell ${extraNixFlags[@]} "$exprArg"
+  if [ -z "$exprArg" ]; then
+    exec nix-shell ${extraNixFlags[@]}
+  else
+    exec nix-shell ${extraNixFlags[@]} "$exprArg"
+  fi
 fi
 
 if [ "$action" = hash ]; then
