@@ -149,7 +149,7 @@
   nixpkgs.config.packageOverrides = pkgs: {
     lnl.nix-script = pkgs.substituteAll {
       name = "nix";
-      src = ../../pkgs/nix-tools/nix.sh;
+      src = ../../pkgs/nix-tools/nix-script.sh;
       dir = "bin";
       isExecutable = true;
     };
