@@ -141,8 +141,10 @@ done
 
 if [ -z "$action" ]; then action='repl'; fi
 
-if [ -z "$src" -a -f ./default.nix ]; then
-  src='./.'
+if [ "$action" = instantiate -o "$action" = build -o "$action" = shell ]; then
+  if [ -z "$src" -a -f ./default.nix ]; then
+    src='./.'
+  fi
 fi
 
 if [ "$#" -gt 0 ]; then
