@@ -22,8 +22,7 @@
   system.defaults.trackpad.Clicking = true;
 
   environment.systemPackages =
-    [ pkgs.lnl.nix-script
-      pkgs.curl
+    [ pkgs.curl
       pkgs.fzf
       pkgs.gettext
       pkgs.git
@@ -39,6 +38,8 @@
   services.nix-daemon.tempDir = "/nix/tmp";
 
   services.activate-system.enable = true;
+
+  programs.nix-script.enable = true;
 
   programs.tmux.enable = true;
   programs.tmux.enableSensible = true;
@@ -147,11 +148,5 @@
   nixpkgs.config.allowUnfree = true;
 
   nixpkgs.config.packageOverrides = pkgs: {
-    lnl.nix-script = pkgs.substituteAll {
-      name = "nix";
-      src = ../../pkgs/nix-tools/nix-script.sh;
-      dir = "bin";
-      isExecutable = true;
-    };
   };
 }

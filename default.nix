@@ -25,6 +25,7 @@ let
         ./modules/services/activate-system.nix
         ./modules/services/nix-daemon.nix
         ./modules/programs/bash.nix
+        ./modules/programs/nix-script.nix
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
         ./modules/programs/zsh.nix
