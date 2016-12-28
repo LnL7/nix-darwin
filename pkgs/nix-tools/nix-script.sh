@@ -18,9 +18,10 @@ showUsage() {
 # Parse the command line.
 origArgs=("$@")
 extraNixFlags=()
+srcArgs=()
+pkgArgs=()
 exprArg=
 action=
-src=
 
 while [ "$#" -gt 0 ]; do
   i="$1"; shift 1
@@ -126,11 +127,14 @@ while [ "$#" -gt 0 ]; do
     -*)
       extraNixFlags+=("$i")
       ;;
-    *'.drv')
-      src=$(readlink "$i")
+    './.'|'<'*'>')
+      pkgArgs+=("$i")
       ;;
-    './'*|'/'*|'<'*'>')
-      src="$i"
+    *'.drv')
+      drvArgs+=("$(readlink "$i")")
+      ;;
+    *'.nix'|'./'*|'/'*)
+      srcArgs+=("$i")
       ;;
     *)
       echo "Unknown option: $i" >&2
@@ -141,34 +145,18 @@ done
 
 if [ -z "$action" ]; then action='repl'; fi
 
-if [ "$action" = instantiate -o "$action" = build -o "$action" = shell ]; then
-  if [ -z "$src" -a -f ./default.nix ]; then
-    src='./.'
-  fi
+if [ -z "$pkgArgs" ]; then
+  if [ -f ./default.nix ]; then pkgArgs+=('./.'); fi
+  pkgArgs+=('<nixpkgs>')
 fi
 
-if [ "$#" -gt 0 ]; then
-  extraNixFlags+=('-E')
-  exprArg="$@"
-fi
-
-if [ -n "$src" -a -z "$exprArg" ]; then
-  extraNixFlags+=("$src")
-fi
-
-if [ -n "$exprArg" ]; then
-  if [ -f "$src" -o -f "$src/default.nix" ]; then
-    if [ "$src" = ./. ]; then
-      exprArg="with import ./. {}; $exprArg"
-    else
-      exprArg="with callPackage $src {}; $exprArg"
-    fi
-  fi
-
-  if [ "$src" != ./. ]; then
-    exprArg="with import <nixpkgs> {}; $exprArg"
-  fi
-fi
+exprArg="$@"
+for f in ${srcArgs[@]}; do
+  exprArg="${exprArg:+with }callPackage $f {}${exprArg:+; $exprArg}"
+done
+for p in ${pkgArgs[@]}; do
+  exprArg="${exprArg:+with }import $p {}${exprArg:+; $exprArg}"
+done
 
 if [ "$action" = version ]; then
   version=$(nix-env --version | awk '{print $3}')
@@ -176,38 +164,46 @@ if [ "$action" = version ]; then
   exit 0
 fi
 
-if [ "$action" = instantiate ]; then
-  if [ -z "$exprArg" ]; then
-    exec nix-instantiate ${extraNixFlags[@]}
+if [ "${traceExpr:-0}" -eq 1 ]; then
+  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
+    echo "<action> ${pkgArgs[@]} ${srcArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}" >&2
   else
-    exec nix-instantiate ${extraNixFlags[@]} "$exprArg"
+    echo "<action> ${extraNixFlags[@]} -E '$exprArg'" >&2
+  fi
+fi
+
+if [ "$action" = instantiate ]; then
+  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
+    exec nix-instantiate ${pkgArgs[@]} ${extraNixFlags[@]}
+  else
+    exec nix-instantiate ${extraNixFlags[@]} -E "$exprArg"
   fi
 fi
 
 if [ "$action" = build ]; then
-  if [ -z "$exprArg" ]; then
-    exec nix-build ${extraNixFlags[@]}
+  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
+    exec nix-build ${pkgArgs[@]} ${extraNixFlags[@]}
   else
-    exec nix-build ${extraNixFlags[@]} "$exprArg"
+    exec nix-build ${extraNixFlags[@]} -E "$exprArg"
   fi
 fi
 
 if [ "$action" = shell ]; then
-  if [ -z "$exprArg" ]; then
-    exec nix-shell ${extraNixFlags[@]}
+  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
+    exec nix-shell ${pkgArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}
   else
-    exec nix-shell ${extraNixFlags[@]} "$exprArg"
+    exec nix-shell ${extraNixFlags[@]} -E "$exprArg"
   fi
 fi
 
 if [ "$action" = hash ]; then
-  exec nix-hash ${extraNixFlags[@]}
+  exec nix-hash ${srcArgs[@]} ${extraNixFlags[@]}
 fi
 
 if [ "$action" = store ]; then
-  exec nix-store ${extraNixFlags[@]}
+  exec nix-store ${srcArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}
 fi
 
 if [ "$action" = repl ]; then
-  exec nix-repl '<nixpkgs/lib>' "${src:-<nixpkgs>}"
+  exec nix-repl '<nixpkgs/lib>' ${pkgArgs[@]} ${srcArgs[@]}
 fi
