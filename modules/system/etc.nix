@@ -44,21 +44,25 @@ in
 
       ln -sfn "$(readlink -f $systemConfig/etc)" /etc/static
 
-      for link in $(ls /etc/static/); do
-        if [ -e "/etc/$link" ]; then
-          if [ ! -L "/etc/$link" ]; then
-            echo "warning: not linking /etc/static/$link because /etc/$link exists, skipping..." >&2
+      for f in $(find /etc/static/* -type l); do
+        l="$(echo $f | sed 's,/etc/static/,/etc/,')"
+        d="$(dirname $l)"
+        if [ ! -e "$d" ]; then
+          mkdir -p "$d"
+        fi
+        if [ -e "$l" ]; then
+          if [ "$(readlink $l)" != "$f" ]; then
+            echo "warning: not linking $l because $l exists, skipping..." >&2
           fi
         else
-          ln -sfn "/etc/static/$link" "/etc/$link"
+          ln -s "$f" "$l"
         fi
       done
 
-      for link in $(find /etc/ -maxdepth 1 -type l); do
-        if [[ "$(readlink $link)" == /etc/static/* ]]; then
-          if [ ! -e "$(readlink -f $link)" ]; then
-            rm $link
-          fi
+      for l in $(find /etc/* -type l 2> /dev/null); do
+        f="$(echo $l | sed 's,/etc/,/etc/static/,')"
+        if [ "$(readlink $l)" = "$f" -a ! -e "$(readlink -f $l)" ]; then
+          rm "$l"
         fi
       done
     '';
