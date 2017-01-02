@@ -6,7 +6,7 @@ let
 
   cfg = config.system;
 
-  text = import ../system/write-text.nix {
+  text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = pkgs.writeText;
   };

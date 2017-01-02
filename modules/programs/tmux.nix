@@ -22,7 +22,7 @@ let
         --add-flags -f --add-flags /etc/tmux.conf
     '';
 
-  text = import ../system/write-text.nix {
+  text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeText "tmux-options-${name}" text;
   };

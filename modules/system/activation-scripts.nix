@@ -8,7 +8,7 @@ let
 
   cfg = config.system;
 
-  script = import ./write-text.nix {
+  script = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeScript "activate-${name}" text;
   };

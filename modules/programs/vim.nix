@@ -12,7 +12,7 @@ let
     vimrcConfig.vam.pluginDictionaries = cfg.plugins;
   };
 
-  text = import ../system/write-text.nix {
+  text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeText "vim-options-${name}" text;
   };

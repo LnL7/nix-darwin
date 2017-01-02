@@ -4,7 +4,7 @@ with lib;
 
 let
 
-  text = import ./write-text.nix {
+  text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeText "etc-${name}" text;
   };
