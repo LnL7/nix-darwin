@@ -10,8 +10,8 @@ showUsage() {
   echo "           {b | build | out}" >&2
   echo "           {s | shell | zsh}" >&2
   echo "           {h | hash}" >&2
-  echo "           {store | r | realise | gc | add | del}" >&2
-  echo "           {r | repl}" >&2
+  echo "           {store | q | query | r | realise | gc | add | delete}" >&2
+  echo "           {repl}" >&2
   exit ${@:-1}
 }
 
@@ -65,6 +65,10 @@ while [ "$#" -gt 0 ]; do
     store)
       action='store'
       ;;
+    q|query)
+      action='store'
+      extraNixFlags+=('--query')
+      ;;
     r|realise)
       action='store'
       extraNixFlags+=('--realise')
@@ -81,7 +85,7 @@ while [ "$#" -gt 0 ]; do
       action='store'
       extraNixFlags+=('--delete')
       ;;
-    r|repl)
+    repl)
       action='repl'
       ;;
     --add-root)
@@ -112,6 +116,34 @@ while [ "$#" -gt 0 ]; do
       j="$1"; shift 1
       extraNixFlags+=("$i" "$j")
       ;;
+    --command|--run|-i)
+      # nix-shell
+      if [ -z "$1" ]; then
+        echo "$0: \`$i' requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraNixFlags+=("$i" "$j")
+      ;;
+    --packages|-p)
+      # nix-shell
+      if [ -z "$1" ]; then
+        echo "$0: \`$i' requires an argument"
+        exit 1
+      fi
+      pkgArgs+=("$i")
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          -*|*.nix|'<'*'>'|'./'*|'/'*|'http://'*|'https://'*)
+            break
+            ;;
+          *)
+            j="$1"; shift 1
+            pkgArgs+=("$j")
+            ;;
+        esac
+      done
+      ;;
     -r|--max-freed)
       # nix-store
       if [ -z "$1" ]; then
@@ -127,7 +159,7 @@ while [ "$#" -gt 0 ]; do
     -*)
       extraNixFlags+=("$i")
       ;;
-    './.'|'<'*'>')
+    './.'|'<'*'>'|'http://'*|'https://'*)
       pkgArgs+=("$i")
       ;;
     *'.drv')
@@ -166,34 +198,34 @@ fi
 
 if [ "${traceExpr:-0}" -eq 1 ]; then
   if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
-    echo "<action> ${pkgArgs[@]} ${srcArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}" >&2
+    echo "nix-$action ${pkgArgs[@]} ${srcArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}" >&2
   else
-    echo "<action> ${extraNixFlags[@]} -E '$exprArg'" >&2
+    echo "nix-$action ${extraNixFlags[@]} -E '$exprArg'" >&2
   fi
 fi
 
 if [ "$action" = instantiate ]; then
   if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
     exec nix-instantiate ${pkgArgs[@]} ${extraNixFlags[@]}
-  else
-    exec nix-instantiate ${extraNixFlags[@]} -E "$exprArg"
   fi
+  exec nix-instantiate ${extraNixFlags[@]} -E "$exprArg"
 fi
 
 if [ "$action" = build ]; then
   if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
     exec nix-build ${pkgArgs[@]} ${extraNixFlags[@]}
-  else
-    exec nix-build ${extraNixFlags[@]} -E "$exprArg"
   fi
+  exec nix-build ${extraNixFlags[@]} -E "$exprArg"
 fi
 
 if [ "$action" = shell ]; then
-  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
-    exec nix-shell ${pkgArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}
-  else
-    exec nix-shell ${extraNixFlags[@]} -E "$exprArg"
+  if [ -n "$drvArgs" ]; then
+    exec nix-shell ${drvArgs[@]} ${extraNixFlags[@]}
   fi
+  if [ "$#" -eq 0 -a -z "$srcArgs" ]; then
+    exec nix-shell ${pkgArgs[@]} ${extraNixFlags[@]}
+  fi
+  exec nix-shell ${extraNixFlags[@]} -E "$exprArg"
 fi
 
 if [ "$action" = hash ]; then
@@ -201,7 +233,10 @@ if [ "$action" = hash ]; then
 fi
 
 if [ "$action" = store ]; then
-  exec nix-store ${srcArgs[@]} ${drvArgs[@]} ${extraNixFlags[@]}
+  if [ -n "$drvArgs" ]; then
+    exec nix-shell ${drvArgs[@]} ${extraNixFlags[@]}
+  fi
+  exec nix-store ${srcArgs[@]} ${extraNixFlags[@]}
 fi
 
 if [ "$action" = repl ]; then
