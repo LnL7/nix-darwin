@@ -7,6 +7,7 @@ with lib;
 let
 
   fileName = file: last (splitString "/" file);
+  mkDefaultIf = cond: value: mkIf cond (mkDefault value);
 
   drv = mkTextDerivation (fileName name) config.text;
 
@@ -51,7 +52,10 @@ in
 
   config = {
 
-    source = mkIf (config.text != "") (mkDefault drv);
+    source = mkMerge
+      [ (mkDefaultIf (config.text != "") drv)
+        (mkDefaultIf (config.text == "") (abort "environment.etc.${name}.text is empty but no source was defined."))
+      ];
 
   };
 }
