@@ -15,7 +15,6 @@ let
       binshDeps = pkgs.writeReferencesToFile sh;
     in
       pkgs.runCommand "nix.conf" { extraOptions = cfg.extraOptions; } ''
-        extraPaths=$(for i in $(cat ${binshDeps}); do if test -d $i; then echo $i; fi; done)
         cat > $out <<END
         # WARNING: this file is generated from the nix.* options in
         # your NixOS configuration, typically
@@ -24,7 +23,9 @@ let
         build-max-jobs = ${toString (cfg.maxJobs)}
         build-cores = ${toString (cfg.buildCores)}
         build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
-        build-sandbox-paths = ${toString cfg.sandboxPaths} /bin/sh=${sh} $(echo $extraPaths)
+        ${optionalString (cfg.sandboxPaths != []) ''
+          build-sandbox-paths = ${toString cfg.sandboxPaths}
+        ''}
         binary-caches = ${toString cfg.binaryCaches}
         trusted-binary-caches = ${toString cfg.trustedBinaryCaches}
         binary-cache-public-keys = ${toString cfg.binaryCachePublicKeys}
