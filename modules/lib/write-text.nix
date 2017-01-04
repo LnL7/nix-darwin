@@ -6,7 +6,9 @@ with lib;
 
 let
 
-  drv = mkTextDerivation name config.text;
+  fileName = file: last (splitString "/" file);
+
+  drv = mkTextDerivation (fileName name) config.text;
 
 in
 
