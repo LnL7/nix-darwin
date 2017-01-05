@@ -19,7 +19,9 @@ let
         # WARNING: this file is generated from the nix.* options in
         # your NixOS configuration, typically
         # /etc/nixos/configuration.nix.  Do not edit it!
-        build-users-group = nixbld
+        ${optionalString (config.services.nix-daemon.enable) ''
+          build-users-group = nixbld
+        ''}
         build-max-jobs = ${toString (cfg.maxJobs)}
         build-cores = ${toString (cfg.buildCores)}
         build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
