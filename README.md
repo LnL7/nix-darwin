@@ -113,6 +113,16 @@ Either modify the existing file to source/import the one from `/etc/static` or r
       . /etc/foorc.local
     fi
   '';
+
+  # Global user configuration, symlink these to the appropriate file:
+  # $ ln -s /etc/static/per-user/lnl/gitconfig ~/.gitconfig
+  environment.etc."per-user/lnl/gitconfig" = ''
+    [include]
+      path = .gitconfig.local
+
+    [color]
+      ui = auto
+  '';
 }
 ```
 
