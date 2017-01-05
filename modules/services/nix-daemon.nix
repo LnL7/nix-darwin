@@ -38,7 +38,7 @@ in
     '';
 
     launchd.daemons.nix-daemon = {
-      serviceConfig.Program = "${config.nix.profile}/bin/nix-daemon";
+      serviceConfig.ProgramArguments = [ "/bin/sh" "-c" "exec ${config.nix.profile}/bin/nix-daemon" ];
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Background";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
