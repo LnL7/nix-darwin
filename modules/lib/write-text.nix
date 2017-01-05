@@ -52,10 +52,7 @@ in
 
   config = {
 
-    source = mkMerge
-      [ (mkDefaultIf (config.text != "") drv)
-        (mkDefaultIf (config.text == "") (abort "environment.etc.${name}.text is empty but no source was defined."))
-      ];
+    source = mkDefault drv;
 
   };
 }
