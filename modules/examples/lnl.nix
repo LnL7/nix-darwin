@@ -396,16 +396,20 @@
     kwmc config split-ratio 0.5
     kwmc config spawn left
 
-    kwmc config padding 40 20 20 20
-    kwmc config gap 10 10
-    kwmc config display 0 padding 28 1 1 1
-    kwmc config display 0 gap 2 2
+
+    kwmc config padding 28 1 1 1
+    kwmc config gap 2 2
+    kwmc config display 1 padding 40 20 20 20
+    kwmc config display 1 gap 10 10
+    kwmc config display 2 padding 40 20 20 20
+    kwmc config display 2 gap 10 10
 
     kwmc config space 0 1 name main
     kwmc config space 0 2 name rnd
     kwmc config space 0 3 mode monocle
     kwmc config space 0 3 name web
     kwmc config space 0 3 mode monocle
+
 
     kwmc config focus-follows-mouse on
     kwmc config mouse-follows-focus on
