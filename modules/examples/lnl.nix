@@ -34,6 +34,8 @@
       pkgs.nox
     ];
 
+  environment.extraOutputsToInstall = [ "man" ];
+
   services.nix-daemon.enable = true;
   services.nix-daemon.tempDir = "/nix/tmp";
 
@@ -58,7 +60,7 @@
   programs.vim.enableSensible = true;
 
   programs.vim.plugins = [
-    { names = [ "fzfWrapper" "youcompleteme" "colors-solarized" ]; }
+    { names = [ "fzfWrapper" "youcompleteme" "syntastic" "gist-vim" "webapi-vim" "vim-eunuch" "vim-repeat" "commentary" "polyglot" "colors-solarized" ]; }
   ];
 
   programs.vim.vimConfig =  ''
@@ -161,6 +163,12 @@
     [pretty]
       color = format:%C(yellow)%h%Cblue%d%Creset %s %C(white)  %an, %ar%Creset
       nocolor = format:%h%d %s   %an, %ar
+
+    [user]
+      name = Daiderd Jordan
+
+    [github]
+      user = LnL7
   '';
 
   environment.etc."per-user/lnl/khdrc".text = ''
