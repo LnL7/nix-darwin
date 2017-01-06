@@ -1,11 +1,11 @@
-{ pkgs ? import <nixpkgs> {}, config ? <darwin-config> }:
+{ pkgs ? import <nixpkgs> {}, configuration ? <darwin-config> }:
 
 let
 
   eval = pkgs.lib.evalModules {
     check = true;
     modules =
-      [ config
+      [ configuration
         ./modules/system
         ./modules/system/activation-scripts.nix
         ./modules/system/defaults-write.nix
