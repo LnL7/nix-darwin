@@ -46,6 +46,10 @@ If you use a symlink you'll probably also want to add `services.activate-system.
 Either modify the existing file to source/import the one from `/etc/static` or remove it.
 
 ```bash
+# install nixpkgs version, this enables libsodium support (for signed binary caches)
+# this is not required if you already upgraded nix at some point
+nix-env -iA nixpkgs.nix
+
 sudo ln -s private/var/run /run
 
 git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
