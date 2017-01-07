@@ -122,7 +122,7 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 
   # Global user configuration, symlink these to the appropriate file:
   # $ ln -s /etc/static/per-user/lnl/gitconfig ~/.gitconfig
-  environment.etc."per-user/lnl/gitconfig" = ''
+  environment.etc."per-user/lnl/gitconfig".text = ''
     [include]
       path = .gitconfig.local
 
