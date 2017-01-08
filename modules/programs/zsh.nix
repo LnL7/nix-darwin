@@ -18,33 +18,6 @@ let
       makeWrapper ${pkgs.zsh}/bin/zsh $out/bin/zsh
     '';
 
-  interactiveShellInit = ''
-    # history defaults
-    SAVEHIST=2000
-    HISTSIZE=2000
-    HISTFILE=$HOME/.zsh_history
-
-    setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
-
-    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-    ${config.system.build.setEnvironment}
-    ${config.system.build.setAliases}
-
-    ${config.environment.extraInit}
-    ${config.environment.interactiveShellInit}
-
-    ${cfg.interactiveShellInit}
-    ${cfg.promptInit}
-
-    # Tell zsh how to find installed completions
-    for p in ''${(z)NIX_PROFILES}; do
-      fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions)
-    done
-
-    ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
-    ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
-  '';
-
 in
 
 {
@@ -140,6 +113,9 @@ in
       if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
       export __ETC_ZSHENV_SOURCED=1
 
+      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+      ${config.system.build.setEnvironment}
+
       ${cfg.shellInit}
 
       # Read system-wide modifications.
@@ -174,7 +150,27 @@ in
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
 
-      ${interactiveShellInit}
+      # history defaults
+      SAVEHIST=2000
+      HISTSIZE=2000
+      HISTFILE=$HOME/.zsh_history
+
+      setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
+
+      ${config.system.build.setAliases}
+
+      ${config.environment.extraInit}
+      ${config.environment.interactiveShellInit}
+      ${cfg.interactiveShellInit}
+      ${cfg.promptInit}
+
+      # Tell zsh how to find installed completions
+      for p in ''${(z)NIX_PROFILES}; do
+        fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions)
+      done
+
+      ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
+      ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then

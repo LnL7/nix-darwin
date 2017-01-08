@@ -40,7 +40,7 @@ in
 
     system.activationScripts.etc.text = ''
       # Set up the statically computed bits of /etc.
-      echo "setting up /etc..."
+      echo "setting up /etc..." >&2
 
       ln -sfn "$(readlink -f $systemConfig/etc)" /etc/static
 

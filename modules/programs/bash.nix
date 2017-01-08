@@ -15,17 +15,6 @@ let
       makeWrapper ${pkgs.bash}/bin/bash $out/bin/bash
     '';
 
-
-  interactiveShellInit = ''
-    export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-    ${config.system.build.setEnvironment}
-    ${config.system.build.setAliases}
-
-    ${config.environment.extraInit}
-    ${config.environment.interactiveShellInit}
-    ${cfg.interactiveShellInit}
-  '';
-
 in
 
 {
@@ -67,7 +56,13 @@ in
       if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
       __ETC_BASHRC_SOURCED=1
 
-      ${interactiveShellInit}
+      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+      ${config.system.build.setEnvironment}
+      ${config.system.build.setAliases}
+
+      ${config.environment.extraInit}
+      ${config.environment.interactiveShellInit}
+      ${cfg.interactiveShellInit}
 
       # Read system-wide modifications.
       if test -f /etc/bash.local; then
