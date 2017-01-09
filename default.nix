@@ -6,6 +6,7 @@ let
     check = true;
     modules =
       [ configuration
+        ./modules/alias.nix
         ./modules/system
         ./modules/system/activation-scripts.nix
         ./modules/system/defaults-write.nix

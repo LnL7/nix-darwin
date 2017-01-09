@@ -19,6 +19,8 @@ let
 
     # Prevent the current configuration from being garbage-collected.
     ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
+
+    ${config.system.activationScripts.nix.text}
   '';
 
 in
