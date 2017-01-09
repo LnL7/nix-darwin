@@ -113,9 +113,6 @@ in
       if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
       export __ETC_ZSHENV_SOURCED=1
 
-      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
-      ${config.system.build.setEnvironment}
-
       ${cfg.shellInit}
 
       # Read system-wide modifications.
@@ -146,6 +143,8 @@ in
       # /etc/zshrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
+      bindkey -e
+
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
@@ -157,6 +156,8 @@ in
 
       setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
 
+      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+      ${config.system.build.setEnvironment}
       ${config.system.build.setAliases}
 
       ${config.environment.extraInit}

@@ -122,8 +122,7 @@
   '';
 
   programs.zsh.interactiveShellInit = ''
-    bindkey -e
-    setopt AUTOCD
+    setopt AUTOCD AUTOPUSHD
   '';
 
   environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
