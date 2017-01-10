@@ -7,7 +7,7 @@ export PATH=@path@:$PATH
 showSyntax() {
   echo "darwin-rebuild [--help] {build | switch} [{--profile-name | -p} name]" >&2
   echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
-  echo "               [--dry-run] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
+  echo "               [--dry-run] [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
   echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
   exec man darwin-rebuild
   exit 1
@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
     switch|build)
       action="$i"
       ;;
-    --show-trace|--no-build-hook|--dry-run|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
+    --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
       ;;
     --max-jobs|-j|--cores|-I)
