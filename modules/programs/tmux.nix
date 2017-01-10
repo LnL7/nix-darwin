@@ -112,7 +112,7 @@ in {
     '';
 
     programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
-      set -g default-command "reattach-to-user-namespace ${config.environment.loginShell}"
+      set -g default-command "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace ${config.environment.loginShell}"
     '' else ''
       set -g default-command "${config.environment.loginShell}"
     '';
@@ -164,7 +164,7 @@ in {
     '' + optionalString stdenv.isLinux ''
       bind -t vi-copy y copy-selection
     '' + optionalString stdenv.isDarwin ''
-      bind -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
+      bind -t vi-copy y copy-pipe "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace pbcopy"
     '');
 
   };
