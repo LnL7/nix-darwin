@@ -41,6 +41,9 @@
 
   services.activate-system.enable = true;
 
+  nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
+  nix.trustedBinaryCaches = [ https://cache.daiderd.com ];
+
   programs.nix-script.enable = true;
 
   programs.tmux.enable = true;
