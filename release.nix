@@ -46,7 +46,7 @@ let
           jobs.zsh.x86_64-darwin
           jobs.nix-repl.x86_64-darwin
           jobs.nix.x86_64-darwin
-          jobs.reattach-to-user-namespace.x86_64-darwin
+          # jobs.reattach-to-user-namespace.x86_64-darwin license?
           jobs.tmux.x86_64-darwin
           jobs.nano.x86_64-darwin
           jobs.vim.x86_64-darwin
