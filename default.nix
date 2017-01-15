@@ -1,11 +1,23 @@
-{ pkgs ? import <nixpkgs> {}, configuration ? <darwin-config> }:
+{ nixpkgs ? <nixpkgs>, configuration ? <darwin-config>, system ? builtins.currentSystem
+, pkgs ? import nixpkgs { inherit system; }
+}:
 
 let
+
+  packages = { config, lib, pkgs, ... }: {
+    config = {
+      _module.args.pkgs = import nixpkgs {
+        inherit system;
+        inherit (config.nixpkgs) config;
+      };
+    };
+  };
 
   eval = pkgs.lib.evalModules {
     check = true;
     modules =
       [ configuration
+        packages
         ./modules/alias.nix
         ./modules/system
         ./modules/system/activation-scripts.nix
@@ -33,12 +45,11 @@ let
       ];
   };
 
-  system = eval.config.system.build.toplevel;
-
 in
 
 {
   inherit (eval.config._module.args) pkgs;
   inherit (eval) options config;
-  inherit system;
+
+  system = eval.config.system.build.toplevel;
 }

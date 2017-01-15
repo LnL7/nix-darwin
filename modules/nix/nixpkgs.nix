@@ -67,9 +67,7 @@ in
 
   config = {
 
-    _module.args.pkgs = import <nixpkgs> {
-      inherit (config.nixpkgs) config;
-    };
+    # _module.args.pkgs is defined in ../../default.nix
 
   };
 }
