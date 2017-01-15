@@ -22,15 +22,13 @@ let
 
   jobs = {
 
-    inherit jobs release pkgs;
-
     unstable = pkgs.releaseTools.aggregate {
       name = "darwin-${pkgs.lib.nixpkgsVersion}";
       constituents =
         [ jobs.stdenv.x86_64-darwin
           jobs.bash.x86_64-darwin
-          jobs.lnl.x86_64-darwin
-          jobs.simple.x86_64-darwin
+          jobs.examples.lnl.x86_64-darwin
+          jobs.examples.simple.x86_64-darwin
         ];
       meta.description = "Release-critical builds for the Nixpkgs unstable channel";
     };
