@@ -42,7 +42,7 @@
   services.activate-system.enable = true;
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
-  nix.trustedBinaryCaches = [ https://cache.daiderd.com ];
+  nix.trustedBinaryCaches = [ http://cache1 https://cache.daiderd.com ];
 
   programs.nix-script.enable = true;
 
@@ -404,7 +404,7 @@
     kwmc config spawn left
 
 
-    kwmc config padding 28 1 1 1
+    kwmc config padding 28 0 0 0
     kwmc config gap 2 2
     kwmc config display 1 padding 40 20 20 20
     kwmc config display 1 gap 10 10
