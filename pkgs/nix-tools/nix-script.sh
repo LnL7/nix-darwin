@@ -12,6 +12,7 @@ showUsage() {
   echo "           {h | hash}" >&2
   echo "           {store | q | query | r | realise | gc | add | delete}" >&2
   echo "           {repl}" >&2
+  echo "           {-q | -i | -e | -u}" >&2
   exit ${@:-1}
 }
 
@@ -87,6 +88,20 @@ while [ "$#" -gt 0 ]; do
       ;;
     repl)
       action='repl'
+      ;;
+    -q)
+      action='env'
+      extraNixFlags+=("$i")
+      ;;
+    -iA|-i|-e|-u)
+      action='env'
+      extraNixFlags+=("$i")
+      if [ -z "$1" ]; then
+        echo "$0: \`$i' requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraNixFlags+=("$i" "$j")
       ;;
     --add-root)
       # nix-instantiate
@@ -237,6 +252,10 @@ if [ "$action" = store ]; then
     exec nix-shell ${drvArgs[@]} ${extraNixFlags[@]}
   fi
   exec nix-store ${srcArgs[@]} ${extraNixFlags[@]}
+fi
+
+if [ "$action" = env ]; then
+  exec nix-env -f '<nixpkgs>' ${extraNixFlags[@]}
 fi
 
 if [ "$action" = repl ]; then
