@@ -41,6 +41,9 @@
 
   services.activate-system.enable = true;
 
+  nix.distributedBuilds = true;
+  nix.extraOptions = "pre-build-hook = ";
+
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ http://cache1 https://cache.daiderd.com ];
 
@@ -146,9 +149,7 @@
     ];
 
   nixpkgs.config.allowUnfree = true;
-
-  nixpkgs.config.packageOverrides = pkgs: {
-  };
+  nixpkgs.config.packageOverrides = pkgs: { };
 
   # TODO: add module for per-user config, etc, ...
   environment.etc."per-user/lnl/gitconfig".text = ''
