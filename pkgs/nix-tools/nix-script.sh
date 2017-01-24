@@ -103,6 +103,9 @@ while [ "$#" -gt 0 ]; do
       j="$1"; shift 1
       extraNixFlags+=("$i" "$j")
       ;;
+    -j[0-9]*)
+      extraNixFlags+=("$i")
+      ;;
     --add-root)
       # nix-instantiate
       if [ -z "$1" ]; then

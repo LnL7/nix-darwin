@@ -31,6 +31,9 @@ while [ "$#" -gt 0 ]; do
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
       ;;
+    -j[0-9]*)
+      extraBuildFlags+=("$i")
+      ;;
     --max-jobs|-j|--cores|-I)
       if [ -z "$1" ]; then
         echo "$0: ‘$i’ requires an argument"
