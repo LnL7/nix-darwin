@@ -4,12 +4,21 @@ with lib;
 
 let
 
+  cfg = config.programs.fish;
   cfge = config.environment;
 
-  cfg = config.programs.fish;
+  foreignEnv = pkgs.writeText "fish-foreign-env" ''
+    # TODO: environment.shellInit
+    ${cfge.extraInit}
+  '';
 
-  fishVariables =
-    mapAttrsToList (n: v: ''set -x ${n} "${v}"'') cfg.variables;
+  loginForeignEnv = pkgs.writeText "fish-login-foreign-env" ''
+    # TODO: environment.loginShellInit
+  '';
+
+  interactiveForeignEnv = pkgs.writeText "fish-interactive-foreign-env" ''
+    ${cfge.interactiveShellInit}
+  '';
 
   shell = pkgs.runCommand pkgs.fish.name
     { buildInputs = [ pkgs.makeWrapper ]; }
@@ -23,6 +32,9 @@ let
   fishAliases = concatStringsSep "\n" (
     mapAttrsFlatten (k: v: "alias ${k} '${v}'") cfg.shellAliases
   );
+
+  fishVariables =
+    mapAttrsToList (n: v: ''set -x ${n} "${v}"'') cfg.variables;
 
 in
 
@@ -99,10 +111,6 @@ in
 
   config = mkIf cfg.enable {
 
-    environment.etc."fish/foreign-env/shellInit".text = cfge.shellInit;
-    environment.etc."fish/foreign-env/loginShellInit".text = cfge.loginShellInit;
-    environment.etc."fish/foreign-env/interactiveShellInit".text = cfge.interactiveShellInit;
-
     environment.etc."fish/config.fish".text = ''
       # /etc/fish/config.fish: DO NOT EDIT -- this file has been generated automatically.
 
@@ -112,20 +120,22 @@ in
 
       ${config.system.build.setEnvironment}
 
-      fenv source /etc/fish/foreign-env/shellInit > /dev/null
-
+      fenv source ${foreignEnv}
       ${cfg.shellInit}
 
       ${concatStringsSep "\n" fishVariables}
 
       if status --is-login
-        fenv source /etc/fish/foreign-env/loginShellInit > /dev/null
+        # TODO: environment.loginShellInit
         ${cfg.loginShellInit}
       end
 
       if status --is-interactive
         ${fishAliases}
-        fenv source /etc/fish/foreign-env/interactiveShellInit > /dev/null
+        ${optionalString (cfge.interactiveShellInit != "") ''
+          fenv source ${interactiveForeignEnv}
+        ''}
+
         ${cfg.interactiveShellInit}
         ${cfg.promptInit}
       end
