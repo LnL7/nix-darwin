@@ -416,10 +416,12 @@
     kwmc config space 0 2 name rnd
     kwmc config space 0 3 mode monocle
     kwmc config space 0 3 name web
-    kwmc config space 0 3 mode monocle
+    kwmc config space 1 1 name rnd
+    kwmc config space 1 1 mode monocle
+    kwmc config space 2 1 name web
 
 
-    kwmc config focus-follows-mouse on
+    kwmc config focus-follows-mouse off
     kwmc config mouse-follows-focus on
     kwmc config standby-on-float on
     kwmc config center-on-float on
