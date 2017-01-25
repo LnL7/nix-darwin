@@ -38,7 +38,7 @@ in
     '';
 
     launchd.daemons.nix-daemon = {
-      serviceConfig.ProgramArguments = [ "/bin/sh" "-c" "exec ${config.nix.package}/bin/nix-daemon" ];
+      command = "${config.nix.package}/bin/nix-daemon";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Background";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
@@ -50,5 +50,6 @@ in
         // { SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; }
         // { TMPDIR = "${cfg.tempDir}"; };
     };
+
   };
 }
