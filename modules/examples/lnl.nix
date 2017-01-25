@@ -36,10 +36,11 @@
 
   environment.extraOutputsToInstall = [ "man" ];
 
-  services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/nix/tmp";
+  services.khd.enable = true;
 
   services.activate-system.enable = true;
+  services.nix-daemon.enable = true;
+  services.nix-daemon.tempDir = "/nix/tmp";
 
   nix.distributedBuilds = true;
   nix.extraOptions = "pre-build-hook = ";

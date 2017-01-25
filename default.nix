@@ -36,6 +36,7 @@ let
         ./modules/environment
         ./modules/launchd
         ./modules/services/activate-system.nix
+        ./modules/services/khd.nix
         ./modules/services/nix-daemon.nix
         ./modules/programs/bash.nix
         ./modules/programs/nix-script.nix
