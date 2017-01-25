@@ -84,6 +84,7 @@ in
       umask 0022
 
       ${cfg.activationScripts.defaults.text}
+      ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.extraUserActivation.text}
 
       exit $_status

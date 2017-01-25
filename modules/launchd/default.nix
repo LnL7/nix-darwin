@@ -35,7 +35,7 @@ let
         path = mkOption {
           type = types.listOf types.path;
           default = [];
-          apply = ps: "${makeBinPath ps}";
+          apply = ps: makeBinPath ps;
           description = ''
             Packages added to the service's <envar>PATH</envar>
             environment variable.  Both the <filename>bin</filename>
@@ -117,12 +117,30 @@ in
       '';
     };
 
+    launchd.user.agents = mkOption {
+      default = {};
+      type = types.attrsOf (types.submodule serviceOptions);
+      description = ''
+        Definition of per-user launchd agents.
+
+        When a user logs in, a per-user launchd is started.
+        It does the following:
+        1. It loads the parameters for each launch-on-demand user agent from the property list files found in /System/Library/LaunchAgents, /Library/LaunchAgents, and the user’s individual Library/LaunchAgents directory.
+        2. It registers the sockets and file descriptors requested by those user agents.
+        3. It launches any user agents that requested to be running all the time.
+        4. As requests for a particular service arrive, it launches the corresponding user agent and passes the request to it.
+        5. When the user logs out, it sends a SIGTERM signal to all of the user agents that it started.
+      '';
+    };
+
   };
 
   config = {
 
     environment.launchAgents = mapAttrs' toEnvironmentText cfg.agents;
     environment.launchDaemons = mapAttrs' toEnvironmentText cfg.daemons;
+
+    environment.userLaunchAgents = mapAttrs' toEnvironmentText cfg.user.agents;
 
   };
 }
