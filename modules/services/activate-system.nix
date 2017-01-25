@@ -43,9 +43,9 @@ in
   config = mkIf cfg.enable {
 
     launchd.daemons.activate-system = {
-      serviceConfig.ProgramArguments = [ "/bin/sh" "-c" "exec ${activateScript}" ];
-      serviceConfig.KeepAlive.SuccessfulExit = false;
+      command = activateScript;
       serviceConfig.RunAtLoad = true;
+      serviceConfig.KeepAlive.SuccessfulExit = false;
     };
 
   };
