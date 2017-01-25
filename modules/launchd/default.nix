@@ -16,7 +16,49 @@ let
 
   serviceOptions =
     { config, name, ... }:
+    let
+
+      cmd = config.command;
+      env = config.environment // optionalAttrs (config.path != "") { PATH = config.path; };
+
+    in
+
     { options = {
+        environment = mkOption {
+          type = types.attrsOf (types.either types.str (types.listOf types.str));
+          default = {};
+          example = { PATH = "/foo/bar/bin"; LANG = "nl_NL.UTF-8"; };
+          description = "Environment variables passed to the service's processes.";
+          apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
+        };
+
+        path = mkOption {
+          type = types.listOf types.path;
+          default = [];
+          apply = ps: "${makeBinPath ps}";
+          description = ''
+            Packages added to the service's <envar>PATH</envar>
+            environment variable.  Both the <filename>bin</filename>
+            and <filename>sbin</filename> subdirectories of each
+            package are added.
+          '';
+        };
+
+        command = mkOption {
+          type = types.either types.str types.path;
+          default = "";
+          description = "Command executed as the service's main process.";
+        };
+
+        # preStart = mkOption {
+        #   type = types.lines;
+        #   default = "";
+        #   description = ''
+        #     Shell commands executed before the service's main process
+        #     is started.
+        #   '';
+        # };
+
         serviceConfig = mkOption {
           type = types.submodule launchdConfig;
           example =
@@ -33,6 +75,8 @@ let
 
       config = {
         serviceConfig.Label = mkDefault "org.nixos.${name}";
+        serviceConfig.ProgramArguments = mkIf (cmd != "") [ "/bin/sh" "-c" "exec ${cmd}" ];
+        serviceConfig.EnvironmentVariables = mkIf (env != {}) env;
       };
     };
 

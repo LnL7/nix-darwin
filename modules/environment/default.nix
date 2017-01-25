@@ -34,9 +34,7 @@ in {
     environment.systemPath = mkOption {
       type = types.loeOf types.path;
       default = (reverseList cfg.profiles) ++ [ "/usr/local" "/usr" "" ];
-      description = ''
-        The set of paths that are added to PATH
-      '';
+      description = "The set of paths that are added to PATH.";
       apply = x: if isList x then makeBinPath x else x;
     };
 
@@ -48,9 +46,7 @@ in {
           "/nix/var/nix/profiles/default"
           "/run/current-system/sw"
         ];
-      description = ''
-        A list of profiles used to setup the global environment.
-      '';
+      description = "A list of profiles used to setup the global environment.";
     };
 
     environment.extraOutputsToInstall = mkOption {
@@ -63,14 +59,13 @@ in {
     environment.loginShell = mkOption {
       type = types.str;
       default = "$SHELL";
-      description = ''
-        Configure default login shell.
-      '';
+      description = "Configure default login shell.";
     };
 
     environment.variables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
+      example = { EDITOR = "vim"; LANG = "nl_NL.UTF-8"; };
       description = ''
         A set of environment variables used in the global environment.
         These variables will be set on shell initialisation.
