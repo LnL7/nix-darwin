@@ -35,7 +35,7 @@ let
         path = mkOption {
           type = types.listOf types.path;
           default = [];
-          apply = ps: makeBinPath ps;
+          apply = ps: "${makeBinPath ps}";
           description = ''
             Packages added to the service's <envar>PATH</envar>
             environment variable.  Both the <filename>bin</filename>
