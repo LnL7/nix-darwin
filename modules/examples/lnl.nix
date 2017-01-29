@@ -38,6 +38,14 @@
 
   services.khd.enable = true;
 
+  launchd.user.agents.fetch-nixpkgs = {
+    command = "${pkgs.git}/bin/git -C ~/.nix-defexpr/nixpkgs fetch origin master";
+    environment.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    serviceConfig.KeepAlive = false;
+    serviceConfig.ProcessType = "Background";
+    serviceConfig.StartInterval = 60;
+  };
+
   services.activate-system.enable = true;
   services.nix-daemon.enable = true;
   services.nix-daemon.tempDir = "/nix/tmp";
@@ -76,14 +84,6 @@
 
     set clipboard=unnamed
 
-    vmap s S
-
-    cnoremap %% <C-r>=expand('%:h') . '/'<CR>
-
-    let mapleader = ' '
-    nnoremap <Leader>p :FZF<CR>
-    nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
-
     set backup
     set backupdir=~/.vim/tmp/backup//
     set backupskip=/tmp/*,/private/tmp/*
@@ -101,6 +101,52 @@
     if !isdirectory(expand(&directory))
       call mkdir(expand(&directory), "p")
     endif
+
+    vmap s S
+
+    cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+
+    let mapleader = ' '
+    nnoremap <Leader>p :FZF<CR>
+    nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
+
+    function! s:ag_to_qf(line)
+      let parts = split(a:line, ':')
+      return {'filename': parts[0], 'lnum': parts[1], 'col': parts[2],
+            \ 'text': join(parts[3:], ':')}
+    endfunction
+
+    function! s:ag_handler(lines)
+      if len(a:lines) < 2 | return | endif
+
+      let cmd = get({'ctrl-x': 'split',
+            \ 'ctrl-v': 'vertical split',
+            \ 'ctrl-t': 'tabe'}, a:lines[0], 'e')
+      let list = map(a:lines[1:], 's:ag_to_qf(v:val)')
+
+      let first = list[0]
+      execute cmd escape(first.filename, ' %#\')
+      execute first.lnum
+      execute 'normal!' first.col.'|zz'
+
+      if len(list) > 1
+        call setqflist(list)
+        copen
+        wincmd p
+      endif
+    endfunction
+
+    command! -nargs=* Ag call fzf#run({
+          \ 'source':  printf('${pkgs.ag}/bin/ag --nogroup --column --color "%s"',
+          \                   escape(empty(<q-args>) ? '^(?=.)' : <q-args>, '"\')),
+          \ 'sink*':   function('<sid>ag_handler'),
+          \ 'options': '--ansi --expect=ctrl-t,ctrl-v,ctrl-x --delimiter : --nth 4.. '.
+          \            '--multi --bind ctrl-a:select-all,ctrl-d:deselect-all '.
+          \            '--color hl:68,hl+:110',
+          \ 'down':    '50%' })
+
+    let g:syntastic_always_populate_loc_list = 1
+    let g:ycm_seed_identifiers_with_syntax = 1
   '';
 
   programs.zsh.enable = true;
