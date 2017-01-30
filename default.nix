@@ -43,7 +43,7 @@ let
         ./modules/programs/nix-script.nix
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
-        ./modules/programs/zsh.nix
+        ./modules/programs/zsh
       ];
   };
 

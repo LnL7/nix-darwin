@@ -26,9 +26,7 @@ in
     programs.zsh.enable = mkOption {
       type = types.bool;
       default = false;
-      description = ''
-        Whether to configure zsh as an interactive shell.
-      '';
+      description = "Whether to configure zsh as an interactive shell.";
     };
 
     programs.zsh.variables = mkOption {
@@ -47,49 +45,43 @@ in
     programs.zsh.shellInit = mkOption {
       type = types.lines;
       default = "";
-      description = ''
-        Shell script code called during zsh shell initialisation.
-      '';
+      description = "Shell script code called during zsh shell initialisation.";
     };
 
     programs.zsh.loginShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = ''
-        Shell script code called during zsh login shell initialisation.
-      '';
+      description = "Shell script code called during zsh login shell initialisation.";
     };
 
     programs.zsh.interactiveShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = ''
-        Shell script code called during interactive zsh shell initialisation.
-      '';
+      description = "Shell script code called during interactive zsh shell initialisation.";
     };
 
     programs.zsh.promptInit = mkOption {
       type = types.lines;
       default = "autoload -U promptinit && promptinit && prompt walters";
-      description = ''
-        Shell script code used to initialise the zsh prompt.
-      '';
+      description = "Shell script code used to initialise the zsh prompt.";
     };
 
     programs.zsh.enableCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Enable zsh completion for all interactive zsh shells.
-      '';
+      description = "Enable zsh completion for all interactive zsh shells.";
     };
 
     programs.zsh.enableBashCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Enable bash completion for all interactive zsh shells.
-      '';
+      description = "Enable bash completion for all interactive zsh shells.";
+    };
+
+    programs.zsh.enableFzfHistory = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable fzf keybinding for Ctrl-r history search.";
     };
 
   };
@@ -144,6 +136,7 @@ in
       # This file is read for interactive shells.
 
       bindkey -e
+      ${optionalString cfg.enableFzfHistory "source ${./fzf-history.zsh}"}
 
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
