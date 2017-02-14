@@ -461,7 +461,7 @@
     kwmc config spawn left
 
 
-    kwmc config padding 28 0 0 0
+    kwmc config padding 28 2 2 2
     kwmc config gap 2 2
     kwmc config display 1 padding 40 20 20 20
     kwmc config display 1 gap 10 10
@@ -477,7 +477,7 @@
     kwmc config space 2 1 name web
 
 
-    kwmc config focus-follows-mouse off
+    kwmc config focus-follows-mouse on
     kwmc config mouse-follows-focus on
     kwmc config standby-on-float on
     kwmc config center-on-float on
@@ -495,6 +495,8 @@
     kwmc config border marked size 2
     kwmc config border marked color 0xDD7f7f7f
     kwmc config border marked radius 6
+
+    kwmc rule owner="iTerm2" properties={role="AXDialog"}
 
     kwmc rule owner="Airmail" properties={float="true"}
     kwmc rule owner="Apple Store" properties={float="true"}
