@@ -5,6 +5,7 @@ with lib;
 let
 
   cfg = config.nix;
+  daemon = config.services.nix-daemon;
 
   nixConf =
     let
@@ -19,7 +20,7 @@ let
         # WARNING: this file is generated from the nix.* options in
         # your NixOS configuration, typically
         # /etc/nixos/configuration.nix.  Do not edit it!
-        ${optionalString config.services.nix-daemon.enable ''
+        ${optionalString daemon.enable ''
           build-users-group = nixbld
         ''}
         build-max-jobs = ${toString cfg.maxJobs}
@@ -353,6 +354,14 @@ in
     system.activationScripts.nix.text = mkIf cfg.distributedBuilds ''
       if [ ! -d ${cfg.envVars.NIX_CURRENT_LOAD} ]; then
         mkdir -p ${cfg.envVars.NIX_CURRENT_LOAD}
+      fi
+    '';
+
+    system.activationScripts.nix-daemon.text = mkIf daemon.enable ''
+      buildUser=$(dscl . -read /Groups/nixbld 2>&1 | awk '/^GroupMembership: / {print $2}')
+      if [ -z $buildUser ]; then
+          echo "Using the nix-daemon requires build users, aborting activation" >&2
+          exit 2
       fi
     '';
 
