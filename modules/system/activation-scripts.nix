@@ -59,6 +59,7 @@ in
       # Prevent the current configuration from being garbage-collected.
       ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
 
+      ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.nix.text}
 
       ${cfg.activationScripts.etc.text}
