@@ -50,9 +50,7 @@ let
     examples.simple = genExample ./modules/examples/simple.nix;
 
   }
-  // (mapTestOn (packagePlatforms packageSet))
-  // (mapTestOn { perlPackages = mapPlatforms all packageSet.perlPackages; })
-  // (mapTestOn { darwin = mapPlatforms darwin packageSet.darwin; });
+  // (mapTestOn (packagePlatforms packageSet));
 
 in
 
