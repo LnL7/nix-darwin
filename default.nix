@@ -38,6 +38,7 @@ let
         ./modules/services/activate-system.nix
         ./modules/services/khd.nix
         ./modules/services/kwm.nix
+        ./modules/services/emacs.nix
         ./modules/services/nix-daemon.nix
         ./modules/programs/bash.nix
         ./modules/programs/fish.nix
