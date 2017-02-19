@@ -1,6 +1,8 @@
+[<img src="https://lnl7.github.io/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
+
 # nix-darwin
 
-[<img src="https://lnl7.github.io/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
+[![Build Status](https://travis-ci.org/LnL7/nix-darwin.svg?branch=master)](https://travis-ci.org/LnL7/nix-darwin)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 This will creates and manages a system profile in `/run/current-system`, just like nixos.
