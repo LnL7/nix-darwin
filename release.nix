@@ -19,21 +19,10 @@ let
   };
 
   packageSet = {
-    # stdenv
     inherit (pkgs)
-      autoconf automake bison bzip2 clang cmake coreutils cpio ed findutils flex gawk gettext gmp
-      gnugrep gnum4 gnumake gnused groff gzip help2man libcxx libcxxabi libedit libffi libtool
-      libxml2 llvm ncurses patch pcre perl pkgconfig python unzip xz zlib;
-    perlPackages = { inherit (pkgs.perlPackages) LocaleGettext; };
-    darwin = {
-      inherit (pkgs.darwin)
-        CF CarbonHeaders CommonCrypto Csu IOKit Libinfo Libm Libnotify Libsystem adv_cmds
-        architecture bootstrap_cmds bsdmake cctools configd copyfile dyld eap8021x launchd
-        libclosure libdispatch libiconv libpthread libresolv libutil objc4 ppp removefile xnu;
-    };
-
-    inherit (pkgs)
-      stdenv bash zsh nix nix-repl nano vim emacs tmux reattach-to-user-namespace;
+      stdenv bash zsh nix nix-repl
+      tmux reattach-to-user-namespace
+      nano emacs vim;
   };
 
   jobs = {
@@ -44,8 +33,8 @@ let
         [ jobs.stdenv.x86_64-darwin
           jobs.bash.x86_64-darwin
           jobs.zsh.x86_64-darwin
-          jobs.nix-repl.x86_64-darwin
           jobs.nix.x86_64-darwin
+          jobs.nix-repl.x86_64-darwin
           # jobs.reattach-to-user-namespace.x86_64-darwin license?
           jobs.tmux.x86_64-darwin
           jobs.nano.x86_64-darwin
