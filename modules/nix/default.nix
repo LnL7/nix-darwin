@@ -19,11 +19,11 @@ let
         # WARNING: this file is generated from the nix.* options in
         # your NixOS configuration, typically
         # /etc/nixos/configuration.nix.  Do not edit it!
-        ${optionalString (config.services.nix-daemon.enable) ''
+        ${optionalString config.services.nix-daemon.enable ''
           build-users-group = nixbld
         ''}
-        build-max-jobs = ${toString (cfg.maxJobs)}
-        build-cores = ${toString (cfg.buildCores)}
+        build-max-jobs = ${toString cfg.maxJobs}
+        build-cores = ${toString cfg.buildCores}
         build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
         ${optionalString (cfg.sandboxPaths != []) ''
           build-sandbox-paths = ${toString cfg.sandboxPaths}
@@ -303,6 +303,9 @@ in
   };
 
   config = {
+
+    warnings = mkIf (!config.services.activate-system.enable && cfg.distributedBuilds)
+      [ "services.activate-system is not enabled, a reboot could cause distributed builds to stop working." ];
 
     nix.binaryCachePublicKeys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
 
