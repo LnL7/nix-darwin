@@ -80,7 +80,7 @@ in
 
     programs.zsh.enableFzfHistory = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = "Enable fzf keybinding for Ctrl-r history search.";
     };
 
