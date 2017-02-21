@@ -9,6 +9,11 @@ let
   zshVariables =
     mapAttrsToList (n: v: ''${n}="${v}"'') cfg.variables;
 
+  fzfCompletion = "${pkgs.fzf.src}/shell/completion.zsh";
+
+  fzfGit = ./fzf-git.zsh;
+  fzfHistory = ./fzf-history.zsh;
+
   shell = pkgs.runCommand pkgs.zsh.name
     { buildInputs = [ pkgs.makeWrapper ]; }
     ''
@@ -78,6 +83,18 @@ in
       description = "Enable bash completion for all interactive zsh shells.";
     };
 
+    programs.zsh.enableFzfCompletion = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable fzf completion.";
+    };
+
+    programs.zsh.enableFzfGit = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable fzf keybindings for C-g git browsing.";
+    };
+
     programs.zsh.enableFzfHistory = mkOption {
       type = types.bool;
       default = false;
@@ -136,7 +153,9 @@ in
       # This file is read for interactive shells.
 
       bindkey -e
-      ${optionalString cfg.enableFzfHistory "source ${./fzf-history.zsh}"}
+      ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}
+      ${optionalString cfg.enableFzfGit "source ${fzfGit}"}
+      ${optionalString cfg.enableFzfHistory "source ${fzfHistory}"}
 
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi

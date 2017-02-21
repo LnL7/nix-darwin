@@ -152,6 +152,8 @@
 
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
+  programs.zsh.enableFzfCompletion = true;
+  programs.zsh.enableFzfGit = true;
   programs.zsh.enableFzfHistory = true;
 
   programs.zsh.variables.cfg = "$HOME/.nixpkgs/darwin-config.nix";
