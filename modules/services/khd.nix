@@ -30,7 +30,7 @@ in
   config = mkIf cfg.enable {
 
     launchd.user.agents.khd = {
-      path = [ cfg.package pkgs.kwm config.environment.systemPath ];
+      path = [ cfg.package pkgs.kwm "${config.environment.systemPath}:" ];
       serviceConfig.Program = "${cfg.package}/bin/khd";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
