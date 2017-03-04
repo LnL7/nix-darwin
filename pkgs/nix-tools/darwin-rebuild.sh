@@ -71,9 +71,13 @@ done
 
 if [ -z "$action" ]; then showSyntax; fi
 
+if [ "$action" = switch ]; then
+  extraBuildFlags+=("--no-out-link")
+fi
+
 echo "building the system configuration..." >&2
 if [ "$action" = switch -o "$action" = build ]; then
-  systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} --no-out-link -A system)"
+  systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
 fi
 
 if [ -z "$systemConfig" ]; then exit 0; fi
