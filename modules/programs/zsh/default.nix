@@ -101,6 +101,12 @@ in
       description = "Enable fzf keybinding for Ctrl-r history search.";
     };
 
+    programs.zsh.enableSyntaxHighlighting = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Enable zsh-syntax-highlighting.";
+    };
+
   };
 
   config = mkIf cfg.enable {
@@ -108,7 +114,8 @@ in
     environment.systemPackages =
       [ # Include zsh package
         pkgs.zsh
-      ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions;
+      ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
+        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
 
     environment.loginShell = mkDefault "${shell}/bin/zsh -l";
     environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
@@ -184,6 +191,11 @@ in
 
       ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
       ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
+
+      ${optionalString cfg.enableSyntaxHighlighting
+        "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      }
+
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then
