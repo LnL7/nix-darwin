@@ -340,7 +340,7 @@ with lib;
       type = types.nullOr (types.listOf (types.submodule {
         options = {
           Minute = mkOption {
-            type = types.nullOr types.integer;
+            type = types.nullOr types.int;
             default = null;
             description = ''
               The minute on which this job will be run.
@@ -348,7 +348,7 @@ with lib;
           };
 
           Hour = mkOption {
-            type = types.nullOr types.integer;
+            type = types.nullOr types.int;
             default = null;
             description = ''
               The hour on which this job will be run.
@@ -356,7 +356,7 @@ with lib;
           };
 
           Day = mkOption {
-            type = types.nullOr types.integer;
+            type = types.nullOr types.int;
             default = null;
             description = ''
               The day on which this job will be run.
@@ -364,7 +364,7 @@ with lib;
           };
 
           Weekday = mkOption {
-            type = types.nullOr types.integer;
+            type = types.nullOr types.int;
             default = null;
             description = ''
               The weekday on which this job will be run (0 and 7 are Sunday).
@@ -372,7 +372,7 @@ with lib;
           };
 
           Month = mkOption {
-            type = types.nullOr types.integer;
+            type = types.nullOr types.int;
             default = null;
             description = ''
               The month on which this job will be run.
