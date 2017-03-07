@@ -9,7 +9,10 @@ let
   vim = pkgs.vim_configurable.customize {
     name = "vim";
     vimrcConfig.customRC = config.environment.etc."vimrc".text;
-    vimrcConfig.vam.pluginDictionaries = cfg.plugins;
+    vimrcConfig.vam = {
+      knownPlugins = pkgs.vimPlugins // cfg.extraKnownPlugins;
+      pluginDictionaries = cfg.plugins;
+    };
   };
 
   text = import ../lib/write-text.nix {
@@ -36,6 +39,29 @@ in {
       example = true;
       description = ''
         Enable sensible configuration options for vim.
+      '';
+    };
+
+    programs.vim.extraKnownPlugins = mkOption {
+      type = types.attrsOf types.package;
+      default = {};
+      example = literalExample
+        ''
+        {
+          vim-jsx = pkgs.vimUtils.buildVimPluginFrom2Nix {
+            name = "vim-javascript-2016-07-29";
+            src = pkgs.fetchgit {
+              url = "git://github.com/mxw/vim-jsx";
+              rev = "261114c925ea81eeb4db1651cc1edced66d6b5d6";
+              sha256 = "17pffzwnvsimnnr4ql1qifdh4a0sqqsmcwfiqqzgglvsnzw5vpls";
+            };
+            dependencies = [];
+
+          };
+        }
+        '';
+      description = ''
+        Custom plugin declarations to add to VAM's knownPlugins.
       '';
     };
 
