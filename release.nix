@@ -13,6 +13,45 @@ let
     (import ./. { inherit nixpkgs configuration system; }).system
   );
 
+  makeTest = test:
+    pkgs.lib.genAttrs [ "x86_64-darwin" ] (system:
+      let
+        configuration =
+          { config, lib, pkgs, ... }:
+          with lib;
+          { imports = [ test ];
+
+            options = {
+              out = mkOption {
+                type = types.package;
+              };
+
+              test = mkOption {
+                type = types.lines;
+              };
+            };
+
+            config = {
+              system.build.run-test = pkgs.runCommand "run-darwin-test"
+                { allowSubstitutes = false;
+                  preferLocalBuild = true;
+                }
+                ''
+                  #! ${pkgs.stdenv.shell}
+                  set -e
+
+                  ${config.test}
+                  echo ok | tee $out >&2
+                '';
+
+              out = config.system.build.toplevel;
+            };
+          };
+        system = "x86_64-darwin";
+      in
+        (import ./. { inherit nixpkgs configuration system; }).config.system.build.run-test
+    );
+
   release = import <nixpkgs/pkgs/top-level/release-lib.nix> {
     inherit supportedSystems scrubJobs;
     packageSet = import nixpkgs;
@@ -48,6 +87,8 @@ let
 
     examples.lnl = genExample ./modules/examples/lnl.nix;
     examples.simple = genExample ./modules/examples/simple.nix;
+
+    tests.system-packages = makeTest ./tests/system-packages.nix;
 
   }
   // (mapTestOn (packagePlatforms packageSet));
