@@ -89,10 +89,12 @@ let
     examples.simple = genExample ./modules/examples/simple.nix;
 
     tests.system-packages = makeTest ./tests/system-packages.nix;
+    tests.system-path-bash = makeTest ./tests/system-path-bash.nix;
+    tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
+    tests.system-path-zsh = makeTest ./tests/system-path-zsh.nix;
 
   }
   // (mapTestOn (packagePlatforms packageSet));
 
 in
-
   jobs
