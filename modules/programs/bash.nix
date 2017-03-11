@@ -6,13 +6,13 @@ let
 
   cfg = config.programs.bash;
 
-  shell = pkgs.runCommand pkgs.zsh.name
+  shell = pkgs.runCommand pkgs.bashInteractive.name
     { buildInputs = [ pkgs.makeWrapper ]; }
     ''
       source $stdenv/setup
 
       mkdir -p $out/bin
-      makeWrapper ${pkgs.bash}/bin/bash $out/bin/bash
+      makeWrapper ${pkgs.bashInteractive}/bin/bash $out/bin/bash
     '';
 
 in
@@ -42,7 +42,7 @@ in
 
     environment.systemPackages =
       [ # Include bash package
-        pkgs.bash
+        pkgs.bashInteractive
       ];
 
     environment.loginShell = mkDefault "${shell}/bin/bash -l";
