@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/LnL7/nix-darwin.svg?branch=master)](https://travis-ci.org/LnL7/nix-darwin)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
-This will creates and manages a system profile in `/run/current-system`, just like nixos.
+This will create and manage a system profile in `/run/current-system`, just like nixos.
 
 The default `NIX_PATH` in nix-darwin will look for this repository in `~/.nix-defexpr/darwin` and for your configuration in `~/.nixpkgs/darwin-configuration.nix`.
 If you want to change these you can set your own with `nix.nixPath = [ ];`.
@@ -23,7 +23,7 @@ building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system
 setting up /etc...
 setting up launchd services...
 writing defaults...
-$ 
+$
 ```
 
 ```
@@ -43,14 +43,14 @@ Whether to activate system at boot time.
 
 ## Install
 
-This will link the system profile to `/run/current-system`, you have to create `/run` or symlink it to `private/var/run`.
-If you use a symlink you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
+This will link the system profile to `/run/current-system`. You have to create `/run` or symlink it to `private/var/run`.
+If you use a symlink, you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
 
-> NOTE: the system activation scripts don't overrwrite existing etc files, etc files like `/etc/bashrc` won't be used by default.
+> NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` won't be used by default.
 Either modify the existing file to source/import the one from `/etc/static` or remove it.
 
 ```bash
-# install nixpkgs version, this enables libsodium support (for signed binary caches)
+# install nixpkgs version, which enables libsodium support (for signed binary caches)
 # this is not required if you already upgraded nix at some point
 nix-env -iA nixpkgs.nix
 
@@ -70,9 +70,16 @@ $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
 . /etc/static/bashrc
 ```
 
+... or for `fish`:
+
+```fish
+(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
+(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
+```
+
 ## Example configuration
 
-Checkout [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
 
 ```nix
 { pkgs, ... }:
