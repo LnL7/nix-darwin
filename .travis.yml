@@ -3,7 +3,17 @@ matrix:
   include:
     - os: osx
       osx_image: xcode8.2
-      script: nix-build ./release.nix -A examples.simple
+      script:
+      - nix-build ./release.nix -A examples.simple
+      - nix-build ./release.nix -A tests.system-packages
+      - nix-build ./release.nix -A tests.system-path-bash
+      - nix-build ./release.nix -A tests.system-path-fish
+      - nix-build ./release.nix -A tests.system-path-zsh
     - os: osx
       osx_image: xcode7.3
-      script: nix-build ./release.nix -A examples.simple
+      script:
+      - nix-build ./release.nix -A examples.simple
+      - nix-build ./release.nix -A tests.system-packages
+      - nix-build ./release.nix -A tests.system-path-bash
+      - nix-build ./release.nix -A tests.system-path-fish
+      - nix-build ./release.nix -A tests.system-path-zsh
