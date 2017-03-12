@@ -5,41 +5,6 @@
 [![Build Status](https://travis-ci.org/LnL7/nix-darwin.svg?branch=master)](https://travis-ci.org/LnL7/nix-darwin)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
-This will create and manage a system profile in `/run/current-system`, just like nixos.
-
-The default `NIX_PATH` in nix-darwin will look for this repository in `~/.nix-defexpr/darwin` and for your configuration in `~/.nixpkgs/darwin-configuration.nix`.
-If you want to change these you can set your own with `nix.nixPath = [ ];`.
-
-```
-$ darwin-rebuild switch
-building the system configuration...
-these derivations will be built:
-  /nix/store/vfad6xgjzr56jcs051cg6vzch4dby92y-etc-zprofile.drv
-  /nix/store/cbmkscxsz0k02ynaph5xaxm1aql0p3vq-etc.drv
-  /nix/store/r5fpn177jhc16f8iyzk12gcw4pivzpbw-nixdarwin-system-16.09.drv
-building path(s) ‘/nix/store/wlq89shja597ip7mrmjv7yzk2lwyh8n0-etc-zprofile’
-building path(s) ‘/nix/store/m8kcm1pa5j570h3indp71a439wsh9lzq-etc’
-building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system-16.09’
-setting up /etc...
-setting up launchd services...
-writing defaults...
-$
-```
-
-```
-$ darwin-option services.activate-system.enable                                                                                                                                            ~/src/nix-darwin
-Value:
-true
-
-Default:
-false
-
-Example:
-no example
-
-Description:
-Whether to activate system at boot time.
-```
 
 ## Install
 
@@ -75,6 +40,42 @@ $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
 ```fish
 (nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
 (nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
+```
+
+This will create and manage a system profile in `/run/current-system`, just like nixos.
+
+The default `NIX_PATH` in nix-darwin will look for this repository in `~/.nix-defexpr/darwin` and for your configuration in `~/.nixpkgs/darwin-configuration.nix`.
+If you want to change these you can set your own with `nix.nixPath = [ ];`.
+
+```
+$ darwin-rebuild switch
+building the system configuration...
+these derivations will be built:
+  /nix/store/vfad6xgjzr56jcs051cg6vzch4dby92y-etc-zprofile.drv
+  /nix/store/cbmkscxsz0k02ynaph5xaxm1aql0p3vq-etc.drv
+  /nix/store/r5fpn177jhc16f8iyzk12gcw4pivzpbw-nixdarwin-system-16.09.drv
+building path(s) ‘/nix/store/wlq89shja597ip7mrmjv7yzk2lwyh8n0-etc-zprofile’
+building path(s) ‘/nix/store/m8kcm1pa5j570h3indp71a439wsh9lzq-etc’
+building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system-16.09’
+setting up /etc...
+setting up launchd services...
+writing defaults...
+$
+```
+
+```
+$ darwin-option services.activate-system.enable                                                                                                                                            ~/src/nix-darwin
+Value:
+true
+
+Default:
+false
+
+Example:
+no example
+
+Description:
+Whether to activate system at boot time.
 ```
 
 ## Example configuration
