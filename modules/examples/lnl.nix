@@ -58,7 +58,8 @@
   nix.extraOptions = "pre-build-hook = ";
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
-  nix.trustedBinaryCaches = [ http://cache1 https://cache.daiderd.com ];
+  nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
+  nix.trustedUsers = [ "@admin" ];
 
   programs.nix-script.enable = true;
 
