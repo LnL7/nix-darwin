@@ -26,12 +26,15 @@
       pkgs.fzf
       pkgs.gettext
       pkgs.git
+      pkgs.htop
       pkgs.jq
       pkgs.mosh
       pkgs.silver-searcher
 
       pkgs.nix-repl
       pkgs.nox
+
+      pkgs.pythonPackages.flake8
     ];
 
   environment.extraOutputsToInstall = [ "man" ];
@@ -76,14 +79,32 @@
   programs.vim.enableSensible = true;
 
   programs.vim.plugins = [
-    { names = [ "fzfWrapper" "youcompleteme" "syntastic" "gist-vim" "webapi-vim" "vim-eunuch" "vim-repeat" "commentary" "polyglot" "colors-solarized" ]; }
+    { names = [ "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
+    { names = [ "ale" "vim-dispatch" ]; }
+    { names = [ "commentary" "vim-eunuch" "repeat" "tabular" ]; }
+    { names = [ "fzfWrapper" "youcompleteme" ]; }
+    { names = [ "gist-vim" "webapi-vim" ]; }
+    { names = [ "polyglot" "colors-solarized" ]; }
+    { names = [ "python-mode" ]; }
   ];
+
+  programs.vim.extraKnownPlugins = with pkgs; {
+    ale = vimUtils.buildVimPluginFrom2Nix {
+      name = "vim-ale-2017-03-12";
+      src = fetchgit {
+        url = "https://github.com/w0rp/ale";
+        rev = "711ab9936274608dad48b20b58727c416672c115";
+        sha256 = "0hhw22y3a91zna9cw9zw5180qcx6mhhnl45nj4pm52mf55wc0wb7";
+      };
+    };
+  };
 
   programs.vim.vimConfig =  ''
     colorscheme solarized
     set bg=dark
 
     set clipboard=unnamed
+    set relativenumber
 
     set backup
     set backupdir=~/.vim/tmp/backup//
@@ -146,8 +167,16 @@
           \            '--color hl:68,hl+:110',
           \ 'down':    '50%' })
 
-    let g:syntastic_always_populate_loc_list = 1
+    let g:ale_sign_error = '⨉'
+    let g:ale_sign_warning = '⚠'
+
     let g:ycm_seed_identifiers_with_syntax = 1
+
+    let g:pymode_folding = 0
+    let g:pymode_lint = 0
+    let g:pymode_options_colorcolumn = 0
+    let g:pymode_rope_regenerate_on_write = 0
+
   '';
 
   programs.zsh.enable = true;
@@ -170,11 +199,10 @@
 
   programs.zsh.loginShellInit = ''
     reexec() {
-      echo "reexecuting shell: $SHELL" >&2
-      __ETC_ZSHRC_SOURCED= \
-      __ETC_ZSHENV_SOURCED= \
-      __ETC_ZPROFILE_SOURCED= \
-        exec $SHELL -l
+      unset __ETC_ZSHRC_SOURCED
+      unset __ETC_ZSHENV_SOURCED
+      unset __ETC_ZPROFILE_SOURCED
+      exec $SHELL -c 'echo "reexecuting shell: $SHELL" >&2 && exec $SHELL -l'
     }
   '';
 
@@ -331,6 +359,8 @@
 
     # switcher mode
     switcher - r            :   khd -e "reload" # reload config
+    switcher + shift - r    :   khd -e "mode activate default";\
+                            :   killall kwm     # restart kwm
 
     switcher - return       :   open -na /Applications/Utilities/Terminal.app;\
                                 khd -e "mode activate default"
