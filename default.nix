@@ -39,6 +39,7 @@ let
         ./modules/services/khd.nix
         ./modules/services/kwm.nix
         ./modules/services/emacs.nix
+        ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix
         ./modules/services/nix-gc.nix
         ./modules/programs/bash.nix
