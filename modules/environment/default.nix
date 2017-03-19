@@ -130,8 +130,7 @@ in {
     '';
 
     environment.variables =
-      { GIT_SSL_CAINFO = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-        SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+      { NIX_SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
         EDITOR = mkDefault "nano";
         PAGER = mkDefault "less -R";
       };
