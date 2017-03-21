@@ -46,7 +46,6 @@ in
         serviceConfig.Program = "${cfg.package}/bin/mopidy";
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive = true;
-        serviceConfig.ProcessType = "Adaptive";
       };
     })
     (mkIf cfg.mediakeys.enable {
@@ -54,7 +53,6 @@ in
         serviceConfig.Program = "${cfg.package}/bin/mpdkeys";
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive = true;
-        serviceConfig.ProcessType = "Interactive";
       };
     })
   ];
