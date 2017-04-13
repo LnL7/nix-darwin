@@ -54,6 +54,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     s|shell)
       action='shell'
+      extraNixFlags+=('-Q')
       ;;
     zsh)
       action='shell'

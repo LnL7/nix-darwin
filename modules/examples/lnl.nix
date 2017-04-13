@@ -81,7 +81,7 @@
 
   programs.vim.plugins = [
     { names = [ "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
-    { names = [ "ale" "vim-dispatch" ]; }
+    { names = [ "ale" "vim-gitgutter" "vim-dispatch" ]; }
     { names = [ "commentary" "vim-eunuch" "repeat" "tabular" ]; }
     { names = [ "fzfWrapper" "youcompleteme" ]; }
     { names = [ "gist-vim" "webapi-vim" ]; }
@@ -127,6 +127,10 @@
 
     vmap s S
 
+    inoremap <C-g> <Esc><CR>
+    vnoremap <C-g> <Esc><CR>
+    cnoremap <C-g> <Esc><CR>
+
     cnoremap %% <C-r>=expand('%:h') . '/'<CR>
 
     let mapleader = ' '
@@ -168,14 +172,27 @@
           \            '--color hl:68,hl+:110',
           \ 'down':    '50%' })
 
+    highlight clear SignColumn
+
     let g:ale_sign_error = '⨉'
     let g:ale_sign_warning = '⚠'
 
+    " let g:ycm_add_preview_to_completeopt = 1
+    let g:ycm_autoclose_preview_window_after_completion = 1
+    let g:ycm_autoclose_preview_window_after_insertion = 1
+
     let g:ycm_seed_identifiers_with_syntax = 1
+    let g:ycm_semantic_triggers = {}
+
+    nmap <Leader>D :YcmCompleter GetDoc<CR>
+    nmap <Leader>d :YcmCompleter GoToDefinition<CR>
+    nmap <Leader>r :YcmCompleter GoToReferences<CR>
 
     let g:pymode_folding = 0
     let g:pymode_lint = 0
     let g:pymode_options_colorcolumn = 0
+    let g:pymode_options_max_line_length = 120
+    let g:pymode_rope_complete_on_dot = 0
     let g:pymode_rope_regenerate_on_write = 0
 
   '';
@@ -220,12 +237,19 @@
 
   environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
 
-  environment.shellAliases.l = "ls -lh";
-  environment.shellAliases.ls = "ls -G";
   environment.shellAliases.g = "git log --pretty=color -32";
+  environment.shellAliases.gc = "git checkout";
+  environment.shellAliases.gcb = "git checkout -B";
+  environment.shellAliases.gd = "git diff --minimal --patch";
+  environment.shellAliases.gf = "git fetch";
   environment.shellAliases.gl = "git log --pretty=color --graph";
   environment.shellAliases.glog = "git log --pretty=nocolor";
-  environment.shellAliases.gd = "git diff --minimal --patch";
+  environment.shellAliases.grh = "git reset --hard";
+  environment.shellAliases.l = "ls -lh";
+  environment.shellAliases.ls = "ls -G";
+  environment.shellAliases.nb = "nix-build";
+  environment.shellAliases.ni = "nix-instantiate";
+  environment.shellAliases.ns = "nix-shell";
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
@@ -529,11 +553,10 @@
     kwmc config border marked color 0xDD7f7f7f
     kwmc config border marked radius 6
 
-    kwmc rule owner="iTerm2" properties={role="AXDialog"}
-
     kwmc rule owner="Airmail" properties={float="true"}
     kwmc rule owner="Apple Store" properties={float="true"}
     kwmc rule owner="System Preferences" properties={float="true"}
+    kwmc rule owner="iTerm2" properties={role="AXDialog"}
     kwmc rule owner="iTunes" properties={float="true"}
   '';
 }
