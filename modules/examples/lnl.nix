@@ -271,7 +271,9 @@
     ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.packageOverrides = pkgs: { };
+  nixpkgs.config.packageOverrides = pkgs: {
+    ycmd = pkgs.ycmd.override { gocode = null; godef = null; rustracerd = null; };
+  };
 
   # TODO: add module for per-user config, etc, ...
   environment.etc."per-user/lnl/gitconfig".text = ''
