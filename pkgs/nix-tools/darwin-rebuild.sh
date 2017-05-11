@@ -94,11 +94,11 @@ if [ "$action" = switch ]; then
     nix-env -p $profile --set $systemConfig
   fi
 
+  $systemConfig/activate-user
+
   if [ "$USER" != root ]; then
     sudo $systemConfig/activate
   else
     $systemConfig/activate
   fi
-
-  $systemConfig/activate-user
 fi
