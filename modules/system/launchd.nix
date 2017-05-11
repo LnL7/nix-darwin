@@ -6,8 +6,6 @@ let
 
   cfg = config.system;
 
-  home = builtins.getEnv "HOME";
-
   text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = pkgs.writeText;
@@ -24,12 +22,12 @@ let
   '';
 
   userLaunchdActivation = target: ''
-    if ! diff '${cfg.build.launchd}${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'; then
-      if test -f '${home}/Library/LaunchAgents/${target}'; then
-        launchctl unload -w '${home}/Library/LaunchAgents/${target}' || true
+    if ! diff ${cfg.build.launchd}/user/Library/LaunchAgents/${target} ~/Library/LaunchAgents/${target}; then
+      if test -f ~/Library/LaunchAgents/${target}; then
+        launchctl unload -w ~/Library/LaunchAgents/${target} || true
       fi
-      cp -f '${cfg.build.launchd}${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'
-      launchctl load '${home}/Library/LaunchAgents/${target}'
+      cp -f '${cfg.build.launchd}/user/Library/LaunchAgents/${target}' ~/Library/LaunchAgents/${target}
+      launchctl load ~/Library/LaunchAgents/${target}
     fi
   '';
 
@@ -71,12 +69,12 @@ in
   config = {
 
     system.build.launchd = pkgs.runCommand "launchd" {} ''
-      mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out${home}/Library/LaunchAgents
+      mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out/user/Library/LaunchAgents
       cd $out/Library/LaunchAgents
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchAgents}
       cd $out/Library/LaunchDaemons
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchDaemons}
-      cd $out${home}/Library/LaunchAgents
+      cd $out/user/Library/LaunchAgents
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") userLaunchAgents}
     '';
 
@@ -103,15 +101,15 @@ in
     '';
 
     system.activationScripts.userLaunchd.text = ''
-      # Set up launchd services in ~/Library/LaunchAgents
+      # Set up user launchd services in ~/Library/LaunchAgents
       echo "setting up user launchd services..."
 
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 
-      for f in $(ls /run/current-system${home}/Library/LaunchAgents); do
-        if test ! -e "${cfg.build.launchd}${home}/Library/LaunchAgents/$f"; then
-          launchctl unload -w "${home}/Library/LaunchAgents/$f" || true
-          if test -e "${home}/Library/LaunchAgents/$f"; then rm -f "${home}/Library/LaunchAgents/$f"; fi
+      for f in $(ls /run/current-system/user/Library/LaunchAgents); do
+        if test ! -e "${cfg.build.launchd}/user/Library/LaunchAgents/$f"; then
+          launchctl unload -w ~/Library/LaunchAgents/$f || true
+          if test -e ~/Library/LaunchAgents/$f; then rm -f ~/Library/LaunchAgents/$f; fi
         fi
       done
     '';
