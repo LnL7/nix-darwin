@@ -24,11 +24,11 @@ let
   '';
 
   userLaunchdActivation = target: ''
-    if ! diff '${cfg.build.launchd}/${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'; then
+    if ! diff '${cfg.build.launchd}${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'; then
       if test -f '${home}/Library/LaunchAgents/${target}'; then
         launchctl unload -w '${home}/Library/LaunchAgents/${target}' || true
       fi
-      cp -f '${cfg.build.launchd}/${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'
+      cp -f '${cfg.build.launchd}${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'
       launchctl load '${home}/Library/LaunchAgents/${target}'
     fi
   '';
@@ -71,12 +71,12 @@ in
   config = {
 
     system.build.launchd = pkgs.runCommand "launchd" {} ''
-      mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out/${home}/Library/LaunchAgents
+      mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out${home}/Library/LaunchAgents
       cd $out/Library/LaunchAgents
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchAgents}
       cd $out/Library/LaunchDaemons
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchDaemons}
-      cd $out/${home}/Library/LaunchAgents
+      cd $out${home}/Library/LaunchAgents
       ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") userLaunchAgents}
     '';
 
@@ -108,8 +108,8 @@ in
 
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 
-      for f in $(ls /run/current-system/${home}/Library/LaunchAgents); do
-        if test ! -e "${cfg.build.launchd}/${home}/Library/LaunchAgents/$f"; then
+      for f in $(ls /run/current-system${home}/Library/LaunchAgents); do
+        if test ! -e "${cfg.build.launchd}${home}/Library/LaunchAgents/$f"; then
           launchctl unload -w "${home}/Library/LaunchAgents/$f" || true
           if test -e "${home}/Library/LaunchAgents/$f"; then rm -f "${home}/Library/LaunchAgents/$f"; fi
         fi
