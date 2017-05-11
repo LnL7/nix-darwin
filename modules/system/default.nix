@@ -8,8 +8,9 @@ let
 
   cfg = config.system;
 
-  failedAssertions = map (x: x.message) (filter (x: !x.assertion) config.assertions);
+  home = builtins.getEnv "HOME";
 
+  failedAssertions = map (x: x.message) (filter (x: !x.assertion) config.assertions);
 
   throwAssertions = res: if (failedAssertions != []) then throw "\nFailed assertions:\n${concatStringsSep "\n" (map (x: "- ${x}") failedAssertions)}" else res;
   showWarnings = res: fold (w: x: builtins.trace "[1;31mwarning: ${w}[0m" x) res config.warnings;
@@ -94,6 +95,9 @@ in
         mkdir -p $out/Library
         ln -s ${cfg.build.launchd}/Library/LaunchAgents $out/Library/LaunchAgents
         ln -s ${cfg.build.launchd}/Library/LaunchDaemons $out/Library/LaunchDaemons
+
+        mkdir -p $out/${home}/Library
+        ln -s ${cfg.build.launchd}/${home}/Library/LaunchAgents $out/${home}/Library/LaunchAgents
 
         echo "$activationScript" > $out/activate
         substituteInPlace $out/activate --subst-var out
