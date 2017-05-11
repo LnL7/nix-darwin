@@ -14,7 +14,7 @@ let
   };
 
   launchdActivation = basedir: target: ''
-    if ! diff '/run/current-system/Library/${basedir}/${target}' '/Library/${basedir}/${target}'; then
+    if ! diff '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}'; then
       if test -f '/Library/${basedir}/${target}'; then
         launchctl unload -w '/Library/${basedir}/${target}' || true
       fi
@@ -24,7 +24,7 @@ let
   '';
 
   userLaunchdActivation = target: ''
-    if ! diff '/run/current-system/${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'; then
+    if ! diff '${cfg.build.launchd}/${home}/Library/LaunchAgents/${target}' '${home}/Library/LaunchAgents/${target}'; then
       if test -f '${home}/Library/LaunchAgents/${target}'; then
         launchctl unload -w '${home}/Library/LaunchAgents/${target}' || true
       fi
