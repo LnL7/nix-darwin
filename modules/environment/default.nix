@@ -33,7 +33,7 @@ in {
 
     environment.systemPath = mkOption {
       type = types.loeOf types.path;
-      default = (reverseList cfg.profiles) ++ [ "/usr/local" "/usr" "" ];
+      default = cfg.profiles ++ [ "/usr/local" "/usr" "" ];
       description = "The set of paths that are added to PATH.";
       apply = x: if isList x then makeBinPath x else x;
     };
