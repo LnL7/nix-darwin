@@ -3,13 +3,6 @@ set -e
 set -o pipefail
 export PATH=@path@:$PATH
 
-
-showSyntax() {
-  echo "$0: <option>" >&2
-  exec man darwin-option
-  exit 1
-}
-
 evalNix() {
   nix-instantiate --eval --strict -E "with import <darwin> {}; $@"
 }
@@ -20,6 +13,13 @@ evalAttrs() {
 
 evalOpt() {
   evalNix "options.$option.$@" 2>/dev/null
+}
+
+showSyntax() {
+  echo "$0: <option>" >&2
+  eval printf $(evalAttrs "options")
+  echo
+  exit 1
 }
 
 # Parse the command line.
