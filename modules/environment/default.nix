@@ -51,7 +51,7 @@ in {
 
     environment.extraOutputsToInstall = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [ "man" ];
       example = [ "doc" "info" "devdoc" ];
       description = "List of additional package outputs to be symlinked into <filename>/run/current-system/sw</filename>.";
     };
