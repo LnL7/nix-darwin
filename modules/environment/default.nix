@@ -56,6 +56,13 @@ in {
       description = "List of additional package outputs to be symlinked into <filename>/run/current-system/sw</filename>.";
     };
 
+    environment.pathsToLink = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      example = [ "/share/doc" ];
+      description = "List of directories to be symlinked in <filename>/run/current-system/sw</filename>.";
+    };
+
     environment.loginShell = mkOption {
       type = types.str;
       default = "$SHELL";
@@ -112,14 +119,12 @@ in {
 
   config = {
 
-    system.build.setEnvironment = concatStringsSep "\n" exportVariables;
-    system.build.setAliases = concatStringsSep "\n" aliasCommands;
-
-    system.path = pkgs.buildEnv {
-      name = "system-path";
-      paths = cfg.systemPackages;
-      inherit (cfg) extraOutputsToInstall;
-    };
+    environment.pathsToLink =
+      [ "/bin"
+        "/lib"
+        "/share/info"
+        "/share/locale"
+      ];
 
     environment.extraInit = ''
        # reset TERM with new TERMINFO available (if any)
@@ -134,6 +139,15 @@ in {
         EDITOR = mkDefault "nano";
         PAGER = mkDefault "less -R";
       };
+
+    system.path = pkgs.buildEnv {
+      name = "system-path";
+      paths = cfg.systemPackages;
+      inherit (cfg) pathsToLink extraOutputsToInstall;
+    };
+
+    system.build.setEnvironment = concatStringsSep "\n" exportVariables;
+    system.build.setAliases = concatStringsSep "\n" aliasCommands;
 
   };
 }
