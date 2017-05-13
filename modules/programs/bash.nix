@@ -23,17 +23,19 @@ in
     programs.bash.enable = mkOption {
       type = types.bool;
       default = false;
-      description = ''
-        Whether to configure bash as an interactive shell.
-      '';
+      description = "Whether to configure bash as an interactive shell.";
     };
 
     programs.bash.interactiveShellInit = mkOption {
       default = "";
-      description = ''
-        Shell script code called during interactive bash shell initialisation.
-      '';
+      description = "Shell script code called during interactive bash shell initialisation.";
       type = types.lines;
+    };
+
+    programs.bash.enableCompletion = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable bash completion for all interactive bash shells.";
     };
 
   };
@@ -43,6 +45,11 @@ in
     environment.systemPackages =
       [ # Include bash package
         pkgs.bashInteractive
+      ] ++ optional cfg.enableCompletion pkgs.bash-completion;
+
+    environment.pathsToLink =
+      [ "/etc/bash_completion.d"
+        "/share/bash-completion/completions"
       ];
 
     environment.loginShell = mkDefault "${shell}/bin/bash -l";
@@ -64,9 +71,23 @@ in
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 
+      ${optionalString cfg.enableCompletion ''
+        source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
+
+        nullglobStatus=$(shopt -p nullglob)
+        shopt -s nullglob
+        for p in $NIX_PROFILES; do
+          for m in "$p/etc/bash_completion.d/"* "$p/share/bash-completion/completions/"*; do
+            source $m
+          done
+        done
+        eval "$nullglobStatus"
+        unset nullglobStatus p m
+      ''}
+
       # Read system-wide modifications.
       if test -f /etc/bash.local; then
-        . /etc/bash.local
+        source /etc/bash.local
       fi
     '';
 
