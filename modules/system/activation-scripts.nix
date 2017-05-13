@@ -50,13 +50,14 @@ in
       # Ensure a consistent umask.
       umask 0022
 
+      ${cfg.activationScripts.extraActivation.text}
+
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.nix.text}
 
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.time.text}
-      ${cfg.activationScripts.extraActivation.text}
 
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system
@@ -84,9 +85,10 @@ in
       # Ensure a consistent umask.
       umask 0022
 
+      ${cfg.activationScripts.extraUserActivation.text}
+
       ${cfg.activationScripts.defaults.text}
       ${cfg.activationScripts.userLaunchd.text}
-      ${cfg.activationScripts.extraUserActivation.text}
 
       exit $_status
     '';
