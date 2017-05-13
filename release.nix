@@ -93,6 +93,8 @@ let
     tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
     tests.system-path-zsh = makeTest ./tests/system-path-zsh.nix;
 
+    tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
+
   }
   // (mapTestOn (packagePlatforms packageSet));
 
