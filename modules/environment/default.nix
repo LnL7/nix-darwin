@@ -40,12 +40,6 @@ in {
 
     environment.profiles = mkOption {
       type = types.listOf types.str;
-      default =
-        [ # Use user, default and system profiles.
-          "$HOME/.nix-profile"
-          "/nix/var/nix/profiles/default"
-          "/run/current-system/sw"
-        ];
       description = "A list of profiles used to setup the global environment.";
     };
 
@@ -118,6 +112,13 @@ in {
   };
 
   config = {
+
+    environment.profiles =
+      [ # Use user, default and system profiles.
+        "$HOME/.nix-profile"
+        "/nix/var/nix/profiles/default"
+        "/run/current-system/sw"
+      ];
 
     environment.pathsToLink =
       [ "/bin"
