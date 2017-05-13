@@ -88,6 +88,8 @@ let
     examples.lnl = genExample ./modules/examples/lnl.nix;
     examples.simple = genExample ./modules/examples/simple.nix;
 
+    tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
+
     tests.system-packages = makeTest ./tests/system-packages.nix;
     tests.system-path-bash = makeTest ./tests/system-path-bash.nix;
     tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
