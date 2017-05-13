@@ -88,6 +88,8 @@ let
     examples.lnl = genExample ./modules/examples/lnl.nix;
     examples.simple = genExample ./modules/examples/simple.nix;
 
+    tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
+
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
 
     tests.system-packages = makeTest ./tests/system-packages.nix;
