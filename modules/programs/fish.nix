@@ -111,6 +111,13 @@ in
 
   config = mkIf cfg.enable {
 
+    environment.systemPackages = [ pkgs.fish ];
+
+    environment.pathsToLink = [ "/share/fish" ];
+
+    environment.loginShell = mkDefault "${shell}/bin/fish -l";
+    environment.variables.SHELL = mkDefault "${shell}/bin/fish";
+
     environment.etc."fish/config.fish".text = ''
       # /etc/fish/config.fish: DO NOT EDIT -- this file has been generated automatically.
 
@@ -140,14 +147,6 @@ in
         ${cfg.promptInit}
       end
     '';
-
-    # include programs that bring their own completions
-    # FIXME: environment.pathsToLink = [ "/share/fish/vendor_completions.d" ];
-
-    environment.systemPackages = [ pkgs.fish ];
-
-    environment.loginShell = mkDefault "${shell}/bin/fish -l";
-    environment.variables.SHELL = mkDefault "${shell}/bin/fish";
 
   };
 
