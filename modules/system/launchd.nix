@@ -12,22 +12,22 @@ let
   };
 
   launchdActivation = basedir: target: ''
-    if ! diff '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}'; then
+    if ! diff '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}' &> /dev/null; then
       if test -f '/Library/${basedir}/${target}'; then
         launchctl unload -w '/Library/${basedir}/${target}' || true
       fi
       cp -f '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}'
-      launchctl load '/Library/${basedir}/${target}'
+      launchctl load -w '/Library/${basedir}/${target}'
     fi
   '';
 
   userLaunchdActivation = target: ''
-    if ! diff ${cfg.build.launchd}/user/Library/LaunchAgents/${target} ~/Library/LaunchAgents/${target}; then
+    if ! diff ${cfg.build.launchd}/user/Library/LaunchAgents/${target} ~/Library/LaunchAgents/${target} &> /dev/null; then
       if test -f ~/Library/LaunchAgents/${target}; then
         launchctl unload -w ~/Library/LaunchAgents/${target} || true
       fi
       cp -f '${cfg.build.launchd}/user/Library/LaunchAgents/${target}' ~/Library/LaunchAgents/${target}
-      launchctl load ~/Library/LaunchAgents/${target}
+      launchctl load -w ~/Library/LaunchAgents/${target}
     fi
   '';
 
