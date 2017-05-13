@@ -117,6 +117,8 @@ in
       ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
         ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
 
+    environment.pathsToLink = [ "/share/zsh" ];
+
     environment.loginShell = mkDefault "${shell}/bin/zsh -l";
     environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
 
