@@ -11,6 +11,10 @@ let
     mkTextDerivation = pkgs.writeText;
   };
 
+  launchdVariables = mapAttrsToList (name: value: ''
+    launchctl setenv ${name} '${value}'
+  '');
+
   launchdActivation = basedir: target: ''
     if ! diff '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}' &> /dev/null; then
       if test -f '/Library/${basedir}/${target}'; then
@@ -86,7 +90,9 @@ in
 
     system.activationScripts.launchd.text = ''
       # Set up launchd services in /Library/LaunchAgents and /Library/LaunchDaemons
-      echo "setting up launchd services..."
+      echo "setting up launchd services..." >&2
+
+      ${concatStringsSep "\n" (launchdVariables config.launchd.envVariables)}
 
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchAgents" attr.target) launchAgents}
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchDaemons" attr.target) launchDaemons}
@@ -111,6 +117,8 @@ in
     system.activationScripts.userLaunchd.text = ''
       # Set up user launchd services in ~/Library/LaunchAgents
       echo "setting up user launchd services..."
+
+      ${concatStringsSep "\n" (launchdVariables config.launchd.user.envVariables)}
 
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 

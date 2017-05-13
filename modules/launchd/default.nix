@@ -86,6 +86,34 @@ in
 {
   options = {
 
+    launchd.envVariables = mkOption {
+      type = types.attrsOf (types.either types.str (types.listOf types.str));
+      default = {};
+      example = { LANG = "nl_NL.UTF-8"; };
+      description = ''
+        A set of environment variables to be set on all future
+        processes launched by launchd in the caller's context.
+        The value of each variable can be either a string or a list of
+        strings.  The latter is concatenated, interspersed with colon
+        characters.
+      '';
+      apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
+    };
+
+    launchd.user.envVariables = mkOption {
+      type = types.attrsOf (types.either types.str (types.listOf types.str));
+      default = {};
+      example = { LANG = "nl_NL.UTF-8"; };
+      description = ''
+        A set of environment variables to be set on all future
+        processes launched by launchd in the caller's context.
+        The value of each variable can be either a string or a list of
+        strings.  The latter is concatenated, interspersed with colon
+        characters.
+      '';
+      apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
+    };
+
     launchd.agents = mkOption {
       default = {};
       type = types.attrsOf (types.submodule serviceOptions);
