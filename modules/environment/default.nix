@@ -32,8 +32,7 @@ in {
     };
 
     environment.systemPath = mkOption {
-      type = types.loeOf types.path;
-      default = cfg.profiles ++ [ "/usr/local" "/usr" "" ];
+      type = types.loeOf types.str;
       description = "The set of paths that are added to PATH.";
       apply = x: if isList x then makeBinPath x else x;
     };
@@ -112,6 +111,8 @@ in {
   };
 
   config = {
+
+    environment.systemPath = cfg.profiles ++ [ "/usr/local" "/usr" "" ];
 
     environment.profiles =
       [ # Use user, default and system profiles.

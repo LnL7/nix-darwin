@@ -14,6 +14,8 @@ let
 
   launchdConfig = import ./launchd.nix;
 
+  makeDrvBinPath = ps: concatMapStringsSep ":" (p: if isDerivation p then "${p}/bin" else p) ps;
+
   serviceOptions =
     { config, name, ... }:
     let
@@ -33,15 +35,14 @@ let
         };
 
         path = mkOption {
-          type = types.listOf types.path;
+          type = types.loeOf (types.either types.path types.str);
           default = [];
-          apply = ps: "${makeBinPath ps}";
           description = ''
             Packages added to the service's <envar>PATH</envar>
-            environment variable.  Both the <filename>bin</filename>
-            and <filename>sbin</filename> subdirectories of each
-            package are added.
+            environment variable.  Only the <filename>bin</filename>
+            and subdirectories of each package is added.
           '';
+          apply = ps: if isList ps then (makeDrvBinPath ps) else ps;
         };
 
         command = mkOption {
