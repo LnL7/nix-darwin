@@ -135,7 +135,7 @@ in
 
       # Read system-wide modifications.
       if test -f /etc/zshenv.local; then
-        . /etc/zshenv.local
+        source /etc/zshenv.local
       fi
     '';
 
@@ -153,7 +153,7 @@ in
 
       # Read system-wide modifications.
       if test -f /etc/zprofile.local; then
-        . /etc/zprofile.local
+        source /etc/zprofile.local
       fi
     '';
 
@@ -201,7 +201,7 @@ in
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then
-        . /etc/zshrc.local
+        source /etc/zshrc.local
       fi
     '';
 
