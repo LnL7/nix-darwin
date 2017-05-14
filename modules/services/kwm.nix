@@ -10,24 +10,22 @@ in
 
 {
   options = {
-    services.kwm = {
+    services.kwm.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable the khd window manager.";
+    };
 
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the khd window manager.";
-      };
-
-      package = mkOption {
-        type = types.path;
-        default = pkgs.kwm;
-        description = "This option specifies the kwm package to use";
-      };
-
+    services.kwm.package = mkOption {
+      type = types.path;
+      example = literalExample pkgs.kwm;
+      description = "This option specifies the kwm package to use";
     };
   };
 
   config = mkIf cfg.enable {
+
+    services.kwm.package = mkDefault pkgs.kwm;
 
     launchd.user.agents.kwm = {
       serviceConfig.Program = "${cfg.package}/kwm";
