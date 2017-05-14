@@ -10,25 +10,22 @@ in
 
 {
   options = {
-    services.khd = {
+    services.khd.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable the khd hototkey daemon.";
+    };
 
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the khd hototkey daemon.";
-      };
-
-      package = mkOption {
-        type = types.path;
-        default = pkgs.khd;
-        defaultText = "pkgs.khd";
-        description = "This option specifies the khd package to use.";
-      };
-
+    services.khd.package = mkOption {
+      type = types.package;
+      example = literalExample "pkgs.khd";
+      description = "This option specifies the khd package to use.";
     };
   };
 
   config = mkIf cfg.enable {
+
+    services.khd.package = mkDefault pkgs.khd;
 
     launchd.user.agents.khd = {
       path = [ cfg.package pkgs.kwm config.environment.systemPath ];
