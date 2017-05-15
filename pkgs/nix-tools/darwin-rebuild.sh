@@ -5,7 +5,7 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "darwin-rebuild [--help] {build | switch} [{--profile-name | -p} name]" >&2
+  echo "darwin-rebuild [--help] {build | switch} [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&2
   echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
   echo "               [--dry-run] [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
   echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
@@ -16,6 +16,7 @@ showSyntax() {
 # Parse the command line.
 origArgs=("$@")
 extraBuildFlags=()
+extraProfileFlags=()
 profile=@profile@
 action=
 
@@ -51,6 +52,19 @@ while [ "$#" -gt 0 ]; do
       k="$1"; shift 1
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
+    --rollback)
+      action="rollback"
+      extraProfileFlags=("$i")
+      ;;
+    --switch-generation|-G)
+      action="rollback"
+      if [ -z "$1" ]; then
+        echo "$0: ‘$i’ requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraProfileFlags=("$i" "$j")
+      ;;
     --profile-name|-p)
       if [ -z "$1" ]; then
         echo "$0: ‘--profile-name’ requires an argument"
@@ -80,12 +94,21 @@ if [ "$action" = switch -o "$action" = build ]; then
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
 fi
 
-if [ -z "$systemConfig" ]; then exit 0; fi
+if [ "$action" = rollback ]; then
+  if [ "$USER" != root -a ! -w $(dirname "$profile") ]; then
+    sudo nix-env -p $profile ${extraProfileFlags[@]}
+  else
+    nix-env -p $profile ${extraProfileFlags[@]}
+  fi
 
-if [ "$action" = build ]; then
-  echo $systemConfig
+  systemConfig="$(cat $profile/systemConfig)"
 fi
 
+if [ -z "$systemConfig" ]; then exit 0; fi
+
+if [ -n "$rollbackFlags" ]; then
+  echo $systemConfig
+fi
 
 if [ "$action" = switch ]; then
   if [ "$USER" != root -a ! -w $(dirname "$profile") ]; then
@@ -93,7 +116,9 @@ if [ "$action" = switch ]; then
   else
     nix-env -p $profile --set $systemConfig
   fi
+fi
 
+if [ "$action" = switch -o "$action" = rollback ]; then
   $systemConfig/activate-user
 
   if [ "$USER" != root ]; then
