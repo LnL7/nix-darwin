@@ -21,14 +21,23 @@ in
       example = literalExample "pkgs.khd";
       description = "This option specifies the khd package to use.";
     };
+
+    services.khd.enableAccessibilityAccess = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable accessibility permissions for the khd daemon.";
+    };
   };
 
   config = mkIf cfg.enable {
 
     services.khd.package = mkDefault pkgs.khd;
 
+    security.accessibilityPrograms = [ "${cfg.package}/bin/khd" ];
+
     launchd.user.agents.khd = {
       path = [ cfg.package pkgs.kwm config.environment.systemPath ];
+
       serviceConfig.Program = "${cfg.package}/bin/khd";
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
