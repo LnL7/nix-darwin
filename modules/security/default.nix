@@ -18,6 +18,7 @@ in
     security.accessibilityPrograms = mkOption {
       type = types.listOf types.path;
       default = [];
+      example = literalExample ''[ ''${pkgs.hello}/bin/hello" ]'';
       description = "List of nix programs that are allowed control through the accessibility APIs.";
     };
   };
