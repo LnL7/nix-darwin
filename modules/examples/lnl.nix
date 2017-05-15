@@ -32,9 +32,6 @@
       pkgs.silver-searcher
 
       pkgs.nix-repl
-      pkgs.nox
-
-      pkgs.pythonPackages.flake8
     ];
 
   environment.extraOutputsToInstall = [ "man" ];
@@ -51,11 +48,16 @@
   };
 
   services.activate-system.enable = true;
-  services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/nix/tmp";
+  # services.nix-daemon.enable = true;
+  # services.nix-daemon.tempDir = "/build/tmp";
 
   # nix.distributedBuilds = true;
-  nix.extraOptions = "pre-build-hook = ";
+  nix.extraOptions = ''
+    gc-keep-derivations = true
+    gc-keep-outputs = true
+
+    pre-build-hook =
+  '';
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
