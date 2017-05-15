@@ -63,7 +63,7 @@ in
       if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
       __ETC_BASHRC_SOURCED=1
 
-      export PATH=${config.environment.systemPath}''${PATH:+:$PATH}
+      export PATH=${config.environment.systemPath}
       ${config.system.build.setEnvironment}
       ${config.system.build.setAliases}
 

@@ -123,7 +123,7 @@ in
 
       set fish_function_path $fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions
 
-      set PATH ${replaceStrings [":"] [" "] config.environment.systemPath} $PATH
+      set PATH ${replaceStrings [":"] [" "] config.environment.systemPath}
 
       ${config.system.build.setEnvironment}
 

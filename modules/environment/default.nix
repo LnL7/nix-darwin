@@ -12,6 +12,7 @@ let
   aliasCommands =
     mapAttrsFlatten (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
 
+  makeDrvBinPath = concatMapStringsSep ":" (p: if isDerivation p then "${p}/bin" else p);
 
 in {
   options = {
@@ -34,7 +35,7 @@ in {
     environment.systemPath = mkOption {
       type = types.loeOf types.str;
       description = "The set of paths that are added to PATH.";
-      apply = x: if isList x then makeBinPath x else x;
+      apply = x: if isList x then makeDrvBinPath x else x;
     };
 
     environment.profiles = mkOption {
@@ -112,7 +113,7 @@ in {
 
   config = {
 
-    environment.systemPath = cfg.profiles ++ [ "/usr/local" "/usr" "" ];
+    environment.systemPath = [ (makeBinPath cfg.profiles) "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ];
 
     environment.profiles =
       [ # Use user, default and system profiles.

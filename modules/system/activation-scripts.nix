@@ -40,7 +40,7 @@ in
       #! ${stdenv.shell}
       set -e
       set -o pipefail
-      export PATH=${pkgs.coreutils}/bin:${config.environment.systemPath}:$PATH
+      export PATH=${pkgs.coreutils}/bin:${config.environment.systemPath}
 
       systemConfig=@out@
 
@@ -75,7 +75,7 @@ in
       #! ${stdenv.shell}
       set -e
       set -o pipefail
-      export PATH=${pkgs.coreutils}/bin:${config.environment.systemPath}:$PATH
+      export PATH=${pkgs.coreutils}/bin:${config.environment.systemPath}
 
       systemConfig=@out@
 
