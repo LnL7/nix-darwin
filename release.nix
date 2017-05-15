@@ -89,17 +89,14 @@ let
     examples.simple = genExample ./modules/examples/simple.nix;
 
     tests.environment-path = makeTest ./tests/environment-path.nix;
-
+    tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
+    tests.security-accessibility-programs = makeTest ./tests/security-accessibility-programs.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
-
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
-
     tests.system-packages = makeTest ./tests/system-packages.nix;
     tests.system-path-bash = makeTest ./tests/system-path-bash.nix;
     tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
     tests.system-path-zsh = makeTest ./tests/system-path-zsh.nix;
-
-    tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
 
   }
   // (mapTestOn (packagePlatforms packageSet));
