@@ -35,6 +35,7 @@ let
         ./modules/nix/nixpkgs.nix
         ./modules/environment
         ./modules/launchd
+        ./modules/security
         ./modules/services/activate-system.nix
         ./modules/services/khd.nix
         ./modules/services/kwm.nix
