@@ -21,11 +21,19 @@ in
       example = literalExample pkgs.kwm;
       description = "This option specifies the kwm package to use";
     };
+
+    services.kwm.enableAccessibilityAccess = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable accessibility permissions for the kwm daemon.";
+    };
   };
 
   config = mkIf cfg.enable {
 
     services.kwm.package = mkDefault pkgs.kwm;
+
+    security.accessibilityPrograms = [ "${cfg.package}/kwm" ];
 
     launchd.user.agents.kwm = {
       serviceConfig.Program = "${cfg.package}/kwm";
