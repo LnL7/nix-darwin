@@ -37,7 +37,9 @@
   environment.extraOutputsToInstall = [ "man" ];
 
   services.khd.enable = true;
+  services.khd.enableAccessibilityAccess = true;
   services.kwm.enable = true;
+  services.kwm.enableAccessibilityAccess = true;
 
   launchd.user.agents.fetch-nixpkgs = {
     command = "${pkgs.git}/bin/git -C ~/.nix-defexpr/nixpkgs fetch origin master";
