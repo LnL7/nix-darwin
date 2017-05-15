@@ -5,6 +5,8 @@ with lib;
 
 let
 
+  inherit (pkgs) stdenv;
+
   cfg = config.launchd;
 
   toEnvironmentText = name: value: {
@@ -51,6 +53,12 @@ let
           description = "Command executed as the service's main process.";
         };
 
+        script = mkOption {
+          type = types.lines;
+          default = "";
+          description = "Shell commands executed as the service's main process.";
+        };
+
         # preStart = mkOption {
         #   type = types.lines;
         #   default = "";
@@ -75,6 +83,12 @@ let
       };
 
       config = {
+        command = mkIf (config.script != "") (pkgs.writeScript "${name}-start" ''
+          #! ${stdenv.shell}
+
+          ${config.script}
+        '');
+
         serviceConfig.Label = mkDefault "org.nixos.${name}";
         serviceConfig.ProgramArguments = mkIf (cmd != "") [ "/bin/sh" "-c" "exec ${cmd}" ];
         serviceConfig.EnvironmentVariables = mkIf (env != {}) env;
@@ -85,7 +99,6 @@ in
 
 {
   options = {
-
     launchd.envVariables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
@@ -161,7 +174,6 @@ in
         5. When the user logs out, it sends a SIGTERM signal to all of the user agents that it started.
       '';
     };
-
   };
 
   config = {
