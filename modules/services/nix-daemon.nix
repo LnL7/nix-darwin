@@ -40,7 +40,7 @@ in
     launchd.daemons.nix-daemon = {
       command = "${config.nix.package}/bin/nix-daemon";
       serviceConfig.KeepAlive = true;
-      serviceConfig.ProcessType = "Background";
+      serviceConfig.ProcessType = "Interactive";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
       serviceConfig.Nice = config.nix.daemonNiceLevel;
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
