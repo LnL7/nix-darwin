@@ -33,7 +33,7 @@ in
 
     services.kwm.package = mkDefault pkgs.kwm;
 
-    security.accessibilityPrograms = [ "${cfg.package}/kwm" ];
+    security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/kwm" ];
 
     launchd.user.agents.kwm = {
       serviceConfig.Program = "${cfg.package}/kwm";

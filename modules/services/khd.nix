@@ -33,7 +33,7 @@ in
 
     services.khd.package = mkDefault pkgs.khd;
 
-    security.accessibilityPrograms = [ "${cfg.package}/bin/khd" ];
+    security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/bin/khd" ];
 
     launchd.user.agents.khd = {
       path = [ cfg.package pkgs.kwm config.environment.systemPath ];
