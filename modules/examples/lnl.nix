@@ -95,12 +95,11 @@
 
   programs.vim.extraKnownPlugins = with pkgs; {
     ale = vimUtils.buildVimPluginFrom2Nix {
-      name = "vim-ale-2017-03-12";
-      src = fetchFromGitHub {
-        owner = "w0rp";
-        repo = "ale";
-        rev = "711ab9936274608dad48b20b58727c416672c115";
-        sha256 = "0jwb3ldashy72g50kf98j02yv8rk83q1d59q3y63828lmqx4d1la";
+      name = "vim-ale-2017-05-16";
+      src = fetchgit {
+        url = "https://github.com/w0rp/ale";
+        rev = "e2860f8a26dc9c04bb4ad6fb59ffb8c743717149";
+        sha256 = "1mpqvfyl47ap32g9qprxpwfcgxhm25ar6qy3p01n77fygva0371d";
       };
     };
 
