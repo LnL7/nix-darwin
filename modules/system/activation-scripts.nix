@@ -59,6 +59,7 @@ in
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.time.text}
+      ${cfg.activationScripts.wrappers.text}
 
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system

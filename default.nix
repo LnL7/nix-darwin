@@ -36,6 +36,7 @@ let
         ./modules/environment
         ./modules/launchd
         ./modules/security
+        ./modules/security/wrappers.nix
         ./modules/services/activate-system.nix
         ./modules/services/khd.nix
         ./modules/services/kwm.nix
