@@ -6,6 +6,8 @@ let
 
   cfg = config.services.khd;
 
+  i3Config = import ./i3.nix { inherit pkgs; };
+
 in
 
 {
@@ -34,9 +36,17 @@ in
       default = "";
       example = "alt + shift - r   : kwmc quit";
     };
+
+    services.khd.i3Keybindings = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Wether to configure i3 style keybindings for kwm.";
+    };
   };
 
   config = mkIf cfg.enable {
+
+    services.khd.khdConfig = mkIf cfg.i3Keybindings i3Config;
 
     security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/bin/khd" ];
 
