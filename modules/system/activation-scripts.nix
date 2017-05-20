@@ -56,6 +56,7 @@ in
       ${cfg.activationScripts.nix.text}
 
       ${cfg.activationScripts.accessibility.text}
+      ${cfg.activationScripts.applications.text}
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.time.text}

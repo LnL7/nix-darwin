@@ -27,6 +27,7 @@ let
         ./modules/system/defaults/dock.nix
         ./modules/system/defaults/finder.nix
         ./modules/system/defaults/trackpad.nix
+        ./modules/system/applications.nix
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
         ./modules/time
