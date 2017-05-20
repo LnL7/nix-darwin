@@ -301,7 +301,7 @@
       user = LnL7
   '';
 
-  environment.etc."per-user/lnl/khdrc".text = ''
+  services.khd.khdConfig = ''
     # remap left-control h/j/k/l -> arrow keys
     lctrl - h         [Safari]      :   khd -p "- left"
     lctrl - j         [Safari]      :   khd -p "- down"
@@ -528,7 +528,7 @@
     tree + shift - o        :   kwmc window -s next
   '';
 
-  environment.etc."per-user/lnl/kwm/kwmrc".text = ''
+  services.kwm.kwmConfig = ''
     kwmc config tiling bsp
     kwmc config split-ratio 0.5
     kwmc config spawn left
