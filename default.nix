@@ -38,7 +38,7 @@ let
         ./modules/security
         ./modules/services/activate-system.nix
         ./modules/services/khd
-        ./modules/services/kwm.nix
+        ./modules/services/kwm
         ./modules/services/emacs.nix
         ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix

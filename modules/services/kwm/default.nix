@@ -18,7 +18,8 @@ in
 
     services.kwm.package = mkOption {
       type = types.path;
-      example = literalExample pkgs.kwm;
+      default = pkgs.kwm;
+      defaultText = "pkgs.kwm";
       description = "This option specifies the kwm package to use";
     };
 
@@ -27,16 +28,23 @@ in
       default = false;
       description = "Whether to enable accessibility permissions for the kwm daemon.";
     };
+
+    services.kwm.kwmConfig = mkOption {
+      type = types.lines;
+      default = "";
+      example = ''kwmc rule owner="iTerm2" properties={role="AXDialog"}'';
+    };
   };
 
   config = mkIf cfg.enable {
 
-    services.kwm.package = mkDefault pkgs.kwm;
-
     security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/kwm" ];
 
+    environment.etc."kwmrc".text = cfg.kwmConfig;
+
     launchd.user.agents.kwm = {
-      serviceConfig.Program = "${cfg.package}/kwm";
+      serviceConfig.ProgramArguments = [ "${cfg.package}/kwm" ]
+        ++ optionals (cfg.kwmConfig != "") [ "-c" "/etc/kwmrc" ];
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Sockets.Listeners =
