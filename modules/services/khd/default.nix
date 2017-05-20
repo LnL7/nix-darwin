@@ -18,7 +18,8 @@ in
 
     services.khd.package = mkOption {
       type = types.package;
-      example = literalExample "pkgs.khd";
+      default = pkgs.khd;
+      defaultText = "pkgs.khd";
       description = "This option specifies the khd package to use.";
     };
 
@@ -27,18 +28,24 @@ in
       default = false;
       description = "Whether to enable accessibility permissions for the khd daemon.";
     };
+
+    services.khd.khdConfig = mkOption {
+      type = types.lines;
+      default = "";
+      example = "alt + shift - r   : kwmc quit";
+    };
   };
 
   config = mkIf cfg.enable {
 
-    services.khd.package = mkDefault pkgs.khd;
-
     security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/bin/khd" ];
+
+    environment.etc."khdrc".text = cfg.khdConfig;
 
     launchd.user.agents.khd = {
       path = [ cfg.package pkgs.kwm config.environment.systemPath ];
 
-      serviceConfig.Program = "${cfg.package}/bin/khd";
+      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/khd" "-c" "/etc/khdrc" ];
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Sockets.Listeners =
