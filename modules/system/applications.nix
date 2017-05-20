@@ -24,10 +24,10 @@ in
       # Set up applications.
       echo "setting up ~/Applications..." >&2
 
-      if [ -d ~/Applications ]; then
-        echo "warning: ~/Applications is a directory, skipping..." >&2
-      else
+      if [ ! -e ~/Applications -o -L ~/Applications ]; then
         ln -sfn ${cfg.build.applications}/Applications ~/Applications
+      else
+        echo "warning: ~/Applications is a directory, skipping..." >&2
       fi
     '';
 
