@@ -55,7 +55,8 @@ in
     launchd.user.agents.khd = {
       path = [ cfg.package pkgs.kwm config.environment.systemPath ];
 
-      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/khd" "-c" "/etc/khdrc" ];
+      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/khd" ]
+        ++ optionals (cfg.khdConfig != "") [ "-c" "/etc/khdrc" ];
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Sockets.Listeners =
