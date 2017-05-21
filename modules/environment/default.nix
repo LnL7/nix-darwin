@@ -43,6 +43,12 @@ in {
       description = "A list of profiles used to setup the global environment.";
     };
 
+    environment.postBuild = mkOption {
+      type = types.lines;
+      default = "";
+      description = "Commands to execute when building the global environment.";
+    };
+
     environment.extraOutputsToInstall = mkOption {
       type = types.listOf types.str;
       default = [];
@@ -125,7 +131,6 @@ in {
     environment.pathsToLink =
       [ "/bin"
         "/lib"
-        "/share/info"
         "/share/locale"
       ];
 
@@ -146,7 +151,7 @@ in {
     system.path = pkgs.buildEnv {
       name = "system-path";
       paths = cfg.systemPackages;
-      inherit (cfg) pathsToLink extraOutputsToInstall;
+      inherit (cfg) postBuild pathsToLink extraOutputsToInstall;
     };
 
     system.build.setEnvironment = concatStringsSep "\n" exportVariables;
