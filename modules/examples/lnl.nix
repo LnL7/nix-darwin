@@ -21,6 +21,8 @@
 
   system.defaults.trackpad.Clicking = true;
 
+  nix.package = pkgs.nix;
+
   environment.systemPackages =
     [ pkgs.curl
       pkgs.fzf
@@ -31,6 +33,7 @@
       pkgs.mosh
       pkgs.silver-searcher
 
+      pkgs.nix
       pkgs.nix-repl
     ];
 
