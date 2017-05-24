@@ -25,12 +25,6 @@ in
       description = "This option specifies the khd package to use.";
     };
 
-    services.khd.enableAccessibilityAccess = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Whether to enable accessibility permissions for the khd daemon.";
-    };
-
     services.khd.khdConfig = mkOption {
       type = types.lines;
       default = "";
@@ -48,7 +42,7 @@ in
 
     services.khd.khdConfig = mkIf cfg.i3Keybindings i3Config;
 
-    security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/bin/khd" ];
+    security.accessibilityPrograms = [ "${cfg.package}/bin/khd" ];
 
     environment.etc."khdrc".text = cfg.khdConfig;
 

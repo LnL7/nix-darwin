@@ -23,12 +23,6 @@ in
       description = "This option specifies the kwm package to use";
     };
 
-    services.kwm.enableAccessibilityAccess = mkOption {
-      type = types.bool;
-      default = false;
-      description = "Whether to enable accessibility permissions for the kwm daemon.";
-    };
-
     services.kwm.kwmConfig = mkOption {
       type = types.lines;
       default = "";
@@ -38,7 +32,7 @@ in
 
   config = mkIf cfg.enable {
 
-    security.accessibilityPrograms = mkIf cfg.enableAccessibilityAccess [ "${cfg.package}/kwm" ];
+    security.accessibilityPrograms = [ "${cfg.package}/kwm" ];
 
     environment.etc."kwmrc".text = cfg.kwmConfig;
 

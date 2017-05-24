@@ -15,6 +15,12 @@ in
 
 {
   options = {
+    security.enableAccessibilityAccess = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Wether to configure programs that are allowed control through the accessibility APIs.";
+    };
+
     security.accessibilityPrograms = mkOption {
       type = types.listOf types.path;
       default = [];
@@ -25,7 +31,7 @@ in
 
   config = {
 
-    system.activationScripts.accessibility.text = ''
+    system.activationScripts.accessibility.text = mkIf cfg.enableAccessibilityAccess ''
       # Set up programs that require accessibility permissions
       echo "setting up accessibility programs..." >&2
 
