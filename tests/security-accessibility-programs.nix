@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 {
+  security.enableAccessibilityAccess = true;
   security.accessibilityPrograms = [ "${pkgs.hello}/bin/hello" ];
 
   test = ''
