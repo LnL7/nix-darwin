@@ -124,8 +124,8 @@ in {
     environment.profiles =
       [ # Use user, default and system profiles.
         "$HOME/.nix-profile"
-        "/nix/var/nix/profiles/default"
         "/run/current-system/sw"
+        "/nix/var/nix/profiles/default"
       ];
 
     environment.pathsToLink =
