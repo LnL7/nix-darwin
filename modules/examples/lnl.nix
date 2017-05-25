@@ -76,6 +76,8 @@
   programs.tmux.enableVim = true;
 
   programs.tmux.tmuxConfig = ''
+    bind-key -n M-r run "tmux send-keys -t1 C-l C-up C-m"
+
     bind 0 set status
 
     set -g status-bg black
