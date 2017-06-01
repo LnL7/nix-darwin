@@ -55,7 +55,7 @@ install(){
 		break
 		;;
 	    n|N)
-		echo "Proceeding without upgrading..."
+		echo "Proceeding without upgrade..."
 		break
 		;;
 	    *)
