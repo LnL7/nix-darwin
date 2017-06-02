@@ -80,7 +80,7 @@ sudo_prompt(){
 # Daemon setup
 create_daemon_users(){
     echo -e ""$BLUE"Nix daemon user/group configuration"$ESC""
-    sudo_prompt
+    [ ! -z $CREATE_DAEMON_USERS ] && sudo_prompt
 
     # If the group exists, dscl returns exit code 56.
     # Since this is not strictly an error code, standard code
