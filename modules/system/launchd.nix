@@ -97,7 +97,7 @@ in
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchAgents" attr.target) launchAgents}
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchDaemons" attr.target) launchDaemons}
 
-      for f in $(ls /run/current-system/Library/LaunchAgents); do
+      for f in $(ls /run/current-system/Library/LaunchAgents 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/Library/LaunchAgents/$f"; then
           echo "removing service $(basename $f .plist)" >&2
           launchctl unload -w "/Library/LaunchAgents/$f" || true
@@ -105,7 +105,7 @@ in
         fi
       done
 
-      for f in $(ls /run/current-system/Library/LaunchDaemons); do
+      for f in $(ls /run/current-system/Library/LaunchDaemons 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/Library/LaunchDaemons/$f"; then
           echo "removing service $(basename $f .plist)" >&2
           launchctl unload -w "/Library/LaunchDaemons/$f" || true
@@ -122,7 +122,7 @@ in
 
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 
-      for f in $(ls /run/current-system/user/Library/LaunchAgents); do
+      for f in $(ls /run/current-system/user/Library/LaunchAgents 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/user/Library/LaunchAgents/$f"; then
           echo "removing user service $(basename $f .plist)" >&2
           launchctl unload -w ~/Library/LaunchAgents/$f || true
