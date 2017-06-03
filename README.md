@@ -12,7 +12,40 @@ This will link the system profile to `/run/current-system`. You have to create `
 If you use a symlink, you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
 
 > NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` won't be used by default.
-Either modify the existing file to source/import the one from `/etc/static` or remove it.
+Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
+
+- `mv /etc/bashrc /etc/bashrc.orig`
+- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
+- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a ~/.bashrc`
+
+```bash
+bash <(curl https://raw.githubusercontent.com/LnL7/nix-darwin/master/bootstrap.sh)
+```
+
+## Example configuration
+
+Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+
+```nix
+{ pkgs, ... }:
+{
+
+  # List packages installed in system profile. To search by name, run:
+  # $ nix-env -qaP | grep wget
+  environment.systemPackages =
+    [ pkgs.nix-repl
+    ];
+
+  # Create /etc/bashrc that loads the nix-darwin environment.
+  programs.bash.enable = true;
+
+  # Recreate /run/current-system symlink after boot.
+  services.activate-system.enable = true;
+
+}
+```
+
+## Manual Install
 
 ```bash
 # install nixpkgs version, which enables libsodium support (for signed binary caches)
@@ -76,29 +109,6 @@ no example
 
 Description:
 Whether to activate system at boot time.
-```
-
-## Example configuration
-
-Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-
-```nix
-{ pkgs, ... }:
-{
-
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.nix-repl
-    ];
-
-  # Create /etc/bashrc that loads the nix-darwin environment.
-  programs.bash.enable = true;
-
-  # Recreate /run/current-system symlink after boot.
-  services.activate-system.enable = true;
-
-}
 ```
 
 ## Modules

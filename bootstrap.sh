@@ -2,6 +2,9 @@
 set -e
 set -o pipefail
 
+{ # Prevent execution if this script was only partially downloaded
+
+
 # Argument parsing
 init(){
     if [ $# -gt 0 ]; then
@@ -232,3 +235,6 @@ main(){
 
 # Actual run
 main $@
+
+
+} # Prevent execution if this script was only partially downloaded
