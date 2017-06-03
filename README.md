@@ -22,6 +22,14 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | tee -a ~/.bashrc`
 
+## Updating
+
+The bootstrap installer will configure a channel for this repository.
+
+```bash
+nix-channel --update darwin
+```
+
 ## Example configuration
 
 Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
