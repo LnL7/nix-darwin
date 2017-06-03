@@ -102,7 +102,6 @@ create_daemon_users(){
 	    echo -e "Creating user: "$YELLOW"nixbld${i}"$ESC"..."
 	    sudo /usr/sbin/sysadminctl -fullName "Nix build user $i" \
 		 -home /var/empty \
-		 -shell /sbin/nologin \
 		 -UID $(expr 30000 + $i) \
 		 -addUser nixbld$i >&2 \
 		|| exit_message "Problem creating user: nixbld${i}"
