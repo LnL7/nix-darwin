@@ -8,6 +8,10 @@ Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
 ## Install
 
+```bash
+bash <(curl https://raw.githubusercontent.com/LnL7/nix-darwin/master/bootstrap.sh)
+```
+
 This will link the system profile to `/run/current-system`. You have to create `/run` or symlink it to `private/var/run`.
 If you use a symlink, you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
 
@@ -16,11 +20,7 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 
 - `mv /etc/bashrc /etc/bashrc.orig`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
-- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a ~/.bashrc`
-
-```bash
-bash <(curl https://raw.githubusercontent.com/LnL7/nix-darwin/master/bootstrap.sh)
-```
+- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | tee -a ~/.bashrc`
 
 ## Example configuration
 
