@@ -27,7 +27,7 @@ with lib;
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnubA1pRqlpoAXkZ1q5nwhqi1RY2z840wFLFDj7vAMSups9E2U8PNIVtuVYApZpkBWIpzD4GGbQTF5Itnu5uBpJswc2Yat9yGWO/guuVyXIaRoBIM0Pg1WBWcWsz+k4rNludu9UQ74FHqEiqZIuIuOcgV+RIZn8xQlGt2kUqN9TWboHhZz8Zhx7EtGSJH6MJRLn3mA/pPjOF6k1jiiFG1pVDuqBTZPANkelWYCWAJ46jCyhxXltWE/jkBYGc/XbB8yT7DFE1XC6TVsSEp68R9PhVG3yqxqY06sniEyduSoGt/TDr6ycERd93bvLElXFATes85YiFszeaUgayYSKwQPe0q7YeHMhIXL0UYJYaKVVgT9saFDiHDzde7kKe+NA+J4+TbIk7Y/Ywn0jepsYV13M7TyEqgqbu9fvVGF3JI9+4g0m1gAzHTa7n6iiAedtz+Pi79uCEpRD2hWSSoLWroyPlep8j1p2tygtFsrieePEukesoToCTwqg1Ejnjh+yKdtUbc6xpyRvl3hKeO8QbCpfaaVd27e4vE4lP2JMW6nOo8b0wlVXQIFe5K2zh52q1MSwhLAq6Kg8oPmgj0lru4IivmPc+/NVwd3Qj3E9ZB8LRfTesfbcxHrC8lF5dL/QpLMeLwebrwCxL19gI0kxmDIaUQuHSyP3B2z+EmBKcN/Xw=="
     ];
 
-  launchd.agents.nix-gc = {
+  launchd.daemons.nix-gc = {
     command = "${config.nix.package}/bin/nix-collect-garbage -d";
     environment.NIX_REMOTE = optionalString config.services.activate-system.enable "daemon";
     serviceConfig.KeepAlive = false;
