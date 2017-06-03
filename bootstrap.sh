@@ -155,19 +155,20 @@ install(){
     test -L /run || sudo ln -snf private/var/run /run
 
     # Fetch the nix-darwin repo
-    echo -e ""$YELLOW"Fetching nix-darwin repo..."$ESC""
-    nix-env -p "/nix/var/nix/profiles/per-user/$USER/darwin" \
-    	    --set $(nix-prefetch-url --unpack --print-path \
-    				     --name nix-darwin-17.03 \
-    				     https://github.com/LnL7/nix-darwin/archive/master.tar.gz \
-    			| grep nix-darwin)
-    ln -sfn "/nix/var/nix/profiles/per-user/$USER/darwin" "$HOME/.nix-defexpr/darwin"
+    echo -e ""$YELLOW"Configuring darwin channel..."$ESC""
+    nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+    nix-channel --update
+    # Create symlink for old NIX_PATH entry
+    ln -sfn "/nix/var/nix/profiles/per-user/$USER/channels/darwin" "$HOME/.nix-defexpr/darwin"
 
     # Copy the example configuration
     echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
 
-    mkdir -p "$HOME/.nixpkgs"
-    cp "$HOME/.nix-defexpr/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix"
+    if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
+      mkdir -p "$HOME/.nixpkgs"
+      cp "$HOME/.nix-defexpr/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix"
+      chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix"
+    fi
 
     # Bootstrap build using default nix.nixPath
     echo "Bootstrapping..."
