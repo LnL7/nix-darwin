@@ -9,6 +9,7 @@
 
   # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
+  programs.bash.enableCompletion = false;
 
   # Recreate /run/current-system symlink after boot.
   services.activate-system.enable = true;
