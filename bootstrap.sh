@@ -1,5 +1,4 @@
 #! /usr/bin/env bash
-set -e
 set -o pipefail
 
 { # Prevent execution if this script was only partially downloaded
@@ -139,7 +138,7 @@ install(){
 	case $ANSWER in
 	    y|Y)
 		echo "Proceeding with upgrade..."
-		nix-env -iA nixpkgs.nix
+		nix-env -iA nixpkgs.nix || exit
 		break
 		;;
 	    n|N)
@@ -151,33 +150,36 @@ install(){
 	esac
     done
 
-    sudo_prompt
+    sudo_prompt || exit
 
     # Link run directory
     echo "Setting up /run..."
-    test -L /run || sudo ln -snf private/var/run /run
+    if ! test -L /run; then
+      sudo ln -sfn private/var/run /run || exit
+    fi
 
     # Fetch the nix-darwin repo
     echo -e ""$YELLOW"Configuring darwin channel..."$ESC""
-    nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-    nix-channel --update
+    nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin || exit
+    nix-channel --update || exit
+
     # Create symlink for old NIX_PATH entry
-    ln -sfn "/nix/var/nix/profiles/per-user/$USER/channels/darwin" "$HOME/.nix-defexpr/darwin"
+    ln -sfn "/nix/var/nix/profiles/per-user/$USER/channels/darwin" "$HOME/.nix-defexpr/darwin" || exit
 
     # Copy the example configuration
     echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
 
     if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
-      mkdir -p "$HOME/.nixpkgs"
-      cp "$HOME/.nix-defexpr/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix"
-      chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix"
+      mkdir -p "$HOME/.nixpkgs" || exit
+      cp "$HOME/.nix-defexpr/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+      chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
     fi
 
     # Bootstrap build using default nix.nixPath
     echo "Bootstrapping..."
     export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
-    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
-    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
+    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build || exit
+    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch || exit
 
     # Source generated bashrc
     . /etc/static/bashrc
@@ -198,7 +200,7 @@ install(){
 	read -p "Would you like to create the Nix daemon group/users? [y/n] " ANSWER
 	case $ANSWER in
 	    y|Y)
-		create_daemon_users
+		create_daemon_users || exit
 		break
 		;;
 	    n|N)
