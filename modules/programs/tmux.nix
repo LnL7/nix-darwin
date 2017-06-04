@@ -160,11 +160,12 @@ in {
       bind s split-window -v -c '#{pane_current_path}'
       bind v split-window -h -c '#{pane_current_path}'
 
-      bind -t vi-copy v begin-selection
+      bind-key -T copy-mode-vi p send-keys -X copy-pipe-and-cancel "tmux paste-buffer"
+      bind-key -T copy-mode-vi v send-keys -X begin-selection
     '' + optionalString stdenv.isLinux ''
-      bind -t vi-copy y copy-selection
+      bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
     '' + optionalString stdenv.isDarwin ''
-      bind -t vi-copy y copy-pipe "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace pbcopy"
+      bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace pbcopy"
     '');
 
   };
