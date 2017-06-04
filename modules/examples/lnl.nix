@@ -76,7 +76,7 @@
   programs.tmux.enableVim = true;
 
   programs.tmux.tmuxConfig = ''
-    bind-key -n M-r run "tmux send-keys -t1 C-l C-up C-m"
+    bind-key -n M-r run "tmux send-keys -t1 C-l up C-m"
 
     bind 0 set status
 
@@ -234,6 +234,10 @@
   '';
 
   programs.zsh.loginShellInit = ''
+    n() {
+      nix-repl '<nixpkgs/lib>' ''${@:-<nixpkgs>}
+    }
+
     reexec() {
       unset __ETC_ZSHRC_SOURCED
       unset __ETC_ZSHENV_SOURCED
