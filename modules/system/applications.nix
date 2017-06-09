@@ -26,8 +26,10 @@ in
 
       if [ ! -e ~/Applications -o -L ~/Applications ]; then
         ln -sfn ${cfg.build.applications}/Applications ~/Applications
+      elif [ ! -e ~/Applications/Nix\ Apps -o -L ~/Applications/Nix\ Apps ]; then
+        ln -sfn ${cfg.build.applications}/Applications ~/Applications/Nix\ Apps
       else
-        echo "warning: ~/Applications is a directory, skipping..." >&2
+        echo "warning: ~/Applications and ~/Applications/Nix Apps are directories, skipping App linking..." >&2
       fi
     '';
 
