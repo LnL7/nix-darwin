@@ -32,6 +32,6 @@ with lib;
     environment.NIX_REMOTE = optionalString config.services.activate-system.enable "daemon";
     serviceConfig.KeepAlive = false;
     serviceConfig.ProcessType = "Background";
-    serviceConfig.StartInterval = 3600;
+    serviceConfig.StartInterval = 86400;
   };
 }
