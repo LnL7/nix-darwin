@@ -9,8 +9,7 @@ let
   zshVariables =
     mapAttrsToList (n: v: ''${n}="${v}"'') cfg.variables;
 
-  fzfCompletion = "${pkgs.fzf.src}/shell/completion.zsh";
-
+  fzfCompletion = ./fzf-completion.zsh;
   fzfGit = ./fzf-git.zsh;
   fzfHistory = ./fzf-history.zsh;
 
