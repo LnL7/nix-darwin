@@ -176,7 +176,7 @@ in
 
       setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
 
-      export PATH=${config.environment.systemPath}
+      export PATH=${config.environment.systemPath}:$PATH
       ${config.system.build.setEnvironment}
       ${config.system.build.setAliases}
 
