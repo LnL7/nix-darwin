@@ -106,6 +106,15 @@ _fzf_complete() {
   command rm -f "$fifo"
 }
 
+_fzf_complete_docker() {
+  FZF_DEFAULT_OPTS="--min-height 15 $FZF_DEFAULT_OPTS --preview 'docker ps -af ancestor={+3} -n 4' --preview-window down:5:wrap" \
+    _fzf_complete '-m --header-lines=1' "$@" < <(docker images)
+}
+
+_fzf_complete_docker_post() {
+  awk '{print $1 ":" $2}'
+}
+
 _fzf_complete_git() {
   FZF_DEFAULT_OPTS="--min-height 15 $FZF_DEFAULT_OPTS --preview 'git log -5 --oneline {+1}' --preview-window down:5:wrap" \
     _fzf_complete '-m' "$@" < <(git branch -v)
