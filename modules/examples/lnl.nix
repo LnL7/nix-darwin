@@ -83,6 +83,9 @@
 
     bind 0 set status
 
+    bind-key -r "<" swap-window -t -1
+    bind-key -r ">" swap-window -t +1
+
     set -g status-bg black
     set -g status-fg white
   '';
