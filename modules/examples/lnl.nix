@@ -33,6 +33,9 @@
       pkgs.mosh
       pkgs.silver-searcher
 
+      pkgs.khd
+      pkgs.kwm
+
       pkgs.nix
       pkgs.nix-repl
     ];
@@ -48,7 +51,7 @@
     environment.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     serviceConfig.KeepAlive = false;
     serviceConfig.ProcessType = "Background";
-    serviceConfig.StartInterval = 60;
+    serviceConfig.StartInterval = 360;
   };
 
   services.activate-system.enable = true;
