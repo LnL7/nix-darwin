@@ -548,8 +548,8 @@
     kwmc config spawn left
 
 
-    kwmc config padding 28 2 2 2
-    kwmc config gap 2 2
+    kwmc config padding 28 4 4 4
+    kwmc config gap 4 4
     kwmc config display 1 padding 40 20 20 20
     kwmc config display 1 gap 10 10
     kwmc config display 2 padding 40 20 20 20
@@ -557,11 +557,11 @@
 
     kwmc config space 0 1 name main
     kwmc config space 0 2 name rnd
-    kwmc config space 0 3 mode monocle
+    kwmc config space 0 2 mode monocle
     kwmc config space 0 3 name web
-    kwmc config space 1 1 name rnd
+    kwmc config space 1 1 name dev
     kwmc config space 1 1 mode monocle
-    kwmc config space 2 1 name web
+    kwmc config space 2 1 name var
 
 
     kwmc config focus-follows-mouse on
@@ -585,6 +585,7 @@
 
     kwmc rule owner="Airmail" properties={float="true"}
     kwmc rule owner="Apple Store" properties={float="true"}
+    kwmc rule owner="Info" properties={float="true"}
     kwmc rule owner="System Preferences" properties={float="true"}
     kwmc rule owner="iTerm2" properties={role="AXDialog"}
     kwmc rule owner="iTunes" properties={float="true"}
