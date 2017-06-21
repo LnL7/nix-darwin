@@ -107,12 +107,27 @@ _fzf_complete() {
 }
 
 _fzf_complete_docker() {
-  FZF_DEFAULT_OPTS="--min-height 15 $FZF_DEFAULT_OPTS --preview 'docker ps -af ancestor={+3} -n 4' --preview-window down:5:wrap" \
-    _fzf_complete '-m --header-lines=1' "$@" < <(docker images)
+  local cmd
+  cmd=${tokens[2]}
+  case $cmd in
+    image|push|rmi|run)
+      FZF_DEFAULT_OPTS="--min-height 15 $FZF_DEFAULT_OPTS --preview 'docker ps -af ancestor={+3} -n 4' --preview-window down:5:wrap" \
+        _fzf_complete '-m --header-lines=1' "$@" < <(docker images)
+      ;;
+    *)
+      FZF_DEFAULT_OPTS="--min-height 15 $FZF_DEFAULT_OPTS --preview 'docker logs --tail=5 {+1}' --preview-window down:5:wrap" \
+        _fzf_complete '-m --header-lines=1' "$@" < <(docker ps --all)
+      ;;
+  esac
 }
 
 _fzf_complete_docker_post() {
-  awk '{print $1 ":" $2}'
+  local cmd
+  cmd=${tokens[2]}
+  case $cmd in
+    image|push|rmi|run) awk '{print $1 ":" $2}' ;;
+    *) awk '{print $1}' ;;
+  esac
 }
 
 _fzf_complete_git() {
