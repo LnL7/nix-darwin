@@ -61,6 +61,14 @@ with lib;
       '';
     };
 
+    system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable smart period substitution.  The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = mkOption {
       type = types.nullOr types.bool;
       default = null;
