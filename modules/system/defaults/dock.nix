@@ -29,6 +29,14 @@ with lib;
       '';
     };
 
+    system.defaults.dock.tilesize = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Size of the icons in the dock.  The default is 64.
+      '';
+    };
+
     system.defaults.dock.minimize-to-application = mkOption {
       type = types.nullOr types.bool;
       default = null;
