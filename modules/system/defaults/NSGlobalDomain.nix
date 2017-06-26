@@ -45,6 +45,14 @@ with lib;
       '';
     };
 
+    system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable automatic capitalization.  The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = mkOption {
       type = types.nullOr types.bool;
       default = null;
