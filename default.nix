@@ -40,6 +40,7 @@ let
         ./modules/services/activate-system.nix
         ./modules/services/khd
         ./modules/services/kwm
+        ./modules/services/chunkwm.nix
         ./modules/services/emacs.nix
         ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix
