@@ -24,6 +24,12 @@ in
         description = "This option specifies the emacs package to use.";
       };
 
+      exec = mkOption {
+        type = types.str ;
+        default = "emacs";
+        description = "Executable emacs command";
+      };
+
     };
   };
 
@@ -31,7 +37,7 @@ in
 
     launchd.user.agents.emacs = {
       serviceConfig.ProgramArguments = [
-        "${cfg.package}/bin/emacs"
+        "${cfg.package}/bin/${cfg.exec}"
         "--daemon"
       ];
       serviceConfig.RunAtLoad = true;
