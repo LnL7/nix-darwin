@@ -198,6 +198,8 @@
 
     highlight clear SignColumn
 
+    let g:is_bash=1
+
     let g:ale_sign_error = '⨉'
     let g:ale_sign_warning = '⚠'
 
@@ -250,6 +252,15 @@
       unset __ETC_ZPROFILE_SOURCED
       exec $SHELL -c 'echo "reexecuting shell: $SHELL" >&2 && exec $SHELL -l'
     }
+
+    reexec-tmux() {
+      local host
+      unset __ETC_ZSHRC_SOURCED
+      unset __ETC_ZSHENV_SOURCED
+      unset __ETC_ZPROFILE_SOURCED
+      host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
+      exec tmux new-session -A -s $host
+    }
   '';
 
   programs.zsh.interactiveShellInit = ''
@@ -263,7 +274,7 @@
     zle -N up-line-or-beginning-search
   '';
 
-  environment.variables.HOMEBREW_CASK_OPTS = "--appdir=/Applications/cask";
+  environment.variables.SHELLCHECK_OPTS = "-e SC1008";
 
   environment.shellAliases.g = "git log --pretty=color -32";
   environment.shellAliases.gc = "git checkout";
@@ -413,11 +424,11 @@
 
 
     # switcher mode
-    switcher - r            :   khd -e "reload" # reload config
-    switcher + shift - r    :   khd -e "mode activate default";\
-                            :   killall kwm     # restart kwm
+    switcher + shift - r    :   killall kwm;\
+                                khd -e "reload";\
+                                khd -e "mode activate default"
 
-    switcher - return       :   open -na /Applications/Utilities/Terminal.app;\
+    switcher - return       :   open -na /Applications/iTerm2.app;\
                                 khd -e "mode activate default"
 
     switcher - h            :   kwmc window -f west
@@ -548,7 +559,7 @@
     kwmc config spawn left
 
 
-    kwmc config padding 28 4 4 4
+    kwmc config padding 28 0 2 0
     kwmc config gap 4 4
     kwmc config display 1 padding 40 20 20 20
     kwmc config display 1 gap 10 10
