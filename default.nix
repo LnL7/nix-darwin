@@ -44,6 +44,7 @@ let
         ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix
         ./modules/services/nix-gc.nix
+        ./modules/services/postgresql
         ./modules/programs/bash.nix
         ./modules/programs/fish.nix
         ./modules/programs/man.nix
