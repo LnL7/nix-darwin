@@ -3,12 +3,13 @@
 with lib;
 
 let
-
   cfg = config.services.chunkwm;
-
-in
-
-{
+  plugins = [
+   "border"
+   "ffm"
+   "tiling"
+  ];
+in {
   options = {
     services.chunkwm.enable = mkOption {
       type = types.bool;
@@ -18,8 +19,7 @@ in
 
     services.chunkwm.package = mkOption {
       type = types.package;
-      default = pkgs.chunkwm-core;
-      defaultText = "pkgs.chunkwm-core";
+      example = pkgs.chunkwm;
       description = "This option specifies the chunkwm package to use";
     };
 
@@ -29,10 +29,12 @@ in
       description = "Whether to enable hotload";
     };
 
-    services.chunkwm.port = mkOption {
-      type = types.int;
-      default = 3920;
-      description = "ChunkC port";
+    services.chunkwm.extraConfig = mkOption {
+      type = types.lines;
+      example = ''
+      chunkc tiling::rule --owner Emacs --state tile
+      '';
+      description = "Additional commands for chunkwmrc";
     };
 
     services.chunkwm.plugins.dir = mkOption {
@@ -42,100 +44,90 @@ in
     };
 
     services.chunkwm.plugins.list = mkOption {
-      type = types.listOf (types.enum [ "border" "tiling" "ffm" ]);
-      default = [ "border" "tiling" "ffm" ];
+      type = types.listOf (types.enum plugins);
+      default = plugins;
+      example = ["tiling"];
       description = "Chunkwm Plugins to enable";
     };
 
-    services.chunkwm.plugins.tiling.config = mkOption {
+    services.chunkwm.plugins."border".config = mkOption {
       type = types.lines;
       default = ''
-      #!/bin/bash
+      chunkc set focused_border_color          0xffc0b18b
+      chunkc set focused_border_width 4
+      chunkc set focused_border_radius 0
+      chunkc set focused_border_skip_floating  0
+      '';
+      description = "Optional border plugin configuration";
+    };
 
-      # use 'chunkc' to send message to socket
-      export CHUNKC_SOCKET=4131
+    services.chunkwm.plugins."tiling".config = mkOption {
+      type = types.lines;
+      default = ''
+      chunkc set global_desktop_mode           bsp
+      chunkc set 2_desktop_mode                monocle
+      chunkc set 5_desktop_mode                float
 
-      chunkc config global_desktop_mode           bsp
-      chunkc config 2_desktop_mode                monocle
-      chunkc config 5_desktop_mode                float
+      chunkc set 1_desktop_tree                ~/.chunkwm_layouts/dev_1
 
-      chunkc config 1_desktop_tree                ~/.chunkwm_layouts/dev_1
+      chunkc set global_desktop_offset_top     25
+      chunkc set global_desktop_offset_bottom  15
+      chunkc set global_desktop_offset_left    15
+      chunkc set global_desktop_offset_right   15
+      chunkc set global_desktop_offset_gap     15
 
-      chunkc config global_desktop_offset_top     25
-      chunkc config global_desktop_offset_bottom  15
-      chunkc config global_desktop_offset_left    15
-      chunkc config global_desktop_offset_right   15
-      chunkc config global_desktop_offset_gap     15
+      chunkc set 1_desktop_offset_top          25
+      chunkc set 1_desktop_offset_bottom       15
+      chunkc set 1_desktop_offset_left         15
+      chunkc set 1_desktop_offset_right        15
+      chunkc set 1_desktop_offset_gap          15
 
-      chunkc config 1_desktop_offset_top          25
-      chunkc config 1_desktop_offset_bottom       15
-      chunkc config 1_desktop_offset_left         15
-      chunkc config 1_desktop_offset_right        15
-      chunkc config 1_desktop_offset_gap          15
+      chunkc set 3_desktop_offset_top          15
+      chunkc set 3_desktop_offset_bottom       15
+      chunkc set 3_desktop_offset_left         15
+      chunkc set 3_desktop_offset_right        15
 
-      chunkc config 3_desktop_offset_top          25
-      chunkc config 3_desktop_offset_bottom       15
-      chunkc config 3_desktop_offset_left         15
-      chunkc config 3_desktop_offset_right        15
+      chunkc set desktop_padding_step_size     10.0
+      chunkc set desktop_gap_step_size         5.0
 
-      chunkc config desktop_padding_step_size     10.0
-      chunkc config desktop_gap_step_size         5.0
+      chunkc set bsp_spawn_left                1
+      chunkc set bsp_optimal_ratio             1.618
+      chunkc set bsp_split_mode                optimal
+      chunkc set bsp_split_ratio               0.66
 
-      chunkc config bsp_spawn_left                1
-      chunkc config bsp_optimal_ratio             1.618
-      chunkc config bsp_split_mode                optimal
-      chunkc config bsp_split_ratio               0.66
-
-      chunkc config window_focus_cycle            all
-      chunkc config mouse_follows_focus           1
-      chunkc config window_float_next             0
-      chunkc config window_float_center           1
-      chunkc config window_region_locked          1
-
-      # signal dock to make windows topmost when floated
-      # requires chwm-sa (https://github.com/koekeishiya/chwm-sa)
-      chunkc config window_float_topmost          0
-
-      # section - window rules
-
-      # regex filters (pattern is case sensitive):
-      #  --owner  | -o  (application name matches pattern)
-      #  --name   | -n  (window name matches pattern)
-      #  --except | -e  (window name does not match pattern)
-
-      # properties:
-      #  --state | -s
-      #   values:
-      #    float
-      #    tile
-
-      chunkc rule --owner "System Preferences" --state tile
-      chunkc rule --owner Finder --name Copy --state float
+      chunkc set window_focus_cycle            monitor
+      chunkc set mouse_follows_focus           1
+      chunkc set window_float_next             0
+      chunkc set window_float_center           1
+      chunkc set window_region_locked          1
       '';
     };
+
 
   };
 
   config = mkIf cfg.enable {
 
-    security.accessibilityPrograms = [ "${cfg.package}/chunkwm" ];
+    security.accessibilityPrograms = [ "${cfg.package}/bin/chunkwm" ];
 
     environment.etc."chunkwmrc".text = ''
       #!/bin/bash
-      export CHUNKC_SOCKET=${toString cfg.port}
-      chunkc plugin_dir ${toString cfg.plugins.dir}
-      chunkc hotload ${if cfg.hotload then "1" else "0"}
-      ${foldl (p1: p2: "${p1}\n${p2}") "" (map (p: "chunkc load "+p+".so") cfg.plugins.list)}
-    '';
-
-    environment.etc."chunkwmtilingrc".text = cfg.plugins.tiling.config;
+      chunkc core::plugin_dir ${toString cfg.plugins.dir}
+      chunkc core::hotload ${if cfg.hotload then "1" else "0"}
+    ''
+      + concatMapStringsSep "\n" (p: "# Config for chunkwm-${p} plugin\n"+cfg.plugins.${p}.config or "# Nothing to configure") cfg.plugins.list
+      + concatMapStringsSep "\n" (p: "chunkc core::load "+p+".so") cfg.plugins.list
+      + "\n" + cfg.extraConfig;
 
     launchd.user.agents.chunkwm = {
-      path = [ cfg.package pkgs.chunkwm-core config.environment.systemPath ];
-      serviceConfig.Program = "${cfg.package}/bin/chunkwm";
+      path = [ cfg.package config.environment.systemPath ];
+      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/chunkwm" ]
+        ++ [ "-c" "/etc/chunkwmrc" ];
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
+      # serviceConfig.StandardOutPath = "/tmp/chunkwm.out";
+      # serviceConfig.StandardErrorPath = "/tmp/chunkwm.err";
     };
 
   };
