@@ -31,6 +31,7 @@ let
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
         ./modules/time
+        ./modules/networking
         ./modules/nix
         ./modules/nix/nix-darwin.nix
         ./modules/nix/nixpkgs.nix
