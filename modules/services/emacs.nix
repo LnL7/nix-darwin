@@ -11,7 +11,6 @@ in
 {
   options = {
     services.emacs = {
-
       enable = mkOption {
         type = types.bool;
         default = false;
@@ -27,7 +26,7 @@ in
       exec = mkOption {
         type = types.string;
         default = "emacs";
-        description = "Emacs command/binary to exeucte";
+        description = "Emacs command/binary to execute.";
       };
     };
   };
