@@ -59,9 +59,6 @@ in
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
-      if [ -z "$PS1" ]; then return; fi
-
-      PS1='\h:\W \u\$ '
       # Make bash check its window size after a process completes
       shopt -s checkwinsize
 
