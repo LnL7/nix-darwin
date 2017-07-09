@@ -115,8 +115,8 @@ in
 
     environment.pathsToLink = [ "/share/fish" ];
 
-    environment.loginShell = mkDefault "${shell}/bin/fish -l";
-    environment.variables.SHELL = mkDefault "${shell}/bin/fish";
+    environment.loginShell = "${shell}/bin/fish -l";
+    environment.variables.SHELL = "${shell}/bin/fish";
 
     environment.etc."fish/config.fish".text = ''
       # /etc/fish/config.fish: DO NOT EDIT -- this file has been generated automatically.

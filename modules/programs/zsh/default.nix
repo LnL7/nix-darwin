@@ -118,8 +118,8 @@ in
 
     environment.pathsToLink = [ "/share/zsh" ];
 
-    environment.loginShell = mkDefault "${shell}/bin/zsh -l";
-    environment.variables.SHELL = mkDefault "${shell}/bin/zsh";
+    environment.loginShell = "${shell}/bin/zsh -l";
+    environment.variables.SHELL = "${shell}/bin/zsh";
 
     environment.etc."zshenv".text = ''
       # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.

@@ -22,7 +22,7 @@ in
 
     programs.bash.enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to configure bash as an interactive shell.";
     };
 
@@ -58,6 +58,14 @@ in
     environment.etc."bashrc".text = ''
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
+
+      if [ -z "$PS1" ]; then return; fi
+
+      PS1='\h:\W \u\$ '
+      # Make bash check its window size after a process completes
+      shopt -s checkwinsize
+
+      [ -r "/etc/bashrc_$TERM_PROGRAM" ] && . "/etc/bashrc_$TERM_PROGRAM"
 
       # Only execute this file once per shell.
       if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
