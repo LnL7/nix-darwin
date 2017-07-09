@@ -165,6 +165,12 @@ in
       ${optionalString cfg.enableFzfGit "source ${fzfGit}"}
       ${optionalString cfg.enableFzfHistory "source ${fzfHistory}"}
 
+      # Don't execute this file when running in a nix-shell.
+      if test ''${IN_NIX_SHELL:-0} -eq 1; then
+        PS1='%F{green}%B[nix-shell:%~]%#%b%f '
+        return
+      fi
+
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
@@ -196,7 +202,6 @@ in
       ${optionalString cfg.enableSyntaxHighlighting
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
       }
-
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then
