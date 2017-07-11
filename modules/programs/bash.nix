@@ -34,8 +34,12 @@ in
 
     programs.bash.enableCompletion = mkOption {
       type = types.bool;
-      default = true;
-      description = "Enable bash completion for all interactive bash shells.";
+      default = false;
+      description = ''
+        Enable bash completion for all interactive bash shells.
+
+        NOTE. This doesn't work with bash 3.2, which is the default on macOS.
+      '';
     };
 
   };
