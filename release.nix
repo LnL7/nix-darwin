@@ -79,12 +79,14 @@ let
           jobs.nano.x86_64-darwin
           jobs.vim.x86_64-darwin
           jobs.emacs.x86_64-darwin
+          jobs.examples.hydra.x86_64-darwin
           jobs.examples.lnl.x86_64-darwin
           jobs.examples.simple.x86_64-darwin
         ];
       meta.description = "Release-critical builds for the darwin unstable channel";
     };
 
+    examples.hydra = genExample ./modules/examples/hydra.nix;
     examples.lnl = genExample ./modules/examples/lnl.nix;
     examples.simple = genExample ./modules/examples/simple.nix;
 
