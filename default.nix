@@ -38,7 +38,7 @@ let
         ./modules/environment
         ./modules/launchd
         ./modules/security
-        ./modules/services/activate-system.nix
+        ./modules/services/activate-system
         ./modules/services/khd
         ./modules/services/kwm
         ./modules/services/chunkwm.nix

@@ -3,21 +3,17 @@
 with lib;
 
 let
-
   inherit (pkgs) stdenv;
 
   cfg = config.services.activate-system;
-
 in
 
 {
   options = {
     services.activate-system.enable = mkOption {
       type = types.bool;
-      default = false;
-      description = ''
-        Whether to activate system at boot time.
-      '';
+      default = true;
+      description = "Whether to activate system at boot time.";
     };
   };
 
