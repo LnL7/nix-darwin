@@ -55,15 +55,10 @@
   };
 
   services.activate-system.enable = true;
-  # services.nix-daemon.enable = true;
-  # services.nix-daemon.tempDir = "/build/tmp";
 
-  # nix.distributedBuilds = true;
   nix.extraOptions = ''
     gc-keep-derivations = true
     gc-keep-outputs = true
-
-    pre-build-hook =
   '';
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
@@ -79,7 +74,7 @@
   programs.tmux.enableVim = true;
 
   programs.tmux.tmuxConfig = ''
-    bind-key -n M-r run "tmux send-keys -t1 C-l up C-m"
+    bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
 
     bind 0 set status
 
