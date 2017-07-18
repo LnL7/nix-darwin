@@ -125,8 +125,8 @@ _fzf_complete_docker_post() {
   local cmd
   cmd=${tokens[2]}
   case $cmd in
-    image|push|rmi|run) awk '{print $1 ":" $2}' ;;
-    *) awk '{print $1}' ;;
+    image|push|rmi|run) awk '{ print ($2 == "<none>") ? $3 : $1 ":" $2}' ;;
+    *) awk '{print $NF}' ;;
   esac
 }
 
