@@ -21,7 +21,7 @@
 
   system.defaults.trackpad.Clicking = true;
 
-  nix.package = pkgs.nix;
+  nix.package = pkgs.nixUnstable;
 
   environment.systemPackages =
     [ pkgs.curl
@@ -36,7 +36,7 @@
       pkgs.khd
       pkgs.kwm
 
-      pkgs.nix
+      pkgs.nixUnstable
       pkgs.nix-repl
     ];
 
@@ -65,7 +65,7 @@
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
   nix.trustedUsers = [ "@admin" ];
 
-  programs.nix-script.enable = true;
+  # programs.nix-script.enable = true;
 
   programs.tmux.enable = true;
   programs.tmux.enableSensible = true;
