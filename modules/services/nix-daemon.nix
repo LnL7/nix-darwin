@@ -51,5 +51,13 @@ in
         // { TMPDIR = "${cfg.tempDir}"; };
     };
 
+    system.activationScripts.nix-daemon.text = mkIf daemon.enable ''
+      buildUser=$(dscl . -read /Groups/nixbld 2>&1 | awk '/^GroupMembership: / {print $2}') || true
+      if [ -z $buildUser ]; then
+          echo "Using the nix-daemon requires build users, aborting activation" >&2
+          exit 2
+      fi
+    '';
+
   };
 }
