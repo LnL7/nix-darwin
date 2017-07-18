@@ -209,7 +209,7 @@ in
 
       binaryCaches = mkOption {
         type = types.listOf types.str;
-        default = [ https://cache.nixos.org/ ];
+        example = [ https://cache.example.org/ ];
         description = ''
           List of binary cache URLs used to obtain pre-built binaries
           of Nix packages.
@@ -219,7 +219,7 @@ in
       trustedBinaryCaches = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        example = [ http://hydra.nixos.org/ ];
+        example = [ https://hydra.example.org/ ];
         description = ''
           List of binary cache URLs that non-root users can use (in
           addition to those specified using
@@ -308,7 +308,8 @@ in
     warnings = mkIf (!config.services.activate-system.enable && cfg.distributedBuilds)
       [ "services.activate-system is not enabled, a reboot could cause distributed builds to stop working." ];
 
-    nix.binaryCachePublicKeys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+    nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
+    nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
 
     environment.etc."nix/nix.conf".source = nixConf;
 
