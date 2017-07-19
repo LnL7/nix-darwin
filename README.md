@@ -121,110 +121,15 @@ Whether to activate system at boot time.
 
 ## Modules
 
-### system.defaults
-
-A set of [modules](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults) to manage macOS settings.
-
-```nix
-{
-  system.defaults.dock.autohide = true;
-  system.defaults.dock.orientation = "left";
-  system.defaults.dock.showhidden = true;
-}
-```
-
-> NOTE: you have to restart the dock in order for these changes to apply. `killall Dock`
-
-### environment.etc
-
-Set of files to be linked in `/etc`, this won't overwrite any existing files.
-Either modify the existing file to source/import the one from `/etc/static` or remove it.
-
-```nix
-{
-  environment.etc."foorc".text = ''
-    export FOO=1
-
-    if test -f /etc/foorc.local; then
-      . /etc/foorc.local
-    fi
-  '';
-
-  # Global user configuration, symlink these to the appropriate file:
-  # $ ln -s /etc/static/per-user/lnl/gitconfig ~/.gitconfig
-  environment.etc."per-user/lnl/gitconfig".text = ''
-    [include]
-      path = .gitconfig.local
-
-    [color]
-      ui = auto
-  '';
-}
-```
-
-### launchd.daemons
-
-Definition of launchd agents/daemons. The [serviceConfig](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix) options are used to generate the launchd plist file.
-
-```nix
-{
-  launchd.daemons.foo = {
-    serviceConfig.ProgramArguments = [ "/usr/bin/touch" "/tmp/foo.lock" ];
-    serviceConfig.RunAtLoad = true;
-  };
-}
-```
-
-### services
-
-A set of modules for predefined services, these generate the appropriate launchd daemons for you.
-
-```nix
-{
-  services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/nix/tmp";
-}
-```
-
-### programs
-
-A set of modules to manage configuration of certain programs.
-
-```nix
-{ pkgs, ... }:
-
-{
-  environment.shellAliases.ls = "${pkgs.coreutils}/bin/ls";
-
-  programs.bash.enable = true;
-
-  programs.vim.enable = true;
-  programs.vim.enableSensible = true;
-}
-```
-
-### nixpkgs.config
-
-This attribute set is used as nixpkgs configuration when using nix-darwin.
-
-```nix
-{
-  environment.systemPackages =
-    [ # Use vim_configurable from packageOverrides
-      lnl.vim
-    ];
-
-  nixpkgs.config.allowUnfree = true;
-
-  nixpkgs.config.packageOverrides = pkgs: {
-    lnl.vim = pkgs.vim_configurable.customize {
-      name = "vim";
-      vimrcConfig.customRC = ''
-        set nocompatible
-        filetype plugin indent on
-        syntax on
-      '';
-    };
-  };
-}
-```
+- [`environment`](https://github.com/LnL7/nix-darwin/blob/master/modules/environment)
+- [`launchd.daemons`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)
+- [`launchd.envVariables`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd)
+- [`launchd.user.agents`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)
+- [`networking`](https://github.com/LnL7/nix-darwin/blob/master/modules/networking)
+- [`nix`](https://github.com/LnL7/nix-darwin/tree/master/modules/nix)
+- [`programs`](https://github.com/LnL7/nix-darwin/tree/master/modules/programs)
+- [`security`](https://github.com/LnL7/nix-darwin/tree/master/modules/security)
+- [`services`](https://github.com/LnL7/nix-darwin/tree/master/modules/services)
+- [`system.defaults`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults)
+- [`system`](https://github.com/LnL7/nix-darwin/tree/master/modules/system)
+- [`time`](https://github.com/LnL7/nix-darwin/tree/master/modules/time)
