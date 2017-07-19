@@ -133,3 +133,12 @@ Whether to activate system at boot time.
 - [`system.defaults`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults)
 - [`system`](https://github.com/LnL7/nix-darwin/tree/master/modules/system)
 - [`time`](https://github.com/LnL7/nix-darwin/tree/master/modules/time)
+
+## Contributing
+
+Let's make nix on darwin awesome!
+Don't hesitate to contribute modules or open an issue.
+
+Also feel free to contact me if you have questions,
+- IRC - LnL, you can find me in #nixos or ##nix-darwin on freenode.net
+- @lnl7 on twitter
