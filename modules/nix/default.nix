@@ -292,8 +292,8 @@ in
           [ # Incldue default paths for <darwin> and <darwin-config>.
             "darwin=$HOME/.nix-defexpr/darwin"
             "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-            "nixpkgs=$HOME/.nix-defexpr/channels/nixpkgs"
             "$HOME/.nix-defexpr/channels"
+            "/nix/var/nix/profiles/per-user/root/channels"
           ];
         description = ''
           The default Nix expression search path, used by the Nix
