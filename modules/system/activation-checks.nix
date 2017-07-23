@@ -5,7 +5,7 @@ with lib;
 let
   darwinChanges = ''
     if test -e /run/current-system/darwin-changes; then
-      darwinChanges=$(grep -v -f /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null)
+      darwinChanges=$(grep -v -f /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
       if test -n "$darwinChanges"; then
         echo >&2
         echo "[1;1mCHANGELOG[0m" >&2
@@ -17,7 +17,7 @@ let
   '';
 
   buildUsers = optionalString config.services.nix-daemon.enable ''
-    buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}')
+    buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
     if [ -z $buildUser ]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
         echo "Create the build users or disable the daemon:" >&2
@@ -79,8 +79,6 @@ in
   config = {
 
     system.activationScripts.checks.text = ''
-      set +e
-
       ${darwinChanges}
       ${buildUsers}
       ${nixPath}
@@ -89,8 +87,6 @@ in
         echo "ok" >&2
         exit 0
       fi
-
-      set -e
     '';
 
   };
