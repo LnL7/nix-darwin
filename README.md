@@ -56,10 +56,6 @@ Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modu
 ## Manual Install
 
 ```bash
-# install nixpkgs version, which enables libsodium support (for signed binary caches)
-# this is not required if you already upgraded nix at some point
-nix-env -iA nixpkgs.nix
-
 sudo ln -s private/var/run /run
 
 git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin

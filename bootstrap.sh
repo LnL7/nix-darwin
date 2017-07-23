@@ -128,28 +128,6 @@ create_daemon_users(){
 install(){
     echo -e ""$BLUE_UL"Welcome to the nix-darwin installer!"$ESC""
 
-    # Prompt for nix package upgrade
-    echo -e "Ensuring "$YELLOW"nixpkgs"$ESC" version meets requirements..."
-    echo -e "To do this, the following will be run to upgrade the "$YELLOW"nix"$ESC" package:"
-    echo -e ""$YELLOW"nix-env -iA nixpkgs.nix"$ESC"\n"
-    echo "If you have a recent install of Nix, this may not be necessary, but should not cause any harm to run"
-    while true ; do
-        read -p "Would you like to upgrade? [y/n] " ANSWER
-        case $ANSWER in
-            y|Y)
-                echo "Proceeding with upgrade..."
-                nix-env -iA nixpkgs.nix || exit
-                break
-                ;;
-            n|N)
-                echo "Proceeding without upgrade..."
-                break
-                ;;
-            *)
-                echo "Please answer 'y' or 'n'..."
-        esac
-    done
-
     sudo_prompt || exit
 
     # Link run directory
