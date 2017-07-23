@@ -283,10 +283,8 @@ in
     nix.nixPath = mkOption {
       type = types.listOf types.str;
       default =
-        [ # Incldue default paths for <darwin> and <darwin-config>.
-          "darwin=$HOME/.nix-defexpr/darwin"
+        [ # Include default path <darwin-config>.
           "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-          "$HOME/.nix-defexpr/channels"
           "/nix/var/nix/profiles/per-user/root/channels"
         ];
       description = ''
