@@ -7,19 +7,19 @@ set -o pipefail
 # Argument parsing
 init(){
     if [ $# -gt 0 ]; then
-	case "$1" in
-	    -h|--help)
-		usage
-		exit 1
-		;;
-	    -u|--create-daemon-users)
-		export CREATE_DAEMON_USERS=true
-		;;
-	    *)
-		echo -e "ERROR: Unrecognized parameter: '${1}'\nSee usage (--help) for options..." 1>&2
-		exit 1
-		;;
-	esac
+        case "$1" in
+            -h|--help)
+                usage
+                exit 1
+                ;;
+            -u|--create-daemon-users)
+                export CREATE_DAEMON_USERS=true
+                ;;
+            *)
+                echo -e "ERROR: Unrecognized parameter: '${1}'\nSee usage (--help) for options..." 1>&2
+                exit 1
+                ;;
+        esac
     fi
 }
 
@@ -40,28 +40,28 @@ EOF
 sanity(){
     # Ensure the script is running on macOS
     if [ $(uname -s) != "Darwin" ]; then
-	echo "This script is for use with macOS!"
-	exit 1
+        echo "This script is for use with macOS!"
+        exit 1
     fi
 
     # Ensure script is not being run with root privileges
     if [ $EUID -eq 0 ]; then
-	echo "Please don't run this script with root privileges!"
-	exit 1
+        echo "Please don't run this script with root privileges!"
+        exit 1
     fi
 
     # Ensure Nix has already been installed
     if [[ ! $(type nix-env 2>/dev/null) ]]; then
-	echo -e "Cannot find "$YELLOW"nix-env"$ESC" in the PATH"
-	echo "Please ensure you've installed and configured your Nix environment correctly"
-	echo -e "Install instructions can be found at: "$BLUE_UL"https://nixos.org/nix/manual/#chap-quick-start"$ESC""
-	exit 1
+        echo -e "Cannot find "$YELLOW"nix-env"$ESC" in the PATH"
+        echo "Please ensure you've installed and configured your Nix environment correctly"
+        echo -e "Install instructions can be found at: "$BLUE_UL"https://nixos.org/nix/manual/#chap-quick-start"$ESC""
+        exit 1
     fi
 
     # Check if nix-darwin is already present
     if [[ $(type darwin-rebuild 2>/dev/null) ]]; then
-	echo -e "It looks like "$YELLOW"nix-darwin"$ESC" is already installed..."
-	[ ! -z $CREATE_DAEMON_USERS ] && create_daemon_users || exit 1
+        echo -e "It looks like "$YELLOW"nix-darwin"$ESC" is already installed..."
+        [ ! -z $CREATE_DAEMON_USERS ] && create_daemon_users || exit 1
     fi
 }
 
@@ -73,10 +73,10 @@ exit_message(){
 
 # Prompt for  sudo password & keep alive
 sudo_prompt(){
-    echo "Please enter your password for sudo authentication"
-    sudo -k
-    sudo echo "sudo authenticaion successful!"
-    while true ; do sudo -n true ; sleep 60 ; kill -0 "$$" || exit ; done 2>/dev/null &
+  echo "Please enter your password for sudo authentication"
+  sudo -k
+  sudo echo "sudo authenticaion successful!"
+  while true ; do sudo -n true ; sleep 60 ; kill -0 "$$" || exit ; done 2>/dev/null &
 }
 
 # Daemon setup
@@ -90,35 +90,35 @@ create_daemon_users(){
     /usr/bin/dscl . -read /Groups/nixbld &> /dev/null
     retCode=$?
     if [[ $retCode != 0 ]]; then
-	echo -e "Creating the "$YELLOW"nixbld"$ESC" group..."
-	sudo /usr/sbin/dseditgroup -o create -r "Nix build group for nix-daemon" -i 30000 nixbld >&2 || \
-	    exit_message "Problem creating group: nixbld"
+        echo -e "Creating the "$YELLOW"nixbld"$ESC" group..."
+        sudo /usr/sbin/dseditgroup -o create -r "Nix build group for nix-daemon" -i 30000 nixbld >&2 || \
+            exit_message "Problem creating group: nixbld"
     else
-	echo -e "It looks like the "$YELLOW"nixbld"$ESC" group already exists!"
+        echo -e "It looks like the "$YELLOW"nixbld"$ESC" group already exists!"
     fi
 
     for i in {1..10}; do
-	/usr/bin/id nixbld${i} &> /dev/null
-	retCode=$?
-	if [[ $retCode != 0 ]]; then
-	    echo -e "Creating user: "$YELLOW"nixbld${i}"$ESC"..."
-	    sudo /usr/sbin/sysadminctl -fullName "Nix build user $i" \
-		 -home /var/empty \
-		 -UID $(expr 30000 + $i) \
-		 -addUser nixbld$i >&2 \
-		|| exit_message "Problem creating user: nixbld${i}"
+        /usr/bin/id nixbld${i} &> /dev/null
+        retCode=$?
+        if [[ $retCode != 0 ]]; then
+            echo -e "Creating user: "$YELLOW"nixbld${i}"$ESC"..."
+            sudo /usr/sbin/sysadminctl -fullName "Nix build user $i" \
+                -home /var/empty \
+                -UID $(expr 30000 + $i) \
+                -addUser nixbld$i >&2 \
+                || exit_message "Problem creating user: nixbld${i}"
 
-	    sudo dscl . -create /Users/nixbld$i IsHidden 1 || \
-		exit_message "Problem setting 'IsHidden' for user: nixbld${i}"
-	    sudo dscl . -create /Users/nixbld$i UserShell /sbin/nologin || \
-		exit_message "Problem setting shell for user: nixbld${i}"
-	    sudo /usr/sbin/dseditgroup -o edit -t user -a nixbld$i nixbld || \
-		exit_message "Problem setting primary group for user: nixbld${i}"
-	    sudo /usr/bin/dscl . -create /Users/nixbld$i PrimaryGroupID 30000 >&2 || \
-		exit_message "Problem setting PrimaryGroupID for user: nixbld${i}"
-	else
-	    echo -e "It looks like the "$YELLOW"nixbld${i}"$ESC" user already exists!"
-	fi
+            sudo dscl . -create /Users/nixbld$i IsHidden 1 || \
+                exit_message "Problem setting 'IsHidden' for user: nixbld${i}"
+            sudo dscl . -create /Users/nixbld$i UserShell /sbin/nologin || \
+                exit_message "Problem setting shell for user: nixbld${i}"
+            sudo /usr/sbin/dseditgroup -o edit -t user -a nixbld$i nixbld || \
+                exit_message "Problem setting primary group for user: nixbld${i}"
+            sudo /usr/bin/dscl . -create /Users/nixbld$i PrimaryGroupID 30000 >&2 || \
+                exit_message "Problem setting PrimaryGroupID for user: nixbld${i}"
+        else
+            echo -e "It looks like the "$YELLOW"nixbld${i}"$ESC" user already exists!"
+        fi
     done
 
     [ ! -z $CREATE_DAEMON_USERS ] && exit 0
@@ -134,20 +134,20 @@ install(){
     echo -e ""$YELLOW"nix-env -iA nixpkgs.nix"$ESC"\n"
     echo "If you have a recent install of Nix, this may not be necessary, but should not cause any harm to run"
     while true ; do
-	read -p "Would you like to upgrade? [y/n] " ANSWER
-	case $ANSWER in
-	    y|Y)
-		echo "Proceeding with upgrade..."
-		nix-env -iA nixpkgs.nix || exit
-		break
-		;;
-	    n|N)
-		echo "Proceeding without upgrade..."
-		break
-		;;
-	    *)
-		echo "Please answer 'y' or 'n'..."
-	esac
+        read -p "Would you like to upgrade? [y/n] " ANSWER
+        case $ANSWER in
+            y|Y)
+                echo "Proceeding with upgrade..."
+                nix-env -iA nixpkgs.nix || exit
+                break
+                ;;
+            n|N)
+                echo "Proceeding without upgrade..."
+                break
+                ;;
+            *)
+                echo "Please answer 'y' or 'n'..."
+        esac
     done
 
     sudo_prompt || exit
@@ -197,19 +197,19 @@ install(){
     echo -e "this script with "$YELLOW"-u"$ESC" or "$YELLOW"--create-daemon-users"$ESC""
 
     while true ; do
-	read -p "Would you like to create the Nix daemon group/users? [y/n] " ANSWER
-	case $ANSWER in
-	    y|Y)
-		create_daemon_users || exit
-		break
-		;;
-	    n|N)
-		echo "Not creating Nix daemon group/users"
-		break
-		;;
-	    *)
-		echo "Please answer 'y' or 'n'..."
-	esac
+        read -p "Would you like to create the Nix daemon group/users? [y/n] " ANSWER
+        case $ANSWER in
+            y|Y)
+                create_daemon_users || exit
+                break
+                ;;
+            n|N)
+                echo "Not creating Nix daemon group/users"
+                break
+                ;;
+            *)
+                echo "Please answer 'y' or 'n'..."
+        esac
     done
 
     # Finish
