@@ -174,21 +174,24 @@ install(){
     echo    "If you decide not to, but later change your mind, you can always re-run"
     echo -e "this script with "$YELLOW"-u"$ESC" or "$YELLOW"--create-daemon-users"$ESC""
 
-    while true ; do
-        read -p "Would you like to create the Nix daemon group/users? [y/n] " ANSWER
-        case $ANSWER in
-            y|Y)
-                create_daemon_users || exit
-                break
-                ;;
-            n|N)
-                echo "Not creating Nix daemon group/users"
-                break
-                ;;
-            *)
-                echo "Please answer 'y' or 'n'..."
-        esac
-    done
+    if ! dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
+        while true; do
+            read -p "Would you like to create the Nix daemon group/users? [y/n] " ANSWER
+            case $ANSWER in
+                y|Y)
+                    create_daemon_users || exit
+                    break
+                    ;;
+                n|N)
+                    echo "Not creating Nix daemon group/users"
+                    break
+                    ;;
+                *)
+                    echo "Please answer 'y' or 'n'..."
+                    ;;
+            esac
+        done
+    fi
 
     # Finish
     echo -e ""$GREEN"You're all done!"$ESC""
