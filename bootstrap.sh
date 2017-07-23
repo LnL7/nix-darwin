@@ -193,6 +193,24 @@ install(){
         done
     fi
 
+    if ! grep /etc/static/bashrc /etc/bashrc &> /dev/null; then
+        while true; do
+            read -p "Would you like to configure /etc/bashrc? [y/n] " ANSWER
+            case $ANSWER in
+                y|Y)
+                    echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc
+                    break
+                    ;;
+                n|N)
+                    break
+                    ;;
+                *)
+                    echo "Please answer 'y' or 'n'..."
+                    ;;
+            esac
+        done
+    fi
+
     # Finish
     echo -e ""$GREEN"You're all done!"$ESC""
     echo -e "Take a look at "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC" to get started."
