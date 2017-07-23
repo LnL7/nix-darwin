@@ -67,8 +67,15 @@ in
 
     system.activationScripts.checks.text = ''
       set +e
+
       ${buildUsers}
       ${nixPath}
+
+      if test ''${checkActivation:-0} -eq 1; then
+        echo "ok" >&2
+        exit 0
+      fi
+
       set -e
     '';
 

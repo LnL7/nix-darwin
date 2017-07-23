@@ -52,6 +52,10 @@ while [ "$#" -gt 0 ]; do
       k="$1"; shift 1
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
+    --check)
+      action="check"
+      export checkActivation=1
+      ;;
     --rollback)
       action="rollback"
       extraProfileFlags=("$i")
@@ -85,12 +89,12 @@ done
 
 if [ -z "$action" ]; then showSyntax; fi
 
-if [ "$action" = switch ]; then
+if [ "$action" = switch -o "$action" = check ]; then
   extraBuildFlags+=("--no-out-link")
 fi
 
 echo "building the system configuration..." >&2
-if [ "$action" = switch -o "$action" = build ]; then
+if [ "$action" = switch -o "$action" = build -o "$action" = check ]; then
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
 fi
 
@@ -126,4 +130,8 @@ if [ "$action" = switch -o "$action" = rollback ]; then
   else
     $systemConfig/activate
   fi
+fi
+
+if [ "$action" = check ]; then
+  $systemConfig/activate-user
 fi
