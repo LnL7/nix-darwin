@@ -20,24 +20,39 @@ let
 
   nixPath = optionalString true ''
     darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>')
-    if [ -z $darwinPath ]; then
+    if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
         echo "Move you configuration.nix or set NIX_PATH:" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"darwi-config=${builtins.toString <darwin-config>}\" ];" >&2
+        echo "    nix.nixPath = [ \"darwin-config=${builtins.toString <darwin-config>}\" ];" >&2
         echo >&2
         exit 2
     fi
 
     darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>')
-    if [ -z $darwinPath ]; then
+    if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set NIX_PATH:" >&2
         echo "$ sudo nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin" >&2
+        echo "$ sudo nix-channel --update" >&2
         echo >&2
         echo "or set" >&2
         echo >&2
         echo "    nix.nixPath = [ \"darwin=${builtins.toString <darwin>}\" ];" >&2
+        echo >&2
+        exit 2
+    fi
+
+    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<nixpkgs>')
+    if ! test -e "$nixpkgsPath"; then
+        echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
+        echo "Add a nixpkgs channel or set NIX_PATH:" >&2
+        echo "$ sudo nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs" >&2
+        echo "$ sudo nix-channel --update" >&2
+        echo >&2
+        echo "or set" >&2
+        echo >&2
+        echo "    nix.nixPath = [ \"nixpkgs=${builtins.toString <nixpkgs>}\" ];" >&2
         echo >&2
         exit 2
     fi
