@@ -9,9 +9,11 @@
 
   # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
-  programs.bash.enableCompletion = false;
 
   # Recreate /run/current-system symlink after boot.
   services.activate-system.enable = true;
 
+  # You should generally set this to the total number of logical cores in your system.
+  # $ sysctl -n hw.ncpu
+  nix.maxJobs = 1;
 }
