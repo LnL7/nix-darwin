@@ -1,5 +1,5 @@
 2017-07-23
-- darwin entry in default the nix.nixPath was removed
+- darwin entry in the default nix.nixPath was removed
 
     Use a channel for nix-darwin or configure nix.nixPath
 
