@@ -24,7 +24,7 @@ let
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
         echo "Move you configuration.nix or set NIX_PATH:" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"darwin-config=${builtins.toString <darwin-config>}\" ];" >&2
+        echo "    nix.nixPath = [ \"darwin-config=$(nix-instantiate --eval -E '<darwin-config>')\" ];" >&2
         echo >&2
         exit 2
     fi
@@ -38,7 +38,7 @@ let
         echo >&2
         echo "or set" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"darwin=${builtins.toString <darwin>}\" ];" >&2
+        echo "    nix.nixPath = [ \"darwin=$(nix-instantiate --eval -E '<darwin>')\" ];" >&2
         echo >&2
         exit 2
     fi
@@ -52,7 +52,7 @@ let
         echo >&2
         echo "or set" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"nixpkgs=${builtins.toString <nixpkgs>}\" ];" >&2
+        echo "    nix.nixPath = [ \"nixpkgs=$(nix-instantiate --eval -E '<darwin>')\" ];" >&2
         echo >&2
         exit 2
     fi
