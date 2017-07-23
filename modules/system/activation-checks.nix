@@ -5,7 +5,7 @@ with lib;
 let
   darwinChanges = ''
     if test -e /run/current-system/darwin-changes; then
-      darwinChanges=$(grep -v -f /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
+      darwinChanges=$(diff --changed-group-format='%>' --unchanged-group-format= /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
       if test -n "$darwinChanges"; then
         echo >&2
         echo "[1;1mCHANGELOG[0m" >&2
