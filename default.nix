@@ -20,6 +20,7 @@ let
         packages
         ./modules/alias.nix
         ./modules/system
+        ./modules/system/activation-checks.nix
         ./modules/system/activation-scripts.nix
         ./modules/system/defaults-write.nix
         ./modules/system/defaults/NSGlobalDomain.nix

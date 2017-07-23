@@ -52,9 +52,7 @@ in
 
       ${cfg.activationScripts.extraActivation.text}
 
-      ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.nix.text}
-
       ${cfg.activationScripts.accessibility.text}
       ${cfg.activationScripts.applications.text}
       ${cfg.activationScripts.etc.text}
@@ -87,6 +85,8 @@ in
 
       # Ensure a consistent umask.
       umask 0022
+
+      ${cfg.activationScripts.checks.text}
 
       ${cfg.activationScripts.extraUserActivation.text}
 
