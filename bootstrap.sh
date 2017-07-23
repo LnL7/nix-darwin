@@ -215,6 +215,8 @@ install(){
     echo -e ""$GREEN"You're all done!"$ESC""
     echo -e "Take a look at "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC" to get started."
     echo -e "See the README for more information: "$BLUE_UL"https://github.com/LnL7/nix-darwin/blob/master/README.md"$ESC""
+    echo
+    echo    "Don't forget to start a new shell or source /etc/bashrc."
 }
 
 main(){
