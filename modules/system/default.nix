@@ -87,6 +87,9 @@ in
 
         systemConfig=$out
 
+        mkdir -p $out/darwin
+        cp -f ${<darwin/CHANGELOG>} $out/darwin-changes
+
         ln -s ${cfg.build.etc}/etc $out/etc
         ln -s ${cfg.path} $out/sw
 

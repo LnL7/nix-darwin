@@ -3,6 +3,19 @@
 with lib;
 
 let
+  darwinChanges = ''
+    if test -e /run/current-system/darwin-changes; then
+      darwinChanges=$(grep -v -f /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null)
+      if test -n "$darwinChanges"; then
+        echo >&2
+        echo "[1;1mCHANGELOG[0m" >&2
+        echo >&2
+        echo "$darwinChanges" >&2
+        echo >&2
+      fi
+    fi
+  '';
+
   buildUsers = optionalString config.services.nix-daemon.enable ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}')
     if [ -z $buildUser ]; then
@@ -18,7 +31,7 @@ let
     fi
   '';
 
-  nixPath = optionalString true ''
+  nixPath = ''
     darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>')
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
@@ -68,6 +81,7 @@ in
     system.activationScripts.checks.text = ''
       set +e
 
+      ${darwinChanges}
       ${buildUsers}
       ${nixPath}
 
