@@ -65,7 +65,7 @@ let
         echo >&2
         echo "or set" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"nixpkgs=$(nix-instantiate --eval -E '<darwin>')\" ];" >&2
+        echo "    nix.nixPath = [ \"nixpkgs=$(nix-instantiate --eval -E '<nixpkgs>')\" ];" >&2
         echo >&2
         exit 2
     fi
