@@ -32,7 +32,7 @@ let
   '';
 
   nixPath = ''
-    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>')
+    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>') || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
         echo "Move you configuration.nix or set NIX_PATH:" >&2
@@ -42,7 +42,7 @@ let
         exit 2
     fi
 
-    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>')
+    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>') || true
     if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set NIX_PATH:" >&2
@@ -56,7 +56,7 @@ let
         exit 2
     fi
 
-    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<nixpkgs>')
+    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<nixpkgs>') || true
     if ! test -e "$nixpkgsPath"; then
         echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
         echo "Add a nixpkgs channel or set NIX_PATH:" >&2
