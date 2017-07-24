@@ -28,6 +28,7 @@ The bootstrap installer will configure a channel for this repository.
 
 ```bash
 sudo nix-channel --update darwin
+darwin-rebuild changelog
 ```
 
 ## Example configuration
