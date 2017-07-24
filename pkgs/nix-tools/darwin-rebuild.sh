@@ -5,7 +5,8 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "darwin-rebuild [--help] {build | switch | check} [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&1
+  echo "darwin-rebuild [--help] {build | switch | check | changelog}" >&2
+  echo "               [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&1
   echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
   echo "               [--dry-run] [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
   echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
@@ -26,12 +27,8 @@ while [ "$#" -gt 0 ]; do
     --help)
       showSyntax
       ;;
-    switch|build)
+    switch|build|changelog|check)
       action="$i"
-      ;;
-    check)
-      action="$i"
-      export checkActivation=1
       ;;
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
@@ -89,12 +86,12 @@ done
 
 if [ -z "$action" ]; then showSyntax; fi
 
-if [ "$action" = switch -o "$action" = check ]; then
+if ! [ "$action" = build ]; then
   extraBuildFlags+=("--no-out-link")
 fi
 
 echo "building the system configuration..." >&2
-if [ "$action" = switch -o "$action" = build -o "$action" = check ]; then
+if ! [ "$action" = rollback ]; then
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
 fi
 
@@ -132,6 +129,15 @@ if [ "$action" = switch -o "$action" = rollback ]; then
   fi
 fi
 
+if [ "$action" = changelog ]; then
+  echo >&2
+  echo "[1;1mCHANGELOG[0m" >&2
+  echo >&2
+  head -n 32 $systemConfig/darwin-changes
+  echo >&2
+fi
+
 if [ "$action" = check ]; then
+  export checkActivation=1
   $systemConfig/activate-user
 fi
