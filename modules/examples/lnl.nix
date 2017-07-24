@@ -21,6 +21,9 @@
 
   system.defaults.trackpad.Clicking = true;
 
+  services.nix-daemon.enable = true;
+  services.nix-daemon.tempDir = "/build/tmp";
+
   nix.package = pkgs.nixUnstable;
 
   environment.systemPackages =
@@ -288,8 +291,8 @@
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
       "darwin=$HOME/.nix-defexpr/darwin"
-      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
+      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
       "/nix/var/nix/profiles/per-user/root/channels"
     ];
 
