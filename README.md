@@ -27,7 +27,7 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 The bootstrap installer will configure a channel for this repository.
 
 ```bash
-nix-channel --update darwin
+sudo nix-channel --update darwin
 ```
 
 ## Example configuration
