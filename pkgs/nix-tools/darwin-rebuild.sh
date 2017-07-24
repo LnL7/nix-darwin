@@ -5,7 +5,7 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "darwin-rebuild [--help] {build | switch} [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&2
+  echo "darwin-rebuild [--help] {build | switch | check} [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&1
   echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
   echo "               [--dry-run] [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
   echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
@@ -29,6 +29,10 @@ while [ "$#" -gt 0 ]; do
     switch|build)
       action="$i"
       ;;
+    check)
+      action="$i"
+      export checkActivation=1
+      ;;
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
       ;;
@@ -51,10 +55,6 @@ while [ "$#" -gt 0 ]; do
       j="$1"; shift 1
       k="$1"; shift 1
       extraBuildFlags+=("$i" "$j" "$k")
-      ;;
-    --check)
-      action="check"
-      export checkActivation=1
       ;;
     --rollback)
       action="rollback"
