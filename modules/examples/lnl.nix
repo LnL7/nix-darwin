@@ -22,7 +22,7 @@
   system.defaults.trackpad.Clicking = true;
 
   services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/build/tmp";
+  services.nix-daemon.tempDir = "/nix/var/tmp";
 
   nix.package = pkgs.nixUnstable;
 
