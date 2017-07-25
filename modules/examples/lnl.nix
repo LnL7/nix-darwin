@@ -101,27 +101,6 @@
     { names = [ "python-mode" ]; }
   ];
 
-  programs.vim.extraKnownPlugins = with pkgs; {
-    ale = vimUtils.buildVimPluginFrom2Nix {
-      name = "vim-ale-2017-05-16";
-      src = fetchgit {
-        url = "https://github.com/w0rp/ale";
-        rev = "e2860f8a26dc9c04bb4ad6fb59ffb8c743717149";
-        sha256 = "1mpqvfyl47ap32g9qprxpwfcgxhm25ar6qy3p01n77fygva0371d";
-      };
-    };
-
-    vim-nix = vimUtils.buildVimPluginFrom2Nix {
-      name = "vim-nix-2017-04-30";
-      src = fetchFromGitHub {
-        owner = "LnL7";
-        repo = "vim-nix";
-        rev = "867488a04c2ddc47f0f235f37599a06472fea299";
-        sha256 = "1mwc06z9q45cigyxd0r9qnfs4ph6lbcwx50rf5lmpavakcn3vqir";
-      };
-    };
-  };
-
   programs.vim.vimConfig =  ''
     colorscheme solarized
     set bg=dark
