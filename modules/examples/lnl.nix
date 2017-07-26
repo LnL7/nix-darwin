@@ -433,16 +433,6 @@
     switcher - 5            :   kwmc space -fExperimental 5
     switcher - 6            :   kwmc space -fExperimental 6
 
-    switcher - z            :   kwmc space -fExperimental left
-    switcher - c            :   kwmc space -fExperimental right
-    switcher - f            :   kwmc space -fExperimental previous
-
-    switcher + shift - z    :   kwmc window -m space left;\
-                                kwmc space -fExperimental left
-
-    switcher + shift - c    :   kwmc window -m space right;\
-                                kwmc space -fExperimental right
-
     switcher + shift - 1    :   kwmc display -f 0
     switcher + shift - 2    :   kwmc display -f 1
     switcher + shift - 3    :   kwmc display -f 2
