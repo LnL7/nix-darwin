@@ -34,13 +34,18 @@
       pkgs.htop
       pkgs.jq
       pkgs.mosh
+      pkgs.shellcheck
       pkgs.silver-searcher
+      pkgs.taskwarrior
 
       pkgs.khd
       pkgs.kwm
 
       pkgs.nixUnstable
+      # pkgs.nix
       pkgs.nix-repl
+
+      pkgs.emacsMacport
     ];
 
   environment.extraOutputsToInstall = [ "man" ];
@@ -78,6 +83,7 @@
 
   programs.tmux.tmuxConfig = ''
     bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
+    bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
 
     bind 0 set status
 
@@ -135,6 +141,10 @@
     cnoremap %% <C-r>=expand('%:h') . '/'<CR>
 
     let mapleader = ' '
+    nnoremap <Leader>( :tabprevious<CR>
+    nnoremap <Leader>) :tabnext<CR>
+
+    nnoremap <Leader>! :Dispatch!<CR>
     nnoremap <Leader>p :FZF<CR>
     nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
 
@@ -179,6 +189,7 @@
 
     let g:ale_sign_error = '⨉'
     let g:ale_sign_warning = '⚠'
+    let g:ale_virtualenv_dir_names = ['venv']
 
     " let g:ycm_add_preview_to_completeopt = 1
     let g:ycm_autoclose_preview_window_after_completion = 1
@@ -197,7 +208,6 @@
     let g:pymode_options_max_line_length = 120
     let g:pymode_rope_complete_on_dot = 0
     let g:pymode_rope_regenerate_on_write = 0
-
   '';
 
   programs.zsh.enable = true;
@@ -251,6 +261,7 @@
     zle -N up-line-or-beginning-search
   '';
 
+  environment.variables.FZF_DEFAULT_COMMAND = "ag -l -f -g ''";
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
 
   environment.shellAliases.g = "git log --pretty=color -32";
