@@ -52,6 +52,7 @@ let
         ./modules/programs/fish.nix
         ./modules/programs/man.nix
         ./modules/programs/info
+        ./modules/programs/nix-index
         ./modules/programs/nix-script.nix
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
