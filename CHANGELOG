@@ -1,3 +1,8 @@
+2017-07-28
+- added support for command-not-found, using nix-index
+
+    programs.nix-index.enable = true;
+
 2017-07-23
 - darwin entry in the default nix.nixPath was removed
 
