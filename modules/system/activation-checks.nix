@@ -4,15 +4,18 @@ with lib;
 
 let
   darwinChanges = ''
+    darwinChanges=/dev/null
     if test -e /run/current-system/darwin-changes; then
-      darwinChanges=$(diff --changed-group-format='%>' --unchanged-group-format= /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
-      if test -n "$darwinChanges"; then
-        echo >&2
-        echo "[1;1mCHANGELOG[0m" >&2
-        echo >&2
-        echo "$darwinChanges" >&2
-        echo >&2
-      fi
+      darwinChanges=/run/current-system/darwin-changes
+    fi
+
+    darwinChanges=$(diff --changed-group-format='%>' --unchanged-group-format= /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
+    if test -n "$darwinChanges"; then
+      echo >&2
+      echo "[1;1mCHANGELOG[0m" >&2
+      echo >&2
+      echo "$darwinChanges" >&2
+      echo >&2
     fi
   '';
 
