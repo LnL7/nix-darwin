@@ -61,7 +61,7 @@ in
       0) echo "yes" ;;
       1)
         echo "no, created"
-        sysadminctl -addUser hydra -fullName "Hydra" -UID 122 >&2 || exit
+        sysadminctl -addUser hydra -fullName "Hydra" >&2 || exit
         dscl . -create /Users/hydra IsHidden 1 || exit
         ;;
     esac
