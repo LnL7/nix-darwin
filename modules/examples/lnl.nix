@@ -73,6 +73,7 @@
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
   nix.trustedUsers = [ "@admin" ];
 
+  programs.nix-index.enable = true;
   # programs.nix-script.enable = true;
 
   programs.tmux.enable = true;
@@ -287,8 +288,9 @@
     ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.packageOverrides = pkgs: {
-    ycmd = pkgs.ycmd.override { gocode = null; godef = null; rustracerd = null; };
+
+  nixpkgs.config.packageOverrides = super: let self = super.pkgs; in {
+    ycmd = super.ycmd.override { gocode = null; godef = null; rustracerd = null; };
   };
 
   # TODO: add module for per-user config, etc, ...
