@@ -285,6 +285,7 @@
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
       "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
       "/nix/var/nix/profiles/per-user/root/channels"
+      "$HOME/.nix-defexpr/channels"
     ];
 
   nixpkgs.config.allowUnfree = true;

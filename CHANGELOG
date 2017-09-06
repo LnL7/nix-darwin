@@ -1,3 +1,10 @@
+2017-07-06
+- added user channels to the default nix.nixPath
+
+    Using a user channel now works without any custom configuration.
+    See https://github.com/NixOS/nix/issues/1548 if you are running into
+    issues when updating your channel.
+
 2017-07-28
 - added support for command-not-found, using nix-index
 
