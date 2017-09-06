@@ -48,8 +48,6 @@
       pkgs.emacsMacport
     ];
 
-  environment.extraOutputsToInstall = [ "man" ];
-
   security.enableAccessibilityAccess = true;
   services.khd.enable = true;
   services.kwm.enable = true;
