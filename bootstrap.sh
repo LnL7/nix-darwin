@@ -141,15 +141,12 @@ install(){
     nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin || exit
     nix-channel --update || exit
 
-    # Create symlink for old NIX_PATH entry
-    ln -sfn "/nix/var/nix/profiles/per-user/root/channels/darwin" "$HOME/.nix-defexpr/darwin" || exit
-
     # Copy the example configuration
     echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
 
     if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
       mkdir -p "$HOME/.nixpkgs" || exit
-      cp "$HOME/.nix-defexpr/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+      cp "$HOME/.nix-defexpr/channels/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
       chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
     fi
 
