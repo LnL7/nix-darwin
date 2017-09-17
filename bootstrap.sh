@@ -142,9 +142,8 @@ install(){
     nix-channel --update || exit
 
     # Copy the example configuration
-    echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
-
     if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
+      echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
       mkdir -p "$HOME/.nixpkgs" || exit
       cp "$HOME/.nix-defexpr/channels/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
       chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
@@ -152,7 +151,7 @@ install(){
 
     # Bootstrap build using default nix.nixPath
     echo "Bootstrapping..."
-    export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
+    export NIX_PATH=darwin=$HOME/.nix-defexpr/channels/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
     $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build || exit
     $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch || exit
 
