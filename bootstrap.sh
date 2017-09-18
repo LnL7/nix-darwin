@@ -6,11 +6,18 @@ set -o pipefail
 
 # Argument parsing
 init(){
-    if [ $# -gt 0 ]; then
+    while [[ $# -gt 0 ]]; do
         case "$1" in
+            -c|--configuration)
+                export CONFIGURATION="$2"
+                shift
+                ;;
             -h|--help)
                 usage
                 exit 1
+                ;;
+            -i|--install-nix)
+                export INSTALL_NIX=true
                 ;;
             -u|--create-daemon-users)
                 export CREATE_DAEMON_USERS=true
@@ -20,7 +27,8 @@ init(){
                 exit 1
                 ;;
         esac
-    fi
+        shift
+    done
 }
 
 # Usage
@@ -30,7 +38,9 @@ usage(){
 
  Options:
 
+   -c, --configuration: URL pointing to an existing Nix configuration
    -h, --help: Show this message
+   -i, --install-nix: Automatically install Nix if not already installed
    -u, --create-daemon-users: Create users & group for use with the Nix daemon
 EOF
 }
@@ -52,10 +62,17 @@ sanity(){
 
     # Ensure Nix has already been installed
     if [[ ! $(type nix-env 2>/dev/null) ]]; then
-        echo -e "Cannot find "$YELLOW"nix-env"$ESC" in the PATH"
-        echo "Please ensure you've installed and configured your Nix environment correctly"
-        echo -e "Install instructions can be found at: "$BLUE_UL"https://nixos.org/nix/manual/#chap-quick-start"$ESC""
-        exit 1
+        if [ ! -z $INSTALL_NIX ]; then
+            echo "Installing Nix ..."
+            # from https://nixos.org/nix/manual/#chap-quick-start
+            curl https://nixos.org/nix/install | sh || exit 1
+            . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+        else
+            echo -e "Cannot find "$YELLOW"nix-env"$ESC" in the PATH"
+            echo -e "Please ensure you've installed and configured your Nix environment correctly or use the --install-nix option."
+            echo -e "Install instructions can be found at: "$BLUE_UL"https://nixos.org/nix/manual/#chap-quick-start"$ESC""
+            exit 1
+        fi
     fi
 
     # Check if nix-darwin is already present
@@ -141,12 +158,19 @@ install(){
     nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin || exit
     nix-channel --update || exit
 
-    # Copy the example configuration
+    # Set up the configuration
     if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
-      echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
-      mkdir -p "$HOME/.nixpkgs" || exit
-      cp "$HOME/.nix-defexpr/channels/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
-      chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+        if [ ! -z $CONFIGURATION ]; then
+            echo -e "Copying $CONFIGURATION to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
+            curl $CONFIGURATION > "~/.nixpkgs/darwin-configuration.nix"
+        else
+            echo -e "Copying example configuration to "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
+            mkdir -p "$HOME/.nixpkgs" || exit
+            cp "$HOME/.nix-defexpr/channels/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+            chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+        fi
+    else
+      echo -e "Using the existing "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC"..."
     fi
 
     # Bootstrap build using default nix.nixPath
