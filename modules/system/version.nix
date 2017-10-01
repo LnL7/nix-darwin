@@ -1,9 +1,11 @@
-{ config, lib, pkgs, ... }:
+{ options, config, lib, pkgs, ... }:
 
 with lib;
 
 let
   cfg = config.system;
+
+  defaultStateVersion = options.system.stateVersion.default;
 
   gitCommitId = lib.substring 0 7 (commitIdFromGitRepo gitRepo);
   gitRepo = "${toString pkgs.path}/.git";
@@ -71,6 +73,8 @@ in
     system.nixpkgsVersion = mkDefault (cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix);
     system.nixpkgsRevision = mkIf (pathIsDirectory gitRepo) (mkDefault gitCommitId);
     system.nixpkgsVersionSuffix = mkIf (pathIsDirectory gitRepo) (mkDefault (".git." + gitCommitId));
+
+    assertions = [ { assertion = cfg.stateVersion <= defaultStateVersion; message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value"; } ];
 
   };
 }
