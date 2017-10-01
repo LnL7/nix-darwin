@@ -11,7 +11,8 @@
     programs.nix-index.enable = true;
 
 2017-07-23
-- darwin entry in the default nix.nixPath was removed
+- darwin entry in the default nix.nixPath was removed for
+  system.stateVersion > 1
 
     Use a channel for nix-darwin or configure nix.nixPath
 
