@@ -42,11 +42,6 @@ in
       '';
     };
 
-    system.darwinLabel = mkOption {
-      type = types.str;
-      default = pkgs.lib.nixpkgsVersion;
-    };
-
     assertions = mkOption {
       type = types.listOf types.unspecified;
       internal = true;

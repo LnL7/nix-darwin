@@ -31,6 +31,7 @@ let
         ./modules/system/applications.nix
         ./modules/system/etc.nix
         ./modules/system/launchd.nix
+        ./modules/system/version.nix
         ./modules/time
         ./modules/networking
         ./modules/nix
