@@ -1,3 +1,8 @@
+2017-10-01
+- added system.stateVersion option, add this to your configuration to
+  avoid breaking changes.  This changelog and the activation checks
+  will show instructions on what to do to safely increment this value.
+
 2017-07-06
 - added user channels to the default nix.nixPath
 
