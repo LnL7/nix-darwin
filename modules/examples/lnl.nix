@@ -234,6 +234,22 @@
       nix-repl '<nixpkgs/lib>' ''${@:-<nixpkgs>}
     }
 
+    hydra-job-revision() {
+      local jobseteval job=$1
+      jobseteval=$(curl -fL -H 'Content-Type: application/json' "$job/latest" | jq '.jobsetevals[0]')
+      curl -f -H 'Content-Type: application/json' "''${job%/job*}/eval/$jobseteval" | jq -r '.jobsetevalinputs.nixpkgs.revision'
+    }
+
+    hydra-job-outputs() {
+      local job=$1
+      curl -fL -H 'Content-Type: application/json' "$job/latest" | jq -r '.buildoutputs | to_entries | .[].value.path'
+    }
+
+    hydra-build-log() {
+      local build=$1
+      nix log "$(curl -f -H 'Content-Type: application/json' "$build/api/get-info" | jq -r .drvPath)"
+    }
+
     reexec() {
       unset __ETC_ZSHRC_SOURCED
       unset __ETC_ZSHENV_SOURCED
