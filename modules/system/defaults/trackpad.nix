@@ -21,5 +21,13 @@ with lib;
       '';
     };
 
+    system.defaults.trackpad.TrackpadThreeFingerDrag = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable three finger drag.  The default is false.
+      '';
+    };
+
   };
 }
