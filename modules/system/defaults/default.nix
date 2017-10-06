@@ -20,7 +20,8 @@ let
   global = defaultsToList "-g" cfg.global;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
-  trackpad = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
+  trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
+  trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
 
 in
@@ -39,6 +40,7 @@ in
       ${concatStringsSep "\n" dock}
       ${concatStringsSep "\n" finder}
       ${concatStringsSep "\n" trackpad}
+      ${concatStringsSep "\n" trackpadBluetooth}
       ${concatStringsSep "\n" LaunchServices}
     '';
 
