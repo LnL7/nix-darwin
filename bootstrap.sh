@@ -50,6 +50,10 @@ sanity(){
         exit 1
     fi
 
+    if [[ -e /etc/static/bashrc ]]; then
+        . /etc/static/bashrc
+    fi
+
     # Ensure Nix has already been installed
     if [[ ! $(type nix-env 2>/dev/null) ]]; then
         echo -e "Cannot find "$YELLOW"nix-env"$ESC" in the PATH"
@@ -61,7 +65,6 @@ sanity(){
     # Check if nix-darwin is already present
     if [[ $(type darwin-rebuild 2>/dev/null) ]]; then
         echo -e "It looks like "$YELLOW"nix-darwin"$ESC" is already installed..."
-        [ ! -z $CREATE_DAEMON_USERS ] && create_daemon_users || exit 1
     fi
 }
 
@@ -152,7 +155,6 @@ install(){
     # Bootstrap build using default nix.nixPath
     echo "Bootstrapping..."
     export NIX_PATH=darwin=$HOME/.nix-defexpr/channels/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
-    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build || exit
     $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch || exit
 
     # Source generated bashrc
@@ -189,22 +191,24 @@ install(){
         done
     fi
 
-    if ! grep /etc/static/bashrc /etc/bashrc &> /dev/null; then
-        while true; do
-            read -p "Would you like to configure /etc/bashrc? [y/n] " ANSWER
-            case $ANSWER in
-                y|Y)
-                    echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc
-                    break
-                    ;;
-                n|N)
-                    break
-                    ;;
-                *)
-                    echo "Please answer 'y' or 'n'..."
-                    ;;
-            esac
-        done
+    if ! test -L /etc/bashrc; then
+      if ! grep /etc/static/bashrc /etc/bashrc &> /dev/null; then
+          while true; do
+              read -p "Would you like to configure /etc/bashrc? [y/n] " ANSWER
+              case $ANSWER in
+                  y|Y)
+                      echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc
+                      break
+                      ;;
+                  n|N)
+                      break
+                      ;;
+                  *)
+                      echo "Please answer 'y' or 'n'..."
+                      ;;
+              esac
+          done
+      fi
     fi
 
     # Finish
@@ -227,13 +231,13 @@ main(){
     local YELLOW='\033[38;33m'
     local YELLOW_UL='\033[38;4;33m'
 
-    init $@
+    init "$@"
     sanity
     install
 }
 
 # Actual run
-main $@
+main "$@"
 
 
 } # Prevent execution if this script was only partially downloaded
