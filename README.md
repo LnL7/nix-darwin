@@ -136,6 +136,14 @@ Whether to activate system at boot time.
 Let's make nix on darwin awesome!
 Don't hesitate to contribute modules or open an issue.
 
+To build your configuration with local changes you can run this. This
+flag can also be used to override darwin-config or nixpkgs, for more
+information on the `-I` flag look at the nix-build manpage.
+
+```
+darwin-rebuild switch -I darwin=.
+```
+
 Also feel free to contact me if you have questions,
 - IRC - LnL, you can find me in #nixos or ##nix-darwin on freenode.net
 - @lnl7 on twitter
