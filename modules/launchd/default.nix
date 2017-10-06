@@ -37,7 +37,7 @@ let
         };
 
         path = mkOption {
-          type = types.loeOf (types.either types.path types.str);
+          type = types.listOf (types.either types.path types.str);
           default = [];
           description = ''
             Packages added to the service's <envar>PATH</envar>

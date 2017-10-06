@@ -33,7 +33,7 @@ in {
     };
 
     environment.systemPath = mkOption {
-      type = types.loeOf types.str;
+      type = types.listOf types.str;
       description = "The set of paths that are added to PATH.";
       apply = x: if isList x then makeDrvBinPath x else x;
     };

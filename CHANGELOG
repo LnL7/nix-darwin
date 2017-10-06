@@ -1,3 +1,10 @@
+2017-10-06
+- loeOf was removed from nixpkgs in 10881bbe11b2f66ebfa880795e5bc01a04158da4
+
+    Using single items instead of a list no longer works for
+    environment.systemPath and launchd.<serviceType>.<name>.path
+
+
 2017-10-01
 - added system.stateVersion option, add this to your configuration to
   avoid breaking changes.  This changelog and the activation checks
