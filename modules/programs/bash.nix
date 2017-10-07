@@ -73,8 +73,8 @@ in
       __ETC_BASHRC_SOURCED=1
 
       export PATH=${config.environment.systemPath}
-      ${config.system.build.setEnvironment}
-      ${config.system.build.setAliases}
+      ${config.system.build.setEnvironment.text}
+      ${config.system.build.setAliases.text}
 
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}

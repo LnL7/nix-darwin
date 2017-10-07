@@ -9,7 +9,7 @@ let
 
   foreignEnv = pkgs.writeText "fish-foreign-env" ''
     # TODO: environment.shellInit
-    ${config.system.build.setEnvironment}
+    ${config.system.build.setEnvironment.text}
   '';
 
   loginForeignEnv = pkgs.writeText "fish-login-foreign-env" ''

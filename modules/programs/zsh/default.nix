@@ -130,7 +130,7 @@ in
       if test -n "$IN_NIX_SHELL"; then return; fi
 
       export PATH=${config.environment.systemPath}
-      ${config.system.build.setEnvironment}
+      ${config.system.build.setEnvironment.text}
 
       ${cfg.shellInit}
 
@@ -149,7 +149,7 @@ in
       __ETC_ZPROFILE_SOURCED=1
 
       ${concatStringsSep "\n" zshVariables}
-      ${config.system.build.setAliases}
+      ${config.system.build.setAliases.text}
 
       ${cfg.loginShellInit}
 

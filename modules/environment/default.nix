@@ -154,14 +154,16 @@ in {
       inherit (cfg) postBuild pathsToLink extraOutputsToInstall;
     };
 
-    system.build.setEnvironment = ''
+    system.build.setEnvironment = pkgs.writeText "set-environment" ''
       ${concatStringsSep "\n" exportVariables}
 
       # Extra initialisation
       ${cfg.extraInit}
     '';
 
-    system.build.setAliases = concatStringsSep "\n" aliasCommands;
+    system.build.setAliases = pkgs.writeText "set-aliases" ''
+      ${concatStringsSep "\n" aliasCommands}
+    '';
 
   };
 }

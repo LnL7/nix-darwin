@@ -20,6 +20,7 @@ in
 
     system.build = mkOption {
       internal = true;
+      type = types.attrsOf types.package;
       default = {};
       description = ''
         Attribute set of derivation used to setup the system.
