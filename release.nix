@@ -41,7 +41,8 @@ let
                   set -e
 
                   ${config.test}
-                  echo ok | tee $out >&2
+                  echo ok >&2
+                  touch $out
                 '';
 
               out = config.system.build.toplevel;
