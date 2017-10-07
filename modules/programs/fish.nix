@@ -9,7 +9,7 @@ let
 
   foreignEnv = pkgs.writeText "fish-foreign-env" ''
     # TODO: environment.shellInit
-    ${cfge.extraInit}
+    ${config.system.build.setEnvironment}
   '';
 
   loginForeignEnv = pkgs.writeText "fish-login-foreign-env" ''
@@ -124,8 +124,6 @@ in
       set fish_function_path $fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions
 
       set PATH ${replaceStrings [":"] [" "] config.environment.systemPath}
-
-      ${config.system.build.setEnvironment}
 
       fenv source ${foreignEnv}
       ${cfg.shellInit}

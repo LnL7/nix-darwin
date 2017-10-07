@@ -76,7 +76,6 @@ in
       ${config.system.build.setEnvironment}
       ${config.system.build.setAliases}
 
-      ${config.environment.extraInit}
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 

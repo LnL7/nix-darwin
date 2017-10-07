@@ -131,7 +131,6 @@ in
 
       export PATH=${config.environment.systemPath}
       ${config.system.build.setEnvironment}
-      ${config.environment.extraInit}
 
       ${cfg.shellInit}
 
