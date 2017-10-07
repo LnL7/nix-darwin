@@ -3,7 +3,6 @@
 with lib;
 
 let
-
   cfg = config.programs.zsh;
 
   zshVariables =
@@ -21,12 +20,10 @@ let
       mkdir -p $out/bin
       makeWrapper ${pkgs.zsh}/bin/zsh $out/bin/zsh
     '';
-
 in
 
 {
   options = {
-
     programs.zsh.enable = mkOption {
       type = types.bool;
       default = false;
@@ -105,7 +102,6 @@ in
       default = false;
       description = "Enable zsh-syntax-highlighting.";
     };
-
   };
 
   config = mkIf cfg.enable {
@@ -130,6 +126,13 @@ in
       if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
       export __ETC_ZSHENV_SOURCED=1
 
+      # Don't execute this file when running in a pure nix-shell.
+      if test -n "$IN_NIX_SHELL"; then return; fi
+
+      export PATH=${config.environment.systemPath}
+      ${config.system.build.setEnvironment}
+      ${config.environment.extraInit}
+
       ${cfg.shellInit}
 
       # Read system-wide modifications.
@@ -147,6 +150,7 @@ in
       __ETC_ZPROFILE_SOURCED=1
 
       ${concatStringsSep "\n" zshVariables}
+      ${config.system.build.setAliases}
 
       ${cfg.loginShellInit}
 
@@ -165,12 +169,6 @@ in
       ${optionalString cfg.enableFzfGit "source ${fzfGit}"}
       ${optionalString cfg.enableFzfHistory "source ${fzfHistory}"}
 
-      # Don't execute this file when running in a nix-shell.
-      if test ''${IN_NIX_SHELL:-0} -eq 1; then
-        PS1='%F{green}%B[nix-shell:%~]%#%b%f '
-        return
-      fi
-
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
@@ -182,14 +180,8 @@ in
 
       setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
 
-      export PATH=${config.environment.systemPath}
-      ${config.system.build.setEnvironment}
-      ${config.system.build.setAliases}
-
-      ${config.environment.extraInit}
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
-      ${cfg.promptInit}
 
       # Tell zsh how to find installed completions
       for p in ''${(z)NIX_PROFILES}; do
@@ -202,6 +194,10 @@ in
       ${optionalString cfg.enableSyntaxHighlighting
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
       }
+
+      ${cfg.promptInit}
+
+      if test -n "$IN_NIX_SHELL"; then PS1='%F{green}%B[nix-shell:%~]%#%b%f '; fi
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then
