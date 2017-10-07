@@ -128,11 +128,7 @@ in {
         "/nix/var/nix/profiles/default"
       ];
 
-    environment.pathsToLink =
-      [ "/bin"
-        "/lib"
-        "/share/locale"
-      ];
+    environment.pathsToLink = [ "/bin" "/share/locale" ];
 
     environment.extraInit = ''
        # reset TERM with new TERMINFO available (if any)
