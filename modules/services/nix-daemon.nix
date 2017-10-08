@@ -3,27 +3,21 @@
 with lib;
 
 let
-
   cfg = config.services.nix-daemon;
-
 in
 
 {
   options = {
-    services.nix-daemon = {
+    services.nix-daemon.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to activate system at boot time.";
+    };
 
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to activate system at boot time.";
-      };
-
-      tempDir = mkOption {
-        type = types.path;
-        default = "/tmp";
-        description = "The TMPDIR to use for nix-daemon.";
-      };
-
+    services.nix-daemon.tempDir = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "The TMPDIR to use for nix-daemon.";
     };
   };
 
@@ -46,9 +40,8 @@ in
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
 
       serviceConfig.EnvironmentVariables = config.nix.envVars
-        # // { CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"; }
-        // { SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; }
-        // { TMPDIR = "${cfg.tempDir}"; };
+        // { NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; }
+        // optionalAttrs (cfg.tempDir != null) { TMPDIR = cfg.tempDir; };
     };
 
   };
