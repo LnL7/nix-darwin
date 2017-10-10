@@ -59,11 +59,16 @@ Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modu
 ```bash
 sudo ln -s private/var/run /run
 
-git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
-cp ~/.nix-defexpr/darwin/modules/examples/simple.nix ~/.nixpkgs/darwin-configuration.nix
+# Configure the channel
+nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+nix-channel --update
+export NIX_PATH=darwin=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
 
-# bootstrap build using default nix.nixPath
+# Or use a local git repository
+git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
 export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
+
+cp ~/.nix-defexpr/darwin/modules/examples/simple.nix ~/.nixpkgs/darwin-configuration.nix
 
 # you can also use this to rebootstrap nix-darwin in case
 # darwin-rebuild is to old to activate the system.
