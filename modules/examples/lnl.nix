@@ -250,6 +250,10 @@
       nix log "$(curl -f -H 'Content-Type: application/json' "$build/api/get-info" | jq -r .drvPath)"
     }
 
+    pr-nixpkgs() {
+      echo "https://github.com/NixOS/nixpkgs/archive/$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$@/commits" | jq -r '.[-1].sha').tar.gz"
+    }
+
     reexec() {
       unset __ETC_ZSHRC_SOURCED
       unset __ETC_ZSHENV_SOURCED
@@ -297,10 +301,9 @@
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
+      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
       "darwin=$HOME/.nix-defexpr/darwin"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
-      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-      "/nix/var/nix/profiles/per-user/root/channels"
       "$HOME/.nix-defexpr/channels"
     ];
 
