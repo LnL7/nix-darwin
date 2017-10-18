@@ -9,7 +9,7 @@ in
 {
   options = {
 
-    nix.profile = mkOption { default = null; };
+    nix.profile = mkOption { internal = true; default = null; };
 
   };
 
