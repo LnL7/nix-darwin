@@ -4,7 +4,6 @@ with import ./lib.nix { inherit lib; };
 with lib;
 
 let
-
   inherit (pkgs) stdenv;
 
   cfg = config.launchd;
@@ -76,8 +75,8 @@ let
             };
           default = {};
           description = ''
-            Each attribute in this set specifies an option for a <key> in the plist.
-            https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man5/launchd.plist.5.html
+            Each attribute in this set specifies an option for a key in the plist.
+            <link xlink:href="https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man5/launchd.plist.5.html"/>
           '';
         };
       };
@@ -94,7 +93,6 @@ let
         serviceConfig.EnvironmentVariables = mkIf (env != {}) env;
       };
     };
-
 in
 
 {
