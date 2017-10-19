@@ -3,9 +3,7 @@
 with lib;
 
 let
-
   cfg = config.services.kwm;
-
 in
 
 {
@@ -20,13 +18,14 @@ in
       type = types.path;
       default = pkgs.kwm;
       defaultText = "pkgs.kwm";
-      description = "This option specifies the kwm package to use";
+      description = "This option specifies the kwm package to use.";
     };
 
     services.kwm.kwmConfig = mkOption {
       type = types.lines;
       default = "";
       example = ''kwmc rule owner="iTerm2" properties={role="AXDialog"}'';
+      description = "Config to use for <filename>kwmrc</filename>.";
     };
   };
 

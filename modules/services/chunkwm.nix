@@ -19,51 +19,59 @@ in {
 
     services.chunkwm.package = mkOption {
       type = types.package;
-      example = pkgs.chunkwm;
-      description = "This option specifies the chunkwm package to use";
+      example = literalExample "pkgs.chunkwm";
+      description = "This option specifies the chunkwm package to use.";
     };
 
     services.chunkwm.hotload = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to enable hotload";
+      description = "Whether to enable hotload.";
     };
 
     services.chunkwm.extraConfig = mkOption {
       type = types.lines;
-      example = ''
-      chunkc tiling::rule --owner Emacs --state tile
-      '';
-      description = "Additional commands for chunkwmrc";
+      default = "";
+      example = ''chunkc tiling::rule --owner Emacs --state tile'';
+      description = "Additional commands for <filename>chunkwmrc</filename>.";
     };
 
     services.chunkwm.plugins.dir = mkOption {
       type = types.path;
       default = "/run/current-system/sw/lib/chunkwm/plugins";
-      description = "Chunkwm Plugins directory";
+      description = "Chunkwm Plugins directory.";
     };
 
     services.chunkwm.plugins.list = mkOption {
       type = types.listOf (types.enum plugins);
       default = plugins;
       example = ["tiling"];
-      description = "Chunkwm Plugins to enable";
+      description = "Chunkwm Plugins to enable.";
     };
 
     services.chunkwm.plugins."border".config = mkOption {
       type = types.lines;
-      default = ''
-      chunkc set focused_border_color          0xffc0b18b
-      chunkc set focused_border_width 4
-      chunkc set focused_border_radius 0
-      chunkc set focused_border_skip_floating  0
-      '';
-      description = "Optional border plugin configuration";
+      default = ''chunkc set focused_border_color   0xffc0b18b'';
+      description = "Optional border plugin configuration.";
     };
 
     services.chunkwm.plugins."tiling".config = mkOption {
       type = types.lines;
-      default = ''
+      example = ''chunkc set global_desktop_mode   bsp'';
+      description = "Optional tiling plugin configuration.";
+    };
+  };
+
+  config = mkIf cfg.enable {
+
+    services.chunkwm.plugins."border".config = mkDefault ''
+      chunkc set focused_border_color          0xffc0b18b
+      chunkc set focused_border_width          4
+      chunkc set focused_border_radius         0
+      chunkc set focused_border_skip_floating  0
+    '';
+
+    services.chunkwm.plugins."tiling".config = mkDefault ''
       chunkc set global_desktop_mode           bsp
       chunkc set 2_desktop_mode                monocle
       chunkc set 5_desktop_mode                float
@@ -100,13 +108,7 @@ in {
       chunkc set window_float_next             0
       chunkc set window_float_center           1
       chunkc set window_region_locked          1
-      '';
-    };
-
-
-  };
-
-  config = mkIf cfg.enable {
+    '';
 
     security.accessibilityPrograms = [ "${cfg.package}/bin/chunkwm" ];
 
@@ -126,8 +128,6 @@ in {
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
-      # serviceConfig.StandardOutPath = "/tmp/chunkwm.out";
-      # serviceConfig.StandardErrorPath = "/tmp/chunkwm.err";
     };
 
   };

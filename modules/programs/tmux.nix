@@ -3,7 +3,6 @@
 with lib;
 
 let
-
   inherit (pkgs) stdenv;
 
   cfg = config.programs.tmux;
@@ -36,52 +35,42 @@ let
     session=$(tmux list-sessions -F '#{session_name}' | fzf --query="$1" --exit-0)
     tmux switch-client -t "$session"
   '';
+in
 
-in {
+{
   options = {
-
     programs.tmux.enable = mkOption {
       type = types.bool;
       default = false;
-      description = ''
-        Whether to configure tmux.
-      '';
+      description = "Whether to configure tmux.";
     };
 
     programs.tmux.enableSensible = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = ''
-        Enable sensible configuration options for tmux.
-      '';
+      description = "Enable sensible configuration options for tmux.";
     };
 
     programs.tmux.enableMouse = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = ''
-        Enable mouse support for tmux.
-      '';
+      description = "Enable mouse support for tmux.";
     };
 
     programs.tmux.enableFzf = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = ''
-        Enable fzf keybindings for selecting tmux sessions and panes.
-      '';
+      description = "Enable fzf keybindings for selecting tmux sessions and panes.";
     };
 
     programs.tmux.enableVim = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = ''
-        Enable vim style keybindings for copy mode, and navigation of tmux panes.
-      '';
+      description = "Enable vim style keybindings for copy mode, and navigation of tmux panes.";
     };
 
     programs.tmux.tmuxOptions = mkOption {
@@ -93,8 +82,8 @@ in {
     programs.tmux.tmuxConfig = mkOption {
       type = types.lines;
       default = "";
+      description = "Extra configuration to add to <filename>tmux.conf</filename>.";
     };
-
   };
 
   config = mkIf cfg.enable {

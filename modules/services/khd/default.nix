@@ -3,11 +3,9 @@
 with lib;
 
 let
-
   cfg = config.services.khd;
 
   i3Config = import ./i3.nix { inherit pkgs; };
-
 in
 
 {
@@ -15,7 +13,7 @@ in
     services.khd.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable the khd hototkey daemon.";
+      description = "Whether to enable the khd hotkey daemon.";
     };
 
     services.khd.package = mkOption {
@@ -28,7 +26,8 @@ in
     services.khd.khdConfig = mkOption {
       type = types.lines;
       default = "";
-      example = "alt + shift - r   : kwmc quit";
+      example = "alt + shift - r   :   kwmc quit";
+      description = "Config to use for <filename>khdrc</filename>.";
     };
 
     services.khd.i3Keybindings = mkOption {

@@ -3,40 +3,35 @@
 with lib;
 
 let
-
   cfg = config.services.mopidy;
-
 in
 
 {
   options = {
-    services.mopidy = {
+    services.mopidy.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable the Mopidy Daemon.";
+    };
 
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = "Whether to enable the Mopidy Daemon.";
-      };
+    services.mopidy.package = mkOption {
+      type = types.path;
+      default = pkgs.mopidy;
+      defaultText = "pkgs.mopidy";
+      description = "This option specifies the mopidy package to use.";
+    };
 
-      package = mkOption {
-        type = types.path;
-        default = pkgs.mopidy;
-        description = "This option specifies the mopidy package to use.";
-      };
+    services.mopidy.mediakeys.enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to enable the Mopidy OSX Media Keys support daemon.";
+    };
 
-      mediakeys = {
-        enable = mkOption {
-          type = types.bool;
-          default = false;
-          description = "Whether to enable the Mopidy OSX Media Keys support daemon.";
-        };
-        package = mkOption {
-          type = types.path;
-          default = pkgs.pythonPackages.osxmpdkeys;
-          description = "This option specifies the mediakeys package to use.";
-        };
-      };
-
+    services.mopidy.mediakeys.package = mkOption {
+      type = types.path;
+      default = pkgs.pythonPackages.osxmpdkeys;
+      defaultText = "pkgs.pythonPackages.osxmpdkeys";
+      description = "This option specifies the mediakeys package to use.";
     };
   };
 
