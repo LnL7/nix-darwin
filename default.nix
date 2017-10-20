@@ -14,6 +14,7 @@ let
   };
 
   eval = pkgs.lib.evalModules {
+    specialArgs = { modulesPath = ./modules; };
     check = true;
     modules =
       [ configuration
