@@ -37,6 +37,7 @@ let
         ./modules/networking
         ./modules/nix
         ./modules/nix/nix-darwin.nix
+        ./modules/nix/nix-info.nix
         ./modules/nix/nixpkgs.nix
         ./modules/environment
         ./modules/launchd
