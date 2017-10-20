@@ -6,10 +6,11 @@ export PATH=@path@:$PATH
 
 showSyntax() {
   echo "darwin-rebuild [--help] {build | switch | check | changelog}" >&2
-  echo "               [{--profile-name | -p} name] [{--switch-generation | -G} generation] [--rollback]" >&1
-  echo "               [--verbose...] [-v...] [-Q] [{--max-jobs | -j} number] [--cores number]" >&2
-  echo "               [--dry-run] [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace] [-I path]" >&2
-  echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
+  echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
+  echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
+  echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&1
+  echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
+  echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   exec man darwin-rebuild
   exit 1
 }
@@ -53,6 +54,10 @@ while [ "$#" -gt 0 ]; do
       k="$1"; shift 1
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
+    --list-generations)
+      action="list"
+      extraProfileFlags=("$i")
+      ;;
     --rollback)
       action="rollback"
       extraProfileFlags=("$i")
@@ -90,12 +95,12 @@ if ! [ "$action" = build ]; then
   extraBuildFlags+=("--no-out-link")
 fi
 
-echo "building the system configuration..." >&2
-if ! [ "$action" = rollback ]; then
+if ! [ "$action" = list -o "$action" = rollback ]; then
+  echo "building the system configuration..." >&2
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
 fi
 
-if [ "$action" = rollback ]; then
+if [ "$action" = list -o "$action" = rollback ]; then
   if [ "$USER" != root -a ! -w $(dirname "$profile") ]; then
     sudo nix-env -p $profile ${extraProfileFlags[@]}
   else
