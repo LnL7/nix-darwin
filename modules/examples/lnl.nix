@@ -22,10 +22,9 @@
   system.defaults.finder.FXEnableExtensionChangeWarning = false;
 
   system.defaults.trackpad.Clicking = true;
+  system.defaults.trackpad.TrackpadThreeFingerDrag = true;
 
   services.nix-daemon.enable = true;
-  services.nix-daemon.tempDir = "/nix/var/tmp";
-
   nix.package = pkgs.nixUnstable;
 
   environment.systemPackages =
@@ -46,8 +45,6 @@
       pkgs.nixUnstable
       # pkgs.nix
       pkgs.nix-repl
-
-      pkgs.emacsMacport
     ];
 
   security.enableAccessibilityAccess = true;
@@ -74,7 +71,6 @@
   nix.trustedUsers = [ "@admin" ];
 
   programs.nix-index.enable = true;
-  # programs.nix-script.enable = true;
 
   programs.tmux.enable = true;
   programs.tmux.enableSensible = true;
@@ -286,6 +282,7 @@
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
 
   environment.shellAliases.g = "git log --pretty=color -32";
+  environment.shellAliases.gb = "git branch";
   environment.shellAliases.gc = "git checkout";
   environment.shellAliases.gcb = "git checkout -B";
   environment.shellAliases.gd = "git diff --minimal --patch";
@@ -601,4 +598,8 @@
     kwmc rule owner="iTerm2" properties={role="AXDialog"}
     kwmc rule owner="iTunes" properties={float="true"}
   '';
+
+  # You should generally set this to the total number of logical cores in your system.
+  # $ sysctl -n hw.ncpu
+  nix.maxJobs = 1;
 }
