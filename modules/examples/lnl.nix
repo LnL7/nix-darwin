@@ -83,6 +83,7 @@
     bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
 
     bind 0 set status
+    bind S choose-client
 
     bind-key -r "<" swap-window -t -1
     bind-key -r ">" swap-window -t +1
@@ -98,7 +99,7 @@
     { names = [ "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
     { names = [ "ale" "vim-gitgutter" "vim-dispatch" ]; }
     { names = [ "commentary" "vim-eunuch" "repeat" "tabular" ]; }
-    { names = [ "fzfWrapper" "youcompleteme" ]; }
+    { names = [ "fzfWrapper" "fzf-vim" "youcompleteme" ]; }
     { names = [ "gist-vim" "webapi-vim" ]; }
     { names = [ "polyglot" "colors-solarized" ]; }
     { names = [ "python-mode" ]; }
@@ -145,40 +146,21 @@
     nnoremap <Leader>p :FZF<CR>
     nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
 
-    function! s:ag_to_qf(line)
-      let parts = split(a:line, ':')
-      return {'filename': parts[0], 'lnum': parts[1], 'col': parts[2],
-            \ 'text': join(parts[3:], ':')}
-    endfunction
+    nmap <leader><tab> <plug>(fzf-maps-n)
+    xmap <leader><tab> <plug>(fzf-maps-x)
+    omap <leader><tab> <plug>(fzf-maps-o)
+    imap <c-x><c-w> <plug>(fzf-complete-word)
 
-    function! s:ag_handler(lines)
-      if len(a:lines) < 2 | return | endif
+    command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>,
+          \   <bang>0 ? fzf#vim#with_preview('up:30%')
+          \   : fzf#vim#with_preview('right:50%:hidden', '?'),
+          \   <bang>0)
 
-      let cmd = get({'ctrl-x': 'split',
-            \ 'ctrl-v': 'vertical split',
-            \ 'ctrl-t': 'tabe'}, a:lines[0], 'e')
-      let list = map(a:lines[1:], 's:ag_to_qf(v:val)')
-
-      let first = list[0]
-      execute cmd escape(first.filename, ' %#\')
-      execute first.lnum
-      execute 'normal!' first.col.'|zz'
-
-      if len(list) > 1
-        call setqflist(list)
-        copen
-        wincmd p
-      endif
-    endfunction
-
-    command! -nargs=* Ag call fzf#run({
-          \ 'source':  printf('${pkgs.ag}/bin/ag --nogroup --column --color "%s"',
-          \                   escape(empty(<q-args>) ? '^(?=.)' : <q-args>, '"\')),
-          \ 'sink*':   function('<sid>ag_handler'),
-          \ 'options': '--ansi --expect=ctrl-t,ctrl-v,ctrl-x --delimiter : --nth 4.. '.
-          \            '--multi --bind ctrl-a:select-all,ctrl-d:deselect-all '.
-          \            '--color hl:68,hl+:110',
-          \ 'down':    '50%' })
+    command! -bang -nargs=* Rg call fzf#vim#grep(
+          \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+          \   <bang>0 ? fzf#vim#with_preview('up:30%')
+          \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+          \   <bang>0)
 
     highlight clear SignColumn
 
@@ -307,7 +289,6 @@
   nixpkgs.config.allowUnfree = true;
 
   nixpkgs.config.packageOverrides = super: let self = super.pkgs; in {
-    ycmd = super.ycmd.override { gocode = null; godef = null; rustracerd = null; };
   };
 
   # TODO: add module for per-user config, etc, ...
