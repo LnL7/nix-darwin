@@ -83,7 +83,7 @@
     bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
 
     bind 0 set status
-    bind S choose-client
+    bind S choose-session
 
     bind-key -r "<" swap-window -t -1
     bind-key -r ">" swap-window -t +1
