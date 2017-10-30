@@ -4,8 +4,7 @@ with lib;
 
 let
   environment = concatStringsSep " "
-    [ "TMPDIR=/nix/var/tmp"
-      "NIX_REMOTE=daemon"
+    [ "NIX_REMOTE=daemon"
       "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
     ];
 in
@@ -81,7 +80,5 @@ in
     cp -f /etc/per-user/hydra/ssh/authorized_keys ~hydra/.ssh/authorized_keys
     chown hydra:hydra ~hydra/.ssh ~hydra/.ssh/authorized_keys
     echo "ok"
-
-    mkdir -m 1777 -p /nix/var/tmp
   '';
 }
