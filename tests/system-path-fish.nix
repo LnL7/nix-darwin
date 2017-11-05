@@ -7,6 +7,6 @@
 
    test = ''
      echo checking systemPath in /etc/fish/config.fish >&2
-     grep 'set PATH ${pkgs.hello}/bin' ${config.out}/etc/fish/config.fish
+     grep 'fenv export PATH=${pkgs.hello}/bin' ${config.out}/etc/fish/nixos-env-preinit.fish
    '';
 }

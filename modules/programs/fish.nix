@@ -1,40 +1,16 @@
-{ config, lib, pkgs, ...}:
+{ config, lib, pkgs, ... }:
 
 with lib;
 
 let
 
-  cfg = config.programs.fish;
   cfge = config.environment;
 
-  foreignEnv = pkgs.writeText "fish-foreign-env" ''
-    # TODO: environment.shellInit
-    ${config.system.build.setEnvironment.text}
-  '';
-
-  loginForeignEnv = pkgs.writeText "fish-login-foreign-env" ''
-    # TODO: environment.loginShellInit
-  '';
-
-  interactiveForeignEnv = pkgs.writeText "fish-interactive-foreign-env" ''
-    ${cfge.interactiveShellInit}
-  '';
-
-  shell = pkgs.runCommand pkgs.fish.name
-    { buildInputs = [ pkgs.makeWrapper ]; }
-    ''
-      source $stdenv/setup
-
-      mkdir -p $out/bin
-      makeWrapper ${pkgs.fish}/bin/fish $out/bin/fish
-    '';
+  cfg = config.programs.fish;
 
   fishAliases = concatStringsSep "\n" (
     mapAttrsFlatten (k: v: "alias ${k} '${v}'") cfg.shellAliases
   );
-
-  fishVariables =
-    mapAttrsToList (n: v: ''set -x ${n} "${v}"'') cfg.variables;
 
 in
 
@@ -45,106 +21,158 @@ in
     programs.fish = {
 
       enable = mkOption {
-        type = types.bool;
         default = false;
         description = ''
           Whether to configure fish as an interactive shell.
         '';
+        type = types.bool;
+      };
+      
+      vendor.config.enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Whether fish should source configuration snippets provided by other packages.
+        '';
       };
 
-      variables = mkOption {
-        type = types.attrsOf (types.either types.str (types.listOf types.str));
-        default = {};
+      vendor.completions.enable = mkOption {
+        type = types.bool;
+        default = true;
         description = ''
-          A set of environment variables used in the global environment.
-          These variables will be set on shell initialisation.
-          The value of each variable can be either a string or a list of
-          strings.  The latter is concatenated, interspersed with colon
-          characters.
+          Whether fish should use completion files provided by other packages.
         '';
-        apply = mapAttrs (n: v: if isList v then concatStringsSep ":" v else v);
+      };
+      
+      vendor.functions.enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Whether fish should autoload fish functions provided by other packages.
+        '';
       };
 
       shellAliases = mkOption {
-        type = types.attrs;
-        default = cfge.shellAliases;
+        default = config.environment.shellAliases;
         description = ''
           Set of aliases for fish shell. See <option>environment.shellAliases</option>
           for an option format description.
         '';
+        type = types.attrs;
       };
 
       shellInit = mkOption {
-        type = types.lines;
         default = "";
         description = ''
-          Shell Script code called during fish shell initialisation.
+          Shell script code called during fish shell initialisation.
         '';
+        type = types.lines;
       };
 
       loginShellInit = mkOption {
-        type = types.lines;
         default = "";
         description = ''
           Shell script code called during fish login shell initialisation.
         '';
+        type = types.lines;
       };
 
       interactiveShellInit = mkOption {
-        type = types.lines;
         default = "";
         description = ''
           Shell script code called during interactive fish shell initialisation.
         '';
+        type = types.lines;
       };
 
       promptInit = mkOption {
-        type = types.lines;
         default = "";
         description = ''
           Shell script code used to initialise fish prompt.
         '';
+        type = types.lines;
       };
 
     };
+
   };
 
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ pkgs.fish ];
+    environment.etc."fish/foreign-env/shellInit".text = cfge.shellInit;
+    environment.etc."fish/foreign-env/loginShellInit".text = cfge.loginShellInit;
+    environment.etc."fish/foreign-env/interactiveShellInit".text = cfge.interactiveShellInit;
 
-    environment.pathsToLink = [ "/share/fish" ];
+    environment.etc."fish/nixos-env-preinit.fish".text = ''
+      # This happens before $__fish_datadir/config.fish sets fish_function_path, so it is currently
+      # unset. We set it and then completely erase it, leaving its configuration to $__fish_datadir/config.fish
+      set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $__fish_datadir/functions
+      
+      # source the NixOS environment config
+      fenv export PATH=${config.environment.systemPath}
+      fenv source ${config.system.build.setEnvironment}
 
-    environment.loginShell = "${shell}/bin/fish -l";
-    environment.variables.SHELL = "${shell}/bin/fish";
+      # clear fish_function_path so that it will be correctly set when we return to $__fish_datadir/config.fish
+      set -e fish_function_path
+    '';
 
     environment.etc."fish/config.fish".text = ''
       # /etc/fish/config.fish: DO NOT EDIT -- this file has been generated automatically.
 
-      set fish_function_path $fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions
+      # if we haven't sourced the general config, do it
+      if not set -q __fish_nix_darwin_general_config_sourced
+        set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $fish_function_path
+        fenv source /etc/fish/foreign-env/shellInit > /dev/null
+        set -e fish_function_path[1]
+        
+        ${cfg.shellInit}
 
-      set PATH ${replaceStrings [":"] [" "] config.environment.systemPath}
-
-      fenv source ${foreignEnv}
-      ${cfg.shellInit}
-
-      ${concatStringsSep "\n" fishVariables}
-
-      if status --is-login
-        # TODO: environment.loginShellInit
-        ${cfg.loginShellInit}
+        # and leave a note so we don't source this config section again from
+        # this very shell (children will source the general config anew)
+        set -g __fish_nix_darwin_general_config_sourced 1
       end
 
-      if status --is-interactive
-        ${fishAliases}
-        ${optionalString (cfge.interactiveShellInit != "") ''
-          fenv source ${interactiveForeignEnv}
-        ''}
+      # if we haven't sourced the login config, do it
+      status --is-login; and not set -q __fish_nix_darwin_login_config_sourced
+      and begin
+        set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $fish_function_path
+        fenv source /etc/fish/foreign-env/loginShellInit > /dev/null
+        set -e fish_function_path[1]
+        
+        ${cfg.loginShellInit}
 
-        ${cfg.interactiveShellInit}
+        # and leave a note so we don't source this config section again from
+        # this very shell (children will source the general config anew)
+        set -g __fish_nix_darwin_login_config_sourced 1
+      end
+
+      # if we haven't sourced the interactive config, do it
+      status --is-interactive; and not set -q __fish_nix_darwin_interactive_config_sourced
+      and begin
+        ${fishAliases}
+        
+
+        set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $fish_function_path
+        fenv source /etc/fish/foreign-env/interactiveShellInit > /dev/null
+        set -e fish_function_path[1]
+        
         ${cfg.promptInit}
+        ${cfg.interactiveShellInit}
+
+        # and leave a note so we don't source this config section again from
+        # this very shell (children will source the general config anew,
+        # allowing configuration changes in, e.g, aliases, to propagate)
+        set -g __fish_nix_darwin_interactive_config_sourced 1
       end
     '';
+
+    # include programs that bring their own completions
+    environment.pathsToLink = []
+      ++ optional cfg.vendor.config.enable "/share/fish/vendor_conf.d"
+      ++ optional cfg.vendor.completions.enable "/share/fish/vendor_completions.d"
+      ++ optional cfg.vendor.functions.enable "/share/fish/vendor_functions.d";
+    
+    environment.systemPackages = [ pkgs.fish ];
 
   };
 
