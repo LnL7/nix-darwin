@@ -14,44 +14,42 @@ let
   );
 
   makeTest = test:
-    pkgs.lib.genAttrs [ "x86_64-darwin" ] (system:
-      let
-        configuration =
-          { config, lib, pkgs, ... }:
-          with lib;
-          { imports = [ test ];
+    let
+      configuration =
+        { config, lib, pkgs, ... }:
+        with lib;
+        { imports = [ test ];
 
-            options = {
-              out = mkOption {
-                type = types.package;
-              };
-
-              test = mkOption {
-                type = types.lines;
-              };
+          options = {
+            out = mkOption {
+              type = types.package;
             };
 
-            config = {
-              system.build.run-test = pkgs.runCommand "run-darwin-test"
-                { allowSubstitutes = false;
-                  preferLocalBuild = true;
-                }
-                ''
-                  #! ${pkgs.stdenv.shell}
-                  set -e
-
-                  ${config.test}
-                  echo ok >&2
-                  touch $out
-                '';
-
-              out = config.system.build.toplevel;
+            test = mkOption {
+              type = types.lines;
             };
           };
-        system = "x86_64-darwin";
-      in
-        (import ./. { inherit nixpkgs configuration system; }).config.system.build.run-test
-    );
+
+          config = {
+            system.build.run-test = pkgs.runCommand "run-darwin-test"
+              { allowSubstitutes = false;
+                preferLocalBuild = true;
+              }
+              ''
+                #! ${pkgs.stdenv.shell}
+                set -e
+
+                ${config.test}
+                echo ok >&2
+                touch $out
+              '';
+
+            out = config.system.build.toplevel;
+          };
+        };
+      system = "x86_64-darwin";
+    in
+      (import ./. { inherit nixpkgs configuration system; }).config.system.build.run-test;
 
   release = import <nixpkgs/pkgs/top-level/release-lib.nix> {
     inherit supportedSystems scrubJobs;

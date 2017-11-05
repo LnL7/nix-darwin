@@ -5,15 +5,9 @@ matrix:
       osx_image: xcode8.2
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
-      - nix-build ./release.nix -I darwin=. -A tests.system-packages
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-bash
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-fish
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-zsh
+      - nix-build ./release.nix -I darwin=. -A tests
     - os: osx
       osx_image: xcode7.3
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
-      - nix-build ./release.nix -I darwin=. -A tests.system-packages
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-bash
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-fish
-      - nix-build ./release.nix -I darwin=. -A tests.system-path-zsh
+      - nix-build ./release.nix -I darwin=. -A tests
