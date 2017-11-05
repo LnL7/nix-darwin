@@ -1,9 +1,13 @@
+2017-11-06
+- the programs.fish module was rewritten based on improvements from
+  NixOS. This might have some incompatible changes compared to the
+  previous implementation.
+
 2017-10-06
 - loeOf was removed from nixpkgs in 10881bbe11b2f66ebfa880795e5bc01a04158da4
 
     Using single items instead of a list no longer works for
     environment.systemPath and launchd.<serviceType>.<name>.path
-
 
 2017-10-01
 - added system.stateVersion option, add this to your configuration to
