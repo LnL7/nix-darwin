@@ -136,6 +136,15 @@ Whether to activate system at boot time.
 - [`system`](https://github.com/LnL7/nix-darwin/tree/master/modules/system)
 - [`time`](https://github.com/LnL7/nix-darwin/tree/master/modules/time)
 
+## Tests
+
+There are basic tests that run sanity checks for some of the modules,
+you can run them like this:
+
+```bash
+nix-build release.nix -A tests.environment-path
+```
+
 ## Contributing
 
 Let's make nix on darwin awesome!
@@ -145,7 +154,7 @@ To build your configuration with local changes you can run this. This
 flag can also be used to override darwin-config or nixpkgs, for more
 information on the `-I` flag look at the nix-build manpage.
 
-```
+```bash
 darwin-rebuild switch -I darwin=.
 ```
 
