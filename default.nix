@@ -61,6 +61,7 @@ let
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
         ./modules/programs/zsh
+        ./modules/user/symlinks.nix
       ];
   };
 
