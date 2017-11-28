@@ -41,7 +41,6 @@ let
         ./modules/nix/nixpkgs.nix
         ./modules/environment
         ./modules/launchd
-        ./modules/security
         ./modules/services/activate-system
         ./modules/services/chunkwm.nix
         ./modules/services/emacs.nix

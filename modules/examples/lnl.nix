@@ -43,7 +43,6 @@
       config.nix.package
     ];
 
-  security.enableAccessibilityAccess = true;
   services.khd.enable = true;
   services.kwm.enable = true;
 
