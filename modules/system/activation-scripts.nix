@@ -61,6 +61,7 @@ in
       ${cfg.activationScripts.defaults.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.nix-daemon.text}
+      ${cfg.activationScripts.kexts.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}

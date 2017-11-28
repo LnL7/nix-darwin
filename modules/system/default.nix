@@ -92,6 +92,20 @@ in
       pathsToLink = "/Library/Extensions";
     };
 
+    system.activationScripts.kexts.text = ''
+      for f in $(ls "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/" 2> /dev/null); do
+        echo "loading kext [$f]" >&2
+        kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") || true
+      done
+
+      for f in $(ls /run/current-system/Library/Extensions 2> /dev/null); do
+        if test ! -e "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f"; then
+          echo "unloading kext [$f]" >&2
+          kextunload -v 1 "/run/current-system/Library/Extensions/$f" || true
+        fi
+      done
+    '';
+
     system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation {
       name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
