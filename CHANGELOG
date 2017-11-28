@@ -1,3 +1,7 @@
+2017-11-29
+- the security.enableAccessibilityAccess option was removed since it
+  no longer works on macOS 10.12 and later.
+
 2017-11-06
 - the programs.fish module was rewritten based on improvements from
   NixOS. This might have some incompatible changes compared to the
