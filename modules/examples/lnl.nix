@@ -24,9 +24,6 @@
   system.defaults.trackpad.Clicking = true;
   system.defaults.trackpad.TrackpadThreeFingerDrag = true;
 
-  services.nix-daemon.enable = true;
-  nix.package = pkgs.nixUnstable;
-
   environment.systemPackages =
     [ pkgs.curl
       pkgs.fzf
@@ -42,9 +39,8 @@
       pkgs.khd
       pkgs.kwm
 
-      pkgs.nixUnstable
-      # pkgs.nix
       pkgs.nix-repl
+      config.nix.package
     ];
 
   security.enableAccessibilityAccess = true;
@@ -59,7 +55,7 @@
     serviceConfig.StartInterval = 360;
   };
 
-  services.activate-system.enable = true;
+  services.nix-daemon.enable = true;
 
   nix.extraOptions = ''
     gc-keep-derivations = true
@@ -69,6 +65,8 @@
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
   nix.trustedUsers = [ "@admin" ];
+  nix.useSandbox = true;
+  nix.package = pkgs.nixUnstable;
 
   programs.nix-index.enable = true;
 
@@ -195,7 +193,7 @@
   programs.zsh.enableFzfGit = true;
   programs.zsh.enableFzfHistory = true;
 
-  programs.zsh.variables.cfg = "$HOME/.nixpkgs/darwin-config.nix";
+  programs.zsh.variables.cfg = "$HOME/.config/nixpkgs/darwin/configuration.nix";
   programs.zsh.variables.darwin = "$HOME/.nix-defexpr/darwin";
   programs.zsh.variables.pkgs = "$HOME/.nix-defexpr/nixpkgs";
 
