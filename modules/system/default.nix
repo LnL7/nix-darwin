@@ -35,6 +35,22 @@ in
       '';
     };
 
+    system.kernel.extraModulePackages = mkOption {
+      type = types.listOf types.package;
+      default = [];
+      description = ''
+        The packages which provide loadable kexts.
+      '';
+    };
+
+    system.kernel.extraModulePackagesPath = mkOption {
+      internal = true;
+      type = types.package;
+      description = ''
+        The packages which provide loadable kexts.
+      '';
+    };
+
     system.profile = mkOption {
       type = types.path;
       default = "/nix/var/nix/profiles/system";
@@ -69,6 +85,12 @@ in
   };
 
   config = {
+    environment.systemPackages = cfg.kernel.extraModulePackages;
+    system.kernel.extraModulePackagesPath = pkgs.buildEnv {
+      name = "system-kexts";
+      paths = cfg.kernel.extraModulePackages;
+      pathsToLink = "/Library/Extensions";
+    };
 
     system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation {
       name = "darwin-system-${cfg.darwinLabel}";
@@ -93,6 +115,8 @@ in
         ln -s ${cfg.build.applications}/Applications $out/Applications
         ln -s ${cfg.build.launchd}/Library/LaunchAgents $out/Library/LaunchAgents
         ln -s ${cfg.build.launchd}/Library/LaunchDaemons $out/Library/LaunchDaemons
+        # Kexts must have root:wheel permissions to be loadable
+        ln -s "${cfg.kernel.extraModulePackagesPath}/Library/Extensions" "$out/Library/Extensions"
 
         mkdir -p $out/user/Library
         ln -s ${cfg.build.launchd}/user/Library/LaunchAgents $out/user/Library/LaunchAgents
