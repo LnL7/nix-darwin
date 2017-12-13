@@ -5,17 +5,14 @@
 with lib;
 
 let
-
   fileName = file: last (splitString "/" file);
   mkDefaultIf = cond: value: mkIf cond (mkDefault value);
 
   drv = mkTextDerivation (fileName name) config.text;
-
 in
 
 {
   options = {
-
     enable = mkOption {
       type = types.bool;
       default = true;
@@ -47,7 +44,6 @@ in
         Path of the source file.
       '';
     };
-
   };
 
   config = {
