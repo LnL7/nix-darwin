@@ -12,6 +12,7 @@ let
     if isBool value then "-bool ${boolValue value}" else
     if isInt value then "-int ${toString value}" else
     if isString value then "-string '${value}'" else
+    if isAttrs value then "-${value.type} '${value.value}'" else
     throw "invalid value type";
 
   writeDefault = domain: key: value:
