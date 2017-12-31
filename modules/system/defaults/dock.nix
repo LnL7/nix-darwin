@@ -2,7 +2,17 @@
 
 with lib;
 
-{
+let
+  isFloat = x: isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null;
+
+  float = mkOptionType {
+    name = "float";
+    description = "float";
+    check = isFloat;
+    merge = options.mergeOneOption;
+  };
+
+in {
   options = {
 
     system.defaults.dock.autohide = mkOption {
@@ -14,24 +24,18 @@ with lib;
     };
 
     system.defaults.dock.autohide-delay = mkOption {
-      type = types.nullOr types.attrs;
+      type = types.nullOr float;
       default = null;
-      example = {
-        type = "float";
-        value = "0.24";
-      };
+      example = "0.24";
       description = ''
         Sets the speed of the autohide delay. The default is given in the example.
       '';
     };
 
     system.defaults.dock.autohide-time-modifier = mkOption {
-      type = types.nullOr types.attrs;
+      type = types.nullOr float;
       default = null;
-      example = {
-        type = "float";
-        value = "1.0";
-      };
+      example = "1.0";
       description = ''
         Sets the speed of the animation when hiding/showing the Dock. The default is given in the example.
       '';
@@ -54,12 +58,9 @@ with lib;
     };
 
     system.defaults.dock.expose-animation-duration = mkOption {
-      type = types.nullOr types.attrs;
+      type = types.nullOr float;
       default = null;
-      example = {
-        type = "float";
-        value = "1.0";
-      };
+      example = "1.0";
       description = ''
         Sets the speed of the Mission Control animations. The default is given in the example.
       '';
