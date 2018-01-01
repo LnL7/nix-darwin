@@ -60,7 +60,7 @@ with lib;
       type = types.nullOr (types.submodule {
         options = {
           Wait = mkOption {
-            type = types.nullOr types.str;
+            type = types.nullOr (types.either types.bool types.str);
             default = null;
             description = ''
               This flag corresponds to the "wait" or "nowait" option of inetd. If true, then the listening
