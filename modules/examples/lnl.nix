@@ -25,7 +25,9 @@
   system.defaults.trackpad.TrackpadThreeFingerDrag = true;
 
   environment.systemPackages =
-    [ pkgs.curl
+    [ pkgs.ctags
+      pkgs.curl
+      pkgs.brotli
       pkgs.fzf
       pkgs.gettext
       pkgs.git
@@ -34,7 +36,6 @@
       pkgs.mosh
       pkgs.shellcheck
       pkgs.silver-searcher
-      pkgs.taskwarrior
 
       pkgs.khd
       pkgs.kwm
@@ -289,6 +290,8 @@
   };
 
   # TODO: add module for per-user config, etc, ...
+  system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
+
   environment.etc."per-user/lnl/gitconfig".text = ''
     [include]
       path = .gitconfig.local
