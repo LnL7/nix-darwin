@@ -6,7 +6,7 @@ let
 
   cfg = config.system.defaults;
 
-  isFloat = x: isString x && builtins.match "^[+-]?([1-9]*[.])?[0-9]+$" x != null;
+  isFloat = x: isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null;
 
   boolValue = x: if x then "YES" else "NO";
 
