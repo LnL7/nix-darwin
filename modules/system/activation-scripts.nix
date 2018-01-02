@@ -59,6 +59,8 @@ in
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
 
+      ${cfg.activationScripts.extraPostActivation.text}
+
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system
       # (which is a symlink to the store), /run/current-system is still
@@ -92,13 +94,17 @@ in
       ${cfg.activationScripts.defaults.text}
       ${cfg.activationScripts.userLaunchd.text}
 
+      ${cfg.activationScripts.extraUserPostActivation.text}
+
       exit $_status
     '';
 
     # Extra activation scripts, that can be customized by users
     # don't use this unless you know what you are doing.
     system.activationScripts.extraActivation.text = mkDefault "";
+    system.activationScripts.extraPostActivation.text = mkDefault "";
     system.activationScripts.extraUserActivation.text = mkDefault "";
+    system.activationScripts.extraUserPostActivation.text = mkDefault "";
 
   };
 }
