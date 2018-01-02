@@ -74,7 +74,9 @@ in
       dscl . -create /Users/hydra PrimaryGroupID 122 >&2 || exit
     fi
     set -e
+  '';
 
+  system.activationScripts.extraPostActivation.text = ''
     printf "configuring ssh keys for hydra... "
     mkdir -p ~hydra/.ssh
     cp -f /etc/per-user/hydra/ssh/authorized_keys ~hydra/.ssh/authorized_keys
