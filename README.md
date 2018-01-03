@@ -159,5 +159,5 @@ darwin-rebuild switch -I darwin=.
 ```
 
 Also feel free to contact me if you have questions,
-- IRC - LnL, you can find me in #nixos or ##nix-darwin on freenode.net
+- IRC - LnL, you can find me in #nixos or #nix-darwin on freenode.net
 - @lnl7 on twitter
