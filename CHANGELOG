@@ -1,3 +1,7 @@
+2017-01-04
+- the nix.useDaemon/services.nix-daemon.enable options now automatically
+  reload the daemon for you when nix.conf changes.
+
 2017-11-29
 - the security.enableAccessibilityAccess option was removed since it
   no longer works on macOS 10.12 and later.
