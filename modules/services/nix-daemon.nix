@@ -11,7 +11,7 @@ in
     services.nix-daemon.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to activate system at boot time.";
+      description = "Whether to enable the nix-daemon service.";
     };
 
     services.nix-daemon.logFile = mkOption {
@@ -35,13 +35,7 @@ in
 
   config = mkIf cfg.enable {
 
-    environment.extraInit = ''
-      # Set up secure multi-user builds: non-root users build through the
-      # Nix daemon.
-      if [ "$USER" != root -o ! -w /nix/var/nix/db ]; then
-          export NIX_REMOTE=daemon
-      fi
-    '';
+    nix.useDaemon = true;
 
     launchd.daemons.nix-daemon = {
       command = "${config.nix.package}/bin/nix-daemon";

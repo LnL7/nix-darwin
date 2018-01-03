@@ -54,6 +54,16 @@ in
       '';
     };
 
+    nix.useDaemon = mkOption {
+      type = types.bool;
+      default = false;
+      description = "
+        If set, Nix will use the daemon to perform operations.
+        Use this instead of services.nix-daemon.enable if you don't wan't the
+        daemon service to be managed for you.
+      ";
+    };
+
     nix.maxJobs = mkOption {
       type = types.int;
       default = 1;
@@ -346,6 +356,14 @@ in
         NIX_CURRENT_LOAD = "/run/nix/current-load";
       };
 
+    environment.extraInit = mkIf cfg.useDaemon ''
+      # Set up secure multi-user builds: non-root users build through the
+      # Nix daemon.
+      if [ "$USER" != root -o ! -w /nix/var/nix/db ]; then
+          export NIX_REMOTE=daemon
+      fi
+    '';
+
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars //
       { NIX_PATH = concatStringsSep ":" cfg.nixPath;
@@ -354,6 +372,13 @@ in
     system.activationScripts.nix.text = mkIf cfg.distributedBuilds ''
       if [ ! -d ${cfg.envVars.NIX_CURRENT_LOAD} ]; then
         mkdir -p ${cfg.envVars.NIX_CURRENT_LOAD}
+      fi
+    '';
+
+    system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
+      if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
+        echo "reloading nix-daemon..." >&2
+        pkill -HUP nix-daemon
       fi
     '';
 

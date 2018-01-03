@@ -56,6 +56,7 @@ in
       ${cfg.activationScripts.applications.text}
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.launchd.text}
+      ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
 
