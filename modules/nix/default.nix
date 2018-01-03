@@ -356,7 +356,7 @@ in
         NIX_CURRENT_LOAD = "/run/nix/current-load";
       };
 
-    environment.extraInit = mkIf cfg.useDaemon ''
+    environment.extraInit = ''
       # Set up secure multi-user builds: non-root users build through the
       # Nix daemon.
       if [ "$USER" != root -o ! -w /nix/var/nix/db ]; then
