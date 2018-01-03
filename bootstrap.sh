@@ -211,6 +211,12 @@ install(){
       fi
     fi
 
+    if grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
+        echo -e ""$RED"WARNING: Detected nix-daemon.sh in /etc/profile."
+        echo    "This will override environment variables configured by nix-darwin,"
+        echo    "you might want to remove that."
+    fi
+
     # Finish
     echo -e ""$GREEN"You're all done!"$ESC""
     echo -e "Take a look at "$YELLOW"~/.nixpkgs/darwin-configuration.nix"$ESC" to get started."
