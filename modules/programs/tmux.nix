@@ -73,6 +73,13 @@ in
       description = "Enable vim style keybindings for copy mode, and navigation of tmux panes.";
     };
 
+    programs.tmux.iTerm2 = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = "Cater to iTerm2 and its tmux integration, as appropriate.";
+    };
+
     programs.tmux.tmuxOptions = mkOption {
       internal = true;
       type = types.attrsOf (types.submodule text);
@@ -100,7 +107,7 @@ in
       source-file -q /etc/tmux.conf.local
     '';
 
-    programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin then ''
+    programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin && !cfg.iTerm2 then ''
       set -g default-command "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace ${config.environment.loginShell}"
     '' else ''
       set -g default-command "${config.environment.loginShell}"
