@@ -28,6 +28,7 @@ let
         ./modules/system/defaults/LaunchServices.nix
         ./modules/system/defaults/dock.nix
         ./modules/system/defaults/finder.nix
+        ./modules/system/defaults/smb.nix
         ./modules/system/defaults/trackpad.nix
         ./modules/system/applications.nix
         ./modules/system/etc.nix

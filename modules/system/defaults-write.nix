@@ -26,6 +26,7 @@ let
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
+  smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
 
@@ -45,6 +46,7 @@ in
       ${concatStringsSep "\n" LaunchServices}
       ${concatStringsSep "\n" dock}
       ${concatStringsSep "\n" finder}
+      ${concatStringsSep "\n" smb}
       ${concatStringsSep "\n" trackpad}
       ${concatStringsSep "\n" trackpadBluetooth}
     '';
