@@ -52,6 +52,7 @@ let
         ./modules/services/nix-daemon.nix
         ./modules/services/nix-gc
         ./modules/services/ofborg
+        ./modules/services/openvpn.nix
         ./modules/services/postgresql
         ./modules/services/redis
         ./modules/programs/bash
