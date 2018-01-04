@@ -7,10 +7,10 @@ let
   cfg = config.networking;
 
   hostName = optionalString (cfg.hostName != null) ''
-    scutil --set ComputerName "${cfg.hostName}"
-    scutil --set LocalHostName "${cfg.hostName}"
-    scutil --set HostName "${cfg.hostName}"
-    defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${cfg.hostName}"
+    scutil --set ComputerName '${cfg.hostName}'
+    scutil --set LocalHostName '${cfg.hostName}'
+    scutil --set HostName '${cfg.hostName}'
+    defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string '${cfg.hostName}'
   '';
 
 in
