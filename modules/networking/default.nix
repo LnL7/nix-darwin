@@ -10,6 +10,7 @@ let
     scutil --set ComputerName "${cfg.hostName}"
     scutil --set LocalHostName "${cfg.hostName}"
     scutil --set HostName "${cfg.hostName}"
+    defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string '${cfg.hostName}'
   '';
 
 in
