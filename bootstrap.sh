@@ -100,7 +100,7 @@ create_daemon_users(){
         echo -e "It looks like the "$YELLOW"nixbld"$ESC" group already exists!"
     fi
 
-    for i in {1..10}; do
+    for i in {1..32}; do
         /usr/bin/id nixbld${i} &> /dev/null
         retCode=$?
         if [[ $retCode != 0 ]]; then

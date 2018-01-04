@@ -112,14 +112,16 @@ in {
 
     security.accessibilityPrograms = [ "${cfg.package}/bin/chunkwm" ];
 
-    environment.etc."chunkwmrc".text = ''
-      #!/bin/bash
-      chunkc core::plugin_dir ${toString cfg.plugins.dir}
-      chunkc core::hotload ${if cfg.hotload then "1" else "0"}
-    ''
-      + concatMapStringsSep "\n" (p: "# Config for chunkwm-${p} plugin\n"+cfg.plugins.${p}.config or "# Nothing to configure") cfg.plugins.list
-      + concatMapStringsSep "\n" (p: "chunkc core::load "+p+".so") cfg.plugins.list
-      + "\n" + cfg.extraConfig;
+    environment.etc."chunkwmrc".source = pkgs.writeScript "etc-chunkwmrc" (
+      ''
+        #!/bin/bash
+        chunkc core::plugin_dir ${toString cfg.plugins.dir}
+        chunkc core::hotload ${if cfg.hotload then "1" else "0"}
+      ''
+        + concatMapStringsSep "\n" (p: "# Config for chunkwm-${p} plugin\n"+cfg.plugins.${p}.config or "# Nothing to configure") cfg.plugins.list
+        + concatMapStringsSep "\n" (p: "chunkc core::load "+p+".so") cfg.plugins.list
+        + "\n" + cfg.extraConfig
+    );
 
     launchd.user.agents.chunkwm = {
       path = [ cfg.package config.environment.systemPath ];
