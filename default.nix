@@ -6,10 +6,8 @@ let
 
   packages = { config, lib, pkgs, ... }: {
     config = {
-      _module.args.pkgs = import nixpkgs {
-        inherit system;
-        inherit (config.nixpkgs) config;
-      };
+      _module.args.pkgs = import nixpkgs config.nixpkgs;
+      nixpkgs.system = system;
     };
   };
 
