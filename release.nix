@@ -92,6 +92,7 @@ let
     tests.environment-path = makeTest ./tests/environment-path.nix;
     tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
     tests.networking = makeTest ./tests/networking.nix;
+    tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
     tests.system-packages = makeTest ./tests/system-packages.nix;
