@@ -45,14 +45,14 @@ in
       ln -sfn "$(readlink -f $systemConfig/etc)" /etc/static
 
       for f in $(find /etc/static/* -type l); do
-        l="$(echo $f | sed 's,/etc/static/,/etc/,')"
-        d="$(dirname $l)"
+        l=/etc/''${f#/etc/static/}
+        d=''${l%/*}
         if [ ! -e "$d" ]; then
           mkdir -p "$d"
         fi
         if [ -e "$l" ]; then
           if [ "$(readlink $l)" != "$f" ]; then
-            echo "warning: not linking $l because $l exists, skipping..." >&2
+            echo "[1;31mwarning: not linking environment.etc.\"''${l#/etc/}\" because $l exists, skipping...[0m" >&2
           fi
         else
           ln -s "$f" "$l"
@@ -61,6 +61,7 @@ in
 
       for l in $(find /etc/* -type l 2> /dev/null); do
         f="$(echo $l | sed 's,/etc/,/etc/static/,')"
+        f=/etc/static/''${l#/etc/}
         if [ "$(readlink $l)" = "$f" -a ! -e "$(readlink -f $l)" ]; then
           rm "$l"
         fi
