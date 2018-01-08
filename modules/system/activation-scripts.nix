@@ -59,6 +59,7 @@ in
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
+      ${cfg.activationScripts.keyboard.text}
 
       ${cfg.activationScripts.extraPostActivation.text}
 

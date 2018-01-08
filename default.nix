@@ -22,15 +22,16 @@ let
         ./modules/system
         ./modules/system/activation-checks.nix
         ./modules/system/activation-scripts.nix
+        ./modules/system/applications.nix
         ./modules/system/defaults-write.nix
-        ./modules/system/defaults/NSGlobalDomain.nix
         ./modules/system/defaults/LaunchServices.nix
+        ./modules/system/defaults/NSGlobalDomain.nix
         ./modules/system/defaults/dock.nix
         ./modules/system/defaults/finder.nix
         ./modules/system/defaults/smb.nix
         ./modules/system/defaults/trackpad.nix
-        ./modules/system/applications.nix
         ./modules/system/etc.nix
+        ./modules/system/keyboard.nix
         ./modules/system/launchd.nix
         ./modules/system/shells.nix
         ./modules/system/version.nix
