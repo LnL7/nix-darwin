@@ -39,6 +39,9 @@ in
 
   config = {
 
+    warnings = mkIf (!cfg.enableKeyMapping && cfg.userKeyMapping != [])
+      [ "system.keyboard.enableKeyMapping is not enabled, keyboard mappings will not be configured." ];
+
     system.keyboard.userKeyMapping = mkMerge [
       (mkIf cfg.remapCapsLockToControl [{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; }])
       (mkIf cfg.remapCapsLockToEscape [{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771113; }])
