@@ -64,6 +64,11 @@ in
 
   config = {
 
+    warnings = [
+      (mkIf (cfg.networkservices == [] && cfg.dns != []) "networking.networkservices is empty, dns servers will not be configured.")
+      (mkIf (cfg.networkservices == [] && cfg.search != []) "networking.networkservices is empty, dns searchdomains will not be configured.")
+    ];
+
     system.defaults.smb.NetBIOSName = cfg.hostName;
 
     system.activationScripts.networking.text = ''
