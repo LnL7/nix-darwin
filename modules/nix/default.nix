@@ -308,8 +308,10 @@ in
 
   config = {
 
-    warnings = mkIf (!config.services.activate-system.enable && cfg.distributedBuilds)
-      [ "services.activate-system is not enabled, a reboot could cause distributed builds to stop working." ];
+    warnings = [
+      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
+      (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
+    ];
 
     nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
     nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
