@@ -2,12 +2,14 @@ language: nix
 matrix:
   include:
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode8.3  # 10.12
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - nix-build ./release.nix -I darwin=. -A tests
+      - yes | ./bootstrap.sh --create-daemon-users
     - os: osx
-      osx_image: xcode7.3
+      osx_image: xcode7.3  # 10.11
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - nix-build ./release.nix -I darwin=. -A tests
+      - yes | ./bootstrap.sh --create-daemon-users
