@@ -26,6 +26,12 @@ in
       description = "Whether to remap the Caps Lock key to Escape.";
     };
 
+    system.keyboard.nonUS.remapTilde = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to remap the Tilde key on non-us keyboards.";
+    };
+
     system.keyboard.userKeyMapping = mkOption {
       internal = true;
       type = types.listOf (types.attrsOf types.int);
@@ -42,9 +48,10 @@ in
     warnings = mkIf (!cfg.enableKeyMapping && cfg.userKeyMapping != [])
       [ "system.keyboard.enableKeyMapping is not enabled, keyboard mappings will not be configured." ];
 
-    system.keyboard.userKeyMapping = mkMerge [
-      (mkIf cfg.remapCapsLockToControl [{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; }])
-      (mkIf cfg.remapCapsLockToEscape [{ HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771113; }])
+    system.keyboard.userKeyMapping = [
+      (mkIf cfg.remapCapsLockToControl { HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; })
+      (mkIf cfg.remapCapsLockToEscape { HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771113; })
+      (mkIf cfg.nonUS.remapTilde { HIDKeyboardModifierMappingSrc = 30064771172; HIDKeyboardModifierMappingDst = 30064771125; })
     ];
 
     system.activationScripts.keyboard.text = optionalString cfg.enableKeyMapping ''
