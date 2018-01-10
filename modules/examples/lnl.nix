@@ -226,6 +226,10 @@
       nix log "$(curl -f -H 'Content-Type: application/json' "$build/api/get-info" | jq -r .drvPath)"
     }
 
+    pr-darwin() {
+      echo "https://github.com/LnL7/nix-darwin/archive/$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$@/commits" | jq -r '.[-1].sha').tar.gz"
+    }
+
     pr-nixpkgs() {
       echo "https://github.com/NixOS/nixpkgs/archive/$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$@/commits" | jq -r '.[-1].sha').tar.gz"
     }
