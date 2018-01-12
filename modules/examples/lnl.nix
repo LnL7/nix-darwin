@@ -279,9 +279,6 @@
   environment.shellAliases.grh = "git reset --hard";
   environment.shellAliases.l = "ls -lh";
   environment.shellAliases.ls = "ls -G";
-  environment.shellAliases.nb = "nix-build";
-  environment.shellAliases.ni = "nix-instantiate";
-  environment.shellAliases.ns = "nix-shell";
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
