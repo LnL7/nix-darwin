@@ -35,7 +35,7 @@ in
 
   config = {
 
-    system.activationScripts.time.text = ''
+    system.activationScripts.time.text = mkIf (cfg.timeZone != null) ''
       # Set defaults
       echo "configuring time..." >&2
 
