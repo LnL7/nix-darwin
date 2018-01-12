@@ -282,7 +282,7 @@
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
-      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+      "darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix"
       "darwin=$HOME/.nix-defexpr/darwin"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
       "$HOME/.nix-defexpr/channels"
