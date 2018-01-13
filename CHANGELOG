@@ -1,3 +1,7 @@
+2017-01-13
+- added users.users and users.groups to manage user accounts.
+  Changes will not be applied to existing users or groups.
+
 2017-01-08
 - added networking.networkservices, to manage dns servers and searchdomains.
   This will clear existing values when enabled.
