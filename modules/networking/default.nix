@@ -14,7 +14,7 @@ let
     scutil --set HostName '${cfg.hostName}'
   '';
 
-  setNetworkServices = optionalString (cfg.networkservices != []) ''
+  setNetworkServices = optionalString (cfg.knownNetworkServices != []) ''
     networkservices=$(networksetup -listallnetworkservices)
     ${concatMapStringsSep "\n" (srv: ''
       case "$networkservices" in
@@ -23,7 +23,7 @@ let
           networksetup -setsearchdomains '${srv}' ${quoteStrings (emptyList cfg.search)}
           ;;
       esac
-    '') cfg.networkservices}
+    '') cfg.knownNetworkServices}
   '';
 in
 
@@ -36,7 +36,7 @@ in
       description = "Hostname for your machine.";
     };
 
-    networking.networkservices = mkOption {
+    networking.knownNetworkServices = mkOption {
       type = types.listOf types.str;
       default = [];
       example = [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
@@ -65,8 +65,8 @@ in
   config = {
 
     warnings = [
-      (mkIf (cfg.networkservices == [] && cfg.dns != []) "networking.networkservices is empty, dns servers will not be configured.")
-      (mkIf (cfg.networkservices == [] && cfg.search != []) "networking.networkservices is empty, dns searchdomains will not be configured.")
+      (mkIf (cfg.knownNetworkServices == [] && cfg.dns != []) "networking.knownNetworkServices is empty, dns servers will not be configured.")
+      (mkIf (cfg.knownNetworkServices == [] && cfg.search != []) "networking.knownNetworkServices is empty, dns searchdomains will not be configured.")
     ];
 
     system.defaults.smb.NetBIOSName = cfg.hostName;

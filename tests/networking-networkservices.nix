@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  networking.networkservices = [ "Wi-Fi" "Thunderbolt Ethernet" ];
+  networking.knownNetworkServices = [ "Wi-Fi" "Thunderbolt Ethernet" ];
   networking.dns = [ "8.8.8.8" "8.8.4.4" ];
 
   test = ''
