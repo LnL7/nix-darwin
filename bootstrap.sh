@@ -134,15 +134,17 @@ install(){
     sudo_prompt || exit
 
     # Link run directory
-    echo "Setting up /run..."
     if ! test -L /run; then
+      echo "Setting up /run..."
       sudo ln -sfn private/var/run /run || exit
     fi
 
     # Fetch the nix-darwin repo
-    echo -e ""$YELLOW"Configuring darwin channel..."$ESC""
-    nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin || exit
-    nix-channel --update || exit
+    if ! nix-instantiate --eval -E '<darwin>' &> /dev/null; then
+      echo -e ""$YELLOW"Configuring darwin channel..."$ESC""
+      nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin || exit
+      nix-channel --update || exit
+    fi
 
     # Copy the example configuration
     if [ ! -e "$HOME/.nixpkgs/darwin-configuration.nix" ]; then
@@ -150,6 +152,59 @@ install(){
       mkdir -p "$HOME/.nixpkgs" || exit
       cp "$HOME/.nix-defexpr/channels/darwin/modules/examples/simple.nix" "$HOME/.nixpkgs/darwin-configuration.nix" || exit
       chmod u+w "$HOME/.nixpkgs/darwin-configuration.nix" || exit
+    fi
+
+    if ! test -L /etc/bashrc; then
+      if ! grep /etc/static/bashrc /etc/bashrc &> /dev/null; then
+          while true; do
+              read -p "Would you like to configure /etc/bashrc? [y/n] " ANSWER
+              case $ANSWER in
+                  y|Y)
+                      echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc
+                      break
+                      ;;
+                  n|N)
+                      break
+                      ;;
+                  *)
+                      echo "Please answer 'y' or 'n'..."
+                      ;;
+              esac
+          done
+      fi
+    fi
+
+    if ! test -L /etc/profile && grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
+        while true; do
+            read -p "Would you like to remove nix-daemon.sh configuration in /etc/profile? [y/n] " i
+            case "$i" in
+                y|Y)
+                    cat <<-'EOF' | sudo patch -d /etc -p1 || exit
+diff --git a/profile b/profile
+index 3748e3b..36ad2cd 100644
+--- a/profile
++++ b/profile
+@@ -7,9 +7,3 @@ fi
+ if [ "${BASH-no}" != "no" ]; then
+ 	[ -r /etc/bashrc ] && . /etc/bashrc
+ fi
+-
+-# Nix
+-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+-  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+-fi
+-# End Nix
+EOF
+                      break
+                      ;;
+                  n|N)
+                      break
+                      ;;
+                  *)
+                      echo "Please answer 'y' or 'n'..."
+                      ;;
+            esac
+        done
     fi
 
     # Bootstrap build using default nix.nixPath
@@ -189,26 +244,6 @@ install(){
                     ;;
             esac
         done
-    fi
-
-    if ! test -L /etc/bashrc; then
-      if ! grep /etc/static/bashrc /etc/bashrc &> /dev/null; then
-          while true; do
-              read -p "Would you like to configure /etc/bashrc? [y/n] " ANSWER
-              case $ANSWER in
-                  y|Y)
-                      echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc
-                      break
-                      ;;
-                  n|N)
-                      break
-                      ;;
-                  *)
-                      echo "Please answer 'y' or 'n'..."
-                      ;;
-              esac
-          done
-      fi
     fi
 
     # Finish
