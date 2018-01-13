@@ -52,7 +52,9 @@ in
         fi
         if [ -e "$l" ]; then
           if [ "$(readlink $l)" != "$f" ]; then
-            echo "[1;31mwarning: not linking environment.etc.\"''${l#/etc/}\" because $l exists, skipping...[0m" >&2
+            if ! grep -q /etc/static "$l"; then
+              echo "[1;31mwarning: not linking environment.etc.\"''${l#/etc/}\" because $l exists, skipping...[0m" >&2
+            fi
           fi
         else
           ln -s "$f" "$l"
