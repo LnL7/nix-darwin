@@ -1,0 +1,14 @@
+diff --git a/profile b/profile
+index 3748e3b..36ad2cd 100644
+--- a/profile
++++ b/profile
+@@ -7,9 +7,3 @@ fi
+ if [ "${BASH-no}" != "no" ]; then
+ 	[ -r /etc/bashrc ] && . /etc/bashrc
+ fi
+-
+-# Nix
+-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+-  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+-fi
+-# End Nix

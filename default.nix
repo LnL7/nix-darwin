@@ -73,4 +73,6 @@ in
   inherit (eval) options config;
 
   system = eval.config.system.build.toplevel;
+
+  installer = pkgs.callPackage ./pkgs/darwin-installer {};
 }
