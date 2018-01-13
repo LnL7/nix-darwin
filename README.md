@@ -136,6 +136,7 @@ Whether to activate system at boot time.
 - [`system.keyboard`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/keyboard.nix)
 - [`system`](https://github.com/LnL7/nix-darwin/tree/master/modules/system)
 - [`time`](https://github.com/LnL7/nix-darwin/tree/master/modules/time)
+- [`users`](https://github.com/LnL7/nix-darwin/tree/master/modules/users)
 
 ## Tests
 
