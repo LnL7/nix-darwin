@@ -53,6 +53,22 @@ let
     esac
   '';
 
+  nixInstaller = ''
+    if grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
+        echo "[1;31merror: Found nix-daemon.sh reference in /etc/profile, aborting activation[0m" >&2
+        echo "This will override options like nix.nixPath because it runs later," >&2
+        echo "remove this snippet from /etc/profile:" >&2
+        echo >&2
+        echo "    # Nix" >&2
+        echo "    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then" >&2
+        echo "      . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'" >&2
+        echo "    fi" >&2
+        echo "    # End Nix" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
+
   nixPath = ''
     darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>' || echo '$HOME/.nixpkgs/darwin-configuration.nix') || true
     if ! test -e "$darwinConfig"; then
@@ -104,6 +120,7 @@ in
       ${darwinChanges}
       ${buildUsers}
       ${nixChannels}
+      ${nixInstaller}
       ${nixPath}
 
       if test ''${checkActivation:-0} -eq 1; then
