@@ -41,4 +41,11 @@ with lib;
         esac
     fi
   '';
+
+  system.activationScripts.preActivation.text = ''
+    echo "setting up /run..."
+    if ! test -L /run; then
+      sudo ln -sfn private/var/run /run
+    fi
+  '';
 }
