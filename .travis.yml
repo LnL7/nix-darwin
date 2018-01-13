@@ -6,10 +6,10 @@ matrix:
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - nix-build ./release.nix -I darwin=. -A tests
-      - yes | ./bootstrap.sh --create-daemon-users
+      - yes | nix-shell -A installer
     - os: osx
       osx_image: xcode7.3  # 10.11
       script:
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - nix-build ./release.nix -I darwin=. -A tests
-      - yes | ./bootstrap.sh --create-daemon-users
+      - yes | nix-shell -A installer
