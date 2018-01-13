@@ -76,7 +76,7 @@ in
     set -e
   '';
 
-  system.activationScripts.extraPostActivation.text = ''
+  system.activationScripts.postActivation.text = ''
     printf "configuring ssh keys for hydra... "
     mkdir -p ~hydra/.ssh
     cp -f /etc/per-user/hydra/ssh/authorized_keys ~hydra/.ssh/authorized_keys
