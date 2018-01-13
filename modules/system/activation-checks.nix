@@ -19,6 +19,17 @@ let
     fi
   '';
 
+  runLink = ''
+    if ! test -e /run; then
+        echo "[1;31merror: Directory /run does not exist, aborting activation[0m" >&2
+        echo "Create a symlink to /var/run with:" >&2
+        echo >&2
+        echo "    sudo ln -s private/var/run /run" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
+
   buildUsers = optionalString config.services.nix-daemon.enable ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
     if [ -z $buildUser ]; then
@@ -42,7 +53,7 @@ let
       "")
         ;;
       *)
-        echo "[1;31merror: The ~/.nix-defexpr/channels symlink does not point your users channels[0m" >&2
+        echo "[1;31merror: The ~/.nix-defexpr/channels symlink does not point your users channels, aborting activation[0m" >&2
         echo "Running nix-channel will regenerate it" >&2
         echo >&2
         echo "    rm ~/.nix-defexpr/channels" >&2
@@ -118,6 +129,7 @@ in
 
     system.activationScripts.checks.text = ''
       ${darwinChanges}
+      ${runLink}
       ${buildUsers}
       ${nixChannels}
       ${nixInstaller}
