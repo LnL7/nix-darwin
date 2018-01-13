@@ -4,12 +4,6 @@ with lib;
 
 {
   options = {
-    enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Whether this user should be created.";
-    };
-
     name = mkOption {
       type = types.str;
       description = ''
