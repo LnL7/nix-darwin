@@ -72,6 +72,9 @@ in
       if [ -n "$__ETC_BASHRC_SOURCED" -o -n "$NOSYSBASHRC" ]; then return; fi
       __ETC_BASHRC_SOURCED=1
 
+      # Don't execute this file when running in a pure nix-shell.
+      if test -n "$IN_NIX_SHELL"; then return; fi
+
       export PATH=${config.environment.systemPath}
       ${config.system.build.setEnvironment.text}
       ${config.system.build.setAliases.text}
