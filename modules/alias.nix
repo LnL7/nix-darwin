@@ -21,6 +21,8 @@ in
     assertions =
       [ { assertion = config.nix.profile == null; message = "nix.profile was renamed to nix.package"; }
         { assertion = config.security.enableAccessibilityAccess == null; message = "security.enableAccessibilityAccess was removed, it's broken since 10.12 because of SIP"; }
+        { assertion = config.system.activationScripts.extraPostActivation.text == ""; message = "system.activationScripts.extraPostActivation was renamed to system.activationScripts.postActivation"; }
+        { assertion = config.system.activationScripts.extraUserPostActivation.text == ""; message = "system.activationScripts.extraUserPostActivation was renamed to system.activationScripts.postUserActivation"; }
       ];
 
     warnings = mkIf (config.networking.networkservices != null) [
@@ -30,6 +32,9 @@ in
     networking.knownNetworkServices = mkIf (config.networking.networkservices != null) config.networking.networkservices;
 
     nix.package = mkIf (config.nix.profile != null) config.nix.profile;
+
+    system.activationScripts.extraPostActivation.text = mkDefault "";
+    system.activationScripts.extraUserPostActivation.text = mkDefault "";
 
   };
 }

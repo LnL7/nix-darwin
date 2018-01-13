@@ -50,8 +50,9 @@ in
       # Ensure a consistent umask.
       umask 0022
 
-      ${cfg.activationScripts.extraActivation.text}
+      ${cfg.activationScripts.preActivation.text}
 
+      ${cfg.activationScripts.extraActivation.text}
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
       ${cfg.activationScripts.nix.text}
@@ -63,7 +64,7 @@ in
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}
 
-      ${cfg.activationScripts.extraPostActivation.text}
+      ${cfg.activationScripts.postActivation.text}
 
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system
@@ -91,14 +92,14 @@ in
       # Ensure a consistent umask.
       umask 0022
 
+      ${cfg.activationScripts.preUserActivation.text}
+
       ${cfg.activationScripts.checks.text}
-
       ${cfg.activationScripts.extraUserActivation.text}
-
       ${cfg.activationScripts.defaults.text}
       ${cfg.activationScripts.userLaunchd.text}
 
-      ${cfg.activationScripts.extraUserPostActivation.text}
+      ${cfg.activationScripts.postUserActivation.text}
 
       exit $_status
     '';
@@ -106,9 +107,11 @@ in
     # Extra activation scripts, that can be customized by users
     # don't use this unless you know what you are doing.
     system.activationScripts.extraActivation.text = mkDefault "";
-    system.activationScripts.extraPostActivation.text = mkDefault "";
+    system.activationScripts.preActivation.text = mkDefault "";
+    system.activationScripts.postActivation.text = mkDefault "";
     system.activationScripts.extraUserActivation.text = mkDefault "";
-    system.activationScripts.extraUserPostActivation.text = mkDefault "";
+    system.activationScripts.preUserActivation.text = mkDefault "";
+    system.activationScripts.postUserActivation.text = mkDefault "";
 
   };
 }
