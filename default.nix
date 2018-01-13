@@ -62,6 +62,7 @@ let
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
         ./modules/programs/zsh
+        ./modules/users/users.nix
         ./modules/users/groups.nix
       ];
   };

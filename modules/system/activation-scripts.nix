@@ -53,6 +53,7 @@ in
       ${cfg.activationScripts.extraActivation.text}
 
       ${cfg.activationScripts.groups.text}
+      ${cfg.activationScripts.users.text}
       ${cfg.activationScripts.nix.text}
       ${cfg.activationScripts.applications.text}
       ${cfg.activationScripts.etc.text}

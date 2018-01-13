@@ -64,16 +64,23 @@ in
       echo "setting up groups..." >&2
 
       ${concatMapStringsSep "\n" (v: ''
-        if ! dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null | grep -q 'PrimaryGroupID: ${toString v.gid}'; then
+        g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
+        g=''${g#PrimaryGroupID: }
+        if [ -z "$g" ]; then
           echo "creating group ${v.name}..." >&2
           dscl . -create '/Groups/${v.name}' PrimaryGroupID ${toString v.gid}
           dscl . -create '/Groups/${v.name}' RealName '${v.description}'
+        else
+          if [ "$g" -ne ${toString v.gid} ]; then
+            echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
+          fi
         fi
       '') createdGroups}
 
       ${concatMapStringsSep "\n" (name: ''
-        if dscl . -read '/Groups/${name}' PrimaryGroupID 2> /dev/null | grep -q 'PrimaryGroupID: '; then
-          g=$(dscl . -read '/Groups/${name}' PrimaryGroupID | awk '{print $2}')
+        g=$(dscl . -read '/Groups/${name}' PrimaryGroupID 2> /dev/null) || true
+        g=''${g#PrimaryGroupID: }
+        if [ -n "$g" ]; then
           if [ "$g" -gt 501 ]; then
             echo "deleting group ${name}..." >&2
             dscl . -delete '/Groups/${name}' 2> /dev/null
