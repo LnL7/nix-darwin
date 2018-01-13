@@ -24,6 +24,20 @@ stdenv.mkDerivation {
     #!/usr/bin/env bash
     set -e
 
+    action=switch
+    while [ "$#" -gt 0 ]; do
+      i="$1"; shift 1
+      case "$i" in
+        --help)
+          echo "darwin-installer: [--check]"
+          exit
+          ;;
+        --check)
+          action=check
+          ;;
+      esac
+    done
+
     export nix=${nix}
 
     config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
@@ -37,7 +51,7 @@ stdenv.mkDerivation {
     system=$($nix/bin/nix-build '<darwin>' -I "user-darwin-config=$config" -A system --no-out-link)
     export PATH=$system/sw/bin:$PATH
 
-    darwin-rebuild switch -I "user-darwin-config=$config"
+    darwin-rebuild "$action" -I "user-darwin-config=$config"
 
     echo >&2
     echo "    Open '$config' to get started." >&2
