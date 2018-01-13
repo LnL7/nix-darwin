@@ -42,45 +42,16 @@ in
       "command=\"${environment} ${config.nix.package}/bin/nix-store --serve --write\" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnubA1pRqlpoAXkZ1q5nwhqi1RY2z840wFLFDj7vAMSups9E2U8PNIVtuVYApZpkBWIpzD4GGbQTF5Itnu5uBpJswc2Yat9yGWO/guuVyXIaRoBIM0Pg1WBWcWsz+k4rNludu9UQ74FHqEiqZIuIuOcgV+RIZn8xQlGt2kUqN9TWboHhZz8Zhx7EtGSJH6MJRLn3mA/pPjOF6k1jiiFG1pVDuqBTZPANkelWYCWAJ46jCyhxXltWE/jkBYGc/XbB8yT7DFE1XC6TVsSEp68R9PhVG3yqxqY06sniEyduSoGt/TDr6ycERd93bvLElXFATes85YiFszeaUgayYSKwQPe0q7YeHMhIXL0UYJYaKVVgT9saFDiHDzde7kKe+NA+J4+TbIk7Y/Ywn0jepsYV13M7TyEqgqbu9fvVGF3JI9+4g0m1gAzHTa7n6iiAedtz+Pi79uCEpRD2hWSSoLWroyPlep8j1p2tygtFsrieePEukesoToCTwqg1Ejnjh+yKdtUbc6xpyRvl3hKeO8QbCpfaaVd27e4vE4lP2JMW6nOo8b0wlVXQIFe5K2zh52q1MSwhLAq6Kg8oPmgj0lru4IivmPc+/NVwd3Qj3E9ZB8LRfTesfbcxHrC8lF5dL/QpLMeLwebrwCxL19gI0kxmDIaUQuHSyP3B2z+EmBKcN/Xw=="
     ];
 
-  system.activationScripts.extraActivation.text = ''
-    set +e
-    printf "checking for hydra group... "
-    dscl . -read /Groups/hydra &> /dev/null
-    case $? in
-      0) echo "yes" ;;
-      56)
-        echo "no, created"
-        dseditgroup -o create -r "Hydra group" -i 122 hydra >&2 || exit
-        ;;
-    esac
-
-    printf "checking for hydra user... "
-    id hydra &> /dev/null
-    case $? in
-      0) echo "yes" ;;
-      1)
-        echo "no, created"
-        sysadminctl -addUser hydra -fullName "Hydra" >&2 || exit
-        dscl . -create /Users/hydra IsHidden 1 || exit
-        ;;
-    esac
-
-    printf "checking group of hydra user... "
-    if test "$(id -g hydra 2> /dev/null)" -eq 122; then
-      echo "ok"
-    else
-      echo "no, updated"
-      dseditgroup -o edit -t user -a hydra hydra
-      dscl . -create /Users/hydra PrimaryGroupID 122 >&2 || exit
-    fi
-    set -e
-  '';
+  users.knownGroups = [ "hydra" ];
+  users.knownUsers = [ "hydra" ];
+  users.groups.hydra = { gid = 530; description = "Hydra builder group"; };
+  users.users.hydra = { uid = 530; gid = 530; description = "Hydra"; home = "/Users/hydra"; isHidden = true; };
 
   system.activationScripts.postActivation.text = ''
     printf "configuring ssh keys for hydra... "
     mkdir -p ~hydra/.ssh
     cp -f /etc/per-user/hydra/ssh/authorized_keys ~hydra/.ssh/authorized_keys
-    chown hydra:hydra ~hydra/.ssh ~hydra/.ssh/authorized_keys
+    chown hydra:hydra ~hydra ~hydra/.ssh ~hydra/.ssh/authorized_keys
     echo "ok"
   '';
 }
