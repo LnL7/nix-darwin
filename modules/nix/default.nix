@@ -46,7 +46,7 @@ in
 {
   options = {
     nix.package = mkOption {
-      type = types.path;
+      type = types.either types.package types.path;
       default = "/nix/var/nix/profiles/default";
       example = "pkgs.nix";
       description = ''
@@ -321,6 +321,9 @@ in
         "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
         "/nix/var/nix/profiles/per-user/root/channels"
       ]);
+
+    environment.systemPackages = mkIf (isDerivation cfg.package)
+      [ cfg.package ];
 
     environment.etc."nix/nix.conf".source = nixConf;
 

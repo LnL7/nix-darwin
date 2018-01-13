@@ -44,7 +44,6 @@
       pkgs.kwm
 
       pkgs.nix-repl
-      config.nix.package
     ];
 
   services.khd.enable = true;
