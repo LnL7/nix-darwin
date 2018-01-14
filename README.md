@@ -9,14 +9,19 @@ Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 ## Install
 
 ```bash
+nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
+./result/bin/darwin-installer
+```
+
+or if you run into problems with that, try the older bootstrap.sh script
+
+```bash
 bash <(curl https://raw.githubusercontent.com/LnL7/nix-darwin/master/bootstrap.sh)
 ```
 
-This will link the system profile to `/run/current-system`. You have to create `/run` or symlink it to `private/var/run`.
-If you use a symlink, you'll probably also want to add `services.activate-system.enable = true;` to your configuration.
-
-> NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` won't be used by default.
-Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
+> NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
+> updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
+> Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
 
 - `mv /etc/bashrc /etc/bashrc.orig`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
@@ -24,7 +29,7 @@ Either modify the existing file to source/import the one from `/etc/static` or r
 
 ## Updating
 
-The bootstrap installer will configure a channel for this repository.
+The installer will configure a channel for this repository.
 
 ```bash
 nix-channel --update darwin
