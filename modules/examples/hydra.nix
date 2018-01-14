@@ -44,7 +44,7 @@ in
 
   users.knownGroups = [ "hydra" ];
   users.knownUsers = [ "hydra" ];
-  users.groups.hydra = { gid = 530; description = "Hydra builder group"; };
+  users.groups.hydra = { gid = 530; description = "Hydra builder group"; members = [ "hydra" ]; };
   users.users.hydra = { uid = 530; gid = 530; description = "Hydra"; home = "/Users/hydra"; shell = "/bin/bash"; isHidden = true; };
 
   system.activationScripts.postActivation.text = ''
