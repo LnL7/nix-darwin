@@ -128,6 +128,9 @@ in
       description = ''
         Whether to distribute builds to the machines listed in
         <option>nix.buildMachines</option>.
+
+        NOTE: This requires services.nix-daemon.enable for a
+        multi-user install.
       '';
     };
 
