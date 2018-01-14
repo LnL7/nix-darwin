@@ -4,6 +4,7 @@
   users.knownGroups = [ "foo" "created.group" "deleted.group" ];
   users.groups.foo.gid = 42000;
   users.groups.foo.description = "Foo group";
+  users.groups.foo.members = [ "admin" "foo" ];
 
   users.groups."created.group".gid = 42001;
   users.groups."unknown.group".gid = 42002;
@@ -29,6 +30,10 @@
     echo "checking group deletion in /activate" >&2
     grep "dscl . -delete '/Groups/deleted.group'" ${config.out}/activate
     grep -qv "dscl . -create '/Groups/deleted.group'" ${config.out}/activate
+
+    echo "checking group membership in /activate" >&2
+    grep "dscl . -create '/Groups/foo' GroupMembership 'admin' 'foo'" ${config.out}/activate
+    grep "dscl . -create '/Groups/created.group' GroupMembership" ${config.out}/activate
 
     echo "checking unknown group in /activate" >&2
     grep -qv "dscl . -create '/Groups/unknown.group'" ${config.out}/activate
