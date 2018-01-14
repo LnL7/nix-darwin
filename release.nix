@@ -4,7 +4,6 @@
 }:
 
 let
-
   inherit (release) mapTestOn packagePlatforms pkgs all linux darwin;
 
   mapPlatforms = systems: pkgs.lib.mapAttrs (n: v: systems);
@@ -18,7 +17,8 @@ let
       configuration =
         { config, lib, pkgs, ... }:
         with lib;
-        { imports = [ test ];
+        {
+          imports = [ test ];
 
           options = {
             out = mkOption {
@@ -32,21 +32,22 @@ let
 
           config = {
             system.build.run-test = pkgs.runCommand "run-darwin-test"
-              { allowSubstitutes = false;
-                preferLocalBuild = true;
-              }
+              { allowSubstitutes = false; preferLocalBuild = true; }
               ''
                 #! ${pkgs.stdenv.shell}
                 set -e
 
+                echo >&2 "running tests for system ${config.out}"
+                echo >&2
                 ${config.test}
-                echo ok >&2
+                echo >&2 ok
                 touch $out
               '';
 
             out = config.system.build.toplevel;
           };
         };
+
       system = "x86_64-darwin";
     in
       (import ./. { inherit nixpkgs configuration system; }).config.system.build.run-test;
@@ -73,7 +74,7 @@ let
           jobs.zsh.x86_64-darwin
           jobs.nix.x86_64-darwin
           jobs.nix-repl.x86_64-darwin
-          # jobs.reattach-to-user-namespace.x86_64-darwin license?
+          jobs.reattach-to-user-namespace.x86_64-darwin
           jobs.tmux.x86_64-darwin
           jobs.nano.x86_64-darwin
           jobs.vim.x86_64-darwin
@@ -82,7 +83,7 @@ let
           jobs.examples.lnl.x86_64-darwin
           jobs.examples.simple.x86_64-darwin
         ];
-      meta.description = "Release-critical builds for the darwin unstable channel";
+      meta.description = "Release-critical builds for the darwin channel";
     };
 
     examples.hydra = genExample ./modules/examples/hydra.nix;
