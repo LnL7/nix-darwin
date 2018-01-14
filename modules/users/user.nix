@@ -35,7 +35,7 @@ with lib;
 
     isHidden = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to make the user account hidden.";
     };
 
