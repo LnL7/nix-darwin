@@ -22,7 +22,7 @@ let
     {
       inherit (config.system) profile;
       inherit (stdenv) shell;
-      path = "${pkgs.coreutils}/bin:${config.environment.systemPath}";
+      path = "${pkgs.coreutils}/bin:${config.nix.package}/bin:${config.environment.systemPath}";
     }
     ../../pkgs/nix-tools/darwin-rebuild.sh;
 
