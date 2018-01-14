@@ -89,6 +89,7 @@ let
     examples.lnl = genExample ./modules/examples/lnl.nix;
     examples.simple = genExample ./modules/examples/simple.nix;
 
+    tests.activation-scripts = makeTest ./tests/activation-scripts.nix;
     tests.environment-path = makeTest ./tests/environment-path.nix;
     tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
     tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
