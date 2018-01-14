@@ -40,12 +40,17 @@ with lib;
                 ;;
         esac
     fi
-  '';
 
-  system.activationScripts.preActivation.text = ''
-    echo "setting up /run..."
     if ! test -L /run; then
-      sudo ln -sfn private/var/run /run
+      echo "setting up /run..."
+      if test -t 1; then
+          read -p "Would you like to create /run? [y/n] " i
+      fi
+      case "$i" in
+          y|Y)
+              sudo ln -sfn private/var/run /run
+              ;;
+      esac
     fi
   '';
 }
