@@ -94,8 +94,8 @@ in
 
     system.activationScripts.kexts.text = ''
       for f in $(ls "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/" 2> /dev/null); do
-        echo "loading kext [$f]" >&2
-        kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") || true
+        echo "loading kext [$f]:"
+        kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") 2>&1 >/dev/null | sed "s/^/> /"
       done
 
       for f in $(ls /run/current-system/Library/Extensions 2> /dev/null); do
