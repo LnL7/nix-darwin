@@ -63,6 +63,7 @@ let
         ./modules/programs/vim.nix
         ./modules/programs/zsh
         ./modules/users
+        ./modules/users/nixbld
       ];
   };
 
