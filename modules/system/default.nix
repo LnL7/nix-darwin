@@ -139,7 +139,7 @@ in
         ln -s ${cfg.build.applications}/Applications $out/Applications
         ln -s ${cfg.build.launchd}/Library/LaunchAgents $out/Library/LaunchAgents
         ln -s ${cfg.build.launchd}/Library/LaunchDaemons $out/Library/LaunchDaemons
-        # Kexts must have root:wheel permissions to be loadable
+        # Kexts
         ln -s "${cfg.kernel.extraModulePackagesPath}/Library/Extensions" "$out/Library/Extensions"
 
         mkdir -p $out/user/Library
