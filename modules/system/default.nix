@@ -106,6 +106,16 @@ in
       done
     '';
 
+    launchd.daemons.load-kexts = {
+      script = ''
+        for f in /run/current-system/Library/Extensions/* do
+          echo "loading kext [$f]:"
+          kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") 2>&1 >/dev/null | sed "s/^/> /"
+        done
+      '';
+      KeepAlive = false;
+    }
+
     system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation {
       name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
