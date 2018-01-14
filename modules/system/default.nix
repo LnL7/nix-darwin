@@ -89,7 +89,7 @@ in
     system.kernel.extraModulePackagesPath = pkgs.buildEnv {
       name = "system-kexts";
       paths = cfg.kernel.extraModulePackages;
-      pathsToLink = "/Library/Extensions";
+      pathsToLink = [ "/Extensions" "/Library/Extensions" ];
     };
 
     system.activationScripts.kexts.text = ''
