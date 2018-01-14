@@ -4,6 +4,14 @@ with lib;
 
 {
   options = {
+    name = mkOption {
+      type = types.str;
+      description = ''
+        The group's name. If undefined, the name of the attribute set
+        will be used.
+      '';
+    };
+
     gid = mkOption {
       type = mkOptionType {
         name = "gid";
@@ -12,12 +20,10 @@ with lib;
       description = "The group's GID.";
     };
 
-    name = mkOption {
-      type = types.str;
-      description = ''
-        The group's name. If undefined, the name of the attribute set
-        will be used.
-      '';
+    members = mkOption {
+      type = types.listOf types.string;
+      default = [];
+      description = "The group's members.";
     };
 
     description = mkOption {

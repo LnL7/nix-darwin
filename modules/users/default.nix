@@ -8,6 +8,8 @@ let
   group = import ./group.nix;
   user = import ./user.nix;
 
+  toArguments = concatMapStringsSep " " (v: "'${v}'");
+
   isCreated = list: name: elem name list;
   isDeleted = attrs: name: ! elem name (mapAttrsToList (n: v: v.name) attrs);
 
@@ -56,10 +58,17 @@ in
           echo "creating group ${v.name}..." >&2
           dscl . -create '/Groups/${v.name}' PrimaryGroupID ${toString v.gid}
           dscl . -create '/Groups/${v.name}' RealName '${v.description}'
-        else
-          if [ "$g" -ne ${toString v.gid} ]; then
-            echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
+          g=${toString v.gid}
+        fi
+
+        if [ "$g" -eq ${toString v.gid} ]; then
+          g=$(dscl . -read '/Groups/${v.name}' GroupMembership 2> /dev/null) || true
+          if [ "$g" != 'GroupMembership: ${concatStringsSep " " v.members}' ]; then
+            echo "updating group members ${v.name}..." >&2
+            dscl . -create '/Groups/${v.name}' GroupMembership ${toArguments v.members}
           fi
+        else
+          echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
         fi
       '') createdGroups}
 
