@@ -228,12 +228,20 @@
       nix log "$(curl -f -H 'Content-Type: application/json' "$build/api/get-info" | jq -r .drvPath)"
     }
 
+    rev-darwin() {
+      echo "https://github.com/LnL7/nix-darwin/archive/''${@:-master}.tar.gz"
+    }
+
+    rev-nixpkgs() {
+      echo "https://github.com/NixOS/nixpkgs/archive/''${@:-master}.tar.gz"
+    }
+
     pr-darwin() {
-      echo "https://github.com/LnL7/nix-darwin/archive/$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$@/commits" | jq -r '.[-1].sha').tar.gz"
+      rev-darwin "$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$@/commits" | jq -r '.[-1].sha')"
     }
 
     pr-nixpkgs() {
-      echo "https://github.com/NixOS/nixpkgs/archive/$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$@/commits" | jq -r '.[-1].sha').tar.gz"
+     rev-nixpkgs "$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$@/commits" | jq -r '.[-1].sha')"
     }
 
     reexec() {
