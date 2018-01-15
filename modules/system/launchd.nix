@@ -23,6 +23,9 @@ let
       else
         echo "creating service $(basename ${target} .plist)" >&2
       fi
+      if test -L '/Library/${basedir}/${target}'; then
+        rm '/Library/${basedir}/${target}'
+      fi
       cp -f '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}'
       launchctl load -w '/Library/${basedir}/${target}'
     fi
@@ -35,6 +38,9 @@ let
         launchctl unload -w ~/Library/LaunchAgents/${target} || true
       else
         echo "creating user service $(basename ${target} .plist)" >&2
+      fi
+      if test -L ~/Library/LaunchAgents/${target}; then
+        rm ~/Library/LaunchAgents/${target}
       fi
       cp -f '${cfg.build.launchd}/user/Library/LaunchAgents/${target}' ~/Library/LaunchAgents/${target}
       launchctl load -w ~/Library/LaunchAgents/${target}
