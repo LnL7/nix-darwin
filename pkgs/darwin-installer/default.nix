@@ -38,6 +38,10 @@ stdenv.mkDerivation {
         esac
     done
 
+    echo >&2
+    echo >&2 "Installing nix-darwin..."
+    echo >&2
+
     export nix=${nix}
 
     config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
