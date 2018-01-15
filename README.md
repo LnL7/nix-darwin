@@ -15,10 +15,6 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 
 or if you run into problems with that, try the older bootstrap.sh script
 
-```bash
-bash <(curl https://raw.githubusercontent.com/LnL7/nix-darwin/master/bootstrap.sh)
-```
-
 > NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
 > updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
 > Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
@@ -34,6 +30,16 @@ The installer will configure a channel for this repository.
 ```bash
 nix-channel --update darwin
 darwin-rebuild changelog
+```
+
+## Uninstalling
+
+There's also an uninstaller if you don't like the project and want to
+remove the configured files and services.
+
+```bash
+nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstaller
+./result/bin/darwin-uninstaller
 ```
 
 ## Example configuration
