@@ -76,4 +76,5 @@ in
   system = eval.config.system.build.toplevel;
 
   installer = pkgs.callPackage ./pkgs/darwin-installer {};
+  uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller {};
 }
