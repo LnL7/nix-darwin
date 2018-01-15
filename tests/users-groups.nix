@@ -13,7 +13,7 @@
   users.users.foo.uid = 42000;
   users.users.foo.gid = 42000;
   users.users.foo.description = "Foo user";
-  users.users.foo.isHidden = true;
+  users.users.foo.isHidden = false;
   users.users.foo.home = "/Users/foo";
   users.users.foo.shell = "/run/current-system/sw/bin/bash";
 
@@ -42,7 +42,7 @@
     echo "checking user creation in /activate" >&2
     grep "dscl . -create '/Users/foo' UniqueID 42000" ${config.out}/activate
     grep "dscl . -create '/Users/foo' PrimaryGroupID 42000" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' IsHidden 1" ${config.out}/activate
+    grep "dscl . -create '/Users/foo' IsHidden 0" ${config.out}/activate
     grep "dscl . -create '/Users/foo' RealName 'Foo user'" ${config.out}/activate
     grep "dscl . -create '/Users/foo' NFSHomeDirectory '/Users/foo'" ${config.out}/activate
     grep "dscl . -create '/Users/foo' UserShell '/run/current-system/sw/bin/bash'" ${config.out}/activate
