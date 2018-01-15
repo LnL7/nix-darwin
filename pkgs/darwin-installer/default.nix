@@ -26,36 +26,36 @@ stdenv.mkDerivation {
 
     action=switch
     while [ "$#" -gt 0 ]; do
-      i="$1"; shift 1
-      case "$i" in
-        --help)
-          echo "darwin-installer: [--check]"
-          exit
-          ;;
-        --check)
-          action=check
-          ;;
-      esac
+        i="$1"; shift 1
+        case "$i" in
+            --help)
+                echo "darwin-installer: [--help] [--check]"
+                exit
+                ;;
+            --check)
+                action=check
+                ;;
+        esac
     done
 
     export nix=${nix}
 
     config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
     if ! test -f "$config"; then
-      echo "copying example configuration.nix" >&2
-      mkdir -p "$HOME/.nixpkgs"
-      cp "${toString ../../modules/examples/simple.nix}" "$config"
+        echo "copying example configuration.nix" >&2
+        mkdir -p "$HOME/.nixpkgs"
+        cp "${toString ../../modules/examples/simple.nix}" "$config"
+    fi
 
-      # Skip when stdin is not a tty, eg.
-      # $ yes | darwin-installer
-      if test -t 0; then
-          read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
-      fi
-      case "$i" in
-          e|E)
-              $EDITOR "$config"
-              ;;
-      esac
+    # Skip when stdin is not a tty, eg.
+    # $ yes | darwin-installer
+    if test -t 0; then
+        read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
+        case "$i" in
+            y|Y)
+                $EDITOR "$config"
+                ;;
+        esac
     fi
 
     export NIX_PATH=${nixPath}
@@ -65,10 +65,10 @@ stdenv.mkDerivation {
     darwin-rebuild "$action" -I "user-darwin-config=$config"
 
     echo >&2
-    echo "    Open '$config' to get started." >&2
-    echo "    See the README for more information: [0;34mhttps://github.com/LnL7/nix-darwin/blob/master/README.md[0m" >&2
+    echo >&2 "    Open '$config' to get started."
+    echo >&2 "    See the README for more information: [0;34mhttps://github.com/LnL7/nix-darwin/blob/master/README.md[0m"
     echo >&2
-    echo "    Don't forget to start a new shell or source /etc/static/bashrc." >&2
+    echo >&2 "    Don't forget to start a new shell or source /etc/static/bashrc."
     echo >&2
     exit
   '';
