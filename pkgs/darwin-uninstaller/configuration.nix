@@ -21,9 +21,12 @@ with lib;
 
   system.activationScripts.postActivation.text = mkAfter ''
     if test -O /nix/store; then
-      sudo launchctl unload /Library/LaunchDaemons/org.nixos.nix-daemon.plist || true
-      sudo cp /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
-      sudo launchctl load /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+      l=$(readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist) || true
+      if test "$l" != "/nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist"; then
+        sudo launchctl unload -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist 2> /dev/null || true
+        sudo ln -sfn /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        sudo launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+      fi
 
       if ! grep -q etc/profile.d/nix-daemon.sh /etc/bashrc; then
         echo >&2 "Found no nix-daemon.sh reference in /etc/bashrc"
