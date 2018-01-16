@@ -367,7 +367,7 @@ in
     environment.extraInit = ''
       # Set up secure multi-user builds: non-root users build through the
       # Nix daemon.
-      if [ "$USER" != root -a ! -w /nix/var/nix/db ]; then
+      if [ ! -w /nix/var/nix/db ]; then
           export NIX_REMOTE=daemon
       fi
     '';
