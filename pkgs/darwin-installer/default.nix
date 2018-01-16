@@ -1,4 +1,4 @@
-{ stdenv, nix, pkgs }:
+{ stdenv, writeScript, nix, pkgs }:
 
 let
   nixPath = stdenv.lib.concatStringsSep ":" [
@@ -21,7 +21,6 @@ stdenv.mkDerivation {
   '';
 
   shellHook = ''
-    #!/usr/bin/env bash
     set -e
 
     action=switch
@@ -76,4 +75,35 @@ stdenv.mkDerivation {
     echo >&2
     exit
   '';
+
+  passthru.check = stdenv.mkDerivation {
+     name = "run-darwin-test";
+     shellHook = ''
+        set -e
+        echo >&2 "running installer tests..."
+        echo >&2
+
+        echo >&2 "checking configuration.nix"
+        test -f ~/.nixpkgs/darwin-configuration.nix
+        test -w ~/.nixpkgs/darwin-configuration.nix
+        echo >&2 "checking darwin channel"
+        readlink ~/.nix-defexpr/channels/darwin
+        test -e ~/.nix-defexpr/channels/darwin
+        echo >&2 "checking /etc"
+        readlink /etc/static
+        test -e /etc/static
+        grep /etc/static/bashrc /etc/bashrc
+        grep -v nix-daemon.sh /etc/profile
+        echo >&2 "checking /run/current-system"
+        readlink /run
+        test -e /run
+        readlink /run/current-system
+        test -e /run/current-system
+        echo >&2 "checking profile"
+        readlink /nix/var/nix/profiles/system
+        test -e /nix/var/nix/profiles/system
+        echo >&2 ok
+        exit
+    '';
+  };
 }
