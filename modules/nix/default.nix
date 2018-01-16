@@ -379,14 +379,14 @@ in
 
     system.activationScripts.nix.text = mkIf cfg.distributedBuilds ''
       if [ ! -d ${cfg.envVars.NIX_CURRENT_LOAD} ]; then
-        mkdir -p ${cfg.envVars.NIX_CURRENT_LOAD}
+          mkdir -p ${cfg.envVars.NIX_CURRENT_LOAD}
       fi
     '';
 
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
-        echo "reloading nix-daemon..." >&2
-        pkill -HUP nix-daemon
+          echo >&2 "reloading nix-daemon..."
+          pkill -HUP nix-daemon
       fi
     '';
 
