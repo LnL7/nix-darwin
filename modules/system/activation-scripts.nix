@@ -58,6 +58,7 @@ in
       ${cfg.activationScripts.nix.text}
       ${cfg.activationScripts.applications.text}
       ${cfg.activationScripts.etc.text}
+      ${cfg.activationScripts.defaults.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
@@ -96,7 +97,7 @@ in
 
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraUserActivation.text}
-      ${cfg.activationScripts.defaults.text}
+      ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
 
       ${cfg.activationScripts.postUserActivation.text}

@@ -32,9 +32,15 @@
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.dock.autohide-delay = "0.24";
   system.defaults.dock.orientation = "left";
+  system.defaults.smb.NetBIOSName = "IMAC-000000";
+  system.defaults.smb.ServerDescription = ''Darwin\\\\U2019s iMac'';
 
   test = ''
-    echo checking defaults write in /activate-user >&2
+    echo >&2 "checking defaults write in /activate"
+    grep "defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server 'NetBIOSName' -string 'IMAC-000000'" ${config.out}/activate
+    grep "defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server 'ServerDescription' -string 'Darwin.*s iMac'" ${config.out}/activate
+
+    echo >&2 "checking defaults write in /activate-user"
     grep "defaults write -g 'AppleFontSmoothing' -int 1" ${config.out}/activate-user
     grep "defaults write -g 'AppleKeyboardUIMode' -int 3" ${config.out}/activate-user
     grep "defaults write -g 'ApplePressAndHoldEnabled' -bool YES" ${config.out}/activate-user

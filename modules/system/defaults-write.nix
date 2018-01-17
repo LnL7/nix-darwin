@@ -3,7 +3,6 @@
 with lib;
 
 let
-
   cfg = config.system.defaults;
 
   isFloat = x: isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null;
@@ -30,26 +29,32 @@ let
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
 
+  mkIfAttrs = list: mkIf (any (attrs: attrs != {}) list);
 in
 
 {
-  options = {
-  };
-
   config = {
 
-    system.activationScripts.defaults.text = ''
-      # Set defaults
-      echo "writing defaults..." >&2
+    system.activationScripts.defaults.text = mkIfAttrs [ smb ]
+      ''
+        # Set defaults
+        echo >&2 "system defaults..."
+        ${concatStringsSep "\n" smb}
+      '';
 
-      ${concatStringsSep "\n" NSGlobalDomain}
-      ${concatStringsSep "\n" LaunchServices}
-      ${concatStringsSep "\n" dock}
-      ${concatStringsSep "\n" finder}
-      ${concatStringsSep "\n" smb}
-      ${concatStringsSep "\n" trackpad}
-      ${concatStringsSep "\n" trackpadBluetooth}
-    '';
+    system.activationScripts.userDefaults.text = mkIfAttrs
+      [ NSGlobalDomain LaunchServices dock finder trackpad trackpadBluetooth ]
+      ''
+        # Set defaults
+        echo >&2 "user defaults..."
+
+        ${concatStringsSep "\n" NSGlobalDomain}
+        ${concatStringsSep "\n" LaunchServices}
+        ${concatStringsSep "\n" dock}
+        ${concatStringsSep "\n" finder}
+        ${concatStringsSep "\n" trackpad}
+        ${concatStringsSep "\n" trackpadBluetooth}
+      '';
 
   };
 }
