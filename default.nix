@@ -20,7 +20,7 @@ let
         packages
         ./modules/alias.nix
         ./modules/system
-        ./modules/system/activation-checks.nix
+        ./modules/system/checks.nix
         ./modules/system/activation-scripts.nix
         ./modules/system/applications.nix
         ./modules/system/defaults-write.nix
