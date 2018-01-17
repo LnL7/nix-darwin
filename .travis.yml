@@ -10,3 +10,4 @@ matrix:
       - nix-shell -A installer.check
       - /run/current-system/sw/bin/darwin-rebuild switch -I darwin=$HOME/.nix-defexpr/channels/darwin -I darwin-config=$HOME/.nixpkgs/darwin-configuration.nix
       - yes | nix-shell -A uninstaller
+      - nix-shell -A uninstaller.check

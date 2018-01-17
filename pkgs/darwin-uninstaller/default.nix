@@ -38,7 +38,7 @@ stdenv.mkDerivation {
     echo >&2
     echo >&2 "Uninstalling nix-darwin, this will:"
     echo >&2
-    echo >&2 "    - remove ~/Applications link.
+    echo >&2 "    - remove ~/Applications link."
     echo >&2 "    - cleanup static /etc files."
     echo >&2 "    - disable and remove all launchd services managed by nix-darwin."
     echo >&2 "    - restore daemon service from nix installer (only when this is a multi-user install)."
@@ -71,4 +71,27 @@ stdenv.mkDerivation {
     echo >&2
     exit
   '';
+
+  passthru.check = stdenv.mkDerivation {
+     name = "run-darwin-test";
+     shellHook = ''
+        set -e
+        echo >&2 "running uninstaller tests..."
+        echo >&2
+
+        echo >&2 "checking darwin channel"
+        ! test -e ~/.nix-defexpr/channels/darwin
+        echo >&2 "checking /etc"
+        ! test -e /etc/static
+        echo >&2 "checking /run/current-system"
+        ! test -e /run/current-system
+        echo >&2 "checking nix-daemon service (assuming a multi-user install)"
+        sudo launchctl list | grep org.nixos.nix-daemon
+        pgrep -l nix-daemon
+        readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        grep /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        echo >&2 ok
+        exit
+    '';
+  };
 }
