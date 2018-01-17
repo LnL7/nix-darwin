@@ -119,6 +119,17 @@ let
         exit 2
     fi
   '';
+
+  nixStore = ''
+    if test -w /nix/var/nix/db -a ! -O /nix/store; then
+        echo >&2 "[1;31merror: the store is not owned by this user, but /nix/var/nix/db is writable[0m"
+        echo >&2 "If you are using the daemon:"
+        echo >&2
+        echo >&2 "    sudo chown -R /nix/var/nix/db"
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -131,6 +142,7 @@ in
       ${darwinChanges}
       ${runLink}
       ${buildUsers}
+      ${nixStore}
       ${nixChannels}
       ${nixInstaller}
       ${nixPath}
