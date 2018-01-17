@@ -69,8 +69,6 @@ in
       (mkIf (cfg.knownNetworkServices == [] && cfg.search != []) "networking.knownNetworkServices is empty, dns searchdomains will not be configured.")
     ];
 
-    system.defaults.smb.NetBIOSName = cfg.hostName;
-
     system.activationScripts.networking.text = ''
       echo "configuring networking..." >&2
 
