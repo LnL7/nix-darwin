@@ -163,11 +163,6 @@ in
       # /etc/zshrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
-      bindkey -e
-      ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}
-      ${optionalString cfg.enableFzfGit "source ${fzfGit}"}
-      ${optionalString cfg.enableFzfHistory "source ${fzfHistory}"}
-
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
@@ -179,6 +174,8 @@ in
 
       setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
 
+      bindkey -e
+
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 
@@ -187,6 +184,8 @@ in
         fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions)
       done
 
+      ${cfg.promptInit}
+
       ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
       ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
 
@@ -194,9 +193,9 @@ in
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
       }
 
-      ${cfg.promptInit}
-
-      if test -n "$IN_NIX_SHELL"; then PS1='%F{green}%B[nix-shell:%~]%#%b%f '; fi
+      ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}
+      ${optionalString cfg.enableFzfGit "source ${fzfGit}"}
+      ${optionalString cfg.enableFzfHistory "source ${fzfHistory}"}
 
       # Read system-wide modifications.
       if test -f /etc/zshrc.local; then

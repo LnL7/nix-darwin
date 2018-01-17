@@ -203,8 +203,12 @@
   programs.zsh.promptInit = ''
     autoload -U promptinit && promptinit
 
-    PROMPT='%B%(?..%? )%b⇒ '
-    RPROMPT='%F{green}%~%f'
+    if [ -n "$IN_NIX_SHELL" ]; then
+        PS1='%F{green}%B[nix-shell]%#%b%f '
+    else
+        PS1='%B%(?..%? )%b⇒ '
+    fi
+    RPS1='%F{green}%~%f'
   '';
 
   programs.zsh.loginShellInit = ''
