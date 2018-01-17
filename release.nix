@@ -31,7 +31,7 @@ let
           };
 
           config = {
-            system.build.run-test = pkgs.runCommand "run-darwin-test"
+            system.build.run-test = pkgs.runCommand "darwin-test"
               { allowSubstitutes = false; preferLocalBuild = true; }
               ''
                 #! ${pkgs.stdenv.shell}
