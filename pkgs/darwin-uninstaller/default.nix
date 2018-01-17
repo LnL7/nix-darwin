@@ -61,7 +61,7 @@ stdenv.mkDerivation {
     $system/sw/bin/darwin-rebuild switch
 
     if test -L /run/current-system; then
-      rm /run/current-system
+      sudo rm /run/current-system
     fi
 
     echo >&2
