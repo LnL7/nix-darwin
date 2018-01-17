@@ -17,6 +17,10 @@ with lib;
     if test -L ~/Applications; then
         rm ~/Applications
     fi
+
+    if test -L ~/.nix-defexpr/channels/darwin; then
+        nix-channel --remove darwin
+    fi
   '';
 
   system.activationScripts.postActivation.text = mkAfter ''
