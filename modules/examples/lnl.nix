@@ -215,55 +215,78 @@
 
   programs.zsh.loginShellInit = ''
     n() {
-      nix-repl '<nixpkgs/lib>' ''${@:-<nixpkgs>}
+        nix-repl '<nixpkgs/lib>' ''${@:-<nixpkgs>}
     }
 
     hydra-job-revision() {
-      local jobseteval job=$1
-      jobseteval=$(curl -fL -H 'Content-Type: application/json' "$job/latest" | jq '.jobsetevals[0]')
-      curl -f -H 'Content-Type: application/json' "''${job%/job*}/eval/$jobseteval" | jq -r '.jobsetevalinputs.nixpkgs.revision'
+        local jobseteval job=$1
+        shift 1
+        case "$job" in
+            *'/'*) ;;
+            *) job="nixpkgs/trunk/$job" ;;
+        esac
+        case "$job" in
+            'http://'*|'https://'*) ;;
+            *) job="https://hydra.nixos.org/job/$job" ;;
+        esac
+        jobseteval=$(curl -fsSL -H 'Content-Type: application/json' "$job/latest" | jq '.jobsetevals[0]')
+        curl -fsSL -H 'Accept: application/json' "''${job%/job*}/eval/$jobseteval" | jq -r '.jobsetevalinputs.nixpkgs.revision'
+    }
+
+    hydra-job-bisect() {
+        local job=$1
+        shift 1
+        nix-build ./pkgs/top-level/release.nix -A "''${job##*/}" --dry-run "$@" || return
+        git bisect start HEAD "$(hydra-job-revision "$job")"
+        git bisect run nix-build ./pkgs/top-level/release.nix -A "''${job##*/}" "$@"
     }
 
     hydra-job-outputs() {
-      local job=$1
-      curl -fL -H 'Content-Type: application/json' "$job/latest" | jq -r '.buildoutputs | to_entries | .[].value.path'
+        local job=$1
+        shift 1
+        curl -fsSL -H 'Accept: application/json' "$job/latest" | jq -r '.buildoutputs | to_entries | .[].value.path'
     }
 
     hydra-build-log() {
-      local build=$1
-      nix log "$(curl -f -H 'Content-Type: application/json' "$build/api/get-info" | jq -r .drvPath)"
+        local build=$1
+        shift 1
+        nix log "$(curl -fsSL -H 'Accept: application/json' "$build/api/get-info" | jq -r .drvPath)"
     }
 
     rev-darwin() {
-      echo "https://github.com/LnL7/nix-darwin/archive/''${@:-master}.tar.gz"
+        echo "https://github.com/LnL7/nix-darwin/archive/''${@:-master}.tar.gz"
     }
 
     rev-nixpkgs() {
-      echo "https://github.com/NixOS/nixpkgs/archive/''${@:-master}.tar.gz"
+        echo "https://github.com/NixOS/nixpkgs/archive/''${@:-master}.tar.gz"
     }
 
     pr-darwin() {
-      rev-darwin "$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$@/commits" | jq -r '.[-1].sha')"
+        local pr=$1
+        shift 1
+        rev-darwin "$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$pr/commits" | jq -r '.[-1].sha')"
     }
 
     pr-nixpkgs() {
-     rev-nixpkgs "$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$@/commits" | jq -r '.[-1].sha')"
+        local pr=$1
+        shift 1
+        rev-nixpkgs "$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$pr/commits" | jq -r '.[-1].sha')"
     }
 
     reexec() {
-      unset __ETC_ZSHRC_SOURCED
-      unset __ETC_ZSHENV_SOURCED
-      unset __ETC_ZPROFILE_SOURCED
-      exec $SHELL -c 'echo "reexecuting shell: $SHELL" >&2 && exec $SHELL -l'
+        unset __ETC_ZSHRC_SOURCED
+        unset __ETC_ZSHENV_SOURCED
+        unset __ETC_ZPROFILE_SOURCED
+        exec $SHELL -c 'echo >&2 "reexecuting shell: $SHELL" && exec $SHELL -l'
     }
 
     reexec-tmux() {
-      local host
-      unset __ETC_ZSHRC_SOURCED
-      unset __ETC_ZSHENV_SOURCED
-      unset __ETC_ZPROFILE_SOURCED
-      host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
-      exec tmux new-session -A -s $host
+        local host
+        unset __ETC_ZSHRC_SOURCED
+        unset __ETC_ZSHENV_SOURCED
+        unset __ETC_ZPROFILE_SOURCED
+        host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
+        exec tmux new-session -A -s $host
     }
   '';
 
