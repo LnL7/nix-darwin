@@ -28,15 +28,17 @@
   system.keyboard.remapCapsLockToControl = true;
 
   environment.systemPackages =
-    [ pkgs.ctags
+    [ pkgs.brotli
+      pkgs.ctags
       pkgs.curl
-      pkgs.brotli
       pkgs.fzf
       pkgs.gettext
       pkgs.git
+      pkgs.gnupg
       pkgs.htop
       pkgs.jq
       pkgs.mosh
+      pkgs.ripgrep
       pkgs.shellcheck
       pkgs.silver-searcher
 
