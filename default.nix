@@ -34,6 +34,7 @@ let
         ./modules/system/etc.nix
         ./modules/system/keyboard.nix
         ./modules/system/launchd.nix
+        ./modules/system/menubar.nix
         ./modules/system/shells.nix
         ./modules/system/version.nix
         ./modules/time

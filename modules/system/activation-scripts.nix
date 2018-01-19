@@ -98,6 +98,7 @@ in
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}
+      ${cfg.activationScripts.menubar.text}
       ${cfg.activationScripts.userLaunchd.text}
 
       ${cfg.activationScripts.postUserActivation.text}
