@@ -53,7 +53,7 @@ let
         ./modules/services/nix-gc
         ./modules/services/postgresql
         ./modules/services/redis
-        ./modules/programs/bash.nix
+        ./modules/programs/bash
         ./modules/programs/fish.nix
         ./modules/programs/man.nix
         ./modules/programs/info
