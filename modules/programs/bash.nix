@@ -3,18 +3,7 @@
 with lib;
 
 let
-
   cfg = config.programs.bash;
-
-  shell = pkgs.runCommand pkgs.bashInteractive.name
-    { buildInputs = [ pkgs.makeWrapper ]; }
-    ''
-      source $stdenv/setup
-
-      mkdir -p $out/bin
-      makeWrapper ${pkgs.bashInteractive}/bin/bash $out/bin/bash
-    '';
-
 in
 
 {
@@ -56,8 +45,8 @@ in
         "/share/bash-completion/completions"
       ];
 
-    environment.loginShell = mkDefault "${shell}/bin/bash -l";
-    environment.variables.SHELL = mkDefault "${shell}/bin/bash";
+    environment.loginShell = mkDefault "bash -l";
+    environment.variables.SHELL = mkDefault "${pkgs.bashInteractive}/bin/bash";
 
     environment.etc."bashrc".text = ''
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
