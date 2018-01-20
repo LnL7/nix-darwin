@@ -11,15 +11,6 @@ let
   fzfCompletion = ./fzf-completion.zsh;
   fzfGit = ./fzf-git.zsh;
   fzfHistory = ./fzf-history.zsh;
-
-  shell = pkgs.runCommand pkgs.zsh.name
-    { buildInputs = [ pkgs.makeWrapper ]; }
-    ''
-      source $stdenv/setup
-
-      mkdir -p $out/bin
-      makeWrapper ${pkgs.zsh}/bin/zsh $out/bin/zsh
-    '';
 in
 
 {
@@ -114,8 +105,8 @@ in
 
     environment.pathsToLink = [ "/share/zsh" ];
 
-    environment.loginShell = "${shell}/bin/zsh -l";
-    environment.variables.SHELL = "${shell}/bin/zsh";
+    environment.loginShell = "zsh -l";
+    environment.variables.SHELL = "${pkgs.zsh}/bin/zsh";
 
     environment.etc."zshenv".text = ''
       # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
