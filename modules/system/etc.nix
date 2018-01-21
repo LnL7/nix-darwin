@@ -31,12 +31,14 @@ in
 
   config = {
 
-    system.build.etc = pkgs.runCommand "etc" {} ''
-      mkdir -p $out/etc
-      cd $out/etc
-      ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
-      ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
-    '';
+    system.build.etc = pkgs.runCommandNoCC "etc"
+      { preferLocalBuild = true; }
+      ''
+        mkdir -p $out/etc
+        cd $out/etc
+        ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
+        ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
+      '';
 
     system.activationScripts.etc.text = ''
       # Set up the statically computed bits of /etc.

@@ -16,31 +16,33 @@ let
       sh = pkgs.stdenv.shell;
       binshDeps = pkgs.writeReferencesToFile sh;
     in
-      pkgs.runCommand "nix.conf" { extraOptions = cfg.extraOptions; } ''
-        cat > $out <<END
-        # WARNING: this file is generated from the nix.* options in
-        # your NixOS configuration, typically
-        # /etc/nixos/configuration.nix.  Do not edit it!
-        ${optionalString config.services.nix-daemon.enable ''
-          build-users-group = nixbld
-        ''}
-        build-max-jobs = ${toString cfg.maxJobs}
-        build-cores = ${toString cfg.buildCores}
-        build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
-        ${optionalString (cfg.sandboxPaths != []) ''
-          build-sandbox-paths = ${toString cfg.sandboxPaths}
-        ''}
-        binary-caches = ${toString cfg.binaryCaches}
-        trusted-binary-caches = ${toString cfg.trustedBinaryCaches}
-        binary-cache-public-keys = ${toString cfg.binaryCachePublicKeys}
-        ${optionalString cfg.requireSignedBinaryCaches ''
-          signed-binary-caches = *
-        ''}
-        trusted-users = ${toString cfg.trustedUsers}
-        allowed-users = ${toString cfg.allowedUsers}
-        $extraOptions
-        END
-      '';
+      pkgs.runCommandNoCC "nix.conf"
+        { preferLocalBuild = true; extraOptions = cfg.extraOptions; }
+        ''
+          cat > $out <<END
+          # WARNING: this file is generated from the nix.* options in
+          # your NixOS configuration, typically
+          # /etc/nixos/configuration.nix.  Do not edit it!
+          ${optionalString config.services.nix-daemon.enable ''
+            build-users-group = nixbld
+          ''}
+          build-max-jobs = ${toString cfg.maxJobs}
+          build-cores = ${toString cfg.buildCores}
+          build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
+          ${optionalString (cfg.sandboxPaths != []) ''
+            build-sandbox-paths = ${toString cfg.sandboxPaths}
+          ''}
+          binary-caches = ${toString cfg.binaryCaches}
+          trusted-binary-caches = ${toString cfg.trustedBinaryCaches}
+          binary-cache-public-keys = ${toString cfg.binaryCachePublicKeys}
+          ${optionalString cfg.requireSignedBinaryCaches ''
+            signed-binary-caches = *
+          ''}
+          trusted-users = ${toString cfg.trustedUsers}
+          allowed-users = ${toString cfg.allowedUsers}
+          $extraOptions
+          END
+        '';
 in
 
 {

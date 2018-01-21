@@ -84,15 +84,17 @@ in
 
   config = {
 
-    system.build.launchd = pkgs.runCommand "launchd" {} ''
-      mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out/user/Library/LaunchAgents
-      cd $out/Library/LaunchAgents
-      ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchAgents}
-      cd $out/Library/LaunchDaemons
-      ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchDaemons}
-      cd $out/user/Library/LaunchAgents
-      ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") userLaunchAgents}
-    '';
+    system.build.launchd = pkgs.runCommandNoCC "launchd"
+      { preferLocalBuild = true; }
+      ''
+        mkdir -p $out/Library/LaunchAgents $out/Library/LaunchDaemons $out/user/Library/LaunchAgents
+        cd $out/Library/LaunchAgents
+        ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchAgents}
+        cd $out/Library/LaunchDaemons
+        ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") launchDaemons}
+        cd $out/user/Library/LaunchAgents
+        ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") userLaunchAgents}
+      '';
 
     system.activationScripts.launchd.text = ''
       # Set up launchd services in /Library/LaunchAgents and /Library/LaunchDaemons
