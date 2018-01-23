@@ -45,12 +45,9 @@ in
   users.knownGroups = [ "hydra" ];
   users.knownUsers = [ "hydra" ];
   users.groups.hydra = { gid = 530; description = "Hydra builder group"; members = [ "hydra" ]; };
-  users.users.hydra = { uid = 530; gid = 530; description = "Hydra"; home = "/Users/hydra"; shell = "/bin/bash"; isHidden = true; };
+  users.users.hydra = { uid = 530; gid = 530; description = "Hydra"; home = "/Users/hydra"; shell = "/bin/bash"; };
 
   system.activationScripts.postActivation.text = ''
-    echo "configuring hydra group"
-    dscl . -create /Groups/hydra GroupMembership hydra
-
     printf "configuring ssh keys for hydra... "
     mkdir -p ~hydra/.ssh
     cp -f /etc/per-user/hydra/ssh/authorized_keys ~hydra/.ssh/authorized_keys
