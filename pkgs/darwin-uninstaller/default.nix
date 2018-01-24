@@ -11,6 +11,7 @@ in
 
 stdenv.mkDerivation {
   name = "darwin-uninstaller";
+  preferLocalBuild = true;
 
   unpackPhase = ":";
 

@@ -11,6 +11,7 @@ in
 
 stdenv.mkDerivation {
   name = "darwin-installer";
+  preferLocalBuild = true;
 
   unpackPhase = ":";
 
@@ -56,7 +57,7 @@ stdenv.mkDerivation {
         read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
         case "$i" in
             y|Y)
-                $EDITOR "$config"
+                ''${EDITOR:-nano} "$config"
                 ;;
         esac
     fi
