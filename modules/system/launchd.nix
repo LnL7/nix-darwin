@@ -19,7 +19,7 @@ let
     if ! diff '${cfg.build.launchd}/Library/${basedir}/${target}' '/Library/${basedir}/${target}' &> /dev/null; then
       if test -f '/Library/${basedir}/${target}'; then
         echo "reloading service $(basename ${target} .plist)" >&2
-        launchctl unload -w '/Library/${basedir}/${target}' || true
+        launchctl unload '/Library/${basedir}/${target}' || true
       else
         echo "creating service $(basename ${target} .plist)" >&2
       fi
@@ -35,7 +35,7 @@ let
     if ! diff ${cfg.build.launchd}/user/Library/LaunchAgents/${target} ~/Library/LaunchAgents/${target} &> /dev/null; then
       if test -f ~/Library/LaunchAgents/${target}; then
         echo "reloading user service $(basename ${target} .plist)" >&2
-        launchctl unload -w ~/Library/LaunchAgents/${target} || true
+        launchctl unload ~/Library/LaunchAgents/${target} || true
       else
         echo "creating user service $(basename ${target} .plist)" >&2
       fi
