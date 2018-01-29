@@ -51,6 +51,7 @@ let
         ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix
         ./modules/services/nix-gc
+        ./modules/services/ofborg
         ./modules/services/postgresql
         ./modules/services/redis
         ./modules/programs/bash
