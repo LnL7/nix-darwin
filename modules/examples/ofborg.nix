@@ -6,8 +6,11 @@ with lib;
   # Logs are enabled by default.
   # $ tail -f /var/log/ofborg.log
   services.ofborg.enable = true;
-  services.ofborg.package = (import <ofborg> {}).ofborg.rs;
   # services.ofborg.configFile = "/var/lib/ofborg/config.json";
+
+  # $ nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
+  # $ nix-channel --update
+  services.ofborg.package = (import <ofborg> {}).ofborg.rs;
 
   services.nix-daemon.enable = true;
 
