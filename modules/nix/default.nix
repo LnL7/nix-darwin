@@ -5,7 +5,9 @@ with lib;
 let
   cfg = config.nix;
 
-  buildHook = if versionAtLeast (cfg.package.version or "<unknown>") "1.12pre"
+  nixVersionAtLeast = versionAtLeast (cfg.package.version or "<unknown>");
+
+  buildHook = if nixVersionAtLeast "1.12pre"
     then "build-remote" else "build-remote.pl";
 
   nixConf =
@@ -317,6 +319,8 @@ in
       (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
+
+    nix.requireSignedBinaryCaches = mkIf (nixVersionAtLeast "2.0pre") false;
 
     nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
     nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
