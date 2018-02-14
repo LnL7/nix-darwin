@@ -170,44 +170,37 @@ in
             The `pre-exit` hook will run just before your build job finishes
           ''; }
       ];
-
-      hooksPath = mkOption {
-        type = types.path;
-        default = hooksDir;
-        defaultText = "generated from services.buildkite-agent.hooks";
-        description = ''
-          Path to the directory storing the hooks.
-          Consider using <option>services.buildkite-agent.hooks.&lt;name&gt;</option>
-          instead.
-        '';
-      };
     };
   };
 
   config = mkIf config.services.buildkite-agent.enable {
-    users.extraUsers.buildkite-agent =
+    users.users.buildkite-agent =
       { name = "buildkite-agent";
         home = cfg.dataDir;
-        createHome = true;
         description = "Buildkite agent user";
-        extraGroups = [ "keys" ];
+        uid = 532;
+        gid = 532;
+      };
+    users.groups.buildkite-agent =
+      { name = "buildkite-agent";
+        description = "Buildkite agent user group";
+        gid = 532;
       };
 
     environment.systemPackages = [ cfg.package ];
 
-    systemd.services.buildkite-agent =
-      { description = "Buildkite Agent";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" ];
-        path = cfg.runtimePackages ++ [ pkgs.coreutils ];
-        environment = config.networking.proxy.envVars // {
+    launchd.daemons.buildkite-agent =
+      {
+        path = cfg.runtimePackages ++ [ pkgs.coreutils cfg.package ];
+        environment = {
           HOME = cfg.dataDir;
           NIX_REMOTE = "daemon";
+          NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
         };
 
         ## NB: maximum care is taken so that secrets (ssh keys and the CI token)
         ##     don't end up in the Nix store.
-        preStart = let
+        script = let
           sshDir = "${cfg.dataDir}/.ssh";
         in
           ''
@@ -221,32 +214,28 @@ in
             name="${cfg.name}"
             meta-data="${cfg.meta-data}"
             build-path="${cfg.dataDir}/builds"
-            hooks-path="${cfg.hooksPath}"
+            hooks-path="${hooksDir}"
             ${cfg.extraConfig}
             EOF
+
+            # Secrets exist in the buildkite-agent home directory
+            chmod 750 "${cfg.dataDir}"
+            chmod 640 "${cfg.dataDir}/buildkite-agent.cfg"
+
+            # Make /usr/bin/sw_vers accessible
+            export PATH=$PATH:/usr/bin
+
+            exec buildkite-agent start --config /var/lib/buildkite-agent/buildkite-agent.cfg
           '';
 
-        serviceConfig =
-          { ExecStart = "${pkgs.buildkite-agent}/bin/buildkite-agent start --config /var/lib/buildkite-agent/buildkite-agent.cfg";
-            User = "buildkite-agent";
-            RestartSec = 5;
-            Restart = "on-failure";
-            TimeoutSec = 10;
-          };
-      };
+        serviceConfig.KeepAlive = true;
+        serviceConfig.RunAtLoad = true;
 
-    assertions = [
-      { assertion = cfg.hooksPath == hooksDir || all isNull (attrValues cfg.hooks);
-        message = ''
-          Options `services.buildkite-agent.hooksPath' and
-          `services.buildkite-agent.hooks.<name>' are mutually exclusive.
-        '';
-      }
-    ];
+        serviceConfig.GroupName = "buildkite-agent";
+        serviceConfig.UserName = "buildkite-agent";
+        serviceConfig.WorkingDirectory = config.users.users.buildkite-agent.home;
+        serviceConfig.StandardErrorPath = "${cfg.dataDir}/buildkite-agent.log";
+        serviceConfig.StandardOutPath = "${cfg.dataDir}/buildkite-agent.log";
+      };
   };
-  imports = [
-    (mkRenamedOptionModule [ "services" "buildkite-agent" "token" ]                [ "services" "buildkite-agent" "tokenPath" ])
-    (mkRenamedOptionModule [ "services" "buildkite-agent" "openssh" "privateKey" ] [ "services" "buildkite-agent" "openssh" "privateKeyPath" ])
-    (mkRenamedOptionModule [ "services" "buildkite-agent" "openssh" "publicKey" ]  [ "services" "buildkite-agent" "openssh" "publicKeyPath" ])
-  ];
 }
