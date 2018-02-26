@@ -186,7 +186,8 @@ in
 
     launchd.daemons.buildkite-agent =
       {
-        path = cfg.runtimePackages ++ [ pkgs.coreutils pkgs.darwin.DarwinTools cfg.package ];
+        path = cfg.runtimePackages ++ [ pkgs.coreutils cfg.package ]
+          ++ (if pkgs.stdenv.isDarwin then [ pkgs.darwin.DarwinTools ] else []);
         environment = {
           HOME = cfg.dataDir;
           NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
