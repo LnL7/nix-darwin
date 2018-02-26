@@ -44,6 +44,7 @@ let
         ./modules/environment
         ./modules/launchd
         ./modules/services/activate-system
+        ./modules/services/buildkite-agent.nix
         ./modules/services/chunkwm.nix
         ./modules/services/emacs.nix
         ./modules/services/khd

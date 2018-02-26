@@ -105,6 +105,7 @@ let
     tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
+    tests.buildkite-agent = makeTest ./tests/buildkite-agent.nix;
 
   }
   // (mapTestOn (packagePlatforms packageSet));
