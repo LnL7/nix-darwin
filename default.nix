@@ -28,6 +28,7 @@ let
         ./modules/system/defaults/NSGlobalDomain.nix
         ./modules/system/defaults/dock.nix
         ./modules/system/defaults/finder.nix
+        ./modules/system/defaults/screencapture.nix
         ./modules/system/defaults/smb.nix
         ./modules/system/defaults/trackpad.nix
         ./modules/system/etc.nix

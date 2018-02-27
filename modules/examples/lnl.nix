@@ -21,6 +21,8 @@
   system.defaults.finder.QuitMenuItem = true;
   system.defaults.finder.FXEnableExtensionChangeWarning = false;
 
+  system.defaults.screencapture.location = "/tmp";
+
   system.defaults.trackpad.Clicking = true;
   system.defaults.trackpad.TrackpadThreeFingerDrag = true;
 
