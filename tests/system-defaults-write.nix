@@ -32,6 +32,7 @@
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.dock.autohide-delay = "0.24";
   system.defaults.dock.orientation = "left";
+  system.defaults.screencapture.location = "/tmp";
   system.defaults.smb.NetBIOSName = "IMAC-000000";
   system.defaults.smb.ServerDescription = ''Darwin\\\\U2019s iMac'';
 
@@ -70,7 +71,8 @@
     grep "defaults write -g 'com.apple.springing.enabled' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.springing.delay' -float 0.0" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.swipescrolldirection' -bool YES" ${config.out}/activate-user
-    grep "defaults write com.apple.dock 'orientation' -string 'left'" ${config.out}/activate-user
     grep "defaults write com.apple.dock 'autohide-delay' -float 0.24" ${config.out}/activate-user
+    grep "defaults write com.apple.dock 'orientation' -string 'left'" ${config.out}/activate-user
+    grep "defaults write com.apple.screencapture 'location' -string '/tmp'" ${config.out}/activate-user
   '';
 }
