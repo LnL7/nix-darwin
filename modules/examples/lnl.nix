@@ -401,19 +401,14 @@
     rshift   :   khd -p "shift - 0"
 
 
-    # enable kwm compatibility mode
-    khd kwm on
-
-
     # set border color for different modes
-    # khd mode default color 0xddd5c4a1
-    khd mode default color 0x00000000
-    khd mode switcher color 0xddbdd322
-    khd mode scratchpad color 0xddd75f5f
-    khd mode swap color 0xdd458588
-    khd mode tree color 0xddfabd2f
-    khd mode space color 0xddb16286
-    khd mode info color 0xddcd950c
+    khd mode default on_enter kwmc config border focused color 0x00000000
+    khd mode switcher on_enter kwmc config border focused color 0xddbdd322
+    khd mode scratchpad on_enter kwmc config border focused color 0xddd75f5f
+    khd mode swap on_enter kwmc config border focused color 0xdd458588
+    khd mode tree on_enter kwmc config border focused color 0xddfabd2f
+    khd mode space on_enter kwmc config border focused color 0xddb16286
+    khd mode info on_enter kwmc config border focused color 0xddcd950c
 
 
     # toggle between modes
