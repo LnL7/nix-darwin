@@ -24,13 +24,21 @@ in
     users.knownGroups = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "List of groups that should be created and configured.";
+      description = ''
+        List of groups owned and managed by nix-darwin. Used to indicate
+        what users are safe to create/delete based on the configuration.
+        Don't add system groups to this.
+      '';
     };
 
     users.knownUsers = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "List of users that should be created and configured.";
+      description = ''
+        List of users owned and managed by nix-darwin. Used to indicate
+        what users are safe to create/delete based on the configuration.
+        Don't add the admin user or other system users to this.
+      '';
     };
 
     users.groups = mkOption {
