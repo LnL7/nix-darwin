@@ -112,7 +112,7 @@
     set bg=dark
 
     set clipboard=unnamed
-    set relativenumber
+    set mouse=a
 
     set backup
     set backupdir=~/.vim/tmp/backup//
@@ -199,7 +199,7 @@
 
   programs.zsh.variables.cfg = "$HOME/.config/nixpkgs/darwin/configuration.nix";
   programs.zsh.variables.darwin = "$HOME/.nix-defexpr/darwin";
-  programs.zsh.variables.pkgs = "$HOME/.nix-defexpr/nixpkgs";
+  programs.zsh.variables.nixpkgs = "$HOME/.nix-defexpr/nixpkgs";
 
 
   programs.zsh.promptInit = ''
@@ -214,8 +214,8 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    n() {
-        nix-repl '<nixpkgs/lib>' ''${@:-<nixpkgs>}
+    nix-repl() {
+        command nix repl ''${@:-<nixpkgs>}
     }
 
     hydra-job-revision() {
@@ -303,6 +303,7 @@
 
   environment.variables.FZF_DEFAULT_COMMAND = "ag -l -f -g ''";
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
+  environment.variables.LC_CTYPE = "UTF-8";
 
   environment.shellAliases.g = "git log --pretty=color -32";
   environment.shellAliases.gb = "git branch";
@@ -356,49 +357,49 @@
 
   services.khd.khdConfig = ''
     # remap left-control h/j/k/l -> arrow keys
-    lctrl - h         [Safari]      :   khd -p "- left"
-    lctrl - j         [Safari]      :   khd -p "- down"
-    lctrl - k         [Safari]      :   khd -p "- up"
-    lctrl - l         [Safari]      :   khd -p "- right"
+    lctrl - h         [Safari]      :   qes -k "- left"
+    lctrl - j         [Safari]      :   qes -k "- down"
+    lctrl - k         [Safari]      :   qes -k "- up"
+    lctrl - l         [Safari]      :   qes -k "- right"
 
-    shift + lctrl - h [Safari]      :   khd -p "shift - left"
-    shift + lctrl - j [Safari]      :   khd -p "shift - down"
-    shift + lctrl - k [Safari]      :   khd -p "shift - up"
-    shift + lctrl - l [Safari]      :   khd -p "shift - right"
+    shift + lctrl - h [Safari]      :   qes -k "shift - left"
+    shift + lctrl - j [Safari]      :   qes -k "shift - down"
+    shift + lctrl - k [Safari]      :   qes -k "shift - up"
+    shift + lctrl - l [Safari]      :   qes -k "shift - right"
 
     # remap left-control a / e   -> start / end of line
-    lctrl - a         [Safari]      :   khd -p "cmd - left"
-    lctrl - e         [Safari]      :   khd -p "cmd - right"
+    lctrl - a         [Safari]      :   qes -k "cmd - left"
+    lctrl - e         [Safari]      :   qes -k "cmd - right"
 
-    shift + lctrl - e [Safari]      :   khd -p "shift + cmd - left"
-    shift + lctrl - e [Safari]      :   khd -p "shift + cmd - right"
+    shift + lctrl - e [Safari]      :   qes -k "shift + cmd - left"
+    shift + lctrl - e [Safari]      :   qes -k "shift + cmd - right"
 
     # remap left-control b / w   -> start / end of word
-    lctrl - b         [Safari]      :   khd -p "alt - left"
-    lctrl - w         [Safari]      :   khd -p "alt - right"
+    lctrl - b         [Safari]      :   qes -k "alt - left"
+    lctrl - w         [Safari]      :   qes -k "alt - right"
 
-    shift + lctrl - b [Safari]      :   khd -p "shift + alt - left"
-    shift + lctrl - w [Safari]      :   khd -p "shift + alt - right"
+    shift + lctrl - b [Safari]      :   qes -k "shift + alt - left"
+    shift + lctrl - w [Safari]      :   qes -k "shift + alt - right"
 
     # remap left-control u / d   -> page up / page down
-    lctrl - u         [Safari]      :   khd -p "alt - up"
-    lctrl - d         [Safari]      :   khd -p "alt - down"
+    lctrl - u         [Safari]      :   qes -k "alt - up"
+    lctrl - d         [Safari]      :   qes -k "alt - down"
 
-    shift + lctrl - u [Safari]      :   khd -p "shift + alt - up"
-    shift + lctrl - d [Safari]      :   khd -p "shift + alt - down"
+    shift + lctrl - u [Safari]      :   qes -k "shift + alt - up"
+    shift + lctrl - d [Safari]      :   qes -k "shift + alt - down"
 
     # remap left-control x       -> forward delete
-    lctrl - x         [Safari]      :   khd -p "- delete"
+    lctrl - x         [Safari]      :   qes -k "- delete"
 
     # remap left-control g       -> escape
-    lctrl - g         [Safari]      :   khd -p "0x35"
+    lctrl - g         [Safari]      :   qes -k "0x35"
 
 
     # modifier only mappings
     khd mod_trigger_timeout 0.2
-    lctrl    :   khd -p "0x35"
-    lshift   :   khd -p "shift - 9"
-    rshift   :   khd -p "shift - 0"
+    lctrl    :   qes -k "escape"
+    lshift   :   qes -k "shift - 9"
+    rshift   :   qes -k "shift - 0"
 
 
     # set border color for different modes
