@@ -44,8 +44,7 @@
 
       pkgs.khd
       pkgs.kwm
-
-      pkgs.nix-repl
+      pkgs.qes
     ];
 
   services.khd.enable = true;
@@ -398,8 +397,8 @@
     # modifier only mappings
     khd mod_trigger_timeout 0.2
     lctrl    :   qes -k "escape"
-    lshift   :   qes -k "shift - 9"
-    rshift   :   qes -k "shift - 0"
+    lshift   :   qes -t "("
+    rshift   :   qes -t ")"
 
 
     # set border color for different modes
