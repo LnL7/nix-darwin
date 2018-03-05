@@ -1,10 +1,14 @@
 { config, pkgs, ... }:
 
 let
+  buildkite-agent = pkgs.runCommand "buildkite-agent-0.0.0" {} "mkdir $out";
   tokenPath = pkgs.writeText "buildkite_token" "TEST_TOKEN";
-in {
+in
+
+{
   services.buildkite-agent = {
     enable = true;
+    package = buildkite-agent;
     extraConfig = "yolo=1";
     openssh.privateKeyPath = "/dev/null";
     openssh.publicKeyPath = "/dev/null";

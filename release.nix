@@ -98,6 +98,7 @@ let
     tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
     tests.programs-zsh = makeTest ./tests/programs-zsh.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
+    tests.services-buildkite-agent = makeTest ./tests/services-buildkite-agent.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;
@@ -106,7 +107,6 @@ let
     tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
-    tests.buildkite-agent = makeTest ./tests/buildkite-agent.nix;
 
   }
   // (mapTestOn (packagePlatforms packageSet));
