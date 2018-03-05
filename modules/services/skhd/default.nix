@@ -30,8 +30,6 @@ in {
 
   config = mkIf cfg.enable {
 
-    security.accessibilityPrograms = [ "${cfg.package}/bin/skhd" ];
-
     environment.etc."skhdrc".text = cfg.skhdConfig;
 
     launchd.user.agents.skhd = {
