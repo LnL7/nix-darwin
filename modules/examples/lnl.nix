@@ -356,10 +356,10 @@
 
   services.khd.khdConfig = ''
     # remap left-control h/j/k/l -> arrow keys
-    lctrl - h         [Safari]      :   qes -k "- left"
-    lctrl - j         [Safari]      :   qes -k "- down"
-    lctrl - k         [Safari]      :   qes -k "- up"
-    lctrl - l         [Safari]      :   qes -k "- right"
+    lctrl - h         [Safari]      :   qes -k "left"
+    lctrl - j         [Safari]      :   qes -k "down"
+    lctrl - k         [Safari]      :   qes -k "up"
+    lctrl - l         [Safari]      :   qes -k "right"
 
     shift + lctrl - h [Safari]      :   qes -k "shift - left"
     shift + lctrl - j [Safari]      :   qes -k "shift - down"
@@ -388,7 +388,7 @@
     shift + lctrl - d [Safari]      :   qes -k "shift + alt - down"
 
     # remap left-control x       -> forward delete
-    lctrl - x         [Safari]      :   qes -k "- delete"
+    lctrl - x         [Safari]      :   qes -k "delete"
 
     # remap left-control g       -> escape
     lctrl - g         [Safari]      :   qes -k "0x35"
