@@ -56,6 +56,7 @@ let
         ./modules/services/ofborg
         ./modules/services/postgresql
         ./modules/services/redis
+        ./modules/services/skhd
         ./modules/programs/bash
         ./modules/programs/fish.nix
         ./modules/programs/man.nix
