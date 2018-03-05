@@ -91,18 +91,18 @@ in
 
     # FIXME: create logfiles automatically if defined.
     system.activationScripts.preActivation.text = ''
-      mkdir -p "${user.home}"
-      touch "${cfg.logFile}"
-      chown ${toString user.uid}:${toString user.gid} "${user.home}" "${cfg.logFile}"
+      mkdir -p '${user.home}'
+      touch '${cfg.logFile}'
+      chown ${toString user.uid}:${toString user.gid} '${user.home}' '${cfg.logFile}'
     '';
 
     system.activationScripts.postActivation.text = ''
-      if ! test -f "${cfg.configFile}"; then
+      if ! test -f '${cfg.configFile}'; then
         echo >&2 "[1;31mwarning: ofborg config \"${cfg.configFile}\" does not exist[0m"
       fi
 
-      chmod 600 "${cfg.configFile}"
-      chown ${toString user.uid}:${toString user.gid} "${cfg.configFile}"
+      chmod 600 '${cfg.configFile}'
+      chown ${toString user.uid}:${toString user.gid} '${cfg.configFile}'
     '';
 
   };
