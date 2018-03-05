@@ -12,13 +12,15 @@ with lib;
   # $ nix-channel --update
   services.ofborg.package = (import <ofborg> {}).ofborg.rs;
 
+  # Keep nix-daemon updated.
   services.nix-daemon.enable = true;
-
   nix.package = pkgs.nixUnstable;
 
   nix.gc.automatic = true;
   nix.gc.options = "--max-freed $((25 * 1024**3 - 1024 * $(df -P -k /nix/store | tail -n 1 | awk '{ print $4 }')))";
 
+  # Manage user for ofborg, this enables creating/deleting users
+  # depending on what modules are enabled.
   users.knownGroups = [ "ofborg" ];
   users.knownUsers = [ "ofborg" ];
 
