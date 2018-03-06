@@ -96,6 +96,7 @@ let
     tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
     tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
     tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
+    tests.programs-ssh = makeTest ./tests/programs-ssh.nix;
     tests.programs-zsh = makeTest ./tests/programs-zsh.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
     tests.services-buildkite-agent = makeTest ./tests/services-buildkite-agent.nix;
