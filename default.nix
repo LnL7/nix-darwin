@@ -63,6 +63,7 @@ let
         ./modules/programs/info
         ./modules/programs/nix-index
         ./modules/programs/nix-script.nix
+        ./modules/programs/ssh
         ./modules/programs/tmux.nix
         ./modules/programs/vim.nix
         ./modules/programs/zsh
