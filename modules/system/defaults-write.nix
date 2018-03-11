@@ -29,6 +29,7 @@ let
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
+  systemUIServer = defaultsToList "com.apple.systemuiserver" cfg.systemUIServer;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != {}) list);
 in
@@ -56,6 +57,11 @@ in
         ${concatStringsSep "\n" screencapture}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
+      '';
+
+    system.activationScripts.systemUIServer.text = mkIfAttrs [ systemUIServer ]
+      ''
+        killall SystemUIServer
       '';
 
   };

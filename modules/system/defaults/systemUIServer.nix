@@ -1,9 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 
 let
-  cfg = config.system.menubar;
 
   items = {
     Airport         = "/System/Library/CoreServices/Menu Extras/AirPort.menu";
@@ -32,21 +31,17 @@ let
   };
 
 in {
+
   options = {
-    system.menubar.items = mkOption {
+    system.defaults.systemUIServer.menuExtras = mkOption {
       type = types.nullOr (types.listOf (types.enum (attrNames items)));
+      example = [ "Airport" "Battery" "Bleutooth" ];
       default = null;
-      description = "Items to display in the menubar";
+      description = ''
+        Items to display in the menubar. There's other mechanisms affecting this,
+        so it may not always give the hoped for results. Default value is an empty list.
+      '';
     };
   };
 
-  config = {
-
-    system.activationScripts.menubar.text = optionalString (!isNull cfg.items) ''
-      defaults write com.apple.systemuiserver menuExtras -array ${builtins.toString (map (k: "'" + (builtins.getAttr k items) + "'") cfg.items)}
-
-      killall SystemUIServer
-    '';
-
-  };
 }

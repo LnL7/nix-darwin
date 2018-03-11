@@ -30,11 +30,11 @@ let
         ./modules/system/defaults/finder.nix
         ./modules/system/defaults/screencapture.nix
         ./modules/system/defaults/smb.nix
+        ./modules/system/defaults/systemUIServer.nix
         ./modules/system/defaults/trackpad.nix
         ./modules/system/etc.nix
         ./modules/system/keyboard.nix
         ./modules/system/launchd.nix
-        ./modules/system/menubar.nix
         ./modules/system/shells.nix
         ./modules/system/version.nix
         ./modules/time
