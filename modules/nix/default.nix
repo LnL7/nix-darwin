@@ -5,10 +5,7 @@ with lib;
 let
   cfg = config.nix;
 
-  nixVersionAtLeast = versionAtLeast (cfg.package.version or "<unknown>");
-
-  buildHook = if nixVersionAtLeast "1.12pre"
-    then "build-remote" else "build-remote.pl";
+  isNix20 = versionAtLeast (cfg.package.version or "<unknown>") "1.12pre";
 
   nixConf =
     let
@@ -28,20 +25,25 @@ let
           ${optionalString config.services.nix-daemon.enable ''
             build-users-group = nixbld
           ''}
-          build-max-jobs = ${toString cfg.maxJobs}
-          build-cores = ${toString cfg.buildCores}
-          build-use-sandbox = ${if (builtins.isBool cfg.useSandbox) then (if cfg.useSandbox then "true" else "false") else cfg.useSandbox}
+          ${if isNix20 then "max-jobs" else "build-max-jobs"} = ${toString (cfg.maxJobs)}
+          ${if isNix20 then "cores" else "build-cores"} = ${toString (cfg.buildCores)}
+          ${if isNix20 then "sandbox" else "build-use-sandbox"} = ${if (builtins.isBool cfg.useSandbox) then boolToString cfg.useSandbox else cfg.useSandbox}
           ${optionalString (cfg.sandboxPaths != []) ''
-            build-sandbox-paths = ${toString cfg.sandboxPaths}
+            ${if isNix20 then "extra-sandbox-paths" else "build-sandbox-paths"} = ${toString cfg.sandboxPaths}
           ''}
-          binary-caches = ${toString cfg.binaryCaches}
-          trusted-binary-caches = ${toString cfg.trustedBinaryCaches}
-          binary-cache-public-keys = ${toString cfg.binaryCachePublicKeys}
-          ${optionalString cfg.requireSignedBinaryCaches ''
-            signed-binary-caches = *
+          ${if isNix20 then "substituters" else "binary-caches"} = ${toString cfg.binaryCaches}
+          ${if isNix20 then "trusted-substituters" else "trusted-binary-caches"} = ${toString cfg.trustedBinaryCaches}
+          ${if isNix20 then "trusted-public-keys" else "binary-cache-public-keys"} = ${toString cfg.binaryCachePublicKeys}
+          ${if isNix20 then ''
+            require-sigs = ${if cfg.requireSignedBinaryCaches then "true" else "false"}
+          '' else ''
+            signed-binary-caches = ${if cfg.requireSignedBinaryCaches then "*" else ""}
           ''}
           trusted-users = ${toString cfg.trustedUsers}
           allowed-users = ${toString cfg.allowedUsers}
+          ${optionalString (isNix20 && !cfg.distributedBuilds) ''
+            builders =
+          ''}
           $extraOptions
           END
         '';
@@ -320,8 +322,6 @@ in
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
 
-    nix.requireSignedBinaryCaches = mkIf (nixVersionAtLeast "2.0pre") false;
-
     nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
     nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
 
@@ -355,7 +355,8 @@ in
       };
 
     nix.envVars =
-      { NIX_CONF_DIR = "/etc/nix";
+      optionalAttrs (!isNix20) {
+        NIX_CONF_DIR = "/etc/nix";
 
         # Enable the copy-from-other-stores substituter, which allows
         # builds to be sped up by copying build results from remote
@@ -363,11 +364,12 @@ in
         # subdirectory of /run/nix/remote-stores.
         NIX_OTHER_STORES = "/run/nix/remote-stores/*/nix";
       }
-
       // optionalAttrs cfg.distributedBuilds {
-        NIX_BUILD_HOOK = "${cfg.package}/libexec/nix/${buildHook}";
-        NIX_REMOTE_SYSTEMS = "/etc/nix/machines";
         NIX_CURRENT_LOAD = "/run/nix/current-load";
+      }
+      // optionalAttrs (cfg.distributedBuilds && !isNix20) {
+        NIX_BUILD_HOOK = "${cfg.package}/libexec/nix/build-remote.pl";
+        NIX_REMOTE_SYSTEMS = "/etc/nix/machines";
       };
 
     environment.extraInit = ''

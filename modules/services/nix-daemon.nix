@@ -48,8 +48,7 @@ in
 
       serviceConfig.EnvironmentVariables = mkMerge [
         config.nix.envVars
-        {
-          NIX_SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        { NIX_SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           TMPDIR = mkIf (cfg.tempDir != null) cfg.tempDir;
         }
       ];
