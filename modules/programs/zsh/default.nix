@@ -158,6 +158,9 @@ in
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
 
+      # Also set to fix `nix run` shells.
+      __ETC_BASHRC_SOURCED=1
+
       # history defaults
       SAVEHIST=2000
       HISTSIZE=2000
