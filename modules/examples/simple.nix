@@ -7,6 +7,10 @@
     [ pkgs.nix-repl
     ];
 
+  # Auto upgrade nix package and the daemon service.
+  # services.nix-daemon.enable = true;
+  # nix.package = pkgs.nix;
+
   # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
   # programs.zsh.enable = true;
