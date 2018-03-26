@@ -46,9 +46,13 @@ in
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
       serviceConfig.StandardErrorPath = cfg.logFile;
 
-      serviceConfig.EnvironmentVariables = config.nix.envVars
-        // { NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"; }
-        // optionalAttrs (cfg.tempDir != null) { TMPDIR = cfg.tempDir; };
+      serviceConfig.EnvironmentVariables = mkMerge [
+        config.nix.envVars
+        {
+          NIX_SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+          TMPDIR = mkIf (cfg.tempDir != null) cfg.tempDir;
+        }
+      ];
     };
 
   };
