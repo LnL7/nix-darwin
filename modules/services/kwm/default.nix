@@ -33,6 +33,8 @@ in
 
     security.accessibilityPrograms = [ "${cfg.package}/kwm" ];
 
+    environment.systemPackages = [ cfg.package ];
+
     environment.etc."kwmrc".text = cfg.kwmConfig;
 
     launchd.user.agents.kwm = {
