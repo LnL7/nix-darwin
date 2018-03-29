@@ -55,7 +55,7 @@ in
       type = types.either types.package types.path;
       default = pkgs.nix;
       defaultText = "pkgs.nix";
-      example = "pkgs.nixUnstable";
+      example = literalExample "pkgs.nixUnstable";
       description = ''
         This option specifies the package or profile that contains the version of Nix to use throughout the system.
         To keep the version of nix originally installed the default profile can be used.
