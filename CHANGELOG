@@ -1,3 +1,11 @@
+2018-03-29
+- default nix.package no longer uses the default profile.
+  system.stateVersion > 2
+
+    For the original behaviour configure nix.package
+
+    nix.package = "/nix/var/nix/profiles/default";
+
 2017-03-06
 - added ssh.knownHosts, to manage global known_hosts.
 
