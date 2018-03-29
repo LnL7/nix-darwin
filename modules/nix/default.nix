@@ -5,7 +5,7 @@ with lib;
 let
   cfg = config.nix;
 
-  isNix20 = versionAtLeast (cfg.package.version or "<unknown>") "1.12pre";
+  isNix20 = versionAtLeast (cfg.version or "<unknown>") "1.12pre";
 
   nixConf =
     let
@@ -62,6 +62,13 @@ in
 
         eg. /nix/var/nix/profiles/default
       '';
+    };
+
+    nix.version = mkOption {
+      type = types.str;
+      default = "<unknown>";
+      example = "1.11.6";
+      description = "The version of nix. Used to determine what settings to configure in nix.conf";
     };
 
     nix.useDaemon = mkOption {
@@ -337,6 +344,8 @@ in
 
     nix.package = mkIf (config.system.stateVersion < 3)
       "/nix/var/nix/profiles/default";
+
+    nix.version = mkIf (isDerivation cfg.package) cfg.package.version or "<unknown>";
 
     environment.systemPackages = mkIf (isDerivation cfg.package)
       [ cfg.package ];
