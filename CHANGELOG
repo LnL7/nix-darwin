@@ -6,28 +6,28 @@
 
     nix.package = "/nix/var/nix/profiles/default";
 
-2017-03-06
+2018-03-06
 - added ssh.knownHosts, to manage global known_hosts.
 
-2017-01-16
+2018-01-16
 - fixed issue for single-user installs, be careful when rolling back to a
   revision after 9792b08fdf049524742143f4f788e3eb61a769fda.
 
     If you run into trouble try NIX_REMOTE= darwin-rebuild switch.
 
-2017-01-13
+2018-01-13
 - added users.users and users.groups to manage user accounts.
   Changes will not be applied to existing users or groups.
 
-2017-01-08
+2018-01-08
 - added networking.networkservices, to manage dns servers and searchdomains.
   This will clear existing values when enabled.
 
-2017-01-06
+2018-01-06
 - added nixpkgs.overlays, there is a chapter on overlays in the nixpkgs manual
   https://nixos.org/nixpkgs/manual/#chap-overlays with more information.
 
-2017-01-04
+2018-01-04
 - the nix.useDaemon/services.nix-daemon.enable options now automatically
   reload the daemon for you when nix.conf changes.
 
