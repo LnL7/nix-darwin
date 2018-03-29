@@ -343,7 +343,7 @@ in
       ]);
 
     nix.package = mkIf (config.system.stateVersion < 3)
-      "/nix/var/nix/profiles/default";
+      (mkDefault "/nix/var/nix/profiles/default");
 
     nix.version = mkIf (isDerivation cfg.package) cfg.package.version or "<unknown>";
 
