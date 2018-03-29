@@ -53,10 +53,14 @@ in
   options = {
     nix.package = mkOption {
       type = types.either types.package types.path;
-      default = "/nix/var/nix/profiles/default";
-      example = "pkgs.nix";
+      default = pkgs.nix;
+      defaultText = "pkgs.nix";
+      example = "pkgs.nixUnstable";
       description = ''
         This option specifies the package or profile that contains the version of Nix to use throughout the system.
+        To keep the version of nix originally installed the default profile can be used.
+
+        eg. /nix/var/nix/profiles/default
       '';
     };
 
@@ -330,6 +334,9 @@ in
         "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
         "/nix/var/nix/profiles/per-user/root/channels"
       ]);
+
+    nix.package = mkIf (config.system.stateVersion < 3)
+      "/nix/var/nix/profiles/default";
 
     environment.systemPackages = mkIf (isDerivation cfg.package)
       [ cfg.package ];
