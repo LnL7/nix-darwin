@@ -4,20 +4,25 @@ set -o pipefail
 export PATH=@path@:$PATH
 
 evalNix() {
-  nix-instantiate --eval --strict -E "with import <darwin> {}; $@"
+  nix-instantiate --eval --strict -E "with import <darwin> {}; $*"
 }
 
 evalAttrs() {
-  evalNix "builtins.concatStringsSep \"\n\" (builtins.attrNames $@)"
+  evalNix "builtins.concatStringsSep \"\\n\" (builtins.attrNames $*)"
 }
 
 evalOpt() {
-  evalNix "options.$option.$@" 2>/dev/null
+  evalNix "options.$option.$*" 2>/dev/null
+}
+
+evalOptText() {
+  eval printf "$(evalNix "options.$option.$*" 2>/dev/null)" 2>/dev/null
+  echo
 }
 
 showSyntax() {
   echo "$0: <option>" >&2
-  eval printf $(evalAttrs "options")
+  eval printf "$(evalAttrs "options")"
   echo
   exit 1
 }
@@ -45,15 +50,19 @@ if [ "$(evalOpt "_type")" = '"option"' ]; then
   evalOpt "value" || echo "no value"
   echo
   echo "Default:"
-  evalOpt "default" || echo "no default"
+  evalOpt "default" || evalOptText "defaultText" || echo "no default"
   echo
   echo "Example:"
-  evalOpt "example" || echo "no example"
+  if [ "$(evalOpt "example._type")" = '"literalExample"' ]; then
+    evalOptText "example.text" || echo "no example"
+  else
+    evalOpt "example" || echo "no example"
+  fi
   echo
   echo "Description:"
-  eval printf $(evalOpt "description") || echo "no description"
+  evalOptText "description" || echo "no description"
   echo
 else
-  eval printf $(evalAttrs "options.$option")
+  eval printf "$(evalAttrs "options.$option")" 2>/dev/null
   echo
 fi
