@@ -26,7 +26,7 @@ with lib;
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
-  system.stateVersion = 2;
+  system.stateVersion = 3;
 
   # You should generally set this to the total number of logical cores in your system.
   # $ sysctl -n hw.ncpu
