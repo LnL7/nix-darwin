@@ -49,6 +49,7 @@ stdenv.mkDerivation {
         echo "copying example configuration.nix" >&2
         mkdir -p "$HOME/.nixpkgs"
         cp "${toString ../../modules/examples/simple.nix}" "$config"
+        chmod u+w "$config"
     fi
 
     # Skip when stdin is not a tty, eg.
