@@ -110,6 +110,12 @@
     colorscheme solarized
     set bg=dark
 
+    set synmaxcol=256
+
+    set lazyredraw
+    set regexpengine=1
+    set ttyfast
+
     set clipboard=unnamed
     set mouse=a
 
@@ -167,8 +173,6 @@
 
     let g:is_bash=1
 
-    let g:ale_sign_error = '⨉'
-    let g:ale_sign_warning = '⚠'
     let g:ale_virtualenv_dir_names = ['venv']
 
     " let g:ycm_add_preview_to_completeopt = 1
@@ -181,13 +185,6 @@
     nmap <Leader>D :YcmCompleter GetDoc<CR>
     nmap <Leader>d :YcmCompleter GoToDefinition<CR>
     nmap <Leader>r :YcmCompleter GoToReferences<CR>
-
-    let g:pymode_folding = 0
-    let g:pymode_lint = 0
-    let g:pymode_options_colorcolumn = 0
-    let g:pymode_options_max_line_length = 120
-    let g:pymode_rope_complete_on_dot = 0
-    let g:pymode_rope_regenerate_on_write = 0
   '';
 
   programs.zsh.enable = true;
