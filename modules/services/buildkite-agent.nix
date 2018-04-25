@@ -221,10 +221,19 @@ in
           '';
 
         serviceConfig = {
-          KeepAlive = true;
-          RunAtLoad = true;
           ProcessType = "Interactive";
           ThrottleInterval = 30;
+
+          # The combination of KeepAlive.NetworkState and WatchPaths
+          # will ensure that buildkite-agent is started on boot, but
+          # after networking is available (so the hostname is
+          # correct).
+          RunAtLoad = true;
+          KeepAlive.NetworkState = true;
+          WatchPaths = [
+            "/etc/resolv.conf"
+            "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+          ];
 
           GroupName = "buildkite-agent";
           UserName = "buildkite-agent";
