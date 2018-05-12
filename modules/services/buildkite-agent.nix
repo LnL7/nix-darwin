@@ -16,18 +16,16 @@ let
   mkHookOptions = hooks: listToAttrs (map mkHookOption hooks);
 
   hooksDir = let
-    mkHookEntry = name: value: ''
-      cat > $out/${name} <<EOF
-      #! ${pkgs.stdenv.shell}
-      set -e
-      ${value}
-      EOF
-      chmod 755 $out/${name}
-    '';
-  in pkgs.runCommand "buildkite-agent-hooks" {} ''
-    mkdir $out
-    ${concatStringsSep "\n" (mapAttrsToList mkHookEntry (filterAttrs (n: v: v != null) cfg.hooks))}
-  '';
+    mkHookEntry = name: value: {
+      inherit name;
+      path = pkgs.writeScript "buildkite-agent-hook-${name}" ''
+        #! ${pkgs.stdenv.shell}
+        set -e
+        ${value}
+      '';
+    };
+  in pkgs.linkFarm "buildkite-agent-hooks"
+    (mapAttrsToList mkHookEntry (filterAttrs (n: v: v != null) cfg.hooks));
 
 in
 
@@ -221,10 +219,19 @@ in
           '';
 
         serviceConfig = {
-          KeepAlive = true;
-          RunAtLoad = true;
           ProcessType = "Interactive";
           ThrottleInterval = 30;
+
+          # The combination of KeepAlive.NetworkState and WatchPaths
+          # will ensure that buildkite-agent is started on boot, but
+          # after networking is available (so the hostname is
+          # correct).
+          RunAtLoad = true;
+          KeepAlive.NetworkState = true;
+          WatchPaths = [
+            "/etc/resolv.conf"
+            "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+          ];
 
           GroupName = "buildkite-agent";
           UserName = "buildkite-agent";
