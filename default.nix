@@ -59,6 +59,7 @@ let
         ./modules/services/skhd
         ./modules/programs/bash
         ./modules/programs/fish.nix
+        ./modules/programs/gnupg.nix
         ./modules/programs/man.nix
         ./modules/programs/info
         ./modules/programs/nix-index
