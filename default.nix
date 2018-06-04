@@ -50,6 +50,7 @@ let
         ./modules/services/emacs.nix
         ./modules/services/khd
         ./modules/services/kwm
+        ./modules/services/mail/offlineimap.nix
         ./modules/services/mopidy.nix
         ./modules/services/nix-daemon.nix
         ./modules/services/nix-gc
