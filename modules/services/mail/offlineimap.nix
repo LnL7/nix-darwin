@@ -25,14 +25,14 @@ in {
 
     startInterval = mkOption {
       type = types.nullOr types.int;
-      default = null;
+      default = 300;
       example = literalExample "300";
       description = "Optional key to start offlineimap services each N seconds";
     };
 
     runQuick = mkOption {
-      type = types.nullOr types.bool;
-      default = null;
+      type = types.bool;
+      default = false;
       description = ''
         Run only quick synchronizations.
         Ignore any flag updates on IMAP servers. If a flag on the remote IMAP changes, and we have the message locally, it will be left untouched in a quick run.
@@ -54,7 +54,7 @@ in {
       command                         = "offlineimap";
       serviceConfig.KeepAlive         = false;
       serviceConfig.RunAtLoad         = true;
-      serviceConfig.ProgramArguments  = [ "-c" "/etc/offlineimaprc" ] ++ optional (cfg.runQuick != null) "-q";
+      serviceConfig.ProgramArguments  = [ "-c" "/etc/offlineimaprc" ] ++ optional (cfg.runQuick) "-q";
       serviceConfig.StartInterval     = cfg.startInterval;
       serviceConfig.StandardErrorPath = "/var/log/offlineimap.log";
       serviceConfig.StandardOutPath   = "/var/log/offlineimap.log";
