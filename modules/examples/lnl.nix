@@ -210,8 +210,36 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    nix-repl() {
-        command nix repl ''${@:-<nixpkgs>}
+    aarch-build() {
+        nix-build --option system aarch64-linux --store ssh-ng://aarch1 "$@"
+    }
+
+    arm-build() {
+        nix-build --option system armv7l-linux --store ssh-ng://arm1 "$@"
+    }
+
+    darwin-build() {
+        nix-build --option system x86_64-darwin --store ssh-ng://mac1 "$@"
+    }
+
+    linux-build() {
+        nix-build --option system x86_64-linux --store ssh-ng://nixos1 "$@"
+    }
+
+    install_name_tool() {
+        ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
+    }
+
+    otool() {
+        ${pkgs.darwin.cctools}/bin/otool "$@"
+    }
+
+    darwin() {
+        nix repl ''${@:-<darwin>}
+    }
+
+    pkgs() {
+        nix repl ''${@:-<nixpkgs>}
     }
 
     hydra-job-revision() {
@@ -299,7 +327,7 @@
 
   environment.variables.FZF_DEFAULT_COMMAND = "ag -l -f -g ''";
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
-  environment.variables.LC_CTYPE = "UTF-8";
+  environment.variables.LANG = "en_US.UTF-8";
 
   environment.shellAliases.g = "git log --pretty=color -32";
   environment.shellAliases.gb = "git branch";
