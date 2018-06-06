@@ -242,6 +242,11 @@
         nix repl ''${@:-<nixpkgs>}
     }
 
+    hydra-bad-machines() {
+        local url=''${1:-https://hydra.nixos.org}
+        curl -fsSL -H 'Accept: application/json' $url/queue-runner-status | jq -r '.machines | to_entries | .[] | select(.value.consecutiveFailures>0) | .key'
+    }
+
     hydra-job-revision() {
         local jobseteval job=$1
         shift 1
