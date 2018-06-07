@@ -243,8 +243,8 @@
     }
 
     hydra-bad-machines() {
-        local url=''${1:-https://hydra.nixos.org}
-        curl -fsSL -H 'Accept: application/json' $url/queue-runner-status | jq -r '.machines | to_entries | .[] | select(.value.consecutiveFailures>0) | .key'
+        local url=https://hydra.nixos.org
+        curl -fsSL -H 'Accept: application/json' $url/queue-runner-status | jq -r '.machines | to_entries | .[] | select(.value.consecutiveFailures>0) | .key'
     }
 
     hydra-job-revision() {
