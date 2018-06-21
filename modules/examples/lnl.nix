@@ -59,6 +59,7 @@
   };
 
   services.nix-daemon.enable = true;
+  services.nix-daemon.enableSocketListener = true;
 
   nix.extraOptions = ''
     gc-keep-derivations = true
