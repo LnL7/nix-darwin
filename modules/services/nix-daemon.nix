@@ -14,6 +14,12 @@ in
       description = "Whether to enable the nix-daemon service.";
     };
 
+    services.nix-daemon.enableSocketListener = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to make the nix-daemon service socket activated.";
+    };
+
     services.nix-daemon.logFile = mkOption {
       type = types.nullOr types.path;
       default = null;
@@ -39,12 +45,18 @@ in
 
     launchd.daemons.nix-daemon = {
       command = "${config.nix.package}/bin/nix-daemon";
-      serviceConfig.KeepAlive = true;
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
       serviceConfig.Nice = config.nix.daemonNiceLevel;
       serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
       serviceConfig.StandardErrorPath = cfg.logFile;
+
+      serviceConfig.KeepAlive = mkIf (!cfg.enableSocketListener) true;
+
+      serviceConfig.Sockets = mkIf cfg.enableSocketListener
+        { Listeners.SockType = "stream";
+          Listeners.SockPathName = "/nix/var/nix/daemon-socket/socket";
+        };
 
       serviceConfig.EnvironmentVariables = mkMerge [
         config.nix.envVars
