@@ -52,6 +52,13 @@ in
       default = {};
       description = "Configuration for users.";
     };
+
+    users.forceRecreate = mkOption {
+      internal = true;
+      type = types.bool;
+      default = false;
+      description = "Remove and recreate existing groups/users.";
+    };
   };
 
   config = {
@@ -60,6 +67,17 @@ in
       echo "setting up groups..." >&2
 
       ${concatMapStringsSep "\n" (v: ''
+        ${optionalString cfg.forceRecreate ''
+          g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
+          g=''${g#PrimaryGroupID: }
+          if [ "$g" -eq ${toString v.gid} ]; then
+            echo "deleting group ${v.name}..." >&2
+            dscl . -delete '/Groups/${v.name}' 2> /dev/null
+          else
+            echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
+          fi
+        ''}
+
         g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
         if [ -z "$g" ]; then
@@ -98,6 +116,17 @@ in
       echo "setting up users..." >&2
 
       ${concatMapStringsSep "\n" (v: ''
+        ${optionalString cfg.forceRecreate ''
+          u=$(dscl . -read '/Users/${v.name}' UniqueID 2> /dev/null) || true
+          u=''${u#UniqueID: }
+          if [ "$u" -eq ${toString v.uid} ]; then
+            echo "deleting user ${v.name}..." >&2
+            dscl . -delete '/Users/${v.name}' 2> /dev/null
+          else
+            echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
+          fi
+        ''}
+
         u=$(dscl . -read '/Users/${v.name}' UniqueID 2> /dev/null) || true
         u=''${u#UniqueID: }
         if [ -z "$u" ]; then
