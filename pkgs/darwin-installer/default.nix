@@ -44,7 +44,7 @@ stdenv.mkDerivation {
 
     export nix=${nix}
 
-    config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
+    config=$($nix/bin/nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
     if ! test -f "$config"; then
         echo "copying example configuration.nix" >&2
         mkdir -p "$HOME/.nixpkgs"
