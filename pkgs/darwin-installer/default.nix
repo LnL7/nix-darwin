@@ -25,7 +25,7 @@ stdenv.mkDerivation {
     set -e
 
     orig_path="$PATH"
-    export PATH="${pkgs.openssh}/bin"  # In case nix needs it
+    export PATH="${pkgs.openssh}/bin:/usr/bin:/bin"  # ssh in case nix needs it
 
     action=switch
     while [ "$#" -gt 0 ]; do
