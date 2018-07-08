@@ -226,6 +226,22 @@
         direnv reload
     }
 
+    xi() {
+        curl -F 'f:1=<-' ix.io
+    }
+
+    install_name_tool() {
+        ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
+    }
+
+    otool() {
+        ${pkgs.darwin.cctools}/bin/otool "$@"
+    }
+
+    pkgs() {
+        nix repl ''${@:-<nixpkgs>}
+    }
+
     aarch-build() {
         nix-build --option system aarch64-linux --store ssh-ng://aarch1 "$@"
     }
@@ -240,22 +256,6 @@
 
     linux-build() {
         nix-build --option system x86_64-linux --store ssh-ng://nixos1 "$@"
-    }
-
-    install_name_tool() {
-        ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
-    }
-
-    otool() {
-        ${pkgs.darwin.cctools}/bin/otool "$@"
-    }
-
-    darwin() {
-        nix repl ''${@:-<darwin>}
-    }
-
-    pkgs() {
-        nix repl ''${@:-<nixpkgs>}
     }
 
     hydra-bad-machines() {
