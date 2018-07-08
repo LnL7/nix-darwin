@@ -31,6 +31,7 @@
     [ pkgs.brotli
       pkgs.ctags
       pkgs.curl
+      pkgs.direnv
       pkgs.fzf
       pkgs.gettext
       pkgs.git
@@ -211,6 +212,18 @@
   '';
 
   programs.zsh.loginShellInit = ''
+    :l() {
+        if [ ! -e .envrc ]; then
+            echo 'use nix' > .envrc
+        fi
+        direnv allow
+        eval "$(direnv hook zsh)"
+    }
+
+    :r() {
+        direnv reload
+    }
+
     aarch-build() {
         nix-build --option system aarch64-linux --store ssh-ng://aarch1 "$@"
     }
