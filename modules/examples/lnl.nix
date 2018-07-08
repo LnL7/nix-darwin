@@ -100,20 +100,17 @@
   programs.vim.enableSensible = true;
 
   programs.vim.plugins = [
-    { names = [ "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
-    { names = [ "ale" "vim-gitgutter" "vim-dispatch" ]; }
-    { names = [ "commentary" "vim-eunuch" "repeat" "tabular" ]; }
-    { names = [ "fzfWrapper" "fzf-vim" "youcompleteme" ]; }
-    { names = [ "gist-vim" "webapi-vim" ]; }
-    { names = [ "polyglot" "colors-solarized" ]; }
-    { names = [ "python-mode" ]; }
+    { names = [ "commentary" "vim-eunuch" "repeat" "tabular" "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
+    { names = [ "fzfWrapper" "fzf-vim" "youcompleteme" "ale" "vim-gitgutter" "vim-dispatch" ]; }
+    { names = [ "fugitive" "rhubarb" "gist-vim" "webapi-vim" ]; }
+    { names = [ "polyglot" "bats-vim" "colors-solarized" "editorconfig-vim" ]; }
   ];
 
   programs.vim.vimConfig =  ''
     colorscheme solarized
     set bg=dark
 
-    set synmaxcol=256
+    set synmaxcol=4096
 
     set lazyredraw
     set regexpengine=1
