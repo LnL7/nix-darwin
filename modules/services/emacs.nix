@@ -24,7 +24,7 @@ in
       };
 
       exec = mkOption {
-        type = types.string;
+        type = types.str;
         default = "emacs";
         description = "Emacs command/binary to execute.";
       };

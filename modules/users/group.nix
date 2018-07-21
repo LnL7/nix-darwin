@@ -21,7 +21,7 @@ with lib;
     };
 
     members = mkOption {
-      type = types.listOf types.string;
+      type = types.listOf types.str;
       default = [];
       description = "The group's members.";
     };
