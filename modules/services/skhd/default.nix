@@ -16,7 +16,7 @@ in
 
     services.skhd.package = mkOption {
       type = types.package;
-      example = literalExample "pkgs.skhd";
+      default = pkgs.skhd;
       description = "This option specifies the skhd package to use.";
     };
 
