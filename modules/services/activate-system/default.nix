@@ -32,6 +32,7 @@ in
 
         ${config.system.activationScripts.keyboard.text}
         ${config.system.activationScripts.nix.text}
+        ${config.system.activationScripts.kexts.text}
       '';
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive.SuccessfulExit = false;

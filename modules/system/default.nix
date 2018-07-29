@@ -93,28 +93,26 @@ in
     };
 
     system.activationScripts.kexts.text = ''
+      echo activating kexts
       for f in $(ls "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/" 2> /dev/null); do
-        echo "loading kext [$f]:"
-        kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") 2>&1 >/dev/null | sed "s/^/> /"
+        if [[ $f = *".kext" ]]; then
+          echo "loading kext [$f]:"
+          kextutil -v 1 \
+            -r "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/" \
+            $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") \
+            2>&1 >/dev/null | sed "s/^/> /"
+        fi
       done
 
       for f in $(ls /run/current-system/Library/Extensions 2> /dev/null); do
         if test ! -e "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f"; then
-          echo "unloading kext [$f]" >&2
-          kextunload -v 1 "/run/current-system/Library/Extensions/$f" || true
+          if [[ $f = *".kext" ]]; then
+            echo "unloading kext [$f]" >&2
+            kextunload -v 1 "/run/current-system/Library/Extensions/$f" || true
+          fi
         fi
       done
     '';
-
-    launchd.daemons.load-kexts = {
-      script = ''
-        for f in /run/current-system/Library/Extensions/* do
-          echo "loading kext [$f]:"
-          kextutil -v 1 $(readlink "${cfg.kernel.extraModulePackagesPath}/Library/Extensions/$f") 2>&1 >/dev/null | sed "s/^/> /"
-        done
-      '';
-      KeepAlive = false;
-    }
 
     system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation {
       name = "darwin-system-${cfg.darwinLabel}";
