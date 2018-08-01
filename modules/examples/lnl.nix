@@ -83,17 +83,20 @@
   programs.tmux.enableVim = true;
 
   programs.tmux.tmuxConfig = ''
-    bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
-    bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
-
     bind 0 set status
     bind S choose-session
 
     bind-key -r "<" swap-window -t -1
     bind-key -r ">" swap-window -t +1
 
+    bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
+    bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
+
+    set -g pane-active-border-style fg=black
+    set -g pane-border-style fg=black
     set -g status-bg black
     set -g status-fg white
+    set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
   '';
 
   programs.vim.enable = true;
