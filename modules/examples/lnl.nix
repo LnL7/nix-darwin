@@ -97,20 +97,28 @@
   '';
 
   programs.vim.enable = true;
-  programs.vim.enableSensible = true;
+  # programs.vim.enableSensible = true;
 
-  programs.vim.plugins = [
-    { names = [ "commentary" "vim-eunuch" "repeat" "tabular" "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion" ]; }
-    { names = [ "fzfWrapper" "fzf-vim" "youcompleteme" "ale" "vim-gitgutter" "vim-dispatch" ]; }
-    { names = [ "fugitive" "rhubarb" "gist-vim" "webapi-vim" ]; }
-    { names = [ "polyglot" "bats-vim" "colors-solarized" "editorconfig-vim" ]; }
-  ];
+  programs.vim.plugins = [{
+    names = [
+      "sensible" "repeat" "surround"
+      "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion"
+      "fzfWrapper" "fzf-vim" "youcompleteme" "ale" "vim-dispatch" "vim-test" "vim-projectionist" "vim-gitgutter"
+      "vim-abolish" "commentary" "vim-eunuch" "fugitive" "rhubarb" "tabular" "vim-tbone" "editorconfig-vim"
+      "gist-vim" "webapi-vim"
+
+      "colors-solarized" "polyglot" "vim-nix" "bats-vim" "vim-docbk"
+
+      "vim-scriptease"
+      # "vim-splice"
+    ];
+  }];
 
   programs.vim.vimConfig =  ''
-    colorscheme solarized
-    set bg=dark
-
-    set synmaxcol=4096
+    set encoding=utf-8
+    set hlsearch
+    set list
+    set number
 
     set lazyredraw
     set regexpengine=1
@@ -137,6 +145,17 @@
       call mkdir(expand(&directory), "p")
     endif
 
+    command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>,
+          \ <bang>0 ? fzf#vim#with_preview('up:30%')
+          \ : fzf#vim#with_preview('right:50%:hidden', '?'),
+          \ <bang>0)
+
+    command! -bang -nargs=* Rg call fzf#vim#grep(
+          \ 'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+          \ <bang>0 ? fzf#vim#with_preview('up:30%')
+          \         : fzf#vim#with_preview('right:50%:hidden', '?'),
+          \ <bang>0)
+
     vmap s S
 
     inoremap <C-g> <Esc><CR>
@@ -149,42 +168,32 @@
     nnoremap <Leader>( :tabprevious<CR>
     nnoremap <Leader>) :tabnext<CR>
 
-    nnoremap <Leader>! :Dispatch!<CR>
+    " fzf
     nnoremap <Leader>p :FZF<CR>
     nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
 
-    nmap <leader><tab> <plug>(fzf-maps-n)
-    xmap <leader><tab> <plug>(fzf-maps-x)
-    omap <leader><tab> <plug>(fzf-maps-o)
-    imap <c-x><c-w> <plug>(fzf-complete-word)
+    " vim-dispatch
+    nnoremap <silent> <Leader><CR> :Dispatch!<CR>
+    nnoremap <silent> <Leader>q :cclose<CR> :lclose<CR> :pclose<CR>
 
-    command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>,
-          \   <bang>0 ? fzf#vim#with_preview('up:30%')
-          \   : fzf#vim#with_preview('right:50%:hidden', '?'),
-          \   <bang>0)
+    " vim-test
+    let test#strategy = 'dispatch'
+    nnoremap t<CR> :TestNearest<CR>
 
-    command! -bang -nargs=* Rg call fzf#vim#grep(
-          \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-          \   <bang>0 ? fzf#vim#with_preview('up:30%')
-          \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-          \   <bang>0)
-
-    highlight clear SignColumn
-
+    " ale
     let g:is_bash=1
-
     let g:ale_virtualenv_dir_names = ['venv']
 
-    " let g:ycm_add_preview_to_completeopt = 1
-    let g:ycm_autoclose_preview_window_after_completion = 1
-    let g:ycm_autoclose_preview_window_after_insertion = 1
-
+    " youcompleteme
+    set completeopt=menuone
     let g:ycm_seed_identifiers_with_syntax = 1
     let g:ycm_semantic_triggers = {}
 
-    nmap <Leader>D :YcmCompleter GetDoc<CR>
-    nmap <Leader>d :YcmCompleter GoToDefinition<CR>
-    nmap <Leader>r :YcmCompleter GoToReferences<CR>
+    nmap <Leader>d :YcmCompleter GoTo<CR>
+
+    " colors-solarized
+    let g:solarized_termcolors = 16
+    let g:solarized_termtrans = 1
   '';
 
   programs.zsh.enable = true;
