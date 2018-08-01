@@ -215,13 +215,21 @@
     :l() {
         if [ ! -e .envrc ]; then
             echo 'use nix' > .envrc
+            direnv edit .
         fi
-        direnv allow
         eval "$(direnv hook zsh)"
     }
 
     :r() {
-        direnv reload
+        if [ -z "$IN_NIX_SHELL" ]; then
+            eval "$(direnv hook zsh)"
+        else
+            direnv reload
+        fi
+    }
+
+    :a() {
+        nix repl ''${@:-<nixpkgs>}
     }
 
     xi() {
@@ -234,10 +242,6 @@
 
     otool() {
         ${pkgs.darwin.cctools}/bin/otool "$@"
-    }
-
-    pkgs() {
-        nix repl ''${@:-<nixpkgs>}
     }
 
     aarch-build() {
@@ -344,6 +348,7 @@
     zle -N up-line-or-beginning-search
   '';
 
+  environment.variables.CLICOLOR = "1";
   environment.variables.FZF_DEFAULT_COMMAND = "ag -l -f -g ''";
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
   environment.variables.LANG = "en_US.UTF-8";
@@ -354,11 +359,10 @@
   environment.shellAliases.gcb = "git checkout -B";
   environment.shellAliases.gd = "git diff --minimal --patch";
   environment.shellAliases.gf = "git fetch";
-  environment.shellAliases.gl = "git log --pretty=color --graph";
-  environment.shellAliases.glog = "git log --pretty=nocolor";
+  environment.shellAliases.gg = "git log --pretty=color --graph";
+  environment.shellAliases.gl = "git log --pretty=nocolor";
   environment.shellAliases.grh = "git reset --hard";
   environment.shellAliases.l = "ls -lh";
-  environment.shellAliases.ls = "ls -G";
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
@@ -406,33 +410,23 @@
           esac
           EOF
         '';
+
+      vim_configurable = super.vim_configurable.override {
+        ftNixSupport = false;  # enable using a custom vim-nix
+      };
+    })
+
+    (self: super: {
+      # TODO: fix darwin build in nixpkgs.
+      kitty = super.runCommandNoCC "kitty" {} ''
+        mkdir -p $out/bin
+        ln -s /Applications/Kitty.app/Contents/MacOS/kitty $out/bin
+      '';
+
+      vimPlugins = super.vimPlugins or {} // {
+      };
     })
   ];
-
-  # TODO: add module for per-user config, etc, ...
-  system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
-
-  environment.etc."per-user/lnl/gitconfig".text = ''
-    [include]
-      path = .gitconfig.local
-
-    [core]
-      excludesfile = ~/.gitignore
-      autocrlf     = input
-
-    [color]
-      ui = auto
-
-    [pretty]
-      color = format:%C(yellow)%h%Cblue%d%Creset %s %C(white)  %an, %ar%Creset
-      nocolor = format:%h%d %s   %an, %ar
-
-    [user]
-      name = Daiderd Jordan
-
-    [github]
-      user = LnL7
-  '';
 
   services.khd.khdConfig = ''
     # modifier only mappings
@@ -539,9 +533,39 @@
     ctrl + alt - s : kwmc space -t monocle
     ctrl + alt - d : kwmc space -t float
 
+    ctrl + alt - return : kitty --single-instance -d ~
+
     # quit/reload daemons
     ctrl + alt - q : kwmc quit;\
                      khd -e "reload"
+  '';
+
+  # TODO: add module for per-user config, etc, ...
+  system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
+
+  environment.etc."per-user/lnl/gitconfig".text = ''
+    [include]
+      path = .gitconfig.local
+
+    [core]
+      excludesfile = ~/.gitignore
+      autocrlf     = input
+
+    [color]
+      ui = auto
+
+    [pretty]
+      color = format:%C(yellow)%h%C(red)%d%Creset %s   %C(green)%an, %ar%Creset
+      nocolor = format:%h%d %s   %an, %ar
+
+    [rerere]
+      enabled = true
+
+    [user]
+      name = Daiderd Jordan
+
+    [github]
+      user = LnL7
   '';
 
   # You should generally set this to the total number of logical cores in your system.
