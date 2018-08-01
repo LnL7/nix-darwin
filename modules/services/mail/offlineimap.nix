@@ -51,10 +51,9 @@ in {
     environment.etc."offlineimaprc".text = cfg.extraConfig;
     launchd.user.agents.offlineimap = {
       path                            = [ cfg.package ];
-      command                         = "offlineimap";
+      command                         = "${cfg.package}/bin/offlineimap -c /etc/offlineimaprc" + optionalString (cfg.runQuick) " -q";
       serviceConfig.KeepAlive         = false;
       serviceConfig.RunAtLoad         = true;
-      serviceConfig.ProgramArguments  = [ "-c" "/etc/offlineimaprc" ] ++ optional (cfg.runQuick) "-q";
       serviceConfig.StartInterval     = cfg.startInterval;
       serviceConfig.StandardErrorPath = "/var/log/offlineimap.log";
       serviceConfig.StandardOutPath   = "/var/log/offlineimap.log";

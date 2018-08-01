@@ -34,7 +34,7 @@ in
   test = ''
     echo >&2 "checking offlineimap service in ~/Library/LaunchAgents"
     grep "org.nixos.offlineimap" ${config.out}/user/Library/LaunchAgents/org.nixos.offlineimap.plist
-    grep "exec\ offlineimap" ${config.out}/user/Library/LaunchAgents/org.nixos.offlineimap.plist
+    grep "bin/offlineimap" ${config.out}/user/Library/LaunchAgents/org.nixos.offlineimap.plist
     grep "\-q" ${config.out}/user/Library/LaunchAgents/org.nixos.offlineimap.plist
 
     echo >&2 "checking config in /etc/offlineimaprc"
