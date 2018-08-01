@@ -45,7 +45,9 @@
 
       pkgs.qes
 
+      pkgs.kitty
       pkgs.lnl-zsh-completions
+      pkgs.lnl-git-statusbar
     ];
 
   services.khd.enable = true;
@@ -53,8 +55,8 @@
   services.skhd.enable = true;
 
   launchd.user.agents.fetch-nixpkgs = {
-    command = "${pkgs.git}/bin/git -C ~/.nix-defexpr/nixpkgs fetch origin master";
-    environment.GIT_SSL_CAINFO = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    command = "${pkgs.git}/bin/git -C /src/nixpkgs fetch origin master";
+    environment.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     serviceConfig.KeepAlive = false;
     serviceConfig.ProcessType = "Background";
     serviceConfig.StartInterval = 360;
@@ -389,6 +391,17 @@
 
   nixpkgs.overlays = [
     (self: super: {
+      lnl-git-statusbar = super.writeScriptBin "git-statusbar" ''
+        #!${super.stdenv.shell}
+        set -e
+        export PATH=${lib.makeBinPath [super.coreutils super.gawk super.git]}
+
+        fork=$(git "$@" log --format=format:%h origin/master...lnl/master 2> /dev/null | awk 'END {print NR}')
+        head=$(git "$@" log --format=format:%h origin/master...HEAD 2> /dev/null | awk 'END {print NR}')
+        echo "[$head/$fork] $(git "$@" log --oneline -1 origin/master | head -1)"
+        git "$@" rev-parse origin/master
+      '';
+
       lnl-zsh-completions = super.runCommandNoCC "lnl-zsh-completions-0.0.0"
         { preferLocalBuild = true; }
         ''
