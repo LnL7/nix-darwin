@@ -105,6 +105,7 @@ let
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
+    tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;
     tests.system-packages = makeTest ./tests/system-packages.nix;
