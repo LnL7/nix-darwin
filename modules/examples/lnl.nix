@@ -168,6 +168,7 @@
     cnoremap <C-g> <Esc><CR>
 
     cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+    nnoremap // :nohlsearch<CR>
 
     let mapleader = ' '
     nnoremap <Leader>( :tabprevious<CR>
@@ -469,7 +470,7 @@
     kwmc config padding 40 15 15 15
     kwmc config gap     15 15
 
-    kwmc config space   0 3 padding 125 125 125 125
+    kwmc config space   0 3 padding 175 175 175 175
     kwmc config display 1   padding 75 70 70 70
     kwmc config display 2   padding 75 70 70 70
 
