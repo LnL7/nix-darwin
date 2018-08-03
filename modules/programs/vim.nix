@@ -5,15 +5,6 @@ with lib;
 let
   cfg = config.programs.vim;
 
-  vim = pkgs.vim_configurable.customize {
-    name = "vim";
-    vimrcConfig.customRC = config.environment.etc."vimrc".text;
-    vimrcConfig.vam = {
-      knownPlugins = pkgs.vimPlugins // cfg.extraKnownPlugins;
-      pluginDictionaries = cfg.plugins;
-    };
-  };
-
   text = import ../lib/write-text.nix {
     inherit lib;
     mkTextDerivation = name: text: pkgs.writeText "vim-options-${name}" text;
@@ -65,6 +56,11 @@ in
       description = "VAM plugin dictionaries to use for vim_configurable.";
     };
 
+    programs.vim.package = mkOption {
+      internal = true;
+      type = types.package;
+    };
+
     programs.vim.vimOptions = mkOption {
       internal = true;
       type = types.attrsOf (types.submodule text);
@@ -82,10 +78,10 @@ in
 
     environment.systemPackages =
       [ # Include vim_configurable package.
-        vim
+        cfg.package
       ];
 
-    environment.variables.EDITOR = "${vim}/bin/vim";
+    environment.variables.EDITOR = "${cfg.package}/bin/vim";
 
     environment.etc."vimrc".text = ''
       ${vimOptions}
@@ -95,6 +91,15 @@ in
         source /etc/vimrc.local
       endif
     '';
+
+    programs.vim.package = pkgs.vim_configurable.customize {
+      name = "vim";
+      vimrcConfig.customRC = config.environment.etc."vimrc".text;
+      vimrcConfig.vam = {
+        knownPlugins = pkgs.vimPlugins // cfg.extraKnownPlugins;
+        pluginDictionaries = cfg.plugins;
+      };
+    };
 
     programs.vim.plugins = mkIf cfg.enableSensible [
       { names = [ "fugitive" "surround" "vim-nix" ]; }
