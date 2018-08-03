@@ -244,7 +244,7 @@
     }
 
     :a() {
-        nix repl ''${@:-<nixpkgs>}
+        nix repl ''${@:-<darwinpkgs>}
     }
 
     xi() {
@@ -383,6 +383,7 @@
     [ # Use local nixpkgs checkout instead of channels.
       "darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix"
       "darwin=$HOME/.nix-defexpr/darwin"
+      "darwinpkgs=${pkgs.lnl-darwinpkgs}"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
       "$HOME/.nix-defexpr/channels"
       "$HOME/.nix-defexpr"
@@ -402,6 +403,16 @@
         echo "[$head/$fork] $(git "$@" log --oneline -1 origin/master | head -1)"
         git "$@" rev-parse origin/master
       '';
+
+      lnl-darwinpkgs = super.writeTextFile {
+        name = "darwinpkgs";
+        destination = "/default.nix";
+        text = ''
+          { ... }@args:
+
+          (import <darwin> args).pkgs
+        '';
+      };
 
       lnl-zsh-completions = super.runCommandNoCC "lnl-zsh-completions-0.0.0"
         { preferLocalBuild = true; }
