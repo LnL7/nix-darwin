@@ -5,7 +5,7 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "darwin-rebuild [--help] {build | switch | check | changelog}" >&2
+  echo "darwin-rebuild [--help] {edit | build | switch | check | changelog}" >&2
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
   echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&1
@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
     --help)
       showSyntax
       ;;
-    switch|build|changelog|check)
+    edit|switch|build|changelog|check)
       action="$i"
       ;;
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
@@ -145,4 +145,9 @@ fi
 if [ "$action" = check ]; then
   export checkActivation=1
   $systemConfig/activate-user
+fi
+
+if [ "$action" = edit ]; then
+  darwinConfig=$(nix-instantiate --eval --strict -E "<darwin-config>")
+  ${EDITOR:-nano} "$darwinConfig"
 fi
