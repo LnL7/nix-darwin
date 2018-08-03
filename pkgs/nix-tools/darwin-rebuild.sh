@@ -95,6 +95,11 @@ if ! [ "$action" = build ]; then
   extraBuildFlags+=("--no-out-link")
 fi
 
+if [ "$action" = edit ]; then
+  darwinConfig=$(nix-instantiate --eval --strict -E "<darwin-config>")
+  exec ${EDITOR:-nano} "$darwinConfig"
+fi
+
 if ! [ "$action" = list -o "$action" = rollback ]; then
   echo "building the system configuration..." >&2
   systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
@@ -145,9 +150,4 @@ fi
 if [ "$action" = check ]; then
   export checkActivation=1
   $systemConfig/activate-user
-fi
-
-if [ "$action" = edit ]; then
-  darwinConfig=$(nix-instantiate --eval --strict -E "<darwin-config>")
-  ${EDITOR:-nano} "$darwinConfig"
 fi
