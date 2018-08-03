@@ -56,6 +56,7 @@ let
         ./modules/services/nix-gc
         ./modules/services/ofborg
         ./modules/services/postgresql
+        ./modules/services/privoxy
         ./modules/services/redis
         ./modules/services/skhd
         ./modules/programs/bash
