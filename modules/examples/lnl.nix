@@ -43,11 +43,12 @@
       pkgs.shellcheck
       pkgs.silver-searcher
 
+      pkgs.kitty
       pkgs.qes
 
-      pkgs.kitty
-      pkgs.lnl-zsh-completions
       pkgs.lnl-git-statusbar
+      pkgs.lnl-vim
+      pkgs.lnl-zsh-completions
     ];
 
   services.khd.enable = true;
@@ -348,7 +349,7 @@
         unset __ETC_ZSHENV_SOURCED
         unset __ETC_ZPROFILE_SOURCED
         host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
-        exec tmux new-session -A -s $host
+        exec tmux new-session -A -s "$host" "$@"
     }
   '';
 
@@ -368,6 +369,7 @@
   environment.variables.SHELLCHECK_OPTS = "-e SC1008";
   environment.variables.LANG = "en_US.UTF-8";
 
+  environment.shellAliases.e = "$EDITOR";
   environment.shellAliases.g = "git log --pretty=color -32";
   environment.shellAliases.gb = "git branch";
   environment.shellAliases.gc = "git checkout";
@@ -449,6 +451,7 @@
         '';
 
       vim_configurable = super.vim_configurable.override {
+        guiSupport = "no";   # Euh, gui vim?
         ftNixSupport = false;  # enable using a custom vim-nix
       };
     })
