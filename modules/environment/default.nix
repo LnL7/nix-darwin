@@ -20,7 +20,7 @@ in {
     environment.systemPackages = mkOption {
       type = types.listOf types.package;
       default = [];
-      example = literalExample "[ pkgs.nix-repl pkgs.vim ]";
+      example = literalExample "[ pkgs.curl pkgs.vim ]";
       description = ''
         The set of packages that appear in
         /run/current-system/sw.  These packages are

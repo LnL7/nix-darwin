@@ -10,12 +10,6 @@ let
 in
 
 {
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.nix-repl
-    ];
-
   # Create /etc/bashrc that loads the nix-darwin environment.
   programs.bash.enable = true;
   programs.bash.enableCompletion = false;

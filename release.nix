@@ -59,7 +59,7 @@ let
 
   packageSet = {
     inherit (pkgs)
-      stdenv bash zsh nix nix-repl
+      stdenv bash zsh nix
       tmux reattach-to-user-namespace
       nano emacs vim;
   };
@@ -73,7 +73,6 @@ let
           jobs.bash.x86_64-darwin
           jobs.zsh.x86_64-darwin
           jobs.nix.x86_64-darwin
-          jobs.nix-repl.x86_64-darwin
           jobs.reattach-to-user-namespace.x86_64-darwin
           jobs.tmux.x86_64-darwin
           jobs.nano.x86_64-darwin
