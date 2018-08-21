@@ -159,24 +159,20 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    :l() {
-        if [ ! -e .envrc ]; then
-            echo 'use nix' > .envrc
-            direnv edit .
-        fi
-        eval "$(direnv hook zsh)"
+    :a() {
+        nix repl ''${@:-<darwinpkgs>}
     }
 
-    :r() {
+    :u() {
+        nix run -f '<darwinpkgs>' "$@"
+    }
+
+    :d() {
         if [ -z "$IN_NIX_SHELL" ]; then
             eval "$(direnv hook zsh)"
         else
             direnv reload
         fi
-    }
-
-    :a() {
-        nix repl ''${@:-<darwinpkgs>}
     }
 
     xi() {
@@ -185,6 +181,10 @@
 
     install_name_tool() {
         ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
+    }
+
+    nm() {
+        ${pkgs.darwin.cctools}/bin/nm "$@"
     }
 
     otool() {
