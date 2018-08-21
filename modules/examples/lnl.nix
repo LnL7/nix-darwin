@@ -43,12 +43,8 @@
       pkgs.shellcheck
       pkgs.silver-searcher
 
-      pkgs.kitty
       pkgs.qes
-
-      pkgs.lnl-git-statusbar
-      pkgs.lnl-vim
-      pkgs.lnl-zsh-completions
+      pkgs.darwin-zsh-completions
     ];
 
   services.khd.enable = true;
@@ -102,106 +98,41 @@
     set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
   '';
 
-  programs.vim.enable = true;
+  # programs.vim.enable = true;
   # programs.vim.enableSensible = true;
-
-  programs.vim.plugins = [{
-    names = [
-      "sensible" "repeat" "surround"
-      "ReplaceWithRegister" "vim-indent-object" "vim-sort-motion"
-      "fzfWrapper" "fzf-vim" "youcompleteme" "ale" "vim-dispatch" "vim-test" "vim-projectionist" "vim-gitgutter"
-      "vim-abolish" "commentary" "vim-eunuch" "fugitive" "rhubarb" "tabular" "vim-tbone" "editorconfig-vim"
-      "gist-vim" "webapi-vim"
-
-      "colors-solarized" "polyglot" "vim-nix" "bats-vim" "vim-docbk"
-
-      "vim-scriptease"
-      # "vim-splice"
+  programs.vim.package = pkgs.vim_configurable.customize {
+    name = "vim";
+    vimrcConfig.packages.darwin.start = with pkgs.vimPlugins; [
+      vim-sensible vim-surround ReplaceWithRegister
+      polyglot fzfWrapper YouCompleteMe ale
     ];
-  }];
+    vimrcConfig.packages.darwin.opt = with pkgs.vimPlugins; [
+      colors-solarized
+      splice-vim
+    ];
+    vimrcConfig.customRC = ''
+      set completeopt=menuone
+      set encoding=utf-8
+      set hlsearch
+      set list
+      set number
+      set showcmd
+      set splitright
 
-  programs.vim.vimConfig =  ''
-    set encoding=utf-8
-    set hlsearch
-    set list
-    set number
+      nnoremap // :nohlsearch<CR>
 
-    set lazyredraw
-    set regexpengine=1
-    set ttyfast
+      let mapleader = ' '
 
-    set clipboard=unnamed
-    set mouse=a
+      " fzf
+      nnoremap <Leader>p :FZF<CR>
 
-    set backup
-    set backupdir=~/.vim/tmp/backup//
-    set backupskip=/tmp/*,/private/tmp/*
-    set directory=~/.vim/tmp/swap/
-    set noswapfile
-    set undodir=~/.vim/tmp/undo//
-    set undofile
+      " vim-surround
+      vmap s S
 
-    if !isdirectory(expand(&undodir))
-      call mkdir(expand(&undodir), "p")
-    endif
-    if !isdirectory(expand(&backupdir))
-      call mkdir(expand(&backupdir), "p")
-    endif
-    if !isdirectory(expand(&directory))
-      call mkdir(expand(&directory), "p")
-    endif
-
-    command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>,
-          \ <bang>0 ? fzf#vim#with_preview('up:30%')
-          \ : fzf#vim#with_preview('right:50%:hidden', '?'),
-          \ <bang>0)
-
-    command! -bang -nargs=* Rg call fzf#vim#grep(
-          \ 'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-          \ <bang>0 ? fzf#vim#with_preview('up:30%')
-          \         : fzf#vim#with_preview('right:50%:hidden', '?'),
-          \ <bang>0)
-
-    vmap s S
-
-    inoremap <C-g> <Esc><CR>
-    vnoremap <C-g> <Esc><CR>
-    cnoremap <C-g> <Esc><CR>
-
-    cnoremap %% <C-r>=expand('%:h') . '/'<CR>
-    nnoremap // :nohlsearch<CR>
-
-    let mapleader = ' '
-    nnoremap <Leader>( :tabprevious<CR>
-    nnoremap <Leader>) :tabnext<CR>
-
-    " fzf
-    nnoremap <Leader>p :FZF<CR>
-    nnoremap <silent> <Leader>e :exe 'FZF ' . expand('%:h')<CR>
-
-    " vim-dispatch
-    nnoremap <silent> <Leader><CR> :Dispatch!<CR>
-    nnoremap <silent> <Leader>q :cclose<CR> :lclose<CR> :pclose<CR>
-
-    " vim-test
-    let test#strategy = 'dispatch'
-    nnoremap t<CR> :TestNearest<CR>
-
-    " ale
-    let g:is_bash=1
-    let g:ale_virtualenv_dir_names = ['venv']
-
-    " youcompleteme
-    set completeopt=menuone
-    let g:ycm_seed_identifiers_with_syntax = 1
-    let g:ycm_semantic_triggers = {}
-
-    nmap <Leader>d :YcmCompleter GoTo<CR>
-
-    " colors-solarized
-    let g:solarized_termcolors = 16
-    let g:solarized_termtrans = 1
-  '';
+      " youcompleteme
+      let g:ycm_seed_identifiers_with_syntax = 1
+    '';
+  };
 
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
@@ -385,7 +316,6 @@
     [ # Use local nixpkgs checkout instead of channels.
       "darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix"
       "darwin=$HOME/.nix-defexpr/darwin"
-      "darwinpkgs=${pkgs.lnl-darwinpkgs}"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
       "$HOME/.nix-defexpr/channels"
       "$HOME/.nix-defexpr"
@@ -395,28 +325,7 @@
 
   nixpkgs.overlays = [
     (self: super: {
-      lnl-git-statusbar = super.writeScriptBin "git-statusbar" ''
-        #!${super.stdenv.shell}
-        set -e
-        export PATH=${lib.makeBinPath [super.coreutils super.gawk super.git]}
-
-        fork=$(git "$@" log --format=format:%h origin/master...lnl/master 2> /dev/null | awk 'END {print NR}')
-        head=$(git "$@" log --format=format:%h origin/master...HEAD 2> /dev/null | awk 'END {print NR}')
-        echo "[$head/$fork] $(git "$@" log --oneline -1 origin/master | head -1)"
-        git "$@" rev-parse origin/master
-      '';
-
-      lnl-darwinpkgs = super.writeTextFile {
-        name = "darwinpkgs";
-        destination = "/default.nix";
-        text = ''
-          { ... }@args:
-
-          (import <darwin> args).pkgs
-        '';
-      };
-
-      lnl-zsh-completions = super.runCommandNoCC "lnl-zsh-completions-0.0.0"
+      darwin-zsh-completions = super.runCommandNoCC "darwin-completions-0.0.0"
         { preferLocalBuild = true; }
         ''
           mkdir -p $out/share/zsh/site-functions
@@ -451,19 +360,7 @@
         '';
 
       vim_configurable = super.vim_configurable.override {
-        guiSupport = "no";   # Euh, gui vim?
-        ftNixSupport = false;  # enable using a custom vim-nix
-      };
-    })
-
-    (self: super: {
-      # TODO: fix darwin build in nixpkgs.
-      kitty = super.runCommandNoCC "kitty" {} ''
-        mkdir -p $out/bin
-        ln -s /Applications/Kitty.app/Contents/MacOS/kitty $out/bin
-      '';
-
-      vimPlugins = super.vimPlugins or {} // {
+        guiSupport = "no";
       };
     })
   ];
@@ -515,8 +412,6 @@
     kwmc rule owner="iTerm2" properties={role="AXDialog"}
     kwmc rule owner="iTunes" properties={float="true"}
   '';
-
-  services.skhd.package = pkgs.skhd;
 
   services.skhd.skhdConfig = ''
     # focus window
