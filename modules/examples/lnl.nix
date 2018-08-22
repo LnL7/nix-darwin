@@ -295,9 +295,6 @@
     zle -N up-line-or-beginning-search
   '';
 
-  environment.variables.CLICOLOR = "1";
-  environment.variables.FZF_DEFAULT_COMMAND = "ag -l -f -g ''";
-  environment.variables.SHELLCHECK_OPTS = "-e SC1008";
   environment.variables.LANG = "en_US.UTF-8";
 
   environment.shellAliases.e = "$EDITOR";
@@ -311,6 +308,15 @@
   environment.shellAliases.gl = "git log --pretty=nocolor";
   environment.shellAliases.grh = "git reset --hard";
   environment.shellAliases.l = "ls -lh";
+
+  environment.extraInit = ''
+    # Load and export variables from environment.d.
+    if [ -d /etc/environment.d ]; then
+        set -a
+        . /etc/environment.d/*
+        set +a
+    fi
+  '';
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
