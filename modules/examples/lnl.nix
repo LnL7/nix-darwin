@@ -325,7 +325,7 @@
 
   nixpkgs.overlays = [
     (self: super: {
-      darwin-zsh-completions = super.runCommandNoCC "darwin-completions-0.0.0"
+      darwin-zsh-completions = super.runCommandNoCC "darwin-zsh-completions-0.0.0"
         { preferLocalBuild = true; }
         ''
           mkdir -p $out/share/zsh/site-functions
