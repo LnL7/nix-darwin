@@ -5,6 +5,9 @@ with lib;
 let
   cfg = config.programs.zsh;
 
+  zshAliases =
+    mapAttrsToList (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
+
   zshVariables =
     mapAttrsToList (n: v: ''${n}="${v}"'') cfg.variables;
 
@@ -19,6 +22,16 @@ in
       type = types.bool;
       default = false;
       description = "Whether to configure zsh as an interactive shell.";
+    };
+
+    programs.zsh.shellAliases = mkOption {
+      type = types.attrs;
+      default = config.environment.shellAliases;
+      description = ''
+        Set of aliases for zsh shell. Overrides the default value taken from
+         <option>environment.shellAliases</option>.
+        See <option>environment.shellAliases</option> for an option format description.
+      '';
     };
 
     programs.zsh.variables = mkOption {
@@ -177,6 +190,8 @@ in
       for p in ''${(z)NIX_PROFILES}; do
         fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions)
       done
+
+      ${concatStringsSep "\n" zshAliases}
 
       ${cfg.promptInit}
 
