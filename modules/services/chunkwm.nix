@@ -4,12 +4,10 @@ with lib;
 
 let
   cfg = config.services.chunkwm;
-  plugins = [
-   "border"
-   "ffm"
-   "tiling"
-  ];
-in {
+  plugins = [ "border" "ffm" "tiling" ];
+in
+
+{
   options = {
     services.chunkwm.enable = mkOption {
       type = types.bool;
@@ -110,8 +108,6 @@ in {
       chunkc set window_region_locked          1
     '';
 
-    security.accessibilityPrograms = [ "${cfg.package}/bin/chunkwm" ];
-
     environment.etc."chunkwmrc".source = pkgs.writeScript "etc-chunkwmrc" (
       ''
         #!/bin/bash
@@ -125,7 +121,7 @@ in {
 
     launchd.user.agents.chunkwm = {
       path = [ cfg.package config.environment.systemPath ];
-      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/chunkwm" ]
+      serviceConfig.ProgramArguments = [ "${getOutput "out" cfg.package}/bin/chunkwm" ]
         ++ [ "-c" "/etc/chunkwmrc" ];
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive = true;
