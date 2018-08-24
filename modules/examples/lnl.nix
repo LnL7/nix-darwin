@@ -28,7 +28,10 @@
   system.keyboard.remapCapsLockToControl = true;
 
   environment.systemPackages =
-    [ pkgs.brotli
+    [ config.programs.vim.package
+      config.services.chunkwm.package
+
+      pkgs.brotli
       pkgs.ctags
       pkgs.curl
       pkgs.direnv
@@ -47,8 +50,8 @@
       pkgs.darwin-zsh-completions
     ];
 
+  services.chunkwm.enable = true;
   services.khd.enable = true;
-  services.kwm.enable = true;
   services.skhd.enable = true;
 
   launchd.user.agents.fetch-nixpkgs = {
@@ -365,11 +368,19 @@
           EOF
         '';
 
+      # Fake package, not in nixpkgs.
+      chunkwm = super.runCommandNoCC "chunkwm-0.0.0" {} ''
+        mkdir $out
+      '';
+
       vim_configurable = super.vim_configurable.override {
         guiSupport = "no";
       };
     })
   ];
+
+  # Dotfiles.
+  # nixpkgs.overlays = mkAfter [ (import <dotpkgs/overlays/50-trivial-packages.nix>) ];
 
   services.khd.khdConfig = ''
     # modifier only mappings
@@ -379,107 +390,17 @@
     rshift : qes -t ")"
   '';
 
-  services.kwm.kwmConfig = ''
-    kwmc config tiling bsp
-    kwmc config split-ratio 0.5
-    kwmc config spawn left
-
-    kwmc config padding 40 15 15 15
-    kwmc config gap     15 15
-
-    kwmc config space   0 3 padding 175 175 175 175
-    kwmc config display 1   padding 75 70 70 70
-    kwmc config display 2   padding 75 70 70 70
-
-    kwmc config space 0 1 name main
-    kwmc config space 0 2 mode monocle
-    kwmc config space 0 2 name rnd
-    kwmc config space 0 3 name dev
-    kwmc config space 1 1 name web
-    kwmc config space 2 1 name var
-
-
-    kwmc config focus-follows-mouse on
-    kwmc config mouse-follows-focus on
-    kwmc config standby-on-float    on
-    kwmc config center-on-float     on
-    kwmc config float-non-resizable on
-    kwmc config lock-to-container   on
-    kwmc config cycle-focus         on
-    kwmc config optimal-ratio       1.605
-
-
-    kwmc rule owner="Airmail" properties={float="true"}
-    kwmc rule owner="Apple Store" properties={float="true"}
-    kwmc rule owner="Finder" properties={role="AXDialog"}
-    kwmc rule owner="Finder" role="AXDialog" properties={float="true"}
-    kwmc rule owner="Info" properties={float="true"}
-    kwmc rule owner="System Preferences" properties={float="true"}
-    kwmc rule owner="iTerm2" properties={role="AXDialog"}
-    kwmc rule owner="iTunes" properties={float="true"}
+  services.chunkwm.package = pkgs.chunkwm;
+  services.chunkwm.hotload = false;
+  services.chunkwm.plugins.dir = "${lib.getOutput "out" pkgs.chunkwm}/lib/chunkwm/plugins";
+  services.chunkwm.plugins.list = [ "ffm" "tiling" ];
+  services.chunkwm.plugins."tiling".config = ''
+    chunkc set global_desktop_mode   bsp
   '';
 
-  services.skhd.skhdConfig = ''
-    # focus window
-    alt - h : kwmc window -f west
-    alt - j : kwmc window -f south
-    alt - k : kwmc window -f north
-    alt - l : kwmc window -f east
-
-    # swap window
-    shift + alt - h : kwmc window -s west
-    shift + alt - j : kwmc window -s south
-    shift + alt - k : kwmc window -s north
-    shift + alt - l : kwmc window -s east
-
-    # move window
-    ctrl + alt - h : kwmc window -m west
-    ctrl + alt - j : kwmc window -m south
-    ctrl + alt - k : kwmc window -m north
-    ctrl + alt - l : kwmc window -m east
-
-    # send window to desktop
-    ctrl + alt - 0x12 : kwmc window -m space 1
-    ctrl + alt - 0x13 : kwmc window -m space 2
-    ctrl + alt - 0x14 : kwmc window -m space 3
-
-    # focus monitor
-    alt - 0x12 : kwmc display -f 0
-    alt - 0x13 : kwmc display -f 1
-    alt - 0x14 : kwmc display -f 2
-
-    # send window to monitor
-    shift + alt - 0x12 : kwmc window -m display 0
-    shift + alt - 0x13 : kwmc window -m display 1
-    shift + alt - 0x14 : kwmc window -m display 2
-
-    # toggle window fullscreen
-    shift + alt - f : kwmc window -z fullscreen
-
-    # toggle window parent zoom
-    shift + alt - d : kwmc window -z parent
-
-    # float / unfloat window and center on screen
-    shift + alt - w : kwmc window -t focused
-
-    # toggle sticky, float and resize to picture-in-picture size
-    # shift + alt - s : chunkc tiling::window --toggle sticky;\
-    #                   chunkc tiling::window --grid-layout 5:5:4:0:1:1
-
-    # rotate tree
-    ctrl + alt - r : kwmc tree rotate 90
-
-    # change layout of desktop
-    ctrl + alt - a : kwmc space -t bsp
-    ctrl + alt - s : kwmc space -t monocle
-    ctrl + alt - d : kwmc space -t float
-
-    ctrl + alt - return : kitty --single-instance -d ~
-
-    # quit/reload daemons
-    ctrl + alt - q : kwmc quit;\
-                     khd -e "reload"
-  '';
+  # Dotfiles.
+  # services.chunkwm.extraConfig = builtins.readFile <dotfiles/chunkwm/chunkwmrc>;
+  # services.skhd.skhdConfig = builtins.readFile <dotfiles/skhd/skhdrc>;
 
   # TODO: add module for per-user config, etc, ...
   system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
