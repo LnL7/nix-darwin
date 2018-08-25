@@ -137,6 +137,9 @@
     '';
   };
 
+  # Dotfiles.
+  # programs.vim.package = mkForce pkgs.lnl.vim;
+
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
   programs.zsh.enableFzfCompletion = true;
