@@ -1,4 +1,5 @@
 { config, lib, pkgs, ... }:
+
 {
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
@@ -323,6 +324,8 @@
         set +a
     fi
   '';
+
+  environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   nix.nixPath =
     [ # Use local nixpkgs checkout instead of channels.
