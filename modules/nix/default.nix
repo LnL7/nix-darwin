@@ -314,7 +314,7 @@ in
       type = types.listOf types.str;
       default =
         [ # Include default path <darwin-config>.
-          "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+          "darwin-config=${config.environment.darwinConfig}"
           "/nix/var/nix/profiles/per-user/root/channels"
           "$HOME/.nix-defexpr/channels"
         ];

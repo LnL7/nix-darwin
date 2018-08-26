@@ -63,6 +63,19 @@ in {
       description = "List of directories to be symlinked in <filename>/run/current-system/sw</filename>.";
     };
 
+    environment.darwinConfig = mkOption {
+      type = types.either types.path types.str;
+      default = "$HOME/.nixpkgs/darwin-configuration.nix";
+      description = ''
+        The path of the darwin configuration.nix used to configure the system,
+        this updates the default darwin-config entry in NIX_PATH. Since this
+        changes an environment variable it will only apply to new shells.
+
+        NOTE: Changing this requires running <command>darwin-rebuild switch -I darwin-config=/path/to/configuration.nix</command>
+        the first time to make darwin-rebuild aware of the custom location.
+      '';
+    };
+
     environment.loginShell = mkOption {
       type = types.str;
       default = "$SHELL";
