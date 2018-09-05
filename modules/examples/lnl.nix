@@ -32,7 +32,9 @@
     [ config.programs.vim.package
       config.services.chunkwm.package
 
+      pkgs.bear
       pkgs.brotli
+      pkgs.cachix
       pkgs.ctags
       pkgs.curl
       pkgs.direnv
@@ -46,6 +48,7 @@
       pkgs.ripgrep
       pkgs.shellcheck
       pkgs.silver-searcher
+      pkgs.vault
 
       pkgs.qes
       pkgs.darwin-zsh-completions
