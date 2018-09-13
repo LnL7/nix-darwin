@@ -425,6 +425,9 @@
     [color]
       ui = auto
 
+    [commit]
+      verbose = true
+
     [pretty]
       color = format:%C(yellow)%h%C(red)%d%Creset %s   %C(green)%an, %ar%Creset
       nocolor = format:%h%d %s   %an, %ar
