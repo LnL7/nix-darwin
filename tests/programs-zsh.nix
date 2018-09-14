@@ -24,9 +24,6 @@
      grep 'export PATH=${pkgs.hello}/bin' ${config.out}/etc/zshenv
      echo >&2 "checking SHELL in /etc/zshenv"
      grep 'export SHELL="${pkgs.zsh}/bin/zsh"' ${config.out}/etc/zshenv
-     echo >&2 "checking nix-daemon init in /etc/zshenv"
-     grep '! -w /nix/var/nix/db' ${config.out}/etc/zshenv
-     grep 'export NIX_REMOTE=daemon' ${config.out}/etc/zshenv
      echo >&2 "checking nix-shell return /etc/zshenv"
      grep 'if test -n "$IN_NIX_SHELL"; then return; fi' ${config.out}/etc/zshenv
      echo >&2 "checking zshenv.d in /etc/zshenv"

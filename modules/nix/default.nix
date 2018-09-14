@@ -388,7 +388,7 @@ in
         NIX_REMOTE_SYSTEMS = "/etc/nix/machines";
       };
 
-    environment.extraInit = ''
+    environment.extraInit = optionalString (!isNix20) ''
       # Set up secure multi-user builds: non-root users build through the
       # Nix daemon.
       if [ ! -w /nix/var/nix/db ]; then
