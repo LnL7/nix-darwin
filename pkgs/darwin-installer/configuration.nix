@@ -11,6 +11,8 @@ with lib;
   users.knownUsers = [ "nixbld1" "nixbld2" "nixbld3" "nixbld4" "nixbld5" "nixbld6" "nixbld7" "nixbld8" "nixbld9" "nixbld10" ];
 
   system.activationScripts.preUserActivation.text = mkBefore ''
+    PATH=/nix/var/nix/profiles/default/bin:$PATH
+
     darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
     if ! test -e "$darwinPath"; then
         if test -t 1; then
