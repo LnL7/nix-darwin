@@ -59,6 +59,7 @@ let
         ./modules/services/privoxy
         ./modules/services/redis
         ./modules/services/skhd
+        ./modules/services/synergy
         ./modules/programs/bash
         ./modules/programs/fish.nix
         ./modules/programs/gnupg.nix
