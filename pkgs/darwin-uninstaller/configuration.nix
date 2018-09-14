@@ -19,7 +19,7 @@ with lib;
     fi
 
     if test -L ~/.nix-defexpr/channels/darwin; then
-        nix-channel --remove darwin
+        nix-channel --remove darwin || true
     fi
   '';
 
@@ -31,7 +31,7 @@ with lib;
     if test -O /nix/store; then
         l=$(readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist) || true
         if test "$l" != "/nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist"; then
-            sudo launchctl unload -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist 2> /dev/null || true
+            sudo launchctl remove org.nixos.nix-daemon 2> /dev/null || true
             sudo ln -sfn /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
             sudo launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
         fi
