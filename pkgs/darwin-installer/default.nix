@@ -24,8 +24,7 @@ stdenv.mkDerivation {
   shellHook = ''
     set -e
 
-    orig_path="$PATH"
-    export PATH="${pkgs.openssh}/bin:/usr/bin:/bin:/usr/sbin:/sbin"  # ssh in case nix needs it
+    export PATH=/nix/var/nix/profiles/default/bin:${nix}/bin:${pkgs.openssh}/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
     action=switch
     while [ "$#" -gt 0 ]; do
@@ -45,9 +44,7 @@ stdenv.mkDerivation {
     echo >&2 "Installing nix-darwin..."
     echo >&2
 
-    export nix=${nix}
-
-    config=$($nix/bin/nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
+    config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo "$HOME/.nixpkgs/darwin-configuration.nix")
     if ! test -f "$config"; then
         echo "copying example configuration.nix" >&2
         mkdir -p "$HOME/.nixpkgs"
@@ -61,15 +58,15 @@ stdenv.mkDerivation {
         read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
         case "$i" in
             y|Y)
-                PATH="$orig_path" ''${EDITOR:-nano} "$config"
+                ''${EDITOR:-nano} "$config"
                 ;;
         esac
     fi
 
     export NIX_PATH=${nixPath}
-    system=$($nix/bin/nix-build '<darwin>' -I "user-darwin-config=$config" -A system --no-out-link)
-    export PATH=$system/sw/bin:$PATH
+    system=$(nix-build '<darwin>' -I "user-darwin-config=$config" -A system --no-out-link)
 
+    export PATH=$system/sw/bin:$PATH
     darwin-rebuild "$action" -I "user-darwin-config=$config"
 
     echo >&2
