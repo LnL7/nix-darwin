@@ -104,6 +104,7 @@ let
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
+    tests.services-synapse-bt = makeTest ./tests/services-synapse-bt.nix;
     tests.services-synergy = makeTest ./tests/services-synergy.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;

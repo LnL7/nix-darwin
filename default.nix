@@ -59,6 +59,7 @@ let
         ./modules/services/privoxy
         ./modules/services/redis
         ./modules/services/skhd
+        ./modules/services/synapse-bt.nix
         ./modules/services/synergy
         ./modules/programs/bash
         ./modules/programs/fish.nix
