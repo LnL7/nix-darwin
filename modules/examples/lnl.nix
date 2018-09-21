@@ -412,35 +412,8 @@
   # services.skhd.skhdConfig = builtins.readFile <dotfiles/skhd/skhdrc>;
 
   # TODO: add module for per-user config, etc, ...
+  # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile <dotfiles/git/gitconfig>;
   system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
-
-  environment.etc."per-user/lnl/gitconfig".text = ''
-    [include]
-      path = .gitconfig.local
-
-    [core]
-      excludesfile = ~/.gitignore
-      autocrlf     = input
-
-    [color]
-      ui = auto
-
-    [commit]
-      verbose = true
-
-    [pretty]
-      color = format:%C(yellow)%h%C(red)%d%Creset %s   %C(green)%an, %ar%Creset
-      nocolor = format:%h%d %s   %an, %ar
-
-    [rerere]
-      enabled = true
-
-    [user]
-      name = Daiderd Jordan
-
-    [github]
-      user = LnL7
-  '';
 
   # You should generally set this to the total number of logical cores in your system.
   # $ sysctl -n hw.ncpu
