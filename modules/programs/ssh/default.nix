@@ -71,6 +71,15 @@ in
         ]
       '';
     };
+    programs.ssh.extraConfig = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Extra configuration text appended to <filename>ssh_config</filename>.
+        See <citerefentry><refentrytitle>ssh_config</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+        for help.
+      '';
+    };
   };
 
   config = {
@@ -80,6 +89,10 @@ in
                   (data.publicKey != null && data.publicKeyFile == null);
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
+
+    environment.etc."ssh/ssh_config".text = ''
+      ${cfg.extraConfig}
+    '';
 
     environment.etc."ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
       (h: assert h.hostNames != [];
