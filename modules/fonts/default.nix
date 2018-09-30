@@ -4,16 +4,11 @@ with lib;
 
 let
   cfg = config.fonts;
+  fontFiles = env: with builtins;
+  filter (n: match ".*\\.ttf" n != null) (attrNames (readDir "${env}/share/fonts/truetype/"));
 in {
   options = {
     fonts = {
-      enableFontDir = mkOption {
-        default = false;
-        description = ''
-          Whether to create a directory with links to all fonts in
-          <filename>/run/current-system/sw/share/fonts</filename>.
-        '';
-      };
       fonts = mkOption {
         type = types.listOf types.path;
         default = [];
@@ -27,15 +22,17 @@ in {
     system.build.fonts = pkgs.buildEnv {
       name = "system-fonts";
       paths = cfg.fonts;
-      pathsToLink = "/share/fonts/truetype";
+      pathsToLink = "/share/fonts";
     };
-    system.activationScripts.fonts.text = optionalString cfg.enableFontDir ''
+    system.activationScripts.fonts.text = ''
       # Set up fonts.
-      echo "setting up fonts..." >&2
-      fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 sudo rm
-      /bin/ln -hf ${config.system.build.fonts}/share/fonts/truetype/* /Library/Fonts/
-      '';
-    environment.pathsToLink = [ "/share/fonts/truetype" ];
+      echo "resetting fonts..." >&2
+      fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
+      echo "updating fonts..." >&2
+      ${concatMapStrings (font: "ln -fn '${config.system.build.fonts}/share/fonts/truetype/${font}' '/Library/Fonts/${font}'\n")
+      (fontFiles config.system.build.fonts)}
+   '';
+    environment.pathsToLink = [ "/share/fonts" ];
   };
 
 }
