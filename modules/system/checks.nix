@@ -81,7 +81,7 @@ let
   '';
 
   nixPath = ''
-    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>' || echo '$HOME/.nixpkgs/darwin-configuration.nix') || true
+    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>' || echo "$HOME/.nixpkgs/darwin-configuration.nix") || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
         echo "Create $darwinConfig or set environment.darwinConfig:" >&2
