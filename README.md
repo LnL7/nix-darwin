@@ -137,7 +137,6 @@ Whether to activate system at boot time.
 - [`networking`](https://github.com/LnL7/nix-darwin/blob/master/modules/networking)
 - [`nix`](https://github.com/LnL7/nix-darwin/tree/master/modules/nix)
 - [`programs`](https://github.com/LnL7/nix-darwin/tree/master/modules/programs)
-- [`security`](https://github.com/LnL7/nix-darwin/tree/master/modules/security)
 - [`services`](https://github.com/LnL7/nix-darwin/tree/master/modules/services)
 - [`system.defaults`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults)
 - [`system.keyboard`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/keyboard.nix)
