@@ -4,8 +4,16 @@ with lib;
 
 let
   cfg = config.fonts;
-  fontFiles = env: with builtins;
-  filter (n: match ".*\\.ttf" n != null) (attrNames (readDir "${env}/share/fonts/truetype/"));
+  printLinks = dir: with builtins;
+    let readDirsRec = path: let
+      home = readDir path;
+      list = mapAttrsToList (name: type:
+        let newPath = "${path}/${name}";
+        in if (type == "directory" || type == "symlink") && !(hasSuffix ".ttf" name) then readDirsRec newPath else [ newPath ]) home;
+      in flatten list;
+    fontFiles = dir: filter (name: hasSuffix ".ttf" name) (readDirsRec dir);
+    print = font: "ln -fn '${font}' '/Library/Fonts/${baseNameOf font}'";
+    in concatMapStringsSep "\n" print (fontFiles dir);
 in {
   options = {
     fonts = {
@@ -29,10 +37,8 @@ in {
       echo "resetting fonts..." >&2
       fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
       echo "updating fonts..." >&2
-      ${concatMapStrings (font: "ln -fn '${config.system.build.fonts}/share/fonts/truetype/${font}' '/Library/Fonts/${font}'\n")
-      (fontFiles config.system.build.fonts)}
+      ${printLinks config.system.build.fonts}
    '';
     environment.pathsToLink = [ "/share/fonts" ];
   };
-
 }

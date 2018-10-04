@@ -8,7 +8,7 @@ in {
   test = ''
     echo checking installed fonts >&2
     grep -o "fontrestore default -n" ${config.out}/activate
-    grep -o "/share/fonts/truetype/DejaVuSans.ttf /Library/Fonts/DejaVuSans.ttf" ${config.out}/activate
+    grep -o "/share/fonts/truetype/DejaVuSans.ttf' '/Library/Fonts/DejaVuSans.ttf'" ${config.out}/activate
   '';
 }
 
