@@ -25,7 +25,7 @@ in {
         type = types.listOf types.path;
         default = [];
         example = literalExample "[ pkgs.dejavu_fonts ]";
-        description = "List of primary font paths.";
+        description = "List of primary font paths. Important: Manually added fonts will be removed upon rebuild.";
       };
     };
   };
