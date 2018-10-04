@@ -9,9 +9,13 @@ let
       home = readDir path;
       list = mapAttrsToList (name: type:
         let newPath = "${path}/${name}";
-        in if (type == "directory" || type == "symlink") && !(hasSuffix ".ttf" name) then readDirsRec newPath else [ newPath ]) home;
+        in if (type == "directory" || type == "symlink") && !(isFont name) then readDirsRec newPath else [ newPath ]) home;
       in flatten list;
-    fontFiles = dir: filter (name: hasSuffix ".ttf" name) (readDirsRec dir);
+    isFont = name: let
+      fontExt = [ ".ttf" ".otf" ];
+      hasExt = exts: name: foldl' (acc: ext: (hasSuffix ext name) || acc) false exts;
+      in hasExt fontExt name;
+    fontFiles = dir: filter isFont (readDirsRec dir);
     print = font: "ln -fn '${font}' '/Library/Fonts/${baseNameOf font}'";
     in concatMapStringsSep "\n" print (fontFiles dir);
 in {
