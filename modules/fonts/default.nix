@@ -21,22 +21,29 @@ let
 in {
   options = {
     fonts = {
+      enableFontDir = mkOption {
+        default = false;
+        description = ''
+          Whether to enable font directory management. 
+          Important: enabling font directory management removes all manually-added fonts.
+        '';
+      };
       fonts = mkOption {
         type = types.listOf types.path;
         default = [];
         example = literalExample "[ pkgs.dejavu_fonts ]";
-        description = "List of primary font paths. Important: Manually added fonts will be removed upon rebuild.";
+        description = "List of primary font paths.";
       };
     };
   };
   
   config = {
-    system.build.fonts = pkgs.buildEnv {
+    system.build.fonts = mkIf cfg.enableFontDir (pkgs.buildEnv {
       name = "system-fonts";
       paths = cfg.fonts;
       pathsToLink = "/share/fonts";
-    };
-    system.activationScripts.fonts.text = ''
+    });
+    system.activationScripts.fonts.text = "" + optionalString cfg.enableFontDir ''
       # Set up fonts.
       echo "resetting fonts..." >&2
       fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
