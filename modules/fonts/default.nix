@@ -1,23 +1,23 @@
 { config, lib, pkgs, ... }:
 
 with lib;
+with builtins;
 
 let
   cfg = config.fonts;
-  printLinks = dir: with builtins;
-    let readDirsRec = path: let
-      home = readDir path;
-      list = mapAttrsToList (name: type:
-        let newPath = "${path}/${name}";
-        in if (type == "directory" || type == "symlink") && !(isFont name) then readDirsRec newPath else [ newPath ]) home;
-      in flatten list;
-    isFont = name: let
-      fontExt = [ ".ttf" ".otf" ];
-      hasExt = exts: name: foldl' (acc: ext: (hasSuffix ext name) || acc) false exts;
-      in hasExt fontExt name;
-    fontFiles = dir: filter isFont (readDirsRec dir);
-    print = font: "ln -fn '${font}' '/Library/Fonts/${baseNameOf font}'";
-    in concatMapStringsSep "\n" print (fontFiles dir);
+  readDirsRec = path: let
+    home = readDir path;
+    list = mapAttrsToList (name: type:
+      let newPath = "${path}/${name}";
+      in if (type == "directory" || type == "symlink") && !(isFont name) then readDirsRec newPath else [ newPath ]) home;
+    in flatten list;
+  isFont = name: let
+    fontExt = [ ".ttf" ".otf" ];
+    hasExt = exts: name: foldl' (acc: ext: (hasSuffix ext name) || acc) false exts;
+    in hasExt fontExt name;
+  fontFiles = dir: filter isFont (readDirsRec dir);
+  print = font: "ln -fn '${font}' '/Library/Fonts/${baseNameOf font}'";
+  printLinks = dir: concatMapStringsSep "\n" print (fontFiles dir);
 in {
   options = {
     fonts = {
