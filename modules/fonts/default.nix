@@ -16,16 +16,22 @@ let
     hasExt = exts: name: foldl' (acc: ext: (hasSuffix ext name) || acc) false exts;
     in hasExt fontExt name;
   fontFiles = dir: filter isFont (readDirsRec dir);
-  print = font: "ln -fn '${font}' '/Library/Fonts/${baseNameOf font}'";
-  printLinks = dir: concatMapStringsSep "\n" print (fontFiles dir);
+  libraryLink = font: "ln -fn '/run/current-system/sw/share/fonts/${baseNameOf font}' '/Library/Fonts/${baseNameOf font}'";
+  outLink = font: "ln -sfn -t $out/share/fonts/ '${font}'";
+  fontLinks = link: dir: concatMapStringsSep "\n" link (fontFiles dir);
+  systemFontsDir = pkgs.runCommand "systemFontsDir" {} ''
+    mkdir -p "$out/share/fonts"
+    echo ${toString config.fonts.fonts}
+    ${concatMapStringsSep "\n" (fontLinks outLink) config.fonts.fonts}
+  '';
 in {
   options = {
     fonts = {
       enableFontDir = mkOption {
         default = false;
         description = ''
-          Whether to enable font directory management. 
-          Important: enabling font directory management removes all manually-added fonts.
+          Whether to enable font directory management and link all fonts in <filename>/run/current-system/sw/share/fonts</filename>.
+          Important: removes all manually-added fonts.
         '';
       };
       fonts = mkOption {
@@ -38,18 +44,14 @@ in {
   };
   
   config = {
-    system.build.fonts = mkIf cfg.enableFontDir (pkgs.buildEnv {
-      name = "system-fonts";
-      paths = cfg.fonts;
-      pathsToLink = "/share/fonts";
-    });
     system.activationScripts.fonts.text = "" + optionalString cfg.enableFontDir ''
       # Set up fonts.
       echo "resetting fonts..." >&2
       fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
       echo "updating fonts..." >&2
-      ${printLinks config.system.build.fonts}
-   '';
+      ${fontLinks libraryLink systemFontsDir}
+    '';
+    environment.systemPackages = [ systemFontsDir ];
     environment.pathsToLink = [ "/share/fonts" ];
   };
 }
