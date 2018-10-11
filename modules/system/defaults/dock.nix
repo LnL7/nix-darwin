@@ -138,6 +138,14 @@ in {
       '';
     };
 
+    system.defaults.dock.show-recents = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Show recent applications in the dock. The default is true.
+      '';
+    };
+
     system.defaults.dock.static-only = mkOption {
       type = types.nullOr types.bool;
       default = null;
