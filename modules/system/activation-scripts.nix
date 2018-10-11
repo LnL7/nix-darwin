@@ -64,6 +64,7 @@ in
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}
+      ${cfg.activationScripts.fonts.text}
 
       ${cfg.activationScripts.postActivation.text}
 

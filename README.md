@@ -131,6 +131,7 @@ Whether to activate system at boot time.
 ## Modules
 
 - [`environment`](https://github.com/LnL7/nix-darwin/blob/master/modules/environment)
+- [`fonts`](https://github.com/LnL7/nix-darwin/blob/master/modules/fonts)
 - [`launchd.daemons`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)
 - [`launchd.envVariables`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd)
 - [`launchd.user.agents`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)

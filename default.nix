@@ -43,6 +43,7 @@ let
         ./modules/nix/nix-info.nix
         ./modules/nix/nixpkgs.nix
         ./modules/environment
+        ./modules/fonts
         ./modules/launchd
         ./modules/services/activate-system
         ./modules/services/buildkite-agent.nix
