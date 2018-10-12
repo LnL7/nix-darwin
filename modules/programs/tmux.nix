@@ -95,6 +95,10 @@ in
 
   config = mkIf cfg.enable {
 
+    warnings = mkIf cfg.iTerm2 [
+      "The programs.tmux.iTerm2 is no longer needed and doesn't do anything anymore"
+    ];
+
     environment.systemPackages =
       [ # Include wrapped tmux package.
         tmux
@@ -107,9 +111,7 @@ in
       source-file -q /etc/tmux.conf.local
     '';
 
-    programs.tmux.tmuxOptions.login-shell.text = if stdenv.isDarwin && !cfg.iTerm2 then ''
-      set -g default-command "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace ${config.environment.loginShell}"
-    '' else ''
+    programs.tmux.tmuxOptions.login-shell.text = ''
       set -g default-command "${config.environment.loginShell}"
     '';
 
@@ -161,7 +163,7 @@ in
     '' + optionalString stdenv.isLinux ''
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
     '' + optionalString stdenv.isDarwin ''
-      bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "${pkgs.reattach-to-user-namespace}/bin/reattach-to-user-namespace pbcopy"
+      bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
     '');
 
   };
