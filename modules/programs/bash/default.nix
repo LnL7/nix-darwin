@@ -52,6 +52,9 @@ in
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
+      # If not running interactively, don't do anything
+      [[ $- != *i* ]] && return
+
       # Make bash check its window size after a process completes
       shopt -s checkwinsize
 
