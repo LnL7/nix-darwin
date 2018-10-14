@@ -75,17 +75,19 @@ in
       ${cfg.interactiveShellInit}
 
       ${optionalString cfg.enableCompletion ''
-        source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
+        if [ "$TERM" != "dumb" ]; then
+          source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
 
-        nullglobStatus=$(shopt -p nullglob)
-        shopt -s nullglob
-        for p in $NIX_PROFILES; do
-          for m in "$p/etc/bash_completion.d/"* "$p/share/bash-completion/completions/"*; do
-            source $m
+          nullglobStatus=$(shopt -p nullglob)
+          shopt -s nullglob
+          for p in $NIX_PROFILES; do
+            for m in "$p/etc/bash_completion.d/"* "$p/share/bash-completion/completions/"*; do
+              source $m
+            done
           done
-        done
-        eval "$nullglobStatus"
-        unset nullglobStatus p m
+          eval "$nullglobStatus"
+          unset nullglobStatus p m
+        fi
       ''}
 
       # Read system-wide modifications.
