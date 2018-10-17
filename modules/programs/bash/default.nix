@@ -52,9 +52,6 @@ in
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
-      # Make bash check its window size after a process completes
-      shopt -s checkwinsize
-
       [ -r "/etc/bashrc_$TERM_PROGRAM" ] && . "/etc/bashrc_$TERM_PROGRAM"
 
       # Only execute this file once per shell.
@@ -66,23 +63,32 @@ in
 
       export PATH=${config.environment.systemPath}
       ${config.system.build.setEnvironment.text}
+
+      # Return early if not running interactively, but after basic nix setup.
+      [[ $- != *i* ]] && return
+
+      # Make bash check its window size after a process completes
+      shopt -s checkwinsize
+
       ${config.system.build.setAliases.text}
 
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 
       ${optionalString cfg.enableCompletion ''
-        source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
+        if [ "$TERM" != "dumb" ]; then
+          source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
 
-        nullglobStatus=$(shopt -p nullglob)
-        shopt -s nullglob
-        for p in $NIX_PROFILES; do
-          for m in "$p/etc/bash_completion.d/"* "$p/share/bash-completion/completions/"*; do
-            source $m
+          nullglobStatus=$(shopt -p nullglob)
+          shopt -s nullglob
+          for p in $NIX_PROFILES; do
+            for m in "$p/etc/bash_completion.d/"* "$p/share/bash-completion/completions/"*; do
+              source $m
+            done
           done
-        done
-        eval "$nullglobStatus"
-        unset nullglobStatus p m
+          eval "$nullglobStatus"
+          unset nullglobStatus p m
+        fi
       ''}
 
       # Read system-wide modifications.
