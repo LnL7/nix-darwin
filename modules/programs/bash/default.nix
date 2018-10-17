@@ -52,12 +52,6 @@ in
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
 
-      # If not running interactively, don't do anything
-      [[ $- != *i* ]] && return
-
-      # Make bash check its window size after a process completes
-      shopt -s checkwinsize
-
       [ -r "/etc/bashrc_$TERM_PROGRAM" ] && . "/etc/bashrc_$TERM_PROGRAM"
 
       # Only execute this file once per shell.
@@ -69,6 +63,13 @@ in
 
       export PATH=${config.environment.systemPath}
       ${config.system.build.setEnvironment.text}
+
+      # Return early if not running interactively, but after basic nix setup.
+      [[ $- != *i* ]] && return
+
+      # Make bash check its window size after a process completes
+      shopt -s checkwinsize
+
       ${config.system.build.setAliases.text}
 
       ${config.environment.interactiveShellInit}
