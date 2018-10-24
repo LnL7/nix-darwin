@@ -61,8 +61,9 @@ in
       # Don't execute this file when running in a pure nix-shell.
       if test -n "$IN_NIX_SHELL"; then return; fi
 
-      export PATH=${config.environment.systemPath}
-      ${config.system.build.setEnvironment.text}
+      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
+        . ${config.system.build.setEnvironment}
+      fi
 
       # Return early if not running interactively, but after basic nix setup.
       [[ $- != *i* ]] && return

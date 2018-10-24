@@ -184,6 +184,10 @@ in {
     };
 
     system.build.setEnvironment = pkgs.writeText "set-environment" ''
+      # Prevent this file from being sourced by child shells.
+      export __NIX_DARWIN_SET_ENVIRONMENT_DONE=1
+
+      export PATH=${config.environment.systemPath}
       ${concatStringsSep "\n" exportVariables}
 
       # Extra initialisation
