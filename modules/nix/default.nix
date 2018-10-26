@@ -315,13 +315,23 @@ in
       default =
         [ # Include default path <darwin-config>.
           "darwin-config=${config.environment.darwinConfig}"
-          "/nix/var/nix/profiles/per-user/root/channels"
-          "$HOME/.nix-defexpr/channels"
         ];
       description = ''
         The default Nix expression search path, used by the Nix
         evaluator to look up paths enclosed in angle brackets
-        (e.g. <literal>&lt;nixpkgs&gt;</literal>).
+        (e.g. <literal>&lt;nixpkgs&gt;</literal>).  This value gets
+        extended with user and/or root channels if those exist and
+        nix.enableChannels isn't disabled.
+      '';
+    };
+
+    nix.enableChannels = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to extend <envar>NIX_PATH</envar> with <filename>~/.nix-defexpr/channels</filename>
+        and <filename>/nix/var/nix/profiles/per-user/root/channels</filename>
+        if they exist.
       '';
     };
   };
@@ -393,6 +403,14 @@ in
       # Nix daemon.
       if [ ! -w /nix/var/nix/db ]; then
           export NIX_REMOTE=daemon
+      fi
+    '' + optionalString cfg.enableChannels ''
+      # Set up NIX_PATH with root and/or user channels.
+      if [ -d "$HOME/.nix-defexpr/channels" ]; then
+          export NIX_PATH="''${NIX_PATH:+$NIX_PATH:}$HOME/.nix-defexpr/channels"
+      fi
+      if [ -d /nix/var/nix/profiles/per-user/root/channels ]; then
+          export NIX_PATH="''${NIX_PATH:+$NIX_PATH:}/nix/var/nix/profiles/per-user/root/channels"
       fi
     '';
 
