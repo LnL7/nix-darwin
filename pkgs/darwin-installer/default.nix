@@ -24,6 +24,7 @@ stdenv.mkDerivation {
   shellHook = ''
     set -e
 
+    _PATH=$PATH
     export PATH=/nix/var/nix/profiles/default/bin:${nix}/bin:${pkgs.openssh}/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
     action=switch
@@ -58,7 +59,7 @@ stdenv.mkDerivation {
         read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
         case "$i" in
             y|Y)
-                ''${EDITOR:-nano} "$config"
+                PATH=$_PATH ''${EDITOR:-nano} "$config"
                 ;;
         esac
     fi
