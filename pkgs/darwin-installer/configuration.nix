@@ -13,7 +13,7 @@ with lib;
   system.activationScripts.preUserActivation.text = mkBefore ''
     PATH=/nix/var/nix/profiles/default/bin:$PATH
 
-    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
+    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath}:$HOME/.nix-defexpr/channels:$NIX_PATH nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
     if ! test -e "$darwinPath"; then
         if test -t 1; then
             read -p "Would you like to manage <darwin> with nix-channel? [y/n] " i
