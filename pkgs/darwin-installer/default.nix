@@ -5,6 +5,8 @@ let
     "darwin-config=${toString ./configuration.nix}"
     "darwin=${toString ../..}"
     "nixpkgs=${toString pkgs.path}"
+    "$HOME/.nix-defexpr/channels"
+    "/nix/var/nix/profiles/per-user/root/channels"
     "$NIX_PATH"
   ];
 in
