@@ -1,10 +1,3 @@
-2018-10-26
-- the nix.nixPath option no longer includes the paths for channels, these are
-  added dynamically instead to avoid warnings.  This can be disabled using the
-  following option.
-
-    nix.enableChannels = false;
-
 2018-03-29
 - default nix.package no longer uses the default profile.
   system.stateVersion > 2
