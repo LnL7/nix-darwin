@@ -108,10 +108,10 @@ let
     tests.services-synergy = makeTest ./tests/services-synergy.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
+    tests.system-environment = makeTest ./tests/system-environment.nix;
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;
     tests.system-packages = makeTest ./tests/system-packages.nix;
-    tests.system-path-bash = makeTest ./tests/system-path-bash.nix;
-    tests.system-path-fish = makeTest ./tests/system-path-fish.nix;
+    tests.system-path = makeTest ./tests/system-path.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
     tests.fonts = makeTest ./tests/fonts.nix;

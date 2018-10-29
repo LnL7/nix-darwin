@@ -20,10 +20,10 @@
      echo >&2 "checking for share/zsh in /sw"
      test -e ${config.out}/sw/share/zsh
 
-     echo >&2 "checking environment.systemPath in /etc/zshenv"
-     grep 'export PATH=${pkgs.hello}/bin' ${config.out}/etc/zshenv
-     echo >&2 "checking SHELL in /etc/zshenv"
-     grep 'export SHELL="${pkgs.zsh}/bin/zsh"' ${config.out}/etc/zshenv
+     echo >&2 "checking setEnvironment in /etc/zshenv"
+     fgrep '. ${config.system.build.setEnvironment}' ${config.out}/etc/zshenv
+     echo >&2 "checking SHELL in setEnvironment"
+     grep 'export SHELL="${pkgs.zsh}/bin/zsh"' ${config.system.build.setEnvironment}
      echo >&2 "checking nix-shell return /etc/zshenv"
      grep 'if test -n "$IN_NIX_SHELL"; then return; fi' ${config.out}/etc/zshenv
      echo >&2 "checking zshenv.d in /etc/zshenv"
