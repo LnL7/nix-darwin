@@ -41,9 +41,6 @@ let
           ''}
           trusted-users = ${toString cfg.trustedUsers}
           allowed-users = ${toString cfg.allowedUsers}
-          ${optionalString (isNix20 && !cfg.distributedBuilds) ''
-            builders =
-          ''}
           $extraOptions
           END
         '';
