@@ -32,6 +32,7 @@
     [ config.programs.vim.package
       config.services.chunkwm.package
 
+      pkgs.awscli
       pkgs.bear
       pkgs.brotli
       pkgs.cachix
