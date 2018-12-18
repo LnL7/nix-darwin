@@ -69,6 +69,8 @@
 
   services.nix-daemon.enable = true;
   services.nix-daemon.enableSocketListener = true;
+  # FIXME workaround for https://github.com/NixOS/nix/issues/2523
+  # launchd.daemons.nix-daemon.environment.OBJC_DISABLE_INITIALIZE_FORK_SAFETY = "YES";
 
   nix.extraOptions = ''
     gc-keep-derivations = true
