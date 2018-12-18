@@ -193,6 +193,16 @@
         curl -F 'f:1=<-' ix.io
     }
 
+    mount_ram() {
+        local dev
+        if [ -e /Volumes/RAM ]; then
+            dev=$(diskutil info | awk '/Device Node:/ {print $3}')
+            umount /Volumes/RAM
+            hdiutil detach "$dev"
+        fi
+        diskutil erasevolume JHFS+ RAM $(hdiutil attach -nomount ram://10248576)
+    }
+
     install_name_tool() {
         ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
     }
@@ -282,17 +292,19 @@
     }
 
     reexec() {
-        unset __ETC_ZSHRC_SOURCED
-        unset __ETC_ZSHENV_SOURCED
+        unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
         unset __ETC_ZPROFILE_SOURCED
+        unset __ETC_ZSHENV_SOURCED
+        unset __ETC_ZSHRC_SOURCED
         exec $SHELL -c 'echo >&2 "reexecuting shell: $SHELL" && exec $SHELL -l'
     }
 
     reexec-tmux() {
         local host
-        unset __ETC_ZSHRC_SOURCED
-        unset __ETC_ZSHENV_SOURCED
+        unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
         unset __ETC_ZPROFILE_SOURCED
+        unset __ETC_ZSHENV_SOURCED
+        unset __ETC_ZSHRC_SOURCED
         host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
         exec tmux new-session -A -s "$host" "$@"
     }
