@@ -1,3 +1,10 @@
+2019-01-02
+- The NIX_PATH validation can be disabled now, this is particularly useful if
+  the darwin configuration is deployed from another machine in which case it
+  often doesn't matter that darwin-rebuild won't work on the host itself.
+
+    system.checks.verifyNixPath = false;
+
 2018-03-29
 - default nix.package no longer uses the default profile.
   system.stateVersion > 2
