@@ -36,7 +36,7 @@ in
     launchd.user.agents.emacs = {
       serviceConfig.ProgramArguments = [
         "${cfg.package}/bin/${cfg.exec}"
-        "--daemon"
+        "--fg-daemon"
       ];
       serviceConfig.RunAtLoad = true;
     };
