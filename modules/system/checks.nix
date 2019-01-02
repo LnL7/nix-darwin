@@ -134,6 +134,17 @@ let
         exit 2
     fi
   '';
+
+  nixGarbageCollector = optionalString config.nix.gc.automatic ''
+    if test -O /nix/store; then
+        echo "[1;31merror: A single-user install can't run gc as root, aborting activation[0m" >&2
+        echo "Configure the garbage collector to run as the current user:" >&2
+        echo >&2
+        echo "    nix.gc.user = \"$USER\";" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -147,6 +158,7 @@ in
       ${runLink}
       ${buildUsers}
       ${nixStore}
+      ${nixGarbageCollector}
       ${nixChannels}
       ${nixInstaller}
       ${nixPath}
