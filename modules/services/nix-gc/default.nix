@@ -14,6 +14,12 @@ in
       description = "Automatically run the garbage collector at a specific time.";
     };
 
+    nix.gc.user = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "User that runs the garbage collector.";
+    };
+
     nix.gc.interval = mkOption {
       type = types.attrs;
       default = { Hour = 3; Minute = 15; };
@@ -38,6 +44,7 @@ in
       environment.NIX_REMOTE = optionalString config.services.nix-daemon.enable "daemon";
       serviceConfig.RunAtLoad = false;
       serviceConfig.StartCalendarInterval = [ cfg.interval ];
+      serviceConfig.UserName = cfg.user;
     };
 
   };
