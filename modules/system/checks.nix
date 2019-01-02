@@ -3,6 +3,8 @@
 with lib;
 
 let
+  cfg = config.system.checks;
+
   darwinChanges = ''
     darwinChanges=/dev/null
     if test -e /run/current-system/darwin-changes; then
@@ -30,7 +32,7 @@ let
     fi
   '';
 
-  buildUsers = optionalString config.services.nix-daemon.enable ''
+  buildUsers = ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
     if [ -z $buildUser ]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
@@ -135,7 +137,7 @@ let
     fi
   '';
 
-  nixGarbageCollector = optionalString config.nix.gc.automatic ''
+  nixGarbageCollector = ''
     if test -O /nix/store; then
         echo "[1;31merror: A single-user install can't run gc as root, aborting activation[0m" >&2
         echo "Configure the garbage collector to run as the current user:" >&2
@@ -149,19 +151,34 @@ in
 
 {
   options = {
+    system.checks.verifyNixPath = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to run the NIX_PATH validation checks.";
+    };
+
+    system.checks.text = mkOption {
+      internal = true;
+      type = types.lines;
+      default = "";
+    };
   };
 
   config = {
 
+    system.checks.text = mkMerge [
+      darwinChanges
+      runLink
+      (mkIf config.services.nix-daemon.enable buildUsers)
+      nixStore
+      (mkIf config.nix.gc.automatic nixGarbageCollector)
+      nixChannels
+      nixInstaller
+      (mkIf cfg.verifyNixPath nixPath)
+    ];
+
     system.activationScripts.checks.text = ''
-      ${darwinChanges}
-      ${runLink}
-      ${buildUsers}
-      ${nixStore}
-      ${nixGarbageCollector}
-      ${nixChannels}
-      ${nixInstaller}
-      ${nixPath}
+      ${cfg.text}
 
       if test ''${checkActivation:-0} -eq 1; then
         echo "ok" >&2
