@@ -101,6 +101,7 @@ let
     tests.services-buildkite-agent = makeTest ./tests/services-buildkite-agent.nix;
     tests.services-nix-daemon = makeTest ./tests/services-nix-daemon.nix;
     tests.sockets-nix-daemon = makeTest ./tests/sockets-nix-daemon.nix;
+    tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
