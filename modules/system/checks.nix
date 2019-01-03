@@ -171,7 +171,7 @@ in
       runLink
       (mkIf config.services.nix-daemon.enable buildUsers)
       nixStore
-      (mkIf (config.nix.gc.automatic && config.nix.gc.user != null) nixGarbageCollector)
+      (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       nixChannels
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
