@@ -1,6 +1,8 @@
 { config, lib, pkgs, ... }:
 
 {
+  # imports = [ ~/.config/nixpkgs/darwin/local-configuration.nix ];
+
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
@@ -56,7 +58,6 @@
     ];
 
   services.chunkwm.enable = true;
-  services.khd.enable = true;
   services.skhd.enable = true;
 
   launchd.user.agents.fetch-nixpkgs = {
@@ -75,6 +76,7 @@
   nix.extraOptions = ''
     gc-keep-derivations = true
     gc-keep-outputs = true
+    log-lines = 128
   '';
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
@@ -176,19 +178,19 @@
 
   programs.zsh.loginShellInit = ''
     :a() {
-        nix repl ''${@:-<darwinpkgs>}
+        nix repl ''${@:-<dotpkgs>}
     }
 
     :u() {
-        nix run -f '<darwinpkgs>' "$@"
+        nix run -f '<dotpkgs>' "$1" "$@"
     }
 
     :d() {
-        if [ -z "$IN_NIX_SHELL" ]; then
-            eval "$(direnv hook zsh)"
-        else
-            direnv reload
-        fi
+        eval "$(direnv hook zsh)"
+    }
+
+    :r() {
+        direnv reload
     }
 
     xi() {
@@ -231,6 +233,10 @@
 
     linux-build() {
         nix-build --option system x86_64-linux --store ssh-ng://nixos1 "$@"
+    }
+
+    nix-unpack() {
+        nix-shell --run 'phases=unpackPhase genericBuild' "$@"
     }
 
     hydra-bad-machines() {
@@ -325,7 +331,6 @@
 
   environment.variables.LANG = "en_US.UTF-8";
 
-  environment.shellAliases.e = "$EDITOR";
   environment.shellAliases.g = "git log --pretty=color -32";
   environment.shellAliases.gb = "git branch";
   environment.shellAliases.gc = "git checkout";
@@ -353,8 +358,6 @@
       "darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix"
       "darwin=$HOME/.nix-defexpr/darwin"
       "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
-      "$HOME/.nix-defexpr/channels"
-      "$HOME/.nix-defexpr"
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -407,15 +410,10 @@
   ];
 
   # Dotfiles.
-  # nixpkgs.overlays = mkAfter [ (import <dotpkgs/overlays/50-trivial-packages.nix>) ];
-
-  services.khd.khdConfig = ''
-    # modifier only mappings
-    khd mod_trigger_timeout 0.2
-    lctrl  : qes -k "escape"
-    lshift : qes -t "("
-    rshift : qes -t ")"
-  '';
+  # nixpkgs.overlays = mkAfter [
+  #   (import <dotfiles/nixpkgs/overlays/20-trivial-overrides.nix>)
+  #   (import <dotfiles/nixpkgs/overlays/50-trivial-packages.nix>)
+  # ];
 
   services.chunkwm.package = pkgs.chunkwm;
   services.chunkwm.hotload = false;
@@ -432,6 +430,9 @@
   # TODO: add module for per-user config, etc, ...
   # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile <dotfiles/git/gitconfig>;
   system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
+
+  users.nix.configureBuildUsers = true;
+  users.nix.nrBuildUsers = 32;
 
   # You should generally set this to the total number of logical cores in your system.
   # $ sysctl -n hw.ncpu
