@@ -19,6 +19,7 @@ let
       [ configuration
         packages
         ./modules/alias.nix
+        ./modules/security/pki
         ./modules/system
         ./modules/system/checks.nix
         ./modules/system/activation-scripts.nix

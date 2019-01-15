@@ -3,7 +3,6 @@
 with lib;
 
 let
-
   cfg = config.environment;
 
   exportVariables =
@@ -13,10 +12,10 @@ let
     mapAttrsFlatten (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
 
   makeDrvBinPath = concatMapStringsSep ":" (p: if isDerivation p then "${p}/bin" else p);
+in
 
-in {
+{
   options = {
-
     environment.systemPackages = mkOption {
       type = types.listOf types.package;
       default = [];
@@ -147,7 +146,6 @@ in {
       '';
       type = types.lines;
     };
-
   };
 
   config = {
@@ -172,8 +170,7 @@ in {
     '';
 
     environment.variables =
-      { NIX_SSL_CERT_FILE = mkDefault "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-        EDITOR = mkDefault "nano";
+      { EDITOR = mkDefault "nano";
         PAGER = mkDefault "less -R";
       };
 
