@@ -37,7 +37,7 @@
       pkgs.awscli
       pkgs.bear
       pkgs.brotli
-      pkgs.cachix
+      # pkgs.cachix
       pkgs.ctags
       pkgs.curl
       pkgs.direnv
