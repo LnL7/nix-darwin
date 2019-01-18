@@ -8,14 +8,14 @@ let
 in
 
 {
-   environment.systemPackages = [ pkgs.hello ];
+   environment.systemPackages = [ hello ];
 
    test = ''
      echo checking hello binary in /sw/bin >&2
      test -e ${config.out}/sw/bin/hello
-     test "$(readlink -f ${config.out}/sw/bin/hello)" = "${pkgs.hello}/bin/hello"
+     test "$(readlink -f ${config.out}/sw/bin/hello)" = "${hello}/bin/hello"
 
      echo checking for unexpected paths in /sw/bin >&2
-     ! test -e ${config.out}/sw/lib/libhello.dylib
+     test -e ${config.out}/sw/lib/libhello.dylib && return
    '';
 }
