@@ -12,6 +12,14 @@ let
   releaseFile = "${toString pkgs.path}/.version";
   revisionFile = "${toString pkgs.path}/.git-revision";
   suffixFile = "${toString pkgs.path}/.version-suffix";
+
+  revision = if builtins.pathExists gitRepo then gitCommitId
+             else if builtins.pathExists revisionFile then fileContents revisionFile
+             else null;
+
+  versionSuffix = if builtins.pathExists gitRepo then ".git." + gitCommitId
+                  else if builtins.pathExists suffixFile then fileContents suffixFile
+                  else null;
 in
 
 {
@@ -71,8 +79,8 @@ in
     # These defaults are set here rather than up there so that
     # changing them would not rebuild the manual
     system.nixpkgsVersion = mkDefault (cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix);
-    system.nixpkgsRevision = mkIf (builtins.pathExists gitRepo) (mkDefault gitCommitId);
-    system.nixpkgsVersionSuffix = mkIf (builtins.pathExists gitRepo) (mkDefault (".git." + gitCommitId));
+    system.nixpkgsRevision = mkIf (revision != null) (mkDefault revision);
+    system.nixpkgsVersionSuffix = mkIf (versionSuffix != null) (mkDefault versionSuffix);
 
     assertions = [ { assertion = cfg.stateVersion <= defaultStateVersion; message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value"; } ];
 
