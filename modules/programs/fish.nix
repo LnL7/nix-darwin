@@ -115,10 +115,20 @@ in
 
       # clear fish_function_path so that it will be correctly set when we return to $__fish_datadir/config.fish
       set -e fish_function_path
+
+      # As part of fish's startup on darwin, it will apply the
+      # path_helper. This will unfortunately shuffle the contents of
+      # the PATH variable, that was either just set, or intended to be
+      # inherited.
+      set -g __fish_nix_darwin_preinit_path $PATH
     '';
 
     environment.etc."fish/config.fish".text = ''
       # /etc/fish/config.fish: DO NOT EDIT -- this file has been generated automatically.
+
+      # Restore the pre path_helper value of PATH
+      set -xg PATH $__fish_nix_darwin_preinit_path
+      set -e __fish_nix_darwin_preinit_path
 
       # if we haven't sourced the general config, do it
       if not set -q __fish_nix_darwin_general_config_sourced
