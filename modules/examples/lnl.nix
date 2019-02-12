@@ -82,8 +82,10 @@
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
   nix.trustedUsers = [ "@admin" ];
-  nix.useSandbox = true;
   nix.package = pkgs.nixUnstable;
+
+  nix.useSandbox = true;
+  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/dev" "/bin/sh" "/usr/bin/env" ];
 
   programs.nix-index.enable = true;
 
