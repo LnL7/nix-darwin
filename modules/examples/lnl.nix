@@ -85,7 +85,7 @@
   nix.package = pkgs.nixUnstable;
 
   nix.useSandbox = true;
-  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/dev" "/bin/sh" "/usr/bin/env" ];
+  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/private/tmp" "/private/var/tmp" "/dev" "/bin/sh" "/usr/bin/env" ];
 
   programs.nix-index.enable = true;
 
