@@ -90,7 +90,7 @@
   nix.package = pkgs.nixUnstable;
 
   nix.useSandbox = true;
-  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/private/tmp" "/private/var/tmp" "/dev" "/bin/sh" "/usr/bin/env" ];
+  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
 
   programs.nix-index.enable = true;
 
@@ -118,6 +118,13 @@
     set -g status-bg black
     set -g status-fg white
     set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
+  '';
+
+  programs.tmux.defaultCommand = "IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/sandbox.sb ${config.environment.loginShell}";
+  environment.etc."nix/sandbox.sb".text = ''
+    (version 1)
+    (allow default)
+    (deny file-write* (subpath "/nix"))
   '';
 
   # programs.vim.enable = true;
@@ -181,6 +188,10 @@
 
     PS1='%F{red}%B%(?..%? )%b%f%# '
     RPS1='$(_prompt_nix)%F{green}%~%f'
+
+    if [ -z "$IN_NIX_SANDBOX" ]; then
+      PS1+='%F{red}[no-sandbox]%f '
+    fi
   '';
 
   programs.zsh.loginShellInit = ''
@@ -322,6 +333,10 @@
         unset __ETC_ZSHRC_SOURCED
         host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
         exec tmux new-session -A -s "$host" "$@"
+    }
+
+    no-sandbox() {
+      tmux split-window -c '#{pane_current_path}' -p 25 $SHELL -l
     }
   '';
 

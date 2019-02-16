@@ -86,7 +86,6 @@ let
 
           (allow process-fork)
           (allow signal (target same-sandbox))
-          (deny file-write* (subpath "/nix/store"))
           (allow file-read* process-exec
                  $storePaths)
 
