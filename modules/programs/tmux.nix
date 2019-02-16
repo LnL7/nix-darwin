@@ -80,6 +80,11 @@ in
       description = "Cater to iTerm2 and its tmux integration, as appropriate.";
     };
 
+    programs.tmux.defaultCommand = mkOption {
+      type = types.either types.str types.package;
+      description = "The default command to use for tmux panes.";
+    };
+
     programs.tmux.tmuxOptions = mkOption {
       internal = true;
       type = types.attrsOf (types.submodule text);
@@ -111,8 +116,10 @@ in
       source-file -q /etc/tmux.conf.local
     '';
 
+    programs.tmux.defaultCommand = mkDefault config.environment.loginShell;
+
     programs.tmux.tmuxOptions.login-shell.text = ''
-      set -g default-command "${config.environment.loginShell}"
+      set -g default-command "${cfg.defaultCommand}"
     '';
 
     programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible ''
