@@ -61,6 +61,8 @@ let
 
       config = {
 
+        allowSystemPaths = mkDefault (config.allowLocalNetworking || config.allowNetworking);
+
         profile = mkOrder 0 ''
           (version 1)
           (deny default)
@@ -97,9 +99,17 @@ let
                  ${concatMapStrings (x: ''(subpath "${x}")'') config.writablePaths})
           ''}
           ${optionalString config.allowSystemPaths ''
-          (allow file-read* process-exec
-                 (subpath "/bin")
-                 (subpath "/usr/bin"))
+          (allow file-read-metadata
+                 (literal "/")
+                 (literal "/etc")
+                 (literal "/run")
+                 (literal "/tmp")
+                 (literal "/var"))
+          (allow file-read*
+                 (literal "/private/etc/group")
+                 (literal "/private/etc/hosts")
+                 (literal "/private/etc/passwd")
+                 (literal "/private/var/run/resolv.conf"))
           ''}
           ${optionalString config.allowLocalNetworking ''
           (allow network* (local ip) (local tcp) (local udp))
