@@ -20,6 +20,7 @@ let
         packages
         ./modules/alias.nix
         ./modules/security/pki
+        ./modules/security/sandbox
         ./modules/system
         ./modules/system/checks.nix
         ./modules/system/activation-scripts.nix
