@@ -42,12 +42,12 @@ in {
       };
     };
   };
-  
+
   config = {
     system.activationScripts.fonts.text = "" + optionalString cfg.enableFontDir ''
       # Set up fonts.
       echo "resetting fonts..." >&2
-      fontrestore default -n 2>&1 | grep -o '/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
+      fontrestore default -n 2>&1 | grep -o '^/Library/Fonts/.*' | tr '\n' '\0' | xargs -0 rm || true
       echo "updating fonts..." >&2
       ${fontLinks libraryLink systemFontsDir}
     '';
