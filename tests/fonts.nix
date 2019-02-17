@@ -12,9 +12,13 @@ in
   fonts.fonts = [ font ];
  
   test = ''
-    echo checking installed fonts >&2
-    grep -o "fontrestore default -n" ${config.out}/activate
-    grep -o "ln -fn '/run/current-system/sw/share/fonts/Font.ttf' '/Library/Fonts/Font.ttf'" ${config.out}/activate
+    echo "checking fonts in /Library/Fonts" >&2
+    test -e ${config.out}/Library/Fonts/Font.ttf
+
+    echo "checking activation of fonts in /activate" >&2
+    grep "fontrestore default -n 2>&1" ${config.out}/activate
+    grep 'ln -fn ".*" /Library/Fonts' ${config.out}/activate
+    grep 'rm "/Library/Fonts/.*"' ${config.out}/activate
   '';
 }
 

@@ -91,6 +91,7 @@ in
 
         mkdir -p $out/Library
         ln -s ${cfg.build.applications}/Applications $out/Applications
+        ln -s ${cfg.build.fonts}/Library/Fonts $out/Library/Fonts
         ln -s ${cfg.build.launchd}/Library/LaunchAgents $out/Library/LaunchAgents
         ln -s ${cfg.build.launchd}/Library/LaunchDaemons $out/Library/LaunchDaemons
 
