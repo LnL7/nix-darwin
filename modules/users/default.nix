@@ -158,5 +158,16 @@ in
       '') deletedUsers}
     '';
 
+    environment.etc = mapAttrs' (name: { packages, ... }: {
+      name = "profiles/per-user/${name}";
+      value.source = pkgs.buildEnv {
+        name = "user-environment";
+        paths = packages;
+        inherit (config.environment) pathsToLink extraOutputsToInstall;
+        inherit (config.system.path) postBuild;
+      };
+    }) (filterAttrs (_: u: u.packages != []) cfg.users);
+
+    environment.profiles = [ "/etc/profiles/per-user/$USER" ];
   };
 }
