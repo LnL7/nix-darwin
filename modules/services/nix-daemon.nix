@@ -45,10 +45,10 @@ in
 
     launchd.daemons.nix-daemon = {
       command = "${config.nix.package}/bin/nix-daemon";
-      serviceConfig.ProcessType = "Interactive";
+      serviceConfig.ProcessType = mkDefault "Interactive";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
       serviceConfig.Nice = config.nix.daemonNiceLevel;
-      serviceConfig.SoftResourceLimits.NumberOfFiles = 4096;
+      serviceConfig.SoftResourceLimits.NumberOfFiles = mkDefault 4096;
       serviceConfig.StandardErrorPath = cfg.logFile;
 
       serviceConfig.KeepAlive = mkIf (!cfg.enableSocketListener) true;
@@ -63,7 +63,7 @@ in
         { NIX_SSL_CERT_FILE = mkDefault config.environment.variables.NIX_SSL_CERT_FILE;
           TMPDIR = mkIf (cfg.tempDir != null) cfg.tempDir;
           # FIXME: workaround for https://github.com/NixOS/nix/issues/2523
-          OBJC_DISABLE_INITIALIZE_FORK_SAFETY = "YES";
+          OBJC_DISABLE_INITIALIZE_FORK_SAFETY = mkDefault "YES";
         }
       ];
     };
