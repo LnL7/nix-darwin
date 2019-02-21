@@ -5,10 +5,8 @@ with lib;
 {
   imports = [ <user-darwin-config> ];
 
-  # NOTE: don't set this outside of the installer.
   users.nix.configureBuildUsers = true;
   users.knownGroups = [ "nixbld" ];
-  users.knownUsers = [ "nixbld1" "nixbld2" "nixbld3" "nixbld4" "nixbld5" "nixbld6" "nixbld7" "nixbld8" "nixbld9" "nixbld10" ];
 
   system.activationScripts.preUserActivation.text = mkBefore ''
     PATH=/nix/var/nix/profiles/default/bin:$PATH

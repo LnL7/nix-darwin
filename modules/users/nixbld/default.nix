@@ -41,7 +41,7 @@ in
         name = "integer";
         check = t: isInt t && t > 1;
       };
-      default = 10;
+      default = 32;
       description = "Number of nixbld user accounts created to perform secure concurrent builds.";
     };
   };
@@ -56,6 +56,9 @@ in
 
     users.groups = mkIf cfg.nix.configureBuildUsers buildGroups;
     users.users = mkIf cfg.nix.configureBuildUsers buildUsers;
+
+    users.knownGroups = mkIf cfg.nix.configureBuildUsers [ "nixbld" ];
+    users.knownUsers = mkIf cfg.nix.configureBuildUsers (mkUsers (i: "nixbld${toString i}"));
 
   };
 }
