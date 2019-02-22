@@ -139,8 +139,10 @@ in
           dscl . -create '/Users/${v.name}' RealName '${v.description}'
           dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
           dscl . -create '/Users/${v.name}' UserShell '${v.shell}'
-          mkdir -p '${v.home}'
-          chown '${toString v.uid}:${toString v.gid}' '${v.home}'
+          ${optionalString (v.home != "/var/empty") ''
+            mkdir -p '${v.home}'
+            chown '${toString v.uid}:${toString v.gid}' '${v.home}'
+          ''}
         else
           if [ "$u" -ne ${toString v.uid} ]; then
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
