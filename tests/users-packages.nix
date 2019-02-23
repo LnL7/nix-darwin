@@ -24,5 +24,8 @@ in
 
     echo checking for unexpected paths in /etc/profiles/per-user/foo/bin >&2
     test -e ${config.out}/etc/profiles/per-user/foo/lib/libhello.dylib && return
+
+    echo "checking /etc/profiles/per-user/foo/bin in environment" >&2
+    grep 'export PATH=.*:/etc/profiles/per-user/$USER/bin' ${config.system.build.setEnvironment}
   '';
 }

@@ -17,6 +17,8 @@ let
   createdUsers = mapAttrsToList (n: v: v) (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
   deletedGroups = filter (n: isDeleted cfg.groups n) cfg.knownGroups;
   deletedUsers = filter (n: isDeleted cfg.users n) cfg.knownUsers;
+
+  packageUsers = filterAttrs (_: u: u.packages != []) cfg.users;
 in
 
 {
@@ -166,8 +168,8 @@ in
         inherit (config.environment) pathsToLink extraOutputsToInstall;
         inherit (config.system.path) postBuild;
       };
-    }) (filterAttrs (_: u: u.packages != []) cfg.users);
+    }) packageUsers;
 
-    environment.profiles = mkOrder 900 [ "/etc/profiles/per-user/$USER" ];
+    environment.profiles = mkIf (packageUsers != {}) (mkOrder 900 [ "/etc/profiles/per-user/$USER" ]);
   };
 }
