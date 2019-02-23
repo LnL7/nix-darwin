@@ -152,12 +152,11 @@ in
 
     environment.systemPath = [ (makeBinPath cfg.profiles) "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ];
 
-    environment.profiles =
-      [ # Use user, default and system profiles.
-        "$HOME/.nix-profile"
-        "/run/current-system/sw"
-        "/nix/var/nix/profiles/default"
-      ];
+    # Use user, default and system profiles.
+    environment.profiles = mkMerge [
+      (mkOrder 800 [ "$HOME/.nix-profile" ])
+      [ "/run/current-system/sw" "/nix/var/nix/profiles/default" ]
+    ];
 
     environment.pathsToLink = [ "/bin" "/share/locale" ];
 

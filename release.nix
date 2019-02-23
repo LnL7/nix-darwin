@@ -117,6 +117,7 @@ let
     tests.system-path = makeTest ./tests/system-path.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
+    tests.users-packages = makeTest ./tests/users-packages.nix;
     tests.fonts = makeTest ./tests/fonts.nix;
 
   }
