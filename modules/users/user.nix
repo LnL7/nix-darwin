@@ -51,6 +51,12 @@ with lib;
       description = "The user's home directory.";
     };
 
+    createHome = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Create the home directory when creating the user.";
+    };
+
     shell = mkOption {
       type = types.either types.shellPackage types.path;
       default = "/sbin/nologin";

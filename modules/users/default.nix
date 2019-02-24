@@ -139,6 +139,7 @@ in
           dscl . -create '/Users/${v.name}' RealName '${v.description}'
           dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
           dscl . -create '/Users/${v.name}' UserShell '${v.shell}'
+          ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
         else
           if [ "$u" -ne ${toString v.uid} ]; then
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2

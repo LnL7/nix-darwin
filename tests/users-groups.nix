@@ -15,6 +15,7 @@
   users.users.foo.description = "Foo user";
   users.users.foo.isHidden = false;
   users.users.foo.home = "/Users/foo";
+  users.users.foo.createHome = true;
   users.users.foo.shell = "/run/current-system/sw/bin/bash";
 
   users.users."created.user".uid = 42001;
@@ -47,6 +48,7 @@
     grep "dscl . -create '/Users/foo' NFSHomeDirectory '/Users/foo'" ${config.out}/activate
     grep "dscl . -create '/Users/foo' UserShell '/run/current-system/sw/bin/bash'" ${config.out}/activate
     grep "dscl . -create '/Users/created.user' UniqueID 42001" ${config.out}/activate
+    grep "createhomedir -cu 'foo'" ${config.out}/activate
     grep -qv "dscl . -delete '/Groups/created.user'" ${config.out}/activate
 
     echo "checking user deletion in /activate" >&2
