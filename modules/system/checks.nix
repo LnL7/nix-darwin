@@ -83,21 +83,21 @@ let
   '';
 
   nixPath = ''
-    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin-config>' || echo "$HOME/.nixpkgs/darwin-configuration.nix") || true
+    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
-        echo "Create $darwinConfig or set environment.darwinConfig:" >&2
+        echo "Create ''${darwinConfig:-~/.nixpkgs/darwin-configuration.nix} or set environment.darwinConfig:" >&2
         echo >&2
-        echo "    environment.darwinConfig = \"$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo '***')\";" >&2
+        echo "    environment.darwinConfig = \"$(nix-instantiate --find-file darwin-config 2> /dev/null || echo '***')\";" >&2
         echo >&2
         echo "And rebuild using (only required once)" >&2
-        echo "$ darwin-rebuild switch -I \"darwin-config=$(nix-instantiate --eval -E '<darwin-config>' 2> /dev/null || echo '***')\"" >&2
+        echo "$ darwin-rebuild switch -I \"darwin-config=$(nix-instantiate --find-file darwin-config 2> /dev/null || echo '***')\"" >&2
         echo >&2
         echo >&2
         exit 2
     fi
 
-    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>') || true
+    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file darwin) || true
     if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set nix.nixPath:" >&2
@@ -106,12 +106,12 @@ let
         echo >&2
         echo "or set" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"darwin=$(nix-instantiate --eval -E '<darwin>')\" ];" >&2
+        echo "    nix.nixPath = [ \"darwin=$(nix-instantiate --find-file darwin 2> /dev/null || echo '***')\" ];" >&2
         echo >&2
         exit 2
     fi
 
-    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<nixpkgs>') || true
+    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file nixpkgs) || true
     if ! test -e "$nixpkgsPath"; then
         echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
         echo "Add a nixpkgs channel or set nix.nixPath:" >&2
@@ -120,7 +120,7 @@ let
         echo >&2
         echo "or set" >&2
         echo >&2
-        echo "    nix.nixPath = [ \"nixpkgs=$(nix-instantiate --eval -E '<nixpkgs>')\" ];" >&2
+        echo "    nix.nixPath = [ \"nixpkgs=$(nix-instantiate --find-file nixpkgs 2> /dev/null || echo '***')\" ];" >&2
         echo >&2
         exit 2
     fi

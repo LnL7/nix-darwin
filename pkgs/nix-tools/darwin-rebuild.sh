@@ -96,7 +96,7 @@ if ! [ "$action" = build ]; then
 fi
 
 if [ "$action" = edit ]; then
-  darwinConfig=$(nix-instantiate --eval --strict -E "<darwin-config>")
+  darwinConfig=$(nix-instantiate --find-file darwin-config)
   exec ${EDITOR:-nano} "$darwinConfig"
 fi
 
