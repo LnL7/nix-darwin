@@ -1,3 +1,9 @@
+2019-02-23
+- The users module now supports declarative per-user packages similar to nixos.
+  eg.
+
+    users.users.<name>.packages = [ pkgs.hello ];
+
 2019-01-02
 - The NIX_PATH validation can be disabled now, this is particularly useful if
   the darwin configuration is deployed from another machine in which case it
