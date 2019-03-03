@@ -232,6 +232,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.trackpad.scaling" = mkOption {
+      type = types.nullOr float;
+      default = null;
+      description = ''
+        Configures the trackpad tracking speed (0 to 3).  The default is "1".
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.springing.enabled" = mkOption {
       type = types.nullOr types.bool;
       default = null;
@@ -254,6 +262,30 @@ in {
       default = null;
       description = ''
         Whether to enable "Natural" scrolling direction.  The default is true.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleMeasurementUnits = mkOption {
+      type = types.nullOr (types.enum [ "Centimeters" "Inches" ]);
+      default = null;
+      description = ''
+        Whether to use centimeters (metric) or inches (US, UK) as the measurement unit.  The default is based on region settings.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleMetricUnits = mkOption {
+      type = types.nullOr (types.enum [ 0 1 ]);
+      default = null;
+      description = ''
+        Whether to use the metric system.  The default is based on region settings.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleTemperatureUnit = mkOption {
+      type = types.nullOr (types.enum [ "Celsius" "Fahrenheit" ]);
+      default = null;
+      description = ''
+        Whether to use Celsius or Fahrenheit.  The default is based on region settings.
       '';
     };
 
