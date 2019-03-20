@@ -111,7 +111,7 @@
     bind-key -r ">" swap-window -t +1
 
     bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
-    bind-key -n M-R run "tmux send-keys -t $(hostname -s | awk -F'-' '{print tolower($NF)}') C-l Up Enter"
+    bind-key -n M-t run "tmux send-keys -t _ C-l Up Enter"
 
     set -g pane-active-border-style fg=black
     set -g pane-border-style fg=black
@@ -120,8 +120,8 @@
     set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
   '';
 
-  programs.tmux.defaultCommand = "IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/sandbox.sb ${config.environment.loginShell}";
-  environment.etc."nix/sandbox.sb".text = ''
+  programs.tmux.defaultCommand = "IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb ${config.environment.loginShell}";
+  environment.etc."nix/user-sandbox.sb".text = ''
     (version 1)
     (allow default)
     (deny file-write* (subpath "/nix"))
@@ -319,24 +319,27 @@
 
     reexec() {
         unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
-        unset __ETC_ZPROFILE_SOURCED
-        unset __ETC_ZSHENV_SOURCED
-        unset __ETC_ZSHRC_SOURCED
+        unset __ETC_ZPROFILE_SOURCED __ETC_ZSHENV_SOURCED __ETC_ZSHRC_SOURCED
         exec $SHELL -c 'echo >&2 "reexecuting shell: $SHELL" && exec $SHELL -l'
     }
 
     reexec-tmux() {
-        local host
         unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
-        unset __ETC_ZPROFILE_SOURCED
-        unset __ETC_ZSHENV_SOURCED
-        unset __ETC_ZSHRC_SOURCED
-        host=$(hostname -s | awk -F'-' '{print tolower($NF)}')
-        exec tmux new-session -A -s "$host" "$@"
+        unset __ETC_ZPROFILE_SOURCED __ETC_ZSHENV_SOURCED __ETC_ZSHRC_SOURCED
+        exec tmux new-session -A -s _ "$@"
+    }
+
+    reexec-sandbox() {
+        unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
+        unset __ETC_ZPROFILE_SOURCED __ETC_ZSHENV_SOURCED __ETC_ZSHRC_SOURCED
+        exec IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb exec $SHELL -l
     }
 
     no-sandbox() {
-      tmux split-window -c '#{pane_current_path}' -p 25 $SHELL -l
+        tmux split-window -c '#{pane_current_path}' -p 25 $SHELL -l
+        if [ $# -gt 0 ]; then
+            tmux send-keys -t . "$*" Enter
+        fi
     }
   '';
 
