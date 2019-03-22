@@ -92,6 +92,7 @@ let
     tests.activation-scripts = makeTest ./tests/activation-scripts.nix;
     tests.checks-nix-gc = makeTest ./tests/checks-nix-gc.nix;
     tests.environment-path = makeTest ./tests/environment-path.nix;
+    tests.launchd-daemons = makeTest ./tests/launchd-daemons.nix;
     tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
     tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
     tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
