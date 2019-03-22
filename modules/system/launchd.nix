@@ -128,6 +128,9 @@ in
 
       ${concatStringsSep "\n" (launchdVariables config.launchd.user.envVariables)}
 
+      ${optionalString (builtins.length userLaunchAgents > 0) ''
+      mkdir -p ~/Library/LaunchAgents
+      ''}
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 
       for f in $(ls /run/current-system/user/Library/LaunchAgents 2> /dev/null); do
