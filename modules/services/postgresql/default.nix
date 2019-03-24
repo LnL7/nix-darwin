@@ -5,6 +5,25 @@ with lib;
 let
   cfg = config.services.postgresql;
 
+  postgresqlAndPlugins = pg:
+    if cfg.extraPlugins == [] then pg
+    else pkgs.buildEnv {
+      name = "postgresql-and-plugins-${(builtins.parseDrvName pg.name).version}";
+      paths = [ pg pg.lib ] ++ cfg.extraPlugins;
+      # We include /bin to ensure the $out/bin directory is created which is
+      # needed because we'll be removing files from that directory in postBuild
+      # below.
+      pathsToLink = [ "/" "/bin" ];
+      buildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        rm $out/bin/{pg_config,postgres,pg_ctl}
+        cp --target-directory=$out/bin ${pg}/bin/{postgres,pg_config,pg_ctl}
+        wrapProgram $out/bin/postgres --set NIX_PGLIBDIR $out/lib
+      '';
+    };
+
+  postgresql = postgresqlAndPlugins cfg.package;
+
   configFile = pkgs.writeText "postgresql.conf"
     ''
       log_destination = 'stderr'
@@ -52,6 +71,19 @@ in
         '';
       };
 
+      extraPlugins = mkOption {
+        type = types.listOf types.path;
+        default = [];
+        example = literalExample "[ (pkgs.postgis.override { postgresql = pkgs.postgresql94; }) ]";
+        description = ''
+          When this list contains elements a new store path is created.
+          PostgreSQL and the elements are symlinked into it. Then pg_config,
+          postgres and pg_ctl are copied to make them use the new
+          $out/lib directory as pkglibdir. This makes it possible to use postgis
+          without patching the .sql files which reference $libdir/postgis-1.5.
+        '';
+      };
+
       extraConfig = mkOption {
         type = types.lines;
         default = "";
@@ -62,10 +94,10 @@ in
 
   config = mkIf cfg.enable {
 
-    environment.systemPackages = [ cfg.package ];
+    environment.systemPackages = [ postgresql ];
 
     launchd.user.agents.postgresql =
-      { path = [ cfg.package ];
+      { path = [ postgresql ];
         script = ''
           # Initialise the database.
           if ! test -e ${cfg.dataDir}/PG_VERSION; then
@@ -73,7 +105,7 @@ in
           fi
           ln -sfn ${configFile} ${cfg.dataDir}/postgresql.conf
 
-          exec ${cfg.package}/bin/postgres -D ${cfg.dataDir} ${optionalString cfg.enableTCPIP "-i"}
+          exec ${postgresql}/bin/postgres -D ${cfg.dataDir} ${optionalString cfg.enableTCPIP "-i"}
         '';
 
         serviceConfig.KeepAlive = true;
