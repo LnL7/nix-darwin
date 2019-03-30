@@ -71,7 +71,7 @@ in
           if ! test -e ${cfg.dataDir}/PG_VERSION; then
             initdb -U postgres -D ${cfg.dataDir}
           fi
-          ln -sfn ${configFile} ${cfg.dataDir}/postgresql.conf
+          ${pkgs.coreutils}/bin/ln -sfn ${configFile} ${cfg.dataDir}/postgresql.conf
 
           exec ${cfg.package}/bin/postgres -D ${cfg.dataDir} ${optionalString cfg.enableTCPIP "-i"}
         '';
