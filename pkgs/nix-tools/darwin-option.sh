@@ -4,7 +4,7 @@ set -o pipefail
 export PATH=@path@:$PATH
 
 evalNix() {
-  nix-instantiate --eval --strict -E "with import <darwin> {}; $*"
+  nix-instantiate --eval --strict "${extraEvalFlags[@]}" -E "with import <darwin> {}; $*"
 }
 
 evalAttrs() {
@@ -21,7 +21,7 @@ evalOptText() {
 }
 
 showSyntax() {
-  echo "$0: <option>" >&2
+  echo "$0: [-I path] <option>" >&2
   eval printf "$(evalAttrs "options")"
   echo
   exit 1
@@ -29,6 +29,7 @@ showSyntax() {
 
 # Parse the command line.
 origArgs=("$@")
+extraEvalFlags=()
 option=
 
 while [ "$#" -gt 0 ]; do
@@ -36,6 +37,14 @@ while [ "$#" -gt 0 ]; do
   case "$i" in
     --help)
       showSyntax
+      ;;
+    -I)
+      if [ -z "$1" ]; then
+        echo "$0: ‘$i’ requires an argument"
+        exit 1
+      fi
+      j="$1"; shift 1
+      extraEvalFlags+=("$i" "$j")
       ;;
     *)
       option="$i"
