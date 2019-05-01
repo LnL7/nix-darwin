@@ -1,3 +1,17 @@
+2019-05-01
+- nix.nixPath entries are now merged by default
+  system.stateVersion > 3
+
+    For the original behaviour, override the option using a higher priority.
+
+    nix.nixPath = lib.mkForce [ "darwin-config=/configuration.nix" ... ];
+
+  This option also supports specifying named NIX_PATH entries using an
+  attribute set now.
+
+    nix.nixPath = [{ darwin = "/src/darwin"; }];
+
+
 2019-02-23
 - The users module now supports declarative per-user packages similar to nixos.
   eg.
