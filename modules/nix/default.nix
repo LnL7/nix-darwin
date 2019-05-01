@@ -363,11 +363,18 @@ in
     nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
     nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
 
-    nix.nixPath = mkIf (config.system.stateVersion < 2) (mkDefault
+    nix.nixPath = mkMerge [
+      (mkIf (config.system.stateVersion < 2) (mkDefault
       [ "darwin=$HOME/.nix-defexpr/darwin"
         "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
         "/nix/var/nix/profiles/per-user/root/channels"
-      ]);
+      ]))
+      (mkIf (config.system.stateVersion > 3) (mkOrder 1200
+      [ { darwin-config = "${config.environment.darwinConfig}"; }
+        "/nix/var/nix/profiles/per-user/root/channels"
+        "$HOME/.nix-defexpr/channels"
+      ]))
+    ];
 
 
     nix.package = mkIf (config.system.stateVersion < 3)
