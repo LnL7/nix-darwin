@@ -311,17 +311,44 @@ in
     };
 
     nix.nixPath = mkOption {
-      type = types.listOf types.str;
+      type = mkOptionType {
+        name = "nix path";
+        merge = loc: defs:
+          let
+            values = flatten (map (def:
+              (map (x:
+                if isAttrs x then (mapAttrsToList nameValuePair x)
+                else if isString x then x
+                else throw "The option value `${showOption loc}` in `${def.file}` is not a attset or string.")
+                (if isList def.value then def.value else [def.value]))) defs);
+
+            namedPaths = mapAttrsToList (n: v: "${n}=${(head v).value}")
+              (zipAttrs
+                (map (x: { "${x.name}" = { inherit (x) value; }; })
+                (filter isAttrs values)));
+
+            searchPaths = unique
+              (filter isString values);
+          in
+            namedPaths ++ searchPaths;
+      };
       default =
         [ # Include default path <darwin-config>.
-          "darwin-config=${config.environment.darwinConfig}"
+          { darwin-config = "${config.environment.darwinConfig}"; }
           "/nix/var/nix/profiles/per-user/root/channels"
           "$HOME/.nix-defexpr/channels"
+        ];
+      example =
+        [ { trunk = "/src/nixpkgs"; }
         ];
       description = ''
         The default Nix expression search path, used by the Nix
         evaluator to look up paths enclosed in angle brackets
         (e.g. <literal>&lt;nixpkgs&gt;</literal>).
+
+        Named entries can be specified using an attribute set, if an
+        entry is configured multiple times the value with the lowest
+        ordering will be used.
       '';
     };
   };
@@ -341,6 +368,7 @@ in
         "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
         "/nix/var/nix/profiles/per-user/root/channels"
       ]);
+
 
     nix.package = mkIf (config.system.stateVersion < 3)
       (mkDefault "/nix/var/nix/profiles/default");
