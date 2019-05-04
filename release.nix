@@ -6,10 +6,15 @@
 let
   inherit (release) mapTestOn packagePlatforms pkgs all linux darwin;
 
+  system = "x86_64-darwin";
+
   mapPlatforms = systems: pkgs.lib.mapAttrs (n: v: systems);
 
-  genExample = configuration: pkgs.lib.genAttrs [ "x86_64-darwin" ] (system:
-    (import ./. { inherit nixpkgs configuration system; }).system
+  buildFromConfig = configuration: sel: sel
+    (import ./. { inherit nixpkgs configuration system; }).config;
+
+  makeSystem = configuration: pkgs.lib.genAttrs [ system ] (system:
+    buildFromConfig configuration (config: config.system.build.toplevel)
   );
 
   makeTest = test:
@@ -47,10 +52,8 @@ let
             out = config.system.build.toplevel;
           };
         };
-
-      system = "x86_64-darwin";
     in
-      (import ./. { inherit nixpkgs configuration system; }).config.system.build.run-test;
+      buildFromConfig configuration (config: config.system.build.run-test);
 
   release = import <nixpkgs/pkgs/top-level/release-lib.nix> {
     inherit supportedSystems scrubJobs;
@@ -85,9 +88,14 @@ let
       meta.description = "Release-critical builds for the darwin channel";
     };
 
-    examples.hydra = genExample ./modules/examples/hydra.nix;
-    examples.lnl = genExample ./modules/examples/lnl.nix;
-    examples.simple = genExample ./modules/examples/simple.nix;
+    manualHTML = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualHTML);
+    manualEpub = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualEpub);
+    manpages = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manpages);
+    options = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.optionsJSON);
+
+    examples.hydra = makeSystem ./modules/examples/hydra.nix;
+    examples.lnl = makeSystem ./modules/examples/lnl.nix;
+    examples.simple = makeSystem ./modules/examples/simple.nix;
 
     tests.activation-scripts = makeTest ./tests/activation-scripts.nix;
     tests.checks-nix-gc = makeTest ./tests/checks-nix-gc.nix;
