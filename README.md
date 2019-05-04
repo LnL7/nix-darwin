@@ -128,22 +128,14 @@ Description:
 Whether to activate system at boot time.
 ```
 
-## Modules
+## Documentation
 
-- [`environment`](https://github.com/LnL7/nix-darwin/blob/master/modules/environment)
-- [`fonts`](https://github.com/LnL7/nix-darwin/blob/master/modules/fonts)
-- [`launchd.daemons`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)
-- [`launchd.envVariables`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd)
-- [`launchd.user.agents`](https://github.com/LnL7/nix-darwin/blob/master/modules/launchd/launchd.nix)
-- [`networking`](https://github.com/LnL7/nix-darwin/blob/master/modules/networking)
-- [`nix`](https://github.com/LnL7/nix-darwin/tree/master/modules/nix)
-- [`programs`](https://github.com/LnL7/nix-darwin/tree/master/modules/programs)
-- [`services`](https://github.com/LnL7/nix-darwin/tree/master/modules/services)
-- [`system.defaults`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/defaults)
-- [`system.keyboard`](https://github.com/LnL7/nix-darwin/tree/master/modules/system/keyboard.nix)
-- [`system`](https://github.com/LnL7/nix-darwin/tree/master/modules/system)
-- [`time`](https://github.com/LnL7/nix-darwin/tree/master/modules/time)
-- [`users`](https://github.com/LnL7/nix-darwin/tree/master/modules/users)
+Reference documentation of all the options is available here
+https://lnl7.github.io/nix-darwin/manual/index.html#sec-options.
+This can also be accessed locally using `man 5 configuration.nix`.
+
+There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
+specific topics, like macOS upgrades.
 
 ## Tests
 
