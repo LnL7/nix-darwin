@@ -1,0 +1,42 @@
+<reference xmlns="http://docbook.org/ns/docbook"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:xi="http://www.w3.org/2001/XInclude">
+ <title>Darwin Reference Pages</title>
+ <info>
+  <author><personname><firstname>Daiderd</firstname><surname>Jordan</surname></personname>
+   <contrib>Author</contrib>
+  </author>
+  <copyright><year>2016-2019</year><holder>Daiderd Jordan</holder>
+  </copyright>
+ </info>
+
+ <refentry>
+  <refmeta>
+   <refentrytitle><filename>configuration.nix</filename>
+   </refentrytitle><manvolnum>5</manvolnum>
+   <refmiscinfo class="source">Darwin</refmiscinfo>
+ <!-- <refmiscinfo class="version"><xi:include href="version.txt" parse="text"/></refmiscinfo> -->
+  </refmeta>
+  <refnamediv>
+   <refname><filename>configuration.nix</filename>
+   </refname><refpurpose>Darwin system configuration specification</refpurpose>
+  </refnamediv>
+  <refsection>
+   <title>Description</title>
+   <para>
+    The file <filename>configuration.nix</filename> contains the
+    declarative specification of your Darwin system configuration. The command
+    <command>darwin-rebuild</command> takes this file and realises the system
+    configuration specified therein.
+   </para>
+  </refsection>
+  <refsection>
+   <title>Options</title>
+   <para>
+    You can use the following options in <filename>configuration.nix</filename>.
+   </para>
+   <xi:include href="./generated/options-db.xml"
+               xpointer="configuration-variable-list" />
+  </refsection>
+ </refentry>
+</reference>

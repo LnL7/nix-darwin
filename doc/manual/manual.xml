@@ -1,0 +1,21 @@
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      version="5.0"
+      xml:id="book-darwin-manual">
+ <info>
+  <title>Darwin Manual</title>
+  <subtitle>Version <xi:include href="./generated/version" parse="text" />
+  </subtitle>
+ </info>
+ <preface xml:id="preface">
+  <title>Preface</title>
+  <para>Nix modules for darwin.</para>
+ </preface>
+ <chapter xml:id="sec-options">
+  <title>Configuration Options</title>
+  <xi:include href="./generated/options-db.xml"
+              xpointer="configuration-variable-list" />
+ </chapter>
+</book>
+
