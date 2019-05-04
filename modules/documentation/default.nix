@@ -13,7 +13,7 @@ let
   manual = import ../../doc/manual rec {
     inherit pkgs config;
     version = "0.0.1";
-    revision = "release-${version}";
+    revision = "master";
     options =
       let
         scrubbedEval = evalModules {

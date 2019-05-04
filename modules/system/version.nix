@@ -7,19 +7,27 @@ let
 
   defaultStateVersion = options.system.stateVersion.default;
 
-  gitCommitId = lib.substring 0 7 (commitIdFromGitRepo gitRepo);
-  gitRepo = "${toString pkgs.path}/.git/";
+  parseGit = path:
+    if pathExists "${path}/.git/" then rec {
+      rev = commitIdFromGitRepo "${path}/.git/";
+      shortRev = substring 0 7 rev;
+    }
+    else if pathExists "${path}/.git-revision" then rec {
+      rev = fileContents "${path}/.git-revision";
+      shortRev = substring 0 7 rev;
+    }
+    else {
+      shortRev = "0000000";
+    };
+
+  darwin = parseGit (toString ../..);
+  nixpkgs = parseGit (toString pkgs.path);
+
   releaseFile = "${toString pkgs.path}/.version";
-  revisionFile = "${toString pkgs.path}/.git-revision";
   suffixFile = "${toString pkgs.path}/.version-suffix";
 
-  revision = if builtins.pathExists gitRepo then gitCommitId
-             else if builtins.pathExists revisionFile then fileContents revisionFile
-             else null;
-
-  versionSuffix = if builtins.pathExists gitRepo then ".git." + gitCommitId
-                  else if builtins.pathExists suffixFile then fileContents suffixFile
-                  else null;
+  nixpkgsSuffix = if pathExists suffixFile then fileContents suffixFile
+                  else ".git." + nixpkgs.shortRev;
 in
 
 {
@@ -42,14 +50,24 @@ in
 
     system.darwinLabel = mkOption {
       type = types.str;
-      default = cfg.nixpkgsVersion;
       description = "Label to be used in the names of generated outputs.";
+    };
+
+    system.darwinVersion = mkOption {
+      internal = true;
+      type = types.str;
+      description = "The full darwin version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
+    };
+
+    system.darwinRevision = mkOption {
+      internal = true;
+      type = types.str;
+      description = "The darwin git revision from which this configuration was built.";
     };
 
     system.nixpkgsRelease = mkOption {
       readOnly = true;
       type = types.str;
-      default = fileContents releaseFile;
       description = "The nixpkgs release (e.g. <literal>16.03</literal>).";
     };
 
@@ -59,17 +77,9 @@ in
       description = "The full nixpkgs version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
     };
 
-    system.nixpkgsVersionSuffix = mkOption {
-      internal = true;
-      type = types.str;
-      default = "pre-git";
-      description = "The nixpkgs version suffix (e.g. <literal>1160.f2d4ee1</literal>).";
-    };
-
     system.nixpkgsRevision = mkOption {
       internal = true;
       type = types.str;
-      default = "master";
       description = "The nixpkgs git revision from which this configuration was built.";
     };
   };
@@ -78,9 +88,13 @@ in
 
     # These defaults are set here rather than up there so that
     # changing them would not rebuild the manual
-    system.nixpkgsVersion = mkDefault (cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix);
-    system.nixpkgsRevision = mkIf (revision != null) (mkDefault revision);
-    system.nixpkgsVersionSuffix = mkIf (versionSuffix != null) (mkDefault versionSuffix);
+    system.darwinLabel = "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
+    system.darwinVersion = "darwin" + toString cfg.stateVersion + "." + darwin.shortRev;
+    system.darwinRevision = mkIf (darwin ? rev) (mkDefault darwin.rev);
+
+    system.nixpkgsVersion = mkDefault (cfg.nixpkgsRelease + nixpkgsSuffix);
+    system.nixpkgsRelease = mkDefault (fileContents releaseFile);
+    system.nixpkgsRevision = mkIf (nixpkgs ? rev) (mkDefault nixpkgs.rev);
 
     assertions = [ { assertion = cfg.stateVersion <= defaultStateVersion; message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value"; } ];
 
