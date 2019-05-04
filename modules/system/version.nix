@@ -62,6 +62,7 @@ in
     system.darwinRevision = mkOption {
       internal = true;
       type = types.str;
+      default = "master";
       description = "The darwin git revision from which this configuration was built.";
     };
 
