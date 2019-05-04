@@ -11,6 +11,7 @@ let
       options = {
         profile = mkOption {
           type = types.lines;
+          internal = true;
           apply = text: pkgs.runCommandNoCC "sandbox.sb" {} ''
             for f in $(< ${config.closure}/store-paths); do
                 storePaths+="(subpath \"$f\")"
@@ -44,6 +45,7 @@ let
         allowSystemPaths = mkOption {
           type = types.bool;
           default = false;
+          description = "Whether to allow read access to FHS paths like /etc and /var.";
         };
 
         allowLocalNetworking = mkOption {
