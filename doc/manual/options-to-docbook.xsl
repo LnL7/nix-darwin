@@ -193,10 +193,10 @@
             <xsl:when test="not(starts-with(@value, '/'))">
               <xsl:choose>
                 <xsl:when test="$revision = 'local'">
-                  <xsl:attribute name="xlink:href">https://github.com/LnL7/nix-darwin/blob/master/<xsl:value-of select="@value"/></xsl:attribute>
+                  <xsl:attribute name="xlink:href">https://github.com/LnL7/nix-darwin/blob/master/<xsl:value-of select="substring-after(@value, 'darwin/')"/></xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:attribute name="xlink:href">https://github.com/LnL7/nix-darwin/blob/<xsl:value-of select="$revision"/>/<xsl:value-of select="@value"/></xsl:attribute>
+                  <xsl:attribute name="xlink:href">https://github.com/LnL7/nix-darwin/blob/<xsl:value-of select="$revision"/>/<xsl:value-of select="substring-after(@value, 'darwin/')"/></xsl:attribute>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:when>

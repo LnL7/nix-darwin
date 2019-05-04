@@ -12,8 +12,8 @@ let
     the path above will be shown and not e.g. `${config.services.foo.package}`. */
   manual = import ../../doc/manual rec {
     inherit pkgs config;
-    version = "0.0.1";
-    revision = "master";
+    version = config.system.darwinVersion;
+    revision = config.system.darwinRevision;
     options =
       let
         scrubbedEval = evalModules {
