@@ -124,7 +124,11 @@
   environment.etc."nix/user-sandbox.sb".text = ''
     (version 1)
     (allow default)
-    (deny file-write* (subpath "/nix"))
+    (deny file-write*
+          (subpath "/nix"))
+    (allow file-write*
+           (subpath "/nix/var/nix/gcroots/per-user")
+           (subpath "/nix/var/nix/profiles/per-user"))
   '';
 
   # programs.vim.enable = true;
