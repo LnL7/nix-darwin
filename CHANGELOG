@@ -1,3 +1,10 @@
+2019-05-04
+- A configuration.nix manpage is now included by default, run
+  `man 5 configuration.nix` or `darwin-help`. The documentation option can be
+  disabled to exclude the manual and it's extra build dependencies.
+
+    documentation.enable = false;
+
 2019-05-01
 - nix.nixPath entries are now merged by default
   system.stateVersion > 3
@@ -10,7 +17,6 @@
   attribute set now.
 
     nix.nixPath = [{ darwin = "/src/darwin"; }];
-
 
 2019-02-23
 - The users module now supports declarative per-user packages similar to nixos.
