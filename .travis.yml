@@ -4,6 +4,7 @@ matrix:
     - os: osx
       osx_image: xcode8.3  # 10.12
       script:
+      - nix-build ./release.nix -I darwin=. -A manpages
       - nix-build ./release.nix -I darwin=. -A tests
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - yes | nix-shell -A installer
