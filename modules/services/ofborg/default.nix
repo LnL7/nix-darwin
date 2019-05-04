@@ -21,7 +21,7 @@ in
       description = ''
         This option specifies the ofborg package to use. eg.
 
-        (import <ofborg> {}).ofborg.rs
+        (import &lt;ofborg&gt; {}).ofborg.rs
 
         $ nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
         $ nix-channel --update
@@ -30,7 +30,6 @@ in
 
     services.ofborg.configFile = mkOption {
       type = types.path;
-      default = "${user.home}/config.json";
       description = ''
         Configuration file to use for ofborg.
 
@@ -56,6 +55,8 @@ in
     warnings = mkIf (isDerivation cfg.configFile) [
       "services.ofborg.configFile is a derivation, credentials will be world readable"
     ];
+
+    services.ofborg.configFile = mkDefault "${user.home}/config.json";
 
     launchd.daemons.ofborg = {
       script = ''
