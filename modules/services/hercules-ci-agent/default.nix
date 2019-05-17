@@ -45,7 +45,8 @@ in {
 
     package = mkOption {
       type = types.package;
-      default = (import (builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-agent/archive/stable.tar.gz")).nixos-19_03.hercules-ci-agent;
+      default = (import (builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-agent/archive/stable.tar.gz") {}).hercules-ci-agent;
+      defaultText = ''(import (builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-agent/archive/stable.tar.gz") {}).hercules-ci-agent'';
       description = ''
         Package containing the bin/hercules-ci-agent program.
       '';
