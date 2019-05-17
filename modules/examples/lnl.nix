@@ -67,7 +67,7 @@
   launchd.user.agents.fetch-nixpkgs-updates = {
     command = "/usr/bin/sandbox-exec -f ${config.security.sandbox.profiles.fetch-nixpkgs-updates.profile} ${pkgs.git}/bin/git -C /src/nixpkgs fetch origin master";
     environment.HOME = "";
-    environment.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    environment.NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     serviceConfig.KeepAlive = false;
     serviceConfig.ProcessType = "Background";
     serviceConfig.StartInterval = 360;

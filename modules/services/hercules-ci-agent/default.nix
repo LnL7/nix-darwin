@@ -63,7 +63,7 @@ in {
 
       path = [ config.nix.package ];
       environment = {
-        SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       };
 
       serviceConfig.KeepAlive = true;
