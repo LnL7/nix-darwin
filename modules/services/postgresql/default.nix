@@ -61,6 +61,13 @@ in
         description = ''Data directory for PostgreSQL.'';
       };
 
+      characterSet = mkOption {
+        type = types.string;
+        default = "UTF8";
+        example = "SJIS";
+        description = ''Character set specified during initialization'';
+      };
+
       enableTCPIP = mkOption {
         type = types.bool;
         default = false;
@@ -101,7 +108,7 @@ in
         script = ''
           # Initialise the database.
           if ! test -e ${cfg.dataDir}/PG_VERSION; then
-            initdb -U postgres -D ${cfg.dataDir}
+            initdb -U postgres -D ${cfg.dataDir} -E ${cfg.characterSet}
           fi
           ${pkgs.coreutils}/bin/ln -sfn ${configFile} ${cfg.dataDir}/postgresql.conf
 
