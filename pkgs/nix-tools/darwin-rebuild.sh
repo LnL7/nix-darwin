@@ -23,13 +23,13 @@ profile=@profile@
 action=
 
 while [ "$#" -gt 0 ]; do
-  i="$1"; shift 1
-  case "$i" in
+  i=$1; shift 1
+  case $i in
     --help)
       showSyntax
       ;;
     edit|switch|build|changelog|check)
-      action="$i"
+      action=$i
       ;;
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
       extraBuildFlags+=("$i")
@@ -42,7 +42,7 @@ while [ "$#" -gt 0 ]; do
         echo "$0: ‘$i’ requires an argument"
         exit 1
       fi
-      j="$1"; shift 1
+      j=$1; shift 1
       extraBuildFlags+=("$i" "$j")
       ;;
     --arg|--argstr|--option)
@@ -50,8 +50,9 @@ while [ "$#" -gt 0 ]; do
         echo "$0: ‘$i’ requires two arguments"
         exit 1
       fi
-      j="$1"; shift 1
-      k="$1"; shift 1
+      j=$1
+      k=$2
+      shift 2
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
     --list-generations)
@@ -68,7 +69,7 @@ while [ "$#" -gt 0 ]; do
         echo "$0: ‘$i’ requires an argument"
         exit 1
       fi
-      j="$1"; shift 1
+      j=$1; shift 1
       extraProfileFlags=("$i" "$j")
       ;;
     --profile-name|-p)
@@ -97,19 +98,19 @@ fi
 
 if [ "$action" = edit ]; then
   darwinConfig=$(nix-instantiate --find-file darwin-config)
-  exec ${EDITOR:-nano} "$darwinConfig"
+  exec "${EDITOR:-nano}" "$darwinConfig"
 fi
 
 if ! [ "$action" = list -o "$action" = rollback ]; then
   echo "building the system configuration..." >&2
-  systemConfig="$(nix-build '<darwin>' ${extraBuildFlags[@]} -A system)"
+  systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
 fi
 
 if [ "$action" = list -o "$action" = rollback ]; then
   if [ "$USER" != root -a ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p $profile ${extraProfileFlags[@]}
+    sudo nix-env -p "$profile" "${extraProfileFlags[@]}"
   else
-    nix-env -p $profile ${extraProfileFlags[@]}
+    nix-env -p "$profile" "${extraProfileFlags[@]}"
   fi
 
   systemConfig="$(cat $profile/systemConfig)"
@@ -117,25 +118,21 @@ fi
 
 if [ -z "$systemConfig" ]; then exit 0; fi
 
-if [ -n "$rollbackFlags" ]; then
-  echo $systemConfig
-fi
-
 if [ "$action" = switch ]; then
   if [ "$USER" != root -a ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p $profile --set $systemConfig
+    sudo nix-env -p "$profile" --set "$systemConfig"
   else
-    nix-env -p $profile --set $systemConfig
+    nix-env -p "$profile" --set "$systemConfig"
   fi
 fi
 
 if [ "$action" = switch -o "$action" = rollback ]; then
-  $systemConfig/activate-user
+  "$systemConfig/activate-user"
 
   if [ "$USER" != root ]; then
-    sudo $systemConfig/activate
+    sudo "$systemConfig/activate"
   else
-    $systemConfig/activate
+    "$systemConfig/activate"
   fi
 fi
 
@@ -143,11 +140,11 @@ if [ "$action" = changelog ]; then
   echo >&2
   echo "[1;1mCHANGELOG[0m" >&2
   echo >&2
-  head -n 32 $systemConfig/darwin-changes
+  head -n 32 "$systemConfig/darwin-changes"
   echo >&2
 fi
 
 if [ "$action" = check ]; then
   export checkActivation=1
-  $systemConfig/activate-user
+  "$systemConfig/activate-user"
 fi
