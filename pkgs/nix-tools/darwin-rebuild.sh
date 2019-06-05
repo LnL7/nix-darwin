@@ -98,7 +98,7 @@ fi
 
 if [ "$action" = edit ]; then
   darwinConfig=$(nix-instantiate --find-file darwin-config)
-  exec "${EDITOR:-nano}" "$darwinConfig"
+  exec "${EDITOR:-vi}" "$darwinConfig"
 fi
 
 if ! [ "$action" = list -o "$action" = rollback ]; then
