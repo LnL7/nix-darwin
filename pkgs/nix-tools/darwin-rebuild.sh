@@ -5,7 +5,7 @@ export PATH=@path@:$PATH
 
 
 showSyntax() {
-  echo "darwin-rebuild [--help] {edit | build | switch | check | changelog}" >&2
+  echo "darwin-rebuild [--help] {edit | switch | activate | build | check | changelog}" >&2
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
   echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&1
@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
     --help)
       showSyntax
       ;;
-    edit|switch|build|changelog|check)
+    edit|switch|activate|build|check|changelog)
       action=$i
       ;;
     --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
@@ -101,7 +101,7 @@ if [ "$action" = edit ]; then
   exec "${EDITOR:-vi}" "$darwinConfig"
 fi
 
-if ! [ "$action" = list -o "$action" = rollback ]; then
+if [ "$action" = switch -o "$action" = build -o "$action" = check ]; then
   echo "building the system configuration..." >&2
   systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
 fi
@@ -112,7 +112,9 @@ if [ "$action" = list -o "$action" = rollback ]; then
   else
     nix-env -p "$profile" "${extraProfileFlags[@]}"
   fi
+fi
 
+if [ "$action" = activate -o "$action" = rollback -o "$action" = check ]; then
   systemConfig="$(cat $profile/systemConfig)"
 fi
 
@@ -126,7 +128,7 @@ if [ "$action" = switch ]; then
   fi
 fi
 
-if [ "$action" = switch -o "$action" = rollback ]; then
+if [ "$action" = switch -o "$action" = activate -o "$action" = rollback ]; then
   "$systemConfig/activate-user"
 
   if [ "$USER" != root ]; then
