@@ -53,7 +53,6 @@
   ./programs/man.nix
   ./programs/info
   ./programs/nix-index
-  ./programs/nix-script.nix
   ./programs/ssh
   ./programs/tmux.nix
   ./programs/vim.nix
