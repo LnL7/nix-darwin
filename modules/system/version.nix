@@ -56,7 +56,7 @@ in
     system.darwinVersion = mkOption {
       internal = true;
       type = types.str;
-      description = "The full darwin version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
+      description = "The full darwin version (e.g. <literal>darwin4.master</literal>).";
     };
 
     system.darwinRevision = mkOption {
