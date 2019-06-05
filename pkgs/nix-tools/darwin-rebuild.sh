@@ -114,8 +114,12 @@ if [ "$action" = list -o "$action" = rollback ]; then
   fi
 fi
 
-if [ "$action" = activate -o "$action" = rollback -o "$action" = check ]; then
+if [ "$action" = rollback -o "$action" = check ]; then
   systemConfig="$(cat $profile/systemConfig)"
+fi
+
+if [ "$action" = activate ]; then
+  systemConfig=$(readlink -f "${0%*/sw/bin/darwin-rebuild}")
 fi
 
 if [ -z "$systemConfig" ]; then exit 0; fi
