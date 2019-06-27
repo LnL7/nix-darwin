@@ -48,14 +48,20 @@ in
 
       for f in $(find /etc/static/* -type l); do
         l=/etc/''${f#/etc/static/}
+        lbackup="$l.nix-darwin.bkp"
         d=''${l%/*}
         if [ ! -e "$d" ]; then
           mkdir -p "$d"
         fi
+        if [ -e "$lbackup" ]; then
+          echo "[1;31mwarning: Backup $lbackup still exists. Review/diff if it's still needed, make a backup and remove it.[0m" >&2
+        fi
         if [ -e "$l" ]; then
           if [ "$(readlink $l)" != "$f" ]; then
             if ! grep -q /etc/static "$l"; then
-              echo "[1;31mwarning: not linking environment.etc.\"''${l#/etc/}\" because $l exists, skipping...[0m" >&2
+              echo "[1;31mwarning: Backing up $l to $lbackup and replacing the original file with linking \"''${l#/etc/}\".[0m" >&2
+              mv "$l" "$lbackup"
+              ln -s "$f" "$l"
             fi
           fi
         else
