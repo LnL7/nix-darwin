@@ -67,7 +67,7 @@ stdenv.mkDerivation {
     fi
 
     export NIX_PATH=${nixPath}
-    system=$(nix-build '<darwin>' -I "user-darwin-config=$config" -A system --no-out-link)
+    system=$(nix-build '<darwin>' -I "user-darwin-config=$config" -A system --no-out-link --show-trace)
 
     export PATH=$system/sw/bin:$PATH
     darwin-rebuild "$action" -I "user-darwin-config=$config"
