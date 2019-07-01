@@ -47,6 +47,21 @@ let
     fi
   '';
 
+  singleUser = ''
+    if grep -q 'build-users-group =' /etc/nix/nix.conf; then
+        echo "[1;31merror: The daemon is not enabled but this is a multi-user install, aborting activation[0m" >&2
+        echo "Enable the nix-daemon service:" >&2
+        echo >&2
+        echo "    services.nix-daemon.enable = true;" >&2
+        echo >&2
+        echo "or set" >&2
+        echo >&2
+        echo "    nix.useDaemon = true;" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
+
   nixChannels = ''
     channelsLink=$(readlink "$HOME/.nix-defexpr/channels") || true
     case "$channelsLink" in
@@ -170,6 +185,7 @@ in
       darwinChanges
       runLink
       (mkIf config.nix.useDaemon buildUsers)
+      (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       nixChannels
