@@ -108,7 +108,7 @@ in
       for f in $(ls /run/current-system/Library/LaunchAgents 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/Library/LaunchAgents/$f"; then
           echo "removing service $(basename $f .plist)" >&2
-          launchctl unload -w "/Library/LaunchAgents/$f" || true
+          launchctl unload "/Library/LaunchAgents/$f" || true
           if test -e "/Library/LaunchAgents/$f"; then rm -f "/Library/LaunchAgents/$f"; fi
         fi
       done
@@ -116,7 +116,7 @@ in
       for f in $(ls /run/current-system/Library/LaunchDaemons 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/Library/LaunchDaemons/$f"; then
           echo "removing service $(basename $f .plist)" >&2
-          launchctl unload -w "/Library/LaunchDaemons/$f" || true
+          launchctl unload "/Library/LaunchDaemons/$f" || true
           if test -e "/Library/LaunchDaemons/$f"; then rm -f "/Library/LaunchDaemons/$f"; fi
         fi
       done
@@ -136,7 +136,7 @@ in
       for f in $(ls /run/current-system/user/Library/LaunchAgents 2> /dev/null); do
         if test ! -e "${cfg.build.launchd}/user/Library/LaunchAgents/$f"; then
           echo "removing user service $(basename $f .plist)" >&2
-          launchctl unload -w ~/Library/LaunchAgents/$f || true
+          launchctl unload ~/Library/LaunchAgents/$f || true
           if test -e ~/Library/LaunchAgents/$f; then rm -f ~/Library/LaunchAgents/$f; fi
         fi
       done
