@@ -8,6 +8,7 @@ matrix:
       - nix-build ./release.nix -I darwin=. -A tests
       - nix-build ./release.nix -I darwin=. -A examples.simple
       - yes | nix-shell -A installer
+      - sudo launchctl kickstart system/org.nixos.nix-daemon  # FIXME
       - nix-shell -A installer.check
       - /run/current-system/sw/bin/darwin-rebuild switch -I darwin=$HOME/.nix-defexpr/channels/darwin -I darwin-config=$HOME/.nixpkgs/darwin-configuration.nix
       - yes | nix-shell -A uninstaller
