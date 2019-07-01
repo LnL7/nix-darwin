@@ -169,7 +169,7 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
-      (mkIf config.services.nix-daemon.enable buildUsers)
+      (mkIf config.nix.useDaemon buildUsers)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       nixChannels

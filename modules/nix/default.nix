@@ -22,7 +22,7 @@ let
           # WARNING: this file is generated from the nix.* options in
           # your NixOS configuration, typically
           # /etc/nixos/configuration.nix.  Do not edit it!
-          ${optionalString config.services.nix-daemon.enable ''
+          ${optionalString cfg.useDaemon ''
             build-users-group = nixbld
           ''}
           ${if isNix20 then "max-jobs" else "build-max-jobs"} = ${toString (cfg.maxJobs)}

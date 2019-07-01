@@ -41,7 +41,7 @@ in
 
     launchd.daemons.nix-gc = {
       command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
-      environment.NIX_REMOTE = optionalString config.services.nix-daemon.enable "daemon";
+      environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       serviceConfig.RunAtLoad = false;
       serviceConfig.StartCalendarInterval = [ cfg.interval ];
       serviceConfig.UserName = cfg.user;
