@@ -114,7 +114,7 @@ if [ "$action" = list -o "$action" = rollback ]; then
   fi
 fi
 
-if [ "$action" = rollback -o "$action" = check ]; then
+if [ "$action" = rollback ]; then
   systemConfig="$(cat $profile/systemConfig)"
 fi
 
