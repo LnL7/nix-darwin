@@ -30,6 +30,7 @@
   ./fonts
   ./launchd
   ./services/activate-system
+  ./services/autossh.nix
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
   ./services/emacs.nix
