@@ -24,6 +24,7 @@
   system.defaults.NSGlobalDomain.KeyRepeat = 1;
   system.defaults.NSGlobalDomain.PMPrintingExpandedStateForPrint = true;
   system.defaults.NSGlobalDomain.PMPrintingExpandedStateForPrint2 = true;
+  system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = true;
   system.defaults.NSGlobalDomain."com.apple.mouse.tapBehavior" = 1;
   system.defaults.NSGlobalDomain."com.apple.trackpad.enableSecondaryClick" = true;
   system.defaults.NSGlobalDomain."com.apple.trackpad.trackpadCornerClickBehavior" = 1;
@@ -65,6 +66,7 @@
     grep "defaults write -g 'KeyRepeat' -int 1" ${config.out}/activate-user
     grep "defaults write -g 'PMPrintingExpandedStateForPrint' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'PMPrintingExpandedStateForPrint2' -bool YES" ${config.out}/activate-user
+    grep "defaults write -g 'com.apple.keyboard.fnState' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.mouse.tapBehavior' -int 1" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.trackpad.enableSecondaryClick' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.trackpad.trackpadCornerClickBehavior' -int 1" ${config.out}/activate-user
