@@ -119,7 +119,6 @@
     set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
   '';
 
-  programs.tmux.defaultCommand = "IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb ${config.environment.loginShell}";
   environment.etc."nix/user-sandbox.sb".text = ''
     (version 1)
     (allow default)
@@ -192,8 +191,8 @@
     PS1='%F{red}%B%(?..%? )%b%f%# '
     RPS1='$(_prompt_nix)%F{green}%~%f'
 
-    if [ -z "$IN_NIX_SANDBOX" ]; then
-      PS1+='%F{red}[no-sandbox]%f '
+    if [ -n "$IN_NIX_SANDBOX" ]; then
+      PS1+='%F{red}[sandbox]%f '
     fi
   '';
 
@@ -226,6 +225,10 @@
             hdiutil detach "$dev"
         fi
         diskutil erasevolume JHFS+ RAM $(hdiutil attach -nomount ram://10248576)
+    }
+
+    ls() {
+        ${pkgs.coreutils}/bin/ls --color=auto "$@"
     }
 
     install_name_tool() {
@@ -308,12 +311,6 @@
         echo "https://github.com/NixOS/nixpkgs/archive/''${@:-master}.tar.gz"
     }
 
-    pr-darwin() {
-        local pr=$1
-        shift 1
-        rev-darwin "$(curl "https://api.github.com/repos/LnL7/nix-darwin/pulls/$pr/commits" | jq -r '.[-1].sha')"
-    }
-
     pr-nixpkgs() {
         local pr=$1
         shift 1
@@ -335,11 +332,12 @@
     reexec-sandbox() {
         unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
         unset __ETC_ZPROFILE_SOURCED __ETC_ZSHENV_SOURCED __ETC_ZSHRC_SOURCED
-        exec IN_NIX_SANDBOX=1 /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb exec $SHELL -l
+        export IN_NIX_SANDBOX=1
+        exec /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb $SHELL -l
     }
 
     no-sandbox() {
-        tmux split-window -c '#{pane_current_path}' -p 25 $SHELL -l
+        tmux split-window -c '#{pane_current_path}' -p 25
         if [ $# -gt 0 ]; then
             tmux send-keys -t . "$*" Enter
         fi
@@ -382,10 +380,9 @@
   environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   nix.nixPath =
-    [ # Use local nixpkgs checkout instead of channels.
-      "darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix"
-      "darwin=$HOME/.nix-defexpr/darwin"
-      "nixpkgs=$HOME/.nix-defexpr/nixpkgs"
+    [{ # Use local nixpkgs checkout instead of channels.
+      darwin-config = "$HOME/.config/nixpkgs/darwin/configuration.nix";
+      darwin = "$HOME/.nix-defexpr/darwin"; }
     ];
 
   nixpkgs.config.allowUnfree = true;
