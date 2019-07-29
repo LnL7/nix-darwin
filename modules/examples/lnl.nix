@@ -87,7 +87,6 @@
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
   nix.trustedUsers = [ "@admin" ];
-  nix.package = pkgs.nixUnstable;
 
   nix.useSandbox = true;
   nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
@@ -426,11 +425,6 @@
           esac
           EOF
         '';
-
-      # Fake package, not in nixpkgs.
-      chunkwm = super.runCommandNoCC "chunkwm-0.0.0" {} ''
-        mkdir $out
-      '';
 
       vim_configurable = super.vim_configurable.override {
         guiSupport = "no";
