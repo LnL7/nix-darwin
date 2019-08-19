@@ -22,6 +22,7 @@ let
   defaultsToList = domain: attrs: mapAttrsToList (writeDefault domain) (filterAttrs (n: v: v != null) attrs);
 
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
+  GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
@@ -44,12 +45,13 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain LaunchServices dock finder screencapture trackpad trackpadBluetooth ]
+      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture trackpad trackpadBluetooth ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
 
         ${concatStringsSep "\n" NSGlobalDomain}
+        ${concatStringsSep "\n" GlobalPreferences}
         ${concatStringsSep "\n" LaunchServices}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}

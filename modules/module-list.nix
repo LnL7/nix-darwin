@@ -10,6 +10,7 @@
   ./system/defaults-write.nix
   ./system/defaults/LaunchServices.nix
   ./system/defaults/NSGlobalDomain.nix
+  ./system/defaults/GlobalPreferences.nix
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
