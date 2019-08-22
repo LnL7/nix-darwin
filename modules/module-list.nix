@@ -40,6 +40,7 @@
   ./services/chunkwm.nix
   ./services/dnsmasq.nix
   ./services/emacs.nix
+  ./services/gitlab-runner.nix
   ./services/khd
   ./services/kwm
   ./services/mail/offlineimap.nix
