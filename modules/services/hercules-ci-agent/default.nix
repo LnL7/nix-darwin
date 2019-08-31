@@ -17,7 +17,7 @@ in {
       description = "Alternative base URL for the Hercules API";
       example = "https://hercules-ci.com";
       default = null;
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
     };
 
     clusterJoinTokenPath = mkOption {
