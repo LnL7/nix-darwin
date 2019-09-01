@@ -208,6 +208,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Use F1, F2, etc. keys as standard function keys.
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.mouse.tapBehavior" = mkOption {
       type = types.nullOr (types.enum [ 1 ]);
       default = null;
