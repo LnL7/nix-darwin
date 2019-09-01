@@ -62,7 +62,7 @@ in
       };
 
       characterSet = mkOption {
-        type = types.string;
+        type = types.str;
         default = "UTF8";
         example = "SJIS";
         description = ''Character set specified during initialization'';
