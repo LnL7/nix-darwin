@@ -297,6 +297,32 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleInterfaceStyle = mkOption {
+      type = types.nullOr (types.enum [ "Light" "Dark" ]);
+      default = null;
+      description = ''
+        Whether to use Light mode or Dark mode. The default is Light.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleAccentColor = mkOption {
+      type = types.nullOr (types.enum [ (-1) 0 1 2 3 4 5 6 ]);
+      default = null;
+      example = "";
+      description = ''
+        Which color to use as the system accent color
+        -1 = Graphite
+        0 = Red
+        1 = Orange
+        2 = Yellow
+        3 = Green
+        4 = Blue
+        5 = Purple
+        6 = Pink
+        The default is blue.
+      '';
+    };
+
   };
 
 }
