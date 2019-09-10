@@ -35,7 +35,6 @@
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
   ./services/emacs.nix
-  ./services/hercules-ci-agent
   ./services/khd
   ./services/kwm
   ./services/mail/offlineimap.nix
