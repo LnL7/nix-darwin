@@ -168,6 +168,8 @@
   # Dotfiles.
   # programs.vim.package = mkForce pkgs.lnl.vim;
 
+  programs.bash.enableCompletion = true;
+
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
   programs.zsh.enableFzfCompletion = true;
@@ -201,16 +203,22 @@
         nix repl ''${@:-<dotpkgs>}
     }
 
-    :u() {
-        nix run -f '<dotpkgs>' "$1" "$@"
-    }
-
     :d() {
         eval "$(direnv hook zsh)"
     }
 
     :r() {
         direnv reload
+    }
+
+    :u() {
+        local exports
+
+        exports=$(direnv apply_dump <(nix-shell -E "with import <dotpkgs> {}; mkShell { buildInputs = [ $* ]; }" --run 'direnv dump'))
+        eval "$exports"
+
+        name+="''${name:+ }$*"
+        typeset -U PATH
     }
 
     xi() {
