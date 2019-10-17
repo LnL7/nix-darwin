@@ -89,6 +89,13 @@ in
         Extra lines to be added verbatim to the configuration file.
       '';
     };
+    services.buildkite-agent.preCommands = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Extra commands to run before starting buildkite.
+      '';
+    };
 
     services.buildkite-agent.openssh =
       { privateKeyPath = mkOption {
@@ -214,6 +221,8 @@ in
             # Secrets exist in the buildkite-agent home directory
             chmod 750 "${cfg.dataDir}"
             chmod 640 "${cfg.dataDir}/buildkite-agent.cfg"
+
+            ${cfg.preCommands}
 
             exec buildkite-agent start --config "${cfg.dataDir}/buildkite-agent.cfg"
           '';
