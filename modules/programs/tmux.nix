@@ -18,6 +18,7 @@ let
         --set __ETC_ZPROFILE_SOURCED  "" \
         --set __ETC_ZSHENV_SOURCED "" \
         --set __ETC_ZSHRC_SOURCED "" \
+        --set __NIX_DARWIN_SET_ENVIRONMENT_DONE "" \
         --add-flags -f --add-flags /etc/tmux.conf
     '';
 
