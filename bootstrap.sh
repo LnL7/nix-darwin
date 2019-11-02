@@ -78,7 +78,7 @@ exit_message(){
 sudo_prompt(){
   echo "Please enter your password for sudo authentication"
   sudo -k
-  sudo echo "sudo authenticaion successful!"
+  sudo echo "sudo authentication successful!"
   while true ; do sudo -n true ; sleep 60 ; kill -0 "$$" || exit ; done 2>/dev/null &
 }
 
