@@ -11,5 +11,6 @@ matrix:
       - sudo launchctl kickstart system/org.nixos.nix-daemon  # FIXME
       - nix-shell -A installer.check
       - /run/current-system/sw/bin/darwin-rebuild switch -I darwin=$HOME/.nix-defexpr/channels/darwin -I darwin-config=$HOME/.nixpkgs/darwin-configuration.nix
+      - sudo launchctl kickstart system/org.nixos.nix-daemon  # FIXME
       - yes | nix-shell -A uninstaller
       - nix-shell -A uninstaller.check
