@@ -107,6 +107,7 @@ let
     tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
     tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
     tests.programs-ssh = makeTest ./tests/programs-ssh.nix;
+    tests.programs-tmux = makeTest ./tests/programs-tmux.nix;
     tests.programs-zsh = makeTest ./tests/programs-zsh.nix;
     tests.security-pki = makeTest ./tests/security-pki.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
