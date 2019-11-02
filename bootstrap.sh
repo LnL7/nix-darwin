@@ -174,18 +174,6 @@ install(){
       fi
     fi
 
-    # Bootstrap build using default nix.nixPath
-    echo "Bootstrapping..."
-    export NIX_PATH=darwin=$HOME/.nix-defexpr/channels/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
-    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch || exit
-
-    # Source generated bashrc
-    . /etc/static/bashrc
-
-    # Run first darwin-rebuild switch
-    echo -e "Running first "$YELLOW"darwin-rebuild switch"$ESC"..."
-    darwin-rebuild switch && echo -e ""$GREEN"Success!"$ESC"" || exit_message "Problem running darwin-rebuild switch"
-
     echo -e ""$BLUE_UL"Nix daemon"$ESC""
     echo    "Optionally, this script can also create the group and users"
     echo -e "needed for running the Nix "$YELLOW"multi-user support daemon"$ESC"."
@@ -212,6 +200,18 @@ install(){
             esac
         done
     fi
+    
+    # Bootstrap build using default nix.nixPath
+    echo "Bootstrapping..."
+    export NIX_PATH=darwin=$HOME/.nix-defexpr/channels/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
+    $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch || exit
+
+    # Source generated bashrc
+    . /etc/static/bashrc
+
+    # Run first darwin-rebuild switch
+    echo -e "Running first "$YELLOW"darwin-rebuild switch"$ESC"..."
+    darwin-rebuild switch && echo -e ""$GREEN"Success!"$ESC"" || exit_message "Problem running darwin-rebuild switch"
 
     # Finish
     echo -e ""$GREEN"You're all done!"$ESC""
