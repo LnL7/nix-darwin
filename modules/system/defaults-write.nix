@@ -26,6 +26,7 @@ let
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
+  alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
@@ -37,10 +38,11 @@ in
 {
   config = {
 
-    system.activationScripts.defaults.text = mkIfAttrs [ smb ]
+    system.activationScripts.defaults.text = mkIfAttrs [ alf smb ]
       ''
         # Set defaults
         echo >&2 "system defaults..."
+        ${concatStringsSep "\n" alf}
         ${concatStringsSep "\n" smb}
       '';
 

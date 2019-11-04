@@ -14,6 +14,7 @@
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
+  ./system/defaults/alf.nix
   ./system/defaults/smb.nix
   ./system/defaults/trackpad.nix
   ./system/etc.nix
