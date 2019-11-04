@@ -237,6 +237,16 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.sound.beep.feedback" = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        # Apple menu > System Preferences > Sound
+        Make a feedback sound when the system volume changed. This setting accepts
+        the integers 0 or 1. Defaults to 1.
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.trackpad.enableSecondaryClick" = mkOption {
       type = types.nullOr types.bool;
       default = null;
