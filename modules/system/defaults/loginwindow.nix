@@ -15,11 +15,11 @@ with lib;
     };
 
     system.defaults.loginwindow.autoLoginUser = mkOption {
-      type = types.nullOr types.bool;
+      type = types.nullOr types.str;
       default = null;
       description = ''
         # Apple menu > System Preferences > Users and Groups > Login Options
-        Auto login the default user on boot. Default is false.
+        Auto login the supplied user on boot. Default is Off.
       '';
     };
 
