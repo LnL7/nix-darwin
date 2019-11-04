@@ -15,6 +15,7 @@
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
   ./system/defaults/alf.nix
+  ./system/defaults/loginwindow.nix
   ./system/defaults/smb.nix
   ./system/defaults/spaces.nix
   ./system/defaults/trackpad.nix

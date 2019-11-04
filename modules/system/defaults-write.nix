@@ -27,6 +27,7 @@ let
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
+  loginwindow = defaultsToList "/Library/Preferences/com.apple.loginwindow" cfg.loginwindow;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
@@ -39,11 +40,12 @@ in
 {
   config = {
 
-    system.activationScripts.defaults.text = mkIfAttrs [ alf smb ]
+    system.activationScripts.defaults.text = mkIfAttrs [ alf loginwindow smb ]
       ''
         # Set defaults
         echo >&2 "system defaults..."
         ${concatStringsSep "\n" alf}
+        ${concatStringsSep "\n" loginwindow}
         ${concatStringsSep "\n" smb}
       '';
 
