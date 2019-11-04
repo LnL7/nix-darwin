@@ -16,6 +16,7 @@
   ./system/defaults/screencapture.nix
   ./system/defaults/alf.nix
   ./system/defaults/smb.nix
+  ./system/defaults/spaces.nix
   ./system/defaults/trackpad.nix
   ./system/etc.nix
   ./system/keyboard.nix

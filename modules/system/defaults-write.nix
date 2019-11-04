@@ -29,6 +29,7 @@ let
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
+  spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
 
@@ -47,7 +48,7 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture trackpad trackpadBluetooth ]
+      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture spaces trackpad trackpadBluetooth ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
@@ -58,6 +59,7 @@ in
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
         ${concatStringsSep "\n" screencapture}
+        ${concatStringsSep "\n" spaces}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
       '';
