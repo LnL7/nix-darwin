@@ -24,6 +24,7 @@ stdenv.mkDerivation {
   '';
 
   shellHook = ''
+    #!${stdenv.shell}
     set -e
 
     _PATH=$PATH

@@ -22,7 +22,7 @@ stdenv.mkDerivation {
   '';
 
   shellHook = ''
-    #!/usr/bin/env bash
+    #!${stdenv.shell}
     set -e
 
     action=switch
