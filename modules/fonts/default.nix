@@ -49,7 +49,7 @@ in
               echo "updating font $font..." >&2
               ln -fn -- "$f" /Library/Fonts 2>/dev/null || {
                 echo "Could not create hard link. Nix is probably on another filesystem. Copying the font instead..." >&2
-                cp -fP "$f" /Library/Fonts
+                rsync -az --inplace "$f" /Library/Fonts
               }
           fi
       done
