@@ -297,6 +297,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain._HIHideMenuBar = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to autohide the menu bar.  The default is false.
+      '';
+    };
+
   };
 
 }
