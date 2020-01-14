@@ -69,7 +69,7 @@ sudo ln -s private/var/run /run
 # Configure the channel
 nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
 nix-channel --update
-export NIX_PATH=darwin=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
+export NIX_PATH=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
 
 # Or use a local git repository
 git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
