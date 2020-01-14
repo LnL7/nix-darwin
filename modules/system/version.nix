@@ -8,8 +8,8 @@ let
   defaultStateVersion = options.system.stateVersion.default;
 
   parseGit = path:
-    if pathExists "${path}/.git/" then rec {
-      rev = commitIdFromGitRepo "${path}/.git/";
+    if pathExists "${path}/.git" then rec {
+      rev = commitIdFromGitRepo "${path}/.git";
       shortRev = substring 0 7 rev;
     }
     else if pathExists "${path}/.git-revision" then rec {
