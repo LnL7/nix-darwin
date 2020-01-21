@@ -224,6 +224,29 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.sound.beep.volume" = mkOption {
+      type = types.nullOr float;
+      default = null;
+      description = ''
+        # Apple menu > System Preferences > Sound
+        Sets the beep/alert volume level from 0.000 (muted) to 1.000 (100% volume).
+
+        75% = 0.7788008
+        50% = 0.6065307
+        25% = 0.4723665
+      '';
+    };
+
+    system.defaults.NSGlobalDomain."com.apple.sound.beep.feedback" = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        # Apple menu > System Preferences > Sound
+        Make a feedback sound when the system volume changed. This setting accepts
+        the integers 0 or 1. Defaults to 1.
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.trackpad.enableSecondaryClick" = mkOption {
       type = types.nullOr types.bool;
       default = null;
