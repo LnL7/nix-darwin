@@ -5,6 +5,8 @@ with lib;
 let
   cfg = config.users;
 
+  named = xs: listToAttrs (map (x: { name = x.name; value = x; }) xs);
+
   createdGroups = mapAttrsToList (n: v: v.name) cfg.groups;
   createdUsers = mapAttrsToList (n: v: v.name) cfg.users;
 
@@ -54,8 +56,8 @@ in
       { assertion = cfg.groups ? "nixbld" -> cfg.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
     ];
 
-    users.groups = mkIf cfg.nix.configureBuildUsers buildGroups;
-    users.users = mkIf cfg.nix.configureBuildUsers buildUsers;
+    users.groups = mkIf cfg.nix.configureBuildUsers (named buildGroups);
+    users.users = mkIf cfg.nix.configureBuildUsers (named buildUsers);
 
     users.knownGroups = mkIf cfg.nix.configureBuildUsers [ "nixbld" ];
     users.knownUsers = mkIf cfg.nix.configureBuildUsers (mkUsers (i: "nixbld${toString i}"));
