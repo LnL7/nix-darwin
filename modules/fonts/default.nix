@@ -47,6 +47,7 @@ in
           f=$(readlink -f "$l")
           if [ ! -e "/Library/Fonts/$font" ] || [ $(stat -c '%i' "$f") != $(stat -c '%i' "/Library/Fonts/$font") ]; then
               echo "updating font $font..." >&2
+              rm -f "/Library/Fonts/$f"
               cp -f "$f" /Library/Fonts
           fi
       done
