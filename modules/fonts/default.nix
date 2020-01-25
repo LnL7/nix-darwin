@@ -47,8 +47,7 @@ in
           f=$(readlink -f "$l")
           if [ ! -e "/Library/Fonts/$font" ] || [ $(stat -c '%i' "$f") != $(stat -c '%i' "/Library/Fonts/$font") ]; then
               echo "updating font $font..." >&2
-              # FIXME: hardlink, won't work if nix is on a dedicated filesystem.
-              ln -fn "$f" /Library/Fonts
+              cp -f "$f" /Library/Fonts
           fi
       done
 
