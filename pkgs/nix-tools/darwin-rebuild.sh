@@ -22,7 +22,7 @@ extraProfileFlags=()
 profile=@profile@
 action=
 
-while [ "$#" -gt 0 ]; do
+while [ $# -gt 0 ]; do
   i=$1; shift 1
   case $i in
     --help)
@@ -38,16 +38,16 @@ while [ "$#" -gt 0 ]; do
       extraBuildFlags+=("$i")
       ;;
     --max-jobs|-j|--cores|-I)
-      if [ -z "$1" ]; then
-        echo "$0: ‘$i’ requires an argument"
+      if [ $# -lt 1 ]; then
+        echo "$0: '$i' requires an argument"
         exit 1
       fi
       j=$1; shift 1
       extraBuildFlags+=("$i" "$j")
       ;;
     --arg|--argstr|--option)
-      if [ -z "$1" -o -z "$2" ]; then
-        echo "$0: ‘$i’ requires two arguments"
+      if [ $# -lt 2 ]; then
+        echo "$0: '$i' requires two arguments"
         exit 1
       fi
       j=$1
@@ -65,8 +65,8 @@ while [ "$#" -gt 0 ]; do
       ;;
     --switch-generation|-G)
       action="rollback"
-      if [ -z "$1" ]; then
-        echo "$0: ‘$i’ requires an argument"
+      if [ $# -lt 1 ]; then
+        echo "$0: '$i' requires an argument"
         exit 1
       fi
       j=$1; shift 1
@@ -74,7 +74,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --profile-name|-p)
       if [ -z "$1" ]; then
-        echo "$0: ‘--profile-name’ requires an argument"
+        echo "$0: '$i' requires an argument"
         exit 1
       fi
       if [ "$1" != system ]; then
@@ -84,7 +84,7 @@ while [ "$#" -gt 0 ]; do
       shift 1
       ;;
     *)
-      echo "$0: unknown option \`$i'"
+      echo "$0: unknown option '$i'"
       exit 1
       ;;
   esac
