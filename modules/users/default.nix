@@ -9,12 +9,17 @@ let
   user = import ./user.nix;
 
   toArguments = concatMapStringsSep " " (v: "'${v}'");
+  toGID = v: { "${toString v.gid}" = v.name; };
+  toUID = v: { "${toString v.uid}" = v.name; };
 
   isCreated = list: name: elem name list;
   isDeleted = attrs: name: ! elem name (mapAttrsToList (n: v: v.name) attrs);
 
-  createdGroups = mapAttrsToList (n: v: v) (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
-  createdUsers = mapAttrsToList (n: v: v) (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
+  gids = mapAttrsToList (n: toGID) (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
+  uids = mapAttrsToList (n: toUID) (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
+
+  createdGroups = mapAttrsToList (n: v: cfg.groups."${v}") cfg.gids;
+  createdUsers = mapAttrsToList (n: v: cfg.users."${v}") cfg.uids;
   deletedGroups = filter (n: isDeleted cfg.groups n) cfg.knownGroups;
   deletedUsers = filter (n: isDeleted cfg.users n) cfg.knownUsers;
 
@@ -55,6 +60,18 @@ in
       description = "Configuration for users.";
     };
 
+    users.gids = mkOption {
+      internal = true;
+      type = types.attrsOf types.str;
+      default = {};
+    };
+
+    users.uids = mkOption {
+      internal = true;
+      type = types.attrsOf types.str;
+      default = {};
+    };
+
     users.forceRecreate = mkOption {
       internal = true;
       type = types.bool;
@@ -64,6 +81,9 @@ in
   };
 
   config = {
+
+    users.gids = mkMerge gids;
+    users.uids = mkMerge uids;
 
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
