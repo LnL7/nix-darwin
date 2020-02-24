@@ -14,11 +14,12 @@
   system.defaults.NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
+  system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
   system.defaults.dock.autohide = true;
+  system.defaults.dock.mru-spaces = false;
   system.defaults.dock.orientation = "left";
   system.defaults.dock.showhidden = true;
-  system.defaults.dock.mru-spaces = false;
 
   system.defaults.finder.AppleShowAllExtensions = true;
   system.defaults.finder.QuitMenuItem = true;
@@ -37,21 +38,24 @@
       pkgs.awscli
       pkgs.bear
       pkgs.brotli
-      # pkgs.cachix
       pkgs.ctags
       pkgs.curl
       pkgs.direnv
+      pkgs.entr
       pkgs.fzf
       pkgs.gettext
       pkgs.git
+      pkgs.gitAndTools.gh
       pkgs.gnupg
       pkgs.htop
       pkgs.jq
+      pkgs.kitty
       pkgs.mosh
       pkgs.ripgrep
       pkgs.shellcheck
       pkgs.silver-searcher
       pkgs.vault
+      pkgs.youtube-dl
 
       pkgs.qes
       pkgs.darwin-zsh-completions
@@ -75,12 +79,12 @@
 
   services.nix-daemon.enable = true;
   services.nix-daemon.enableSocketListener = true;
-  # FIXME workaround for https://github.com/NixOS/nix/issues/2523
-  # launchd.daemons.nix-daemon.environment.OBJC_DISABLE_INITIALIZE_FORK_SAFETY = "YES";
 
   nix.extraOptions = ''
     gc-keep-derivations = true
     gc-keep-outputs = true
+    min-free = 68719480000
+    max-free = 274877900000
     log-lines = 128
   '';
 
@@ -109,8 +113,8 @@
     bind-key -r "<" swap-window -t -1
     bind-key -r ">" swap-window -t +1
 
-    bind-key -n M-r run "tmux send-keys -t .+ C-l Up Enter"
-    bind-key -n M-t run "tmux send-keys -t _ C-l Up Enter"
+    bind-key -n M-c run "tmux send-keys -t .+ C-\\\\ && tmux send-keys -t .+ C-a C-k C-l Up && tmux send-keys -t .+ Enter"
+    bind-key -n M-r run "tmux send-keys -t .+ C-a C-k C-l Up && tmux send-keys -t .+ Enter"
 
     set -g pane-active-border-style fg=black
     set -g pane-border-style fg=black
@@ -219,6 +223,13 @@
 
         name+="''${name:+ }$*"
         typeset -U PATH
+    }
+
+    z() {
+        local dir
+
+        dir=$(find ~/Code -mindepth 2 -maxdepth 2 | fzf --preview-window right:50%  --preview 'git -C {} log --pretty=color --color=always -16')
+        cd "$dir"
     }
 
     xi() {
@@ -344,7 +355,7 @@
         exec /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb $SHELL -l
     }
 
-    no-sandbox() {
+    tmux-run() {
         tmux split-window -c '#{pane_current_path}' -p 25
         if [ $# -gt 0 ]; then
             tmux send-keys -t . "$*" Enter
@@ -371,6 +382,7 @@
   environment.shellAliases.gcb = "git checkout -B";
   environment.shellAliases.gd = "git diff --minimal --patch";
   environment.shellAliases.gf = "git fetch";
+  environment.shellAliases.ga = "git log --pretty=color --all";
   environment.shellAliases.gg = "git log --pretty=color --graph";
   environment.shellAliases.gl = "git log --pretty=nocolor";
   environment.shellAliases.grh = "git reset --hard";
@@ -386,12 +398,6 @@
   '';
 
   environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
-
-  nix.nixPath =
-    [{ # Use local nixpkgs checkout instead of channels.
-      darwin-config = "$HOME/.config/nixpkgs/darwin/configuration.nix";
-      darwin = "$HOME/.nix-defexpr/darwin"; }
-    ];
 
   nixpkgs.config.allowUnfree = true;
 
@@ -465,4 +471,5 @@
   # You should generally set this to the total number of logical cores in your system.
   # $ sysctl -n hw.ncpu
   nix.maxJobs = 1;
+  nix.buildCores = 1;
 }
