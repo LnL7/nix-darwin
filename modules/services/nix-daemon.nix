@@ -44,7 +44,10 @@ in
     nix.useDaemon = true;
 
     launchd.daemons.nix-daemon = {
-      command = "${config.nix.package}/bin/nix-daemon";
+      serviceConfig.ProgramArguments = [
+        "/bin/sh" "-c"
+        "/bin/wait4path ${config.nix.package}/bin/nix-daemon &amp;&amp; exec ${config.nix.package}/bin/nix-daemon"
+      ];
       serviceConfig.ProcessType = mkDefault "Interactive";
       serviceConfig.LowPriorityIO = config.nix.daemonIONice;
       serviceConfig.Nice = config.nix.daemonNiceLevel;
