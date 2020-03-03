@@ -45,10 +45,12 @@ in
       find -L "$systemConfig/Library/Fonts" -type f -print0 | while IFS= read -rd "" l; do
           font=''${l##*/}
           f=$(readlink -f "$l")
-          if [ ! -e "/Library/Fonts/$font" ] || [ $(stat -c '%i' "$f") != $(stat -c '%i' "/Library/Fonts/$font") ]; then
+          if [ ! -e "/Library/Fonts/$font" ]; then
               echo "updating font $font..." >&2
-              # FIXME: hardlink, won't work if nix is on a dedicated filesystem.
-              ln -fn "$f" /Library/Fonts
+              ln -fn -- "$f" /Library/Fonts 2>/dev/null || {
+                echo "Could not create hard link. Nix is probably on another filesystem. Copying the font instead..." >&2
+                rsync -az --inplace "$f" /Library/Fonts
+              }
           fi
       done
 

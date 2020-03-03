@@ -17,7 +17,7 @@ in
 
     echo "checking activation of fonts in /activate" >&2
     grep "fontrestore default -n 2>&1" ${config.out}/activate
-    grep 'ln -fn ".*" /Library/Fonts' ${config.out}/activate
+    grep 'ln -fn ".*" /Library/Fonts' ${config.out}/activate || grep 'rsync -az --inplace ".*" /Library/Fonts' ${config.out}/activate
     grep 'rm "/Library/Fonts/.*"' ${config.out}/activate
   '';
 }
