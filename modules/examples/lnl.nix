@@ -106,7 +106,7 @@
   programs.tmux.enableFzf = true;
   programs.tmux.enableVim = true;
 
-  programs.tmux.tmuxConfig = ''
+  programs.tmux.extraConfig = ''
     bind 0 set status
     bind S choose-session
 
