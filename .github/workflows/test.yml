@@ -1,0 +1,32 @@
+name: "Test"
+on:
+  pull_request:
+  push:
+jobs:
+  tests:
+    runs-on: macos
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - run: nix-build ./release.nix -I darwin=. -A tests
+    - run: nix-build ./release.nix -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I darwin=. -A examples.simple
+  install:
+    runs-on: macos
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - run: |
+        nix-channel --update
+        echo "FIXME workaround channel permission error"
+    - run: |
+        nix-shell -A installer
+        nix-shell -A installer.check
+    - run: |
+        . /etc/static/bashrc
+        darwin-rebuild switch -I darwin=.
+    - run: |
+        nix-shell -A uninstaller
+        nix-shell -A uninstaller.check
