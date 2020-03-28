@@ -2,7 +2,7 @@
 
 # nix-darwin
 
-[![Build Status](https://travis-ci.org/LnL7/nix-darwin.svg?branch=master)](https://travis-ci.org/LnL7/nix-darwin)
+![Test](https://github.com/LnL7/nix-darwin/workflows/Test/badge.svg)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
