@@ -12,6 +12,7 @@ with lib;
     PATH=/nix/var/nix/profiles/default/bin:$PATH
 
     darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
+    i=y
     if ! test -e "$darwinPath"; then
         if test -t 1; then
             read -p "Would you like to manage <darwin> with nix-channel? [y/n] " i
@@ -47,13 +48,20 @@ with lib;
     fi
 
     if ! test -L /run; then
-      echo "setting up /run..."
       if test -t 1; then
           read -p "Would you like to create /run? [y/n] " i
       fi
       case "$i" in
           y|Y)
-              sudo ln -sfn private/var/run /run
+              if ! grep -q '^run\b' /etc/synthetic.conf 2>/dev/null; then
+                  echo "setting up /etc/synthetic.conf..."
+                  echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf >/dev/null
+                  /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B 2>/dev/null || true
+              fi
+              if ! test -L /run; then
+                  echo "setting up /run..."
+                  sudo ln -sfn private/var/run /run
+              fi
               ;;
       esac
     fi

@@ -25,9 +25,20 @@ let
     if ! test -e /run; then
         echo "[1;31merror: Directory /run does not exist, aborting activation[0m" >&2
         echo "Create a symlink to /var/run with:" >&2
-        echo >&2
-        echo "    sudo ln -s private/var/run /run" >&2
-        echo >&2
+        if test -e /etc/synthetic.conf; then
+            echo >&2
+            echo "$ echo "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf" >&2
+            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B" >&2
+            echo >&2
+            echo "The current contents of /etc/synthetic.conf is:" >&2
+            echo >&2
+            sed 's/^/    /' /etc/synthetic.conf >&2
+            echo >&2
+        else
+            echo >&2
+            echo "$ sudo ln -s private/var/run /run" >&2
+            echo >&2
+        fi
         exit 2
     fi
   '';
