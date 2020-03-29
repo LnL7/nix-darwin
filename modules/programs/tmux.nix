@@ -39,6 +39,9 @@ let
 in
 
 {
+  imports = [
+    (mkRenamedOptionModule [ "programs" "tmux" "tmuxConfig" ] [ "programs" "tmux" "extraConfig" ])
+  ];
   options = {
     programs.tmux.enable = mkOption {
       type = types.bool;
@@ -92,7 +95,7 @@ in
       default = {};
     };
 
-    programs.tmux.tmuxConfig = mkOption {
+    programs.tmux.extraConfig = mkOption {
       type = types.lines;
       default = "";
       description = "Extra configuration to add to <filename>tmux.conf</filename>.";
@@ -112,7 +115,7 @@ in
 
     environment.etc."tmux.conf".text = ''
       ${tmuxOptions}
-      ${cfg.tmuxConfig}
+      ${cfg.extraConfig}
 
       source-file -q /etc/tmux.conf.local
     '';
