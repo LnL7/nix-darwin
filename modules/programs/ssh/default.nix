@@ -151,12 +151,13 @@ in
     services.openssh.authorizedKeysFiles = [ "%h/.ssh/authorized_keys" "/etc/ssh/authorized_keys.d/%u" ];
 
     environment.etc = authKeysFiles //
-      { "ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
-        (h: assert h.hostNames != [];
-          concatStringsSep "," h.hostNames + " "
-          + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
-        )) + "\n";
-
+      { "ssh/ssh_known_hosts" = mkIf (builtins.length knownHosts > 0) {
+          text = (flip (concatMapStringsSep "\n") knownHosts
+            (h: assert h.hostNames != [];
+              concatStringsSep "," h.hostNames + " "
+              + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
+            )) + "\n";
+        };
         "ssh/sshd_config.d/101-authorized-keys.conf" = {
           text = "AuthorizedKeysFile ${toString config.services.openssh.authorizedKeysFiles}\n";
           # Allows us to automatically migrate from using a file to a symlink
