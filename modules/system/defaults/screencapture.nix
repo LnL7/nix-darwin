@@ -12,5 +12,13 @@ with lib;
           The filesystem path to which screencaptures should be written.
         '';
     };
+
+    system.defaults.screencapture.disable-shadow = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+          Disable drop shadow border around screencaptures.
+        '';
+    };
   };
 }
