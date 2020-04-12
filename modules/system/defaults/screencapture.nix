@@ -14,10 +14,10 @@ with lib;
     };
 
     system.defaults.screencapture.disable-shadow = mkOption {
-      type = types.bool;
-      default = false;
+      type = types.nullOr types.bool;
+      default = null;
       description = ''
-          Disable drop shadow border around screencaptures.
+          Disable drop shadow border around screencaptures. The default is false;
         '';
     };
   };
