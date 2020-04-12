@@ -24,6 +24,7 @@
   ./system/keyboard.nix
   ./system/launchd.nix
   ./system/shells.nix
+  ./system/shortcuts.nix
   ./system/version.nix
   ./time
   ./networking

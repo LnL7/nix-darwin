@@ -106,6 +106,8 @@ in
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
 
+      ${cfg.activationScripts.shortcuts.text}
+
       ${cfg.activationScripts.postUserActivation.text}
 
       exit $_status
