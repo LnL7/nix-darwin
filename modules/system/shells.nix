@@ -18,7 +18,7 @@ in
         and other shells that are available by default on
         macOS.
       '';
-      apply = map (v: if types.shellPackage.check v then "/run/current-system/sw${v.shellPath}" else v);
+      apply = map (v: if types.shellPackage.check v then "${config.environment.currentSystemPath}/sw${v.shellPath}" else v);
     };
   };
 

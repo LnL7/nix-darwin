@@ -101,6 +101,7 @@ let
     tests.autossh = makeTest ./tests/autossh.nix;
     tests.checks-nix-gc = makeTest ./tests/checks-nix-gc.nix;
     tests.environment-path = makeTest ./tests/environment-path.nix;
+    tests.environment-path-custom = makeTest ./tests/environment-path-custom.nix;
     tests.launchd-daemons = makeTest ./tests/launchd-daemons.nix;
     tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
     tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
@@ -111,6 +112,7 @@ let
     tests.programs-zsh = makeTest ./tests/programs-zsh.nix;
     tests.security-pki = makeTest ./tests/security-pki.nix;
     tests.services-activate-system = makeTest ./tests/services-activate-system.nix;
+    tests.services-activate-system-custom = makeTest ./tests/services-activate-system-custom.nix;
     tests.services-buildkite-agent = makeTest ./tests/services-buildkite-agent.nix;
     tests.services-nix-daemon = makeTest ./tests/services-nix-daemon.nix;
     tests.sockets-nix-daemon = makeTest ./tests/sockets-nix-daemon.nix;
@@ -127,6 +129,7 @@ let
     tests.system-packages = makeTest ./tests/system-packages.nix;
     tests.system-path = makeTest ./tests/system-path.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
+    tests.system-shells-custom = makeTest ./tests/system-shells-custom.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
     tests.users-packages = makeTest ./tests/users-packages.nix;
     tests.fonts = makeTest ./tests/fonts.nix;

@@ -36,7 +36,7 @@ in
 
     services.chunkwm.plugins.dir = mkOption {
       type = types.path;
-      default = "/run/current-system/sw/lib/chunkwm/plugins";
+      default = "${config.environment.currentSystemPath}/sw/lib/chunkwm/plugins";
       description = "Chunkwm Plugins directory.";
     };
 

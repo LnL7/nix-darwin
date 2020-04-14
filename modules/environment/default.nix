@@ -37,6 +37,15 @@ in
       apply = x: if isList x then makeDrvBinPath x else x;
     };
 
+    environment.currentSystemPath = mkOption {
+      type = types.either types.path types.str;
+      description = ''
+        The location where to expose the nix-darwin system.
+      '';
+      default = /run/current-system;
+      apply = p: builtins.toString p;
+    };
+
     environment.profiles = mkOption {
       type = types.listOf types.str;
       description = "A list of profiles used to setup the global environment.";
@@ -155,7 +164,7 @@ in
     # Use user, default and system profiles.
     environment.profiles = mkMerge [
       (mkOrder 800 [ "$HOME/.nix-profile" ])
-      [ "/run/current-system/sw" "/nix/var/nix/profiles/default" ]
+      [ "${config.environment.currentSystemPath}/sw" "/nix/var/nix/profiles/default" ]
     ];
 
     environment.pathsToLink = [ "/bin" "/share/locale" ];

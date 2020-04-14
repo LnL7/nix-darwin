@@ -443,7 +443,7 @@ in
     '';
 
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
-      if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
+      if ! diff /etc/nix/nix.conf ${config.environment.currentSystemPath}/etc/nix/nix.conf &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
       fi
