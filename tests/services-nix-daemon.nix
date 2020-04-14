@@ -8,6 +8,7 @@ in
 {
   services.nix-daemon.enable = true;
   nix.package = nix;
+  launchd.labelPrefix = "org.nix-darwin"; # should not have an effect on nix-daemon
 
   environment.variables.NIX_SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-certificates.crt";
 

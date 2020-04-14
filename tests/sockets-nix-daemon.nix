@@ -8,6 +8,7 @@ in
   services.nix-daemon.enable = true;
   services.nix-daemon.enableSocketListener = true;
   nix.package = nix;
+  launchd.labelPrefix = "org.nix-darwin"; # should not have an effect on nix-daemon
 
   test = ''
     echo checking nix-daemon service in /Library/LaunchDaemons >&2
