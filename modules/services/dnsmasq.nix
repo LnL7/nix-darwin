@@ -37,7 +37,10 @@ in
     services.dnsmasq.addresses = mkOption {
       type = types.attrs;
       default = {};
-      description = "List of domains that will be redirected by the DNSmasq";
+      description = "List of domains that will be redirected by the DNSmasq.";
+      example = literalExample ''
+        { localhost = "127.0.0.1"; }
+        '';
     };
   };
 
