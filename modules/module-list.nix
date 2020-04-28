@@ -38,6 +38,7 @@
   ./services/autossh.nix
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
+  ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/khd
   ./services/kwm

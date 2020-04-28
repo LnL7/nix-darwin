@@ -23,7 +23,7 @@ in
     };
 
     services.dnsmasq.bind = mkOption {
-      type = types.string;
+      type = types.str;
       default = "127.0.0.1";
       description = "This option specifies the interface on which DNSmasq will listen.";
     };
