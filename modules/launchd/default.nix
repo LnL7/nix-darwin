@@ -88,7 +88,7 @@ let
           ${config.script}
         '');
 
-        serviceConfig.Label = mkDefault "org.nixos.${name}";
+        serviceConfig.Label = mkDefault "${cfg.labelPrefix}.${name}";
         serviceConfig.ProgramArguments = mkIf (cmd != "") [ "/bin/sh" "-c" "exec ${cmd}" ];
         serviceConfig.EnvironmentVariables = mkIf (env != {}) env;
       };
@@ -97,6 +97,15 @@ in
 
 {
   options = {
+    launchd.labelPrefix = mkOption {
+      type = types.str;
+      default = "org.nixos";
+      description = ''
+        The default prefix of the service label. Individual services can
+        override this by setting the Label attribute.
+      '';
+    };
+
     launchd.envVariables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
