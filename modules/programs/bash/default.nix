@@ -86,9 +86,6 @@ in
             for m in "$p/etc/bash_completion.d/"*; do
               source $m
             done
-            for m in "$p/share/bash-completion/completions/"*; do
-              source $m
-            done
           done
           eval "$nullglobStatus"
           unset nullglobStatus p m
