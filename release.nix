@@ -123,6 +123,7 @@ let
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
     tests.services-synapse-bt = makeTest ./tests/services-synapse-bt.nix;
     tests.services-synergy = makeTest ./tests/services-synergy.nix;
+    tests.services-yabai = makeTest ./tests/services-yabai.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
     tests.system-environment = makeTest ./tests/system-environment.nix;
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;
