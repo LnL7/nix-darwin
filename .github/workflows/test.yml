@@ -4,7 +4,7 @@ on:
   push:
 jobs:
   tests:
-    runs-on: macos
+    runs-on: macos-10.15
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
@@ -13,7 +13,7 @@ jobs:
     - run: nix-build ./release.nix -I darwin=. -A manpages
     - run: nix-build ./release.nix -I darwin=. -A examples.simple
   install:
-    runs-on: macos
+    runs-on: macos-10.15
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
