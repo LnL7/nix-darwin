@@ -51,6 +51,7 @@
   ./services/privoxy
   ./services/redis
   ./services/skhd
+  ./services/spacebar
   ./services/synapse-bt.nix
   ./services/synergy
   ./services/yabai
