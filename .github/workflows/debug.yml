@@ -1,5 +1,10 @@
 name: "Debug"
 on:
+  # curl -fsSL -XPOST \
+  #     -H "Accept: application/vnd.github.everest-preview+json" \
+  #     -H "Authorization: token $GITHUB_TOKEN" \
+  #     --data '{"event_type": "debug"}' \
+  #     https://api.github.com/repos/LnL7/nix-darwin/dispatches
   repository_dispatch:
       types:
         - debug
