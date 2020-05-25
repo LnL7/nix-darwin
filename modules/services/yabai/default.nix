@@ -14,7 +14,7 @@ let
       (if (cfg.config != {})
        then "${toYabaiConfig cfg.config}"
        else "")
-      + optionalString (cfg.extraConfig != "") cfg.extraConfig)}";
+      + optionalString (cfg.extraConfig != "") ("\n" + cfg.extraConfig + "\n"))}";
 in
 
 {

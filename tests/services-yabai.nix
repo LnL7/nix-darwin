@@ -23,5 +23,6 @@ in
     echo >&2 "checking config in $conf"
     grep "yabai -m config focus_follows_mouse autoraise" $conf
     grep "yabai -m rule --add app='System Preferences' manage=off" $conf
+    if [ `cat $conf | wc -l` -eq "2" ]; then echo "yabairc correctly contains 2 lines"; else return 1; fi
   '';
 }
