@@ -23,6 +23,7 @@
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix
+  ./system/patches.nix
   ./system/shells.nix
   ./system/version.nix
   ./time

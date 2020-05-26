@@ -86,6 +86,7 @@ in
         mkdir -p $out/darwin
         cp -f ${../../CHANGELOG} $out/darwin-changes
 
+        ln -s ${cfg.build.patches}/patches $out/patches
         ln -s ${cfg.build.etc}/etc $out/etc
         ln -s ${cfg.path} $out/sw
 
