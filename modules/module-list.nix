@@ -42,6 +42,7 @@
   ./services/emacs.nix
   ./services/khd
   ./services/kwm
+  ./services/lorri.nix
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
   ./services/nix-daemon.nix
