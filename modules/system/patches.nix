@@ -50,14 +50,18 @@ in
       # Applying patches to /.
       echo "applying patches..." >&2
 
-      f=$(readlink /run/current-system/patches)
-      if ! test "$f" = ${config.system.build.patches}/patches; then
-          for f in $(find /run/current-system/patches/ -type l); do
-              patch --reverse --backup -d / -p1 < "$f" >/dev/null || true
-          done
+      for f in $(ls /run/current-system/patches 2> /dev/null); do
+          if test ! -e "${config.system.build.patches}/patches/$f"; then
+              patch --reverse --backup -d / -p1 < "/run/current-system/patches/$f" || true
+          fi
+      done
 
-          ${concatMapStringsSep "\n" (f: "patch --forward --backup -d / -p1 < '${f}' || true") cfg.patches}
-      fi
+        ${concatMapStringsSep "\n" (f: ''
+          f="$(basename ${f})"
+          if ! diff "${cfg.build.patches}/patches/$f" "/run/current-system/patches/$f" &> /dev/null; then
+              patch --forward --backup -d / -p1 < '${f}' || true
+          fi
+        '') cfg.patches}
     '';
 
   };
