@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v8
+    - uses: cachix/install-nix-action@v9
     - run: nix-build ./release.nix -I darwin=. -A tests
     - run: nix-build ./release.nix -I darwin=. -A manpages
     - run: nix-build ./release.nix -I darwin=. -A examples.simple
