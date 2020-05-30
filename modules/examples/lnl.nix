@@ -79,14 +79,21 @@
     serviceConfig.StartInterval = 360;
   };
 
+  launchd.user.agents.letty = {
+    serviceConfig.Program = "${pkgs.lnl.letty}/bin/letty-blink";
+    serviceConfig.WatchPaths = ["/var/mail/lnl"];
+    serviceConfig.KeepAlive = false;
+    serviceConfig.ProcessType = "Background";
+  };
+
   services.nix-daemon.enable = true;
-  services.nix-daemon.enableSocketListener = true;
+  # services.nix-daemon.enableSocketListener = true;
 
   nix.extraOptions = ''
     gc-keep-derivations = true
     gc-keep-outputs = true
-    min-free = 68719480000
-    max-free = 274877900000
+    min-free = 17179870000
+    max-free = 17179870000
     log-lines = 128
   '';
 
