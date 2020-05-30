@@ -82,24 +82,25 @@ in
     };
 
     nix.maxJobs = mkOption {
-      type = types.int;
-      default = 1;
+      type = types.either types.int (types.enum ["auto"]);
+      default = "auto";
       example = 64;
       description = ''
-        This option defines the maximum number of jobs that Nix will try
-        to build in parallel.  The default is 1.  You should generally
-        set it to the total number of logical cores in your system (e.g., 16
-        for two CPUs with 4 cores each and hyper-threading).
+        This option defines the maximum number of jobs that Nix will try to
+        build in parallel. The default is auto, which means it will use all
+        available logical cores. It is recommend to set it to the total
+        number of logical cores in your system (e.g., 16 for two CPUs with 4
+        cores each and hyper-threading).
       '';
     };
 
     nix.buildCores = mkOption {
       type = types.int;
-      default = 1;
+      default = 0;
       example = 64;
       description = ''
         This option defines the maximum number of concurrent tasks during
-        one build. It affects, e.g., -j option for make. The default is 1.
+        one build. It affects, e.g., -j option for make.
         The special value 0 means that the builder should use all
         available CPU cores in the system. Some builds may become
         non-deterministic with this option; use with care! Packages will
