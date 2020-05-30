@@ -106,8 +106,8 @@
 
   programs.nix-index.enable = true;
 
-  programs.gnupg.agent.enable = true;
-  programs.gnupg.agent.enableSSHSupport = true;
+  # programs.gnupg.agent.enable = true;
+  # programs.gnupg.agent.enableSSHSupport = true;
 
   programs.tmux.enable = true;
   programs.tmux.enableSensible = true;
