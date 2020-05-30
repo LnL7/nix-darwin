@@ -231,7 +231,7 @@
     :u() {
         local exports
 
-        exports=$(direnv apply_dump <(nix-shell -E "with import <dotpkgs> {}; mkShell { buildInputs = [ $* ]; }" --run 'direnv dump'))
+        exports=$(direnv apply_dump <(nix-shell -E "with import <nixpkgs> {}; mkShell { buildInputs = [ $* ]; }" --run 'direnv dump'))
         eval "$exports"
 
         name+="''${name:+ }$*"
@@ -241,22 +241,16 @@
     z() {
         local dir
 
-        dir=$(find ~/Code -mindepth 2 -maxdepth 2 | fzf --preview-window right:50%  --preview 'git -C {} log --pretty=color --color=always -16')
+        dir=$(find ~/Code -mindepth 2 -maxdepth 2 | fzf --preview-window right:50% --preview 'git -C {} log --pretty=color --color=always -16')
         cd "$dir"
+    }
+
+    fzf-store() {
+        find /nix/store -type d -mindepth 1 -maxdepth 1 | fzf -m --preview-window right:50% --preview 'nix-store -q --tree {}'
     }
 
     xi() {
         curl -F 'f:1=<-' ix.io
-    }
-
-    mount_ram() {
-        local dev
-        if [ -e /Volumes/RAM ]; then
-            dev=$(diskutil info | awk '/Device Node:/ {print $3}')
-            umount /Volumes/RAM
-            hdiutil detach "$dev"
-        fi
-        diskutil erasevolume JHFS+ RAM $(hdiutil attach -nomount ram://10248576)
     }
 
     ls() {
@@ -275,20 +269,22 @@
         ${pkgs.darwin.cctools}/bin/otool "$@"
     }
 
-    aarch-build() {
-        nix-build --option system aarch64-linux --store ssh-ng://aarch1 "$@"
+    vat() {
+        TERM=vt100 nvim -R "$@" "+setl updatetime=0" "+autocmd CursorHold * :q"
     }
 
-    arm-build() {
-        nix-build --option system armv7l-linux --store ssh-ng://arm1 "$@"
-    }
-
-    darwin-build() {
-        nix-build --option system x86_64-darwin --store ssh-ng://mac1 "$@"
-    }
-
-    linux-build() {
-        nix-build --option system x86_64-linux --store ssh-ng://nixos1 "$@"
+    nixq() {
+        nix eval --json "(
+        with builtins;
+        with import <nixpkgs/lib>;
+        let
+          _ = fromJSON (readFile /dev/stdin);
+          _0 = head _;
+          _1 = head _0;
+          _2 = head _1;
+        in
+        $*
+        )"
     }
 
     nix-unpack() {
@@ -373,6 +369,28 @@
         if [ $# -gt 0 ]; then
             tmux send-keys -t . "$*" Enter
         fi
+    }
+
+    gh-darwin-debug() {
+        curl -X POST -fsSL \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data '{"event_type": "debug"}' \
+            https://api.github.com/repos/LnL7/nix-darwin/dispatches
+    }
+
+    pushover() {
+        local i
+        "$@"
+        i=$?
+        curl -fsSL -XPOST \
+            --form-string "token=$PUSHOVER_TOKEN" \
+            --form-string "user=$PUSHOVER_USER" \
+            --form-string "expire=60" \
+            --form-string "sound=intermission" \
+            --form-string "message=$*: completed with status $i" \
+            https://api.pushover.net/1/messages.json > /dev/null
+        return "$i"
     }
   '';
 
