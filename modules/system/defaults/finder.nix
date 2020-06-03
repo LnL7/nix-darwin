@@ -13,6 +13,14 @@ with lib;
       '';
     };
 
+    system.defaults.finder.CreateDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to show icons on the desktop or not. The default is true.
+      '';
+    };
+
     system.defaults.finder.QuitMenuItem = mkOption {
       type = types.nullOr types.bool;
       default = null;
