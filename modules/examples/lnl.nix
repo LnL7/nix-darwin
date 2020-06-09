@@ -66,18 +66,18 @@
   services.chunkwm.enable = true;
   services.skhd.enable = true;
 
-  security.sandbox.profiles.fetch-nixpkgs-updates.closure = [ pkgs.cacert pkgs.git ];
-  security.sandbox.profiles.fetch-nixpkgs-updates.writablePaths = [ (toString <nixpkgs-trunk>) ];
-  security.sandbox.profiles.fetch-nixpkgs-updates.allowNetworking = true;
+  # security.sandbox.profiles.fetch-nixpkgs-updates.closure = [ pkgs.cacert pkgs.git ];
+  # security.sandbox.profiles.fetch-nixpkgs-updates.allowNetworking = true;
+  # security.sandbox.profiles.fetch-nixpkgs-updates.writablePaths = [ (toString ~/Code/nixos/nixpkgs) ];
 
-  launchd.user.agents.fetch-nixpkgs-updates = {
-    command = "/usr/bin/sandbox-exec -f ${config.security.sandbox.profiles.fetch-nixpkgs-updates.profile} ${pkgs.git}/bin/git -C ${toString <nixpkgs-trunk>} fetch origin master";
-    environment.HOME = "";
-    environment.NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-    serviceConfig.KeepAlive = false;
-    serviceConfig.ProcessType = "Background";
-    serviceConfig.StartInterval = 360;
-  };
+  # launchd.user.agents.fetch-nixpkgs-updates = {
+  #   command = "/usr/bin/sandbox-exec -f ${config.security.sandbox.profiles.fetch-nixpkgs-updates.profile} ${pkgs.git}/bin/git -C ${toString ~/Code/nixos/nixpkgs} fetch origin master";
+  #   environment.HOME = "";
+  #   environment.NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+  #   serviceConfig.KeepAlive = false;
+  #   serviceConfig.ProcessType = "Background";
+  #   serviceConfig.StartInterval = 360;
+  # };
 
   launchd.user.agents.letty = {
     serviceConfig.Program = "${pkgs.lnl.letty}/bin/letty-blink";
