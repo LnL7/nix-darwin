@@ -1,0 +1,18 @@
+name: "Build"
+on:
+  # curl -fsSL -XPOST \
+  #     -H "Accept: application/vnd.github.everest-preview+json" \
+  #     -H "Authorization: token $GITHUB_TOKEN" \
+  #     --data '{"event_type": "build", "client_payload": {"args": "-f channel:nixpkgs-unstable hello"}}' \
+  #     https://api.github.com/repos/LnL7/nix-darwin/dispatches
+  repository_dispatch:
+      types:
+        - build
+jobs:
+  build:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v9
+    - run: |
+        nix build ${{ github.event.client_payload.args }} -vL
