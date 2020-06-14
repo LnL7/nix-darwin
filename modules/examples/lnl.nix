@@ -63,7 +63,8 @@
       pkgs.darwin-zsh-completions
     ];
 
-  services.chunkwm.enable = true;
+  services.yabai.enable = true;
+  services.yabai.package = pkgs.yabai;
   services.skhd.enable = true;
 
   # security.sandbox.profiles.fetch-nixpkgs-updates.closure = [ pkgs.cacert pkgs.git ];
@@ -79,12 +80,13 @@
   #   serviceConfig.StartInterval = 360;
   # };
 
-  launchd.user.agents.letty = {
-    serviceConfig.Program = "${pkgs.lnl.letty}/bin/letty-blink";
-    serviceConfig.WatchPaths = ["/var/mail/lnl"];
-    serviceConfig.KeepAlive = false;
-    serviceConfig.ProcessType = "Background";
-  };
+  # Dotfiles.
+  # launchd.user.agents.letty = {
+  #   serviceConfig.Program = "${pkgs.lnl.letty}/bin/letty-blink";
+  #   serviceConfig.WatchPaths = ["/var/mail/lnl"];
+  #   serviceConfig.KeepAlive = false;
+  #   serviceConfig.ProcessType = "Background";
+  # };
 
   services.nix-daemon.enable = true;
   # services.nix-daemon.enableSocketListener = true;
@@ -148,38 +150,50 @@
 
   # programs.vim.enable = true;
   # programs.vim.enableSensible = true;
-  programs.vim.package = pkgs.vim_configurable.customize {
-    name = "vim";
-    vimrcConfig.packages.darwin.start = with pkgs.vimPlugins; [
-      vim-sensible vim-surround ReplaceWithRegister
-      polyglot fzfWrapper YouCompleteMe ale
-    ];
-    vimrcConfig.packages.darwin.opt = with pkgs.vimPlugins; [
-      colors-solarized
-      splice-vim
-    ];
-    vimrcConfig.customRC = ''
-      set completeopt=menuone
-      set encoding=utf-8
-      set hlsearch
-      set list
-      set number
-      set showcmd
-      set splitright
+  programs.vim.package = pkgs.neovim.override {
+      configure = {
+        packages.darwin.start = with pkgs.vimPlugins; [
+          vim-sensible vim-surround ReplaceWithRegister
+          polyglot fzfWrapper ale deoplete-nvim
+        ];
 
-      nnoremap // :nohlsearch<CR>
+        customRC = ''
+        set completeopt=menuone
+        set encoding=utf-8
+        set hlsearch
+        set list
+        set number
+        set showcmd
+        set splitright
 
-      let mapleader = ' '
+        cnoremap %% <C-r>=expand('%:h') . '/'<CR>
+        nnoremap // :nohlsearch<CR>
 
-      " fzf
-      nnoremap <Leader>p :FZF<CR>
+        let mapleader = ' '
 
-      " vim-surround
-      vmap s S
+        " fzf
+        nnoremap <Leader>p :FZF<CR>
 
-      " youcompleteme
-      let g:ycm_seed_identifiers_with_syntax = 1
-    '';
+        " vim-surround
+        vmap s S
+
+        " ale
+        nnoremap <Leader>d :ALEGoToDefinition<CR>
+        nnoremap <Leader>D :ALEGoToDefinitionInVSplit<CR>
+        nnoremap <Leader>k :ALESignature<CR>
+        nnoremap <Leader>K :ALEHover<CR>
+        nnoremap [a :ALEPreviousWrap<CR>
+        nnoremap ]a :ALENextWrap<CR>
+
+        " deoplete
+        inoremap <expr><C-g> deoplete#undo_completion()
+        inoremap <expr><C-l> deoplete#refresh()
+        inoremap <silent><expr><C-Tab> deoplete#mappings#manual_complete()
+        inoremap <silent><expr><Tab> pumvisible() ? "\<C-n>" : "\<TAB>"
+
+        let g:deoplete#enable_at_startup = 1
+      '';
+    };
   };
 
   # Dotfiles.
@@ -428,7 +442,7 @@
     fi
   '';
 
-  environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
+  # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   nixpkgs.config.allowUnfree = true;
 
