@@ -105,8 +105,8 @@ in
 
     environment.pathsToLink = [ "/share/zsh" ];
 
-    environment.loginShell = "zsh -l";
-    environment.variables.SHELL = "${pkgs.zsh}/bin/zsh";
+    environment.loginShell = mkDefault "zsh -l";
+    environment.variables.SHELL = mkDefault "${pkgs.zsh}/bin/zsh";
 
     environment.etc."zshenv".text = ''
       # /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
