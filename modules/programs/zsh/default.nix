@@ -195,5 +195,17 @@ in
       fi
     '';
 
+    environment.etc."zprofile".knownSha256Hashes = [
+      "db8422f92d8cff684e418f2dcffbb98c10fe544b5e8cd588b2009c7fa89559c5"
+      "0235d3c1b6cf21e7043fbc98e239ee4bc648048aafaf6be1a94a576300584ef2"
+    ];
+
+    environment.etc."zshrc".knownSha256Hashes = [
+      "19a2d673ffd47b8bed71c5218ff6617dfc5e8533b240b9ba79142a45f8823c23"
+      "fb5827cb4712b7e7932d438067ec4852c8955a9ff0f55e282473684623ebdfa1"
+      "c5a00c072c920f46216454978c44df044b2ec6d03409dc492c7bdcd92c94a110"  # nix install
+      "40b0d8751adae5b0100a4f863be5b75613a49f62706427e92604f7e04d2e2261"  # nix install
+    ];
+
   };
 }

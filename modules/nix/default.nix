@@ -388,6 +388,10 @@ in
 
     environment.etc."nix/nix.conf".source = nixConf;
 
+    environment.etc."nix/nix.conf".knownSha256Hashes = [
+      "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"  # nix installer
+    ];
+
     # List of machines for distributed Nix builds in the format
     # expected by build-remote.
     environment.etc."nix/machines" =
