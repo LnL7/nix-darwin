@@ -44,6 +44,12 @@ in
         Path of the source file.
       '';
     };
+
+    knownSha256Hashes = mkOption {
+      internal = true;
+      type = types.listOf types.str;
+      default = [];
+    };
   };
 
   config = {
