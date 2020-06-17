@@ -104,6 +104,7 @@ stdenv.mkDerivation {
         readlink /etc/static
         test -e /etc/static
         grep /etc/static/bashrc /etc/bashrc
+        grep /etc/static/zshrc /etc/zshrc
         grep -v nix-daemon.sh /etc/profile
         echo >&2 "checking /run/current-system"
         readlink /run

@@ -36,6 +36,17 @@ with lib;
         esac
     fi
 
+    if ! test -L /etc/zshrc && ! grep -q /etc/static/zshrc /etc/zshrc; then
+        if test -t 1; then
+            read -p "Would you like to load darwin configuration in /etc/zshrc? [y/n] " i
+        fi
+        case "$i" in
+            y|Y)
+                echo 'if test -e /etc/static/zshrc; then . /etc/static/zshrc; fi' | sudo tee -a /etc/zshrc
+                ;;
+        esac
+    fi
+
     if ! test -L /etc/profile && grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
         if test -t 1; then
             read -p "Would you like to remove nix-daemon.sh configuration in /etc/profile? [y/n] " i
