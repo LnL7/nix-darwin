@@ -21,7 +21,7 @@
   ./system/defaults/spaces.nix
   ./system/defaults/trackpad.nix
   ./system/etc.nix
-  ./system/keyboard.nix
+  ./system/keyboard
   ./system/launchd.nix
   ./system/patches.nix
   ./system/shells.nix

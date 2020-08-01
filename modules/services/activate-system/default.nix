@@ -30,7 +30,6 @@ in
         # Prevent the current configuration from being garbage-collected.
         ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
 
-        ${config.system.activationScripts.keyboard.text}
         ${config.system.activationScripts.nix.text}
       '';
       serviceConfig.RunAtLoad = true;

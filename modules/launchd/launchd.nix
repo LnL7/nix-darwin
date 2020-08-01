@@ -708,6 +708,21 @@ with lib;
       });
     };
 
+    LaunchEvents = mkOption {
+      type = types.nullOr (types.attrs);
+      default = null;
+      description = ''
+        Specifies higher-level event types to be used as launch-on-demand event
+        sources.  Each sub-dictionary defines events for a particular event
+        subsystem, such as "com.apple.iokit.match-ing", which can be used to
+        launch jobs based on the appearance of nodes in the IORegistry. Each
+        dictionary within the sub-dictionary specifies an event descriptor that
+        is specified to each event subsystem. With this key, the job promises to
+        use the xpc_set_event_stream_handler(3) API to consume events. See
+        xpc_events(3) for more details on event sources.
+      '';
+    };
+
     Sockets = mkOption {
       default = null;
       description = ''

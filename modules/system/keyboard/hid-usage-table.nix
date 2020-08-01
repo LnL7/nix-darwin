@@ -1,0 +1,130 @@
+# These attributes are based on this table:
+# https://developer.apple.com/library/archive/technotes/tn2450/_index.html
+#
+# There are more "usage IDs" in the specification[0] than cited there, but maybe
+# not all of them are supported on macOS.
+#
+# [0] https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
+
+{
+  "Keyboard ' and \"" = 52; # 0x34
+  "Keyboard , and \"<\"" = 54; # 0x36
+  "Keyboard - and _" = 45; # 0x2D
+  "Keyboard . and \">\"" = 55; # 0x37
+  "Keyboard / and ?" = 56; # 0x38
+  "Keyboard 0 and )" = 39; # 0x27
+  "Keyboard 1 and !" = 30; # 0x1E
+  "Keyboard 2 and @" = 31; # 0x1F
+  "Keyboard 3 and #" = 32; # 0x20
+  "Keyboard 4 and $" = 33; # 0x21
+  "Keyboard 5 and %" = 34; # 0x22
+  "Keyboard 6 and ^" = 35; # 0x23
+  "Keyboard 7 and &" = 36; # 0x24
+  "Keyboard 8 and *" = 37; # 0x25
+  "Keyboard 9 and (" = 38; # 0x26
+  "Keyboard ; and :" = 51; # 0x33
+  "Keyboard = and +" = 46; # 0x2E
+  "Keyboard Application" = 101; # 0x65
+  "Keyboard Caps Lock" = 57; # 0x39
+  "Keyboard Delete (Backspace)" = 42; # 0x2A
+  "Keyboard Delete Forward" = 76; # 0x4C
+  "Keyboard Down Arrow" = 81; # 0x51
+  "Keyboard End" = 77; # 0x4D
+  "Keyboard Escape" = 41; # 0x29
+  "Keyboard F1" = 58; # 0x3A
+  "Keyboard F10" = 67; # 0x43
+  "Keyboard F11" = 68; # 0x44
+  "Keyboard F12" = 69; # 0x45
+  "Keyboard F13" = 104; # 0x68
+  "Keyboard F14" = 105; # 0x69
+  "Keyboard F15" = 106; # 0x6A
+  "Keyboard F16" = 107; # 0x6B
+  "Keyboard F17" = 108; # 0x6C
+  "Keyboard F18" = 109; # 0x6D
+  "Keyboard F19" = 110; # 0x6E
+  "Keyboard F2" = 59; # 0x3B
+  "Keyboard F20" = 111; # 0x6F
+  "Keyboard F21" = 112; # 0x70
+  "Keyboard F22" = 113; # 0x71
+  "Keyboard F23" = 114; # 0x72
+  "Keyboard F24" = 115; # 0x73
+  "Keyboard F3" = 60; # 0x3C
+  "Keyboard F4" = 61; # 0x3D
+  "Keyboard F5" = 62; # 0x3E
+  "Keyboard F6" = 63; # 0x3F
+  "Keyboard F7" = 64; # 0x40
+  "Keyboard F8" = 65; # 0x41
+  "Keyboard F9" = 66; # 0x42
+  "Keyboard Grave Accent and Tilde" = 53; # 0x35
+  "Keyboard Home" = 74; # 0x4A
+  "Keyboard Insert" = 73; # 0x49
+  "Keyboard Left Alt" = 226; # 0xE2
+  "Keyboard Left Arrow" = 80; # 0x50
+  "Keyboard Left Control" = 224; # 0xE0
+  "Keyboard Left GUI" = 227; # 0xE3
+  "Keyboard Left Shift" = 225; # 0xE1
+  "Keyboard Non-US # and ~" = 50; # 0x32
+  "Keyboard Non-US \ and |" = 100; # 0x64
+  "Keyboard Page Down" = 78; # 0x4E
+  "Keyboard Page Up" = 75; # 0x4B
+  "Keyboard Pause" = 72; # 0x48
+  "Keyboard Power" = 102; # 0x66
+  "Keyboard Print Screen" = 70; # 0x46
+  "Keyboard Return (Enter)" = 40; # 0x28
+  "Keyboard Right Alt" = 230; # 0xE6
+  "Keyboard Right Arrow" = 79; # 0x4F
+  "Keyboard Right Control" = 228; # 0xE4
+  "Keyboard Right GUI" = 231; # 0xE7
+  "Keyboard Right Shift" = 229; # 0xE5;
+  "Keyboard Scroll Lock" = 71; # 0x47
+  "Keyboard Spacebar" = 44; # 0x2C
+  "Keyboard Tab" = 43; # 0x2B
+  "Keyboard Up Arrow" = 82; # 0x52
+  "Keyboard [ and {" = 47; # 0x2F
+  "Keyboard \ and |" = 49; # 0x31
+  "Keyboard ] and }" = 48; # 0x30
+  "Keyboard a and A" = 4; # 0x04
+  "Keyboard b and B" = 5; # 0x05
+  "Keyboard c and C" = 6; # 0x06
+  "Keyboard d and D" = 7; # 0x07
+  "Keyboard e and E" = 8; # 0x08
+  "Keyboard f and F" = 9; # 0x09
+  "Keyboard g and G" = 10; # 0x0A
+  "Keyboard h and H" = 11; # 0x0B
+  "Keyboard i and I" = 12; # 0x0C
+  "Keyboard j and J" = 13; # 0x0D
+  "Keyboard k and K" = 14; # 0x0E
+  "Keyboard l and L" = 15; # 0x0F
+  "Keyboard m and M" = 16; # 0x10
+  "Keyboard n and N" = 17; # 0x11
+  "Keyboard o and O" = 18; # 0x12
+  "Keyboard p and P" = 19; # 0x13
+  "Keyboard q and Q" = 20; # 0x14
+  "Keyboard r and R" = 21; # 0x15
+  "Keyboard s and S" = 22; # 0x16
+  "Keyboard t and T" = 23; # 0x17
+  "Keyboard u and U" = 24; # 0x18
+  "Keyboard v and V" = 25; # 0x19
+  "Keyboard w and W" = 26; # 0x1A
+  "Keyboard x and X" = 27; # 0x1B
+  "Keyboard y and Y" = 28; # 0x1C
+  "Keyboard z and Z" = 29; # 0x1D
+  "Keypad *" = 85; # 0x55
+  "Keypad +" = 87; # 0x57
+  "Keypad -" = 86; # 0x56
+  "Keypad . and Delete" = 99; # 0x63
+  "Keypad /" = 84; # 0x54
+  "Keypad 0 and Insert" = 98; # 0x62
+  "Keypad 1 and End" = 89; # 0x59
+  "Keypad 2 and Down Arrow" = 90; # 0x5A
+  "Keypad 3 and Page Down" = 91; # 0x5B
+  "Keypad 4 and Left Arrow" = 92; # 0x5C
+  "Keypad 5" = 93; # 0x5D
+  "Keypad 6 and Right Arrow" = 94; # 0x5E
+  "Keypad 7 and Home" = 95; # 95; # 0x5F
+  "Keypad 8 and Up Arrow" = 96; # 0x60
+  "Keypad 9 and Page Up" = 97; # 0x61
+  "Keypad =" = 103; # 0x67
+  "Keypad Enter" = 88; # 0x58
+  "Keypad Num Lock and Clear" = 83; # 0x53
+}
