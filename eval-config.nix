@@ -1,10 +1,40 @@
-{ lib, system ? "x86_64-darwin" }:
+#{ lib, system ? "x86_64-darwin", check ? true }:
 
-{ configuration, inputs }:
+{ configuration, inputs ? null, pkgs ? (import inputs.nixpkgs { system = system; }), lib ? pkgs.lib, check ? true, modules ? [], specialArgs ? {}, system ? "x86_64-darwin" }:
+
+let
+  darwinModules = import ./modules/module-list.nix;
+
+  eval = lib.evalModules {
+    modules = let
+      initModule = { ... }: {
+        _file = ./default.nix;
+        config = {
+          _module.args = {
+            pkgs = pkgs;
+            baseModules = darwinModules;
+          } // (if inputs != null then inputs else {});
+          nixpkgs.system = system;
+          # TODO: assert pkgs.system == system?
+        };
+      };
+    in [ initModule configuration ] ++ modules ++ darwinModules;
+    specialArgs = { modulesPath = ./modules; } // specialArgs;
+    inherit check;
+  };
+
+in {
+  inherit pkgs; # TODO: why a round trip throug eval?
+  inherit (eval) options config;
+
+  system = eval.config.system.build.toplevel;
+}
+
+/*{ configuration, inputs, modules ? [], specialArgs ? {} }:
 
 let
   baseModules = import ./modules/module-list.nix;
-  modules = [ configuration packages ] ++ baseModules;
+  evalModules = [ configuration packages ] ++ baseModules ++ modules;
 
   packages = { config, lib, pkgs, ... }: {
     _file = ./default.nix;
@@ -16,9 +46,9 @@ let
   };
 
   eval = lib.evalModules {
-    inherit modules;
-    args = { inherit baseModules modules; };
-    specialArgs = { modulesPath = ./modules; };
+    modules = evalModules;
+    args = { inherit baseModules; modules = evalModules; };
+    specialArgs = { modulesPath = ./modules; } // specialArgs;
     check = true;
   };
 
@@ -32,4 +62,4 @@ in
   inherit (eval) options config;
 
   system = eval.config.system.build.toplevel;
-}
+}*/

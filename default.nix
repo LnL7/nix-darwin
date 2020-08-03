@@ -4,7 +4,7 @@
 }:
 
 let
-  evalConfig = import ./eval-config.nix { inherit (pkgs) lib; };
+  evalConfig = import ./eval-config.nix;
 
   eval = evalConfig {
     inherit configuration;

@@ -5,7 +5,7 @@
   outputs = { self, nixpkgs }: {
 
     lib = {
-      evalConfig = import ./eval-config.nix { inherit (nixpkgs) lib; };
+      evalConfig = import ./eval-config.nix;
     };
 
     examples.lnl = import ./modules/examples/lnl.nix;
