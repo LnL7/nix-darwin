@@ -1,10 +1,16 @@
-{ stdenv, nix, pkgs }:
+{ stdenv, nix, pkgs, nix-darwin }:
 
 let
+  configuration = builtins.path {
+    name = "nix-darwin-uninstaller-configuration";
+    path = ./.;
+    filter = name: _type: name != toString ./default.nix;
+  };
+
   nixPath = stdenv.lib.concatStringsSep ":" [
-    "darwin-config=${toString ./configuration.nix}"
-    "darwin=${toString ../..}"
-    "nixpkgs=${toString pkgs.path}"
+    "darwin-config=${configuration}/configuration.nix"
+    "darwin=${nix-darwin}"
+    "nixpkgs=${pkgs.path}"
     "$NIX_PATH"
   ];
 in
