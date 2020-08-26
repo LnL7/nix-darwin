@@ -64,7 +64,7 @@ stdenv.mkDerivation {
     # Skip when stdin is not a tty, eg.
     # $ yes | darwin-installer
     if test -t 0; then
-        read -p "Would you like edit the default configuration.nix before starting? [y/n] " i
+        read -p "Would you like to edit the default configuration.nix before starting? [y/n] " i
         case "$i" in
             y|Y)
                 PATH=$_PATH ''${EDITOR:-nano} "$config"
