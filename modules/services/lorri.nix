@@ -20,9 +20,9 @@ in
         example =  "/var/tmp/lorri.log";
         description = ''
           The logfile to use for the lorri service. Alternatively
-          <command>sudo launchctl debug system/com.target.lorri --stderr</command>
+          <command>sudo launchctl debug system/org.nixos.lorri --stderr</command>
           can be used to stream the logs to a shell after restarting the service with
-          <command>sudo launchctl kickstart -k system/com.target.lorri</command>.
+          <command>sudo launchctl kickstart -k system/org.nixos.lorri</command>.
         '';
       };
     };
