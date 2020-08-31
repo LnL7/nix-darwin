@@ -16,7 +16,7 @@ in
       
       logFile = mkOption {
         type = types.nullOr types.path;
-        default = "/var/tmp/lorri.log";
+        default = null;
         example =  "/var/tmp/lorri.log";
         description = ''
           The logfile to use for the lorri service. Alternatively
