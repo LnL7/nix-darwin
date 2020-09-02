@@ -57,7 +57,7 @@ in
   options = {
 
     environment.launchAgents = mkOption {
-      type = types.loaOf (types.submodule text);
+      type = types.attrsOf (types.submodule text);
       default = {};
       description = ''
         Set of files that have to be linked in <filename>/Library/LaunchAgents</filename>.
@@ -65,7 +65,7 @@ in
     };
 
     environment.launchDaemons = mkOption {
-      type = types.loaOf (types.submodule text);
+      type = types.attrsOf (types.submodule text);
       default = {};
       description = ''
         Set of files that have to be linked in <filename>/Library/LaunchDaemons</filename>.
@@ -73,7 +73,7 @@ in
     };
 
     environment.userLaunchAgents = mkOption {
-      type = types.loaOf (types.submodule text);
+      type = types.attrsOf (types.submodule text);
       default = {};
       description = ''
         Set of files that have to be linked in <filename>~/Library/LaunchAgents</filename>.
