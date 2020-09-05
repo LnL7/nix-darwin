@@ -24,12 +24,12 @@ in
       # Set up applications.
       echo "setting up ~/Applications..." >&2
 
-      if [ ! -e ~/Applications -o -L ~/Applications ]; then
-        ln -sfn ${cfg.build.applications}/Applications ~/Applications
-      elif [ ! -e ~/Applications/Nix\ Apps -o -L ~/Applications/Nix\ Apps ]; then
+      mkdir -p ~/Applications
+
+      if [ ! -e ~/Applications/Nix\ Apps -o -L ~/Applications/Nix\ Apps ]; then
         ln -sfn ${cfg.build.applications}/Applications ~/Applications/Nix\ Apps
       else
-        echo "warning: ~/Applications and ~/Applications/Nix Apps are directories, skipping App linking..." >&2
+        echo "warning: ~/Applications/Nix Apps is not owned by nix-darwin, skipping App linking..." >&2
       fi
     '';
 
