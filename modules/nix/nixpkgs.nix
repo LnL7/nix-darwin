@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, options, lib, pkgs, ... }:
 
 with lib;
 
@@ -44,10 +44,39 @@ let
     check = builtins.isFunction;
     merge = lib.mergeOneOption;
   };
+
+  pkgsType = mkOptionType {
+    name = "nixpkgs";
+    description = "An evaluation of Nixpkgs; the top level attribute set of packages";
+    check = builtins.isAttrs;
+  };
+
+  defaultPkgs = import <nixpkgs> {
+    inherit (config.nixpkgs) config overlays;
+  };
+
+  finalPkgs = if options.nixpkgs.pkgs.isDefined then config.nixpkgs.pkgs.appendOverlays config.nixpkgs.overlays else defaultPkgs;
 in
 
 {
   options = {
+    nixpkgs.pkgs = mkOption {
+      defaultText = ''
+        import <nixpkgs> {
+          inherit (config.nixpkgs) config overlays;
+        };
+      '';
+      example = literalExample ''import <nixpkgs> {}'';
+      type = pkgsType;
+      description = ''
+        If set, the pkgs argument to all NixOS modules is the value of
+        this option, extended with nixpkgs.overlays, if that is also
+        set. Any other options in nixpkgs.*, notably config, will be
+        ignored. If unset, the pkgs argument to all nix-darwin modules
+        is determined as shown in the default value for this option.
+      '';
+    };
+
     nixpkgs.config = mkOption {
       default = {};
       example = literalExample
@@ -108,8 +137,8 @@ in
   };
 
   config = {
-
-    # _module.args.pkgs is defined in ../../default.nix
-
+    _module.args = {
+      pkgs = finalPkgs;
+    };
   };
 }

@@ -9,7 +9,6 @@ let
   packages = { config, lib, pkgs, ... }: {
     _file = ./default.nix;
     config = {
-      _module.args.pkgs = import nixpkgs config.nixpkgs;
       nixpkgs.system = system;
     };
   };
