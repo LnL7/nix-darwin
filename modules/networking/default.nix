@@ -5,14 +5,10 @@ with lib;
 let
   cfg = config.networking;
 
+  hostnameRegEx = ''^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'';
+
   emptyList = lst: if lst != [] then lst else ["empty"];
   quoteStrings = concatMapStringsSep " " (str: "'${str}'");
-
-  setHostName = optionalString (cfg.hostName != null) ''
-    scutil --set ComputerName '${cfg.hostName}'
-    scutil --set LocalHostName '${cfg.hostName}'
-    scutil --set HostName '${cfg.hostName}'
-  '';
 
   setNetworkServices = optionalString (cfg.knownNetworkServices != []) ''
     networkservices=$(networksetup -listallnetworkservices)
@@ -29,11 +25,49 @@ in
 
 {
   options = {
-    networking.hostName = mkOption {
+    networking.computerName = mkOption {
       type = types.nullOr types.str;
       default = null;
-      example = "myhostname";
-      description = "Hostname for your machine.";
+      example = "John’s MacBook Pro";
+      description = ''
+        The user-friendly name for the system, set in System Preferences > Sharing > Computer Name.
+
+        Setting this option is equivalent to running `scutil --set ComputerName`.
+
+        This name can contain spaces and Unicode characters.
+      '';
+    };
+
+    networking.hostName = mkOption {
+      type = types.nullOr (types.strMatching hostnameRegEx);
+      default = null;
+      example = "Johns-MacBook-Pro";
+      description = ''
+        The hostname of your system, as visible from the command line and used by local and remote
+        networks when connecting through SSH and Remote Login.
+
+        Setting this option is equivalent to running the command `scutil --set HostName`.
+
+        (Note that networking.localHostName defaults to the value of this option.)
+      '';
+    };
+
+    networking.localHostName = mkOption {
+      type = types.nullOr (types.strMatching hostnameRegEx);
+      default = cfg.hostName;
+      example = "Johns-MacBook-Pro";
+      description = ''
+        The local hostname, or local network name, is displayed beneath the computer's name at the
+        top of the Sharing preferences pane. It identifies your Mac to Bonjour-compatible services.
+
+        Setting this option is equivalent to running the command `scutil --set LocalHostName`, where
+        running, e.g., `scutil --set LocalHostName 'Johns-MacBook-Pro'`, would set
+        the systems local hostname to "Johns-MacBook-Pro.local". The value of this option defaults
+        to the value of the networking.hostName option.
+
+        By default on macOS the local hostname is your computer's name with ".local" appended, with
+        any spaces replaced with hyphens, and invalid characters omitted.
+      '';
     };
 
     networking.knownNetworkServices = mkOption {
@@ -72,7 +106,16 @@ in
     system.activationScripts.networking.text = ''
       echo "configuring networking..." >&2
 
-      ${setHostName}
+      ${optionalString (cfg.computerName != null) ''
+        scutil --set ComputerName '${cfg.computerName}'
+      ''}
+      ${optionalString (cfg.hostName != null) ''
+        scutil --set HostName '${cfg.hostName}'
+      ''}
+      ${optionalString (cfg.localHostName != null) ''
+        scutil --set LocalHostName '${cfg.localHostName}'
+      ''}
+
       ${setNetworkServices}
     '';
 
