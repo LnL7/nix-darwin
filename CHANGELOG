@@ -1,3 +1,10 @@
+2020-09-12
+- Options using the deprecated loaOf where removed, see https://github.com/NixOS/nixpkgs/pull/96042
+
+    The following options no longer accept lists:
+    environment.etc, environment.launchAgents.*, environment.launchDaemons.*,
+    users.users, programs.ssh.knownHosts
+
 2019-05-04
 - A configuration.nix manpage is now included by default, run
   `man 5 configuration.nix` or `darwin-help`. The documentation option can be
