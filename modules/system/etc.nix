@@ -20,7 +20,7 @@ in
   options = {
 
     environment.etc = mkOption {
-      type = types.loaOf (types.submodule text);
+      type = types.attrsOf (types.submodule text);
       default = {};
       description = ''
         Set of files that have to be linked in <filename>/etc</filename>.

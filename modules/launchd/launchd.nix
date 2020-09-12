@@ -722,7 +722,7 @@ with lib;
 
         The parameters below are used as inputs to call <literal>getaddrinfo(3)</literal>.
       '';
-      type = types.nullOr (types.loaOf (types.submodule {
+      type = types.nullOr (types.attrsOf (types.submodule {
         options = {
           SockType = mkOption {
             type = types.nullOr (types.enum [ "stream" "dgram" "seqpacket" ]);

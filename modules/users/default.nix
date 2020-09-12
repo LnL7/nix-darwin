@@ -49,13 +49,13 @@ in
     };
 
     users.groups = mkOption {
-      type = types.loaOf (types.submodule group);
+      type = types.attrsOf (types.submodule group);
       default = {};
       description = "Configuration for groups.";
     };
 
     users.users = mkOption {
-      type = types.loaOf (types.submodule user);
+      type = types.attrsOf (types.submodule user);
       default = {};
       description = "Configuration for users.";
     };

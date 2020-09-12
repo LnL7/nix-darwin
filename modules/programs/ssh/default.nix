@@ -54,7 +54,7 @@ in
 
     programs.ssh.knownHosts = mkOption {
       default = {};
-      type = types.loaOf (types.submodule host);
+      type = types.attrsOf (types.submodule host);
       description = ''
         The set of system-wide known SSH hosts.
       '';
