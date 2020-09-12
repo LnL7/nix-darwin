@@ -23,6 +23,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleInterfaceStyle = mkOption {
+      type = types.nullOr (types.enum [ "Dark" ]);
+      default = null;
+      description = ''
+        Set to 'Dark' to enable dark mode, or leave unset for normal mod.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleKeyboardUIMode = mkOption {
       type = types.nullOr (types.enum [ 3 ]);
       default = null;
