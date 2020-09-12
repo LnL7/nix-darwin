@@ -506,9 +506,11 @@
   # services.chunkwm.extraConfig = builtins.readFile <dotfiles/chunkwm/chunkwmrc>;
   # services.skhd.skhdConfig = builtins.readFile <dotfiles/skhd/skhdrc>;
 
-  # TODO: add module for per-user config, etc, ...
+  # Dotfiles.
+  # $ cat ~/.gitconfig
+  # [include]
+  #     path = /etc/per-user/lnl/gitconfig
   # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile <dotfiles/git/gitconfig>;
-  system.activationScripts.extraUserActivation.text = "ln -sfn /etc/per-user/lnl/gitconfig ~/.gitconfig";
 
   users.nix.configureBuildUsers = true;
   users.nix.nrBuildUsers = 32;
