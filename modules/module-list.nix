@@ -2,6 +2,7 @@
   ./alias.nix
   ./documentation
   ./misc/lib.nix
+  ./security/pam.nix
   ./security/pki
   ./security/sandbox
   ./system
@@ -29,7 +30,6 @@
   ./system/launchd.nix
   ./system/patches.nix
   ./system/shells.nix
-  ./system/sudo.nix
   ./system/version.nix
   ./time
   ./networking
