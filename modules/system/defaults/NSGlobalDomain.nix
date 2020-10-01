@@ -87,7 +87,7 @@ in {
       type = types.nullOr (types.enum [ "Dark" ]);
       default = null;
       description = ''
-        Set to 'Dark' to enable dark mode, or leave unset for normal mod.
+        Set to 'Dark' to enable dark mode, or leave unset for normal mode.
       '';
     };
 
