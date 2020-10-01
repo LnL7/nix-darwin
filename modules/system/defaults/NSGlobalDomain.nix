@@ -98,6 +98,9 @@ in {
         (types.nullOr types.int);
       default = null;
       description = ''
+        Configures the color of native controls.
+        Catalina: The default is Blue
+        Big Sur: The default is multicolor
       '';
     };
 
@@ -108,6 +111,9 @@ in {
         (types.nullOr types.string);
       default = null;
       description = ''
+        Configures the highlight color for text, files, etc.
+        Catalina: The default is Blue
+        Big Sur: The default is multicolor
       '';
     };
 
