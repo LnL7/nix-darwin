@@ -46,7 +46,7 @@ let
     };
     Blue = {
       accent = 4;
-      highlight = null;
+      highlight = "0.698039 0.843137 1.000000 Blue";
     };
     Purple = {
       accent = 5;
