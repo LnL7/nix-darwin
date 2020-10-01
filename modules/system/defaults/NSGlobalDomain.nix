@@ -114,6 +114,8 @@ in {
         Configures the highlight color for text, files, etc.
         Catalina: The default is Blue
         Big Sur: The default is multicolor
+        
+        If left unset, AppleHighlightColor will match AppleAccentColor
       '';
     };
 
