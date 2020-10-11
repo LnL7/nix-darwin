@@ -236,14 +236,11 @@ in
           # after networking is available (so the hostname is
           # correct).
           RunAtLoad = true;
-          KeepAlive.NetworkState = true;
           WatchPaths = [
             "/etc/resolv.conf"
             "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
           ];
 
-          GroupName = "buildkite-agent";
-          UserName = "buildkite-agent";
           WorkingDirectory = config.users.users.buildkite-agent.home;
           StandardErrorPath = "${cfg.dataDir}/buildkite-agent.log";
           StandardOutPath = "${cfg.dataDir}/buildkite-agent.log";
