@@ -11,6 +11,9 @@
   let
     configuration = { pkgs, ... }: {
       nix.package = pkgs.nixFlakes;
+
+      # FIXME: for github actions, this shouldn't be in the example.
+      services.nix-daemon.enable = true;
     };
   in
   {

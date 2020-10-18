@@ -41,7 +41,6 @@ jobs:
         echo "FIXME workaround channel permission error"
         nix-shell -A installer
         echo "TODO installed doesn't support flakes, handle multi-user install"
-        nix-shell -p gnused --run 'sed -i "s/# services.nix-daemon.enable/services.nix-daemon.enable/" modules/examples/simple.nix'
     - run: |
         nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" registry add darwin $PWD'
         nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" build ./modules/examples#darwinConfigurations.simple.system'
