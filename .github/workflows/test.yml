@@ -45,7 +45,7 @@ jobs:
         nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" registry add darwin $PWD'
         nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" build ./modules/examples#darwinConfigurations.simple.system'
     - run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#darwinConfigurations.simple
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple
     - run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#darwinConfigurations.simple
+        darwin-rebuild build --flake ./modules/examples#simple

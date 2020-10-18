@@ -121,8 +121,8 @@ if [ -n "$flake" ]; then
     fi
     if [ -z "$flakeAttr" ]; then
       flakeAttr=$(hostname)
-      flakeAttr=darwinConfigurations.${flakeAttr%.local}
     fi
+    flakeAttr=darwinConfigurations.${flakeAttr%.local}
 fi
 
 if [ -n "$flake" ]; then
