@@ -61,6 +61,50 @@ Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modu
 }
 ```
 
+## Flakes (experimental)
+
+There is also preliminary support for building your configuration using a flake.  This
+is mostly based on the flake support that was added to NixOS.
+
+A minimal example of using an existing configuration.nix:
+
+```nix
+{
+  description = "John's darwin system";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-20.09-darwin";
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, darwin, nixpkgs }: {
+    darwinConfigurations."Johns-MacBook" = darwin.lib.darwinSystem {
+      modules = [ ./configuration.nix ];
+    };
+  };
+}
+```
+
+Inputs from the flake can also be passed to `darwinSystem`, these inputs are then
+accessible as an argument, similar to pkgs and lib inside the configuration.
+
+```nix
+darwin.lib.darwinSystem {
+  modules = [ ... ];
+  inputs = { inherit darwin dotfiles nixpkgs; };
+}
+```
+
+Since the installer doesn't work with flakes out of the box yet nix-darwin will need to
+be to be bootstrapped using the installer or manually.  Afterwards the flake based
+configuration can be built.  The `hostname(1)` of your system will be used to decide
+which darwin configuration is applied if it's not specified explicitly in the flake ref.
+
+```sh
+darwin-rebuild switch --flake ~/.config/darwin
+```
+
 ## Manual Install
 
 ```bash
@@ -114,7 +158,7 @@ $
 ```
 
 ```
-$ darwin-option services.activate-system.enable                                                                                                                                            ~/src/nix-darwin
+$ darwin-option services.activate-system.enable
 Value:
 true
 
