@@ -63,7 +63,7 @@ while [ $# -gt 0 ]; do
       flake=$1
       shift 1
       ;;
-    --impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file)
+    -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file)
       extraLockFlags+=("$i")
       ;;
     --update-input)
