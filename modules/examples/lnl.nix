@@ -51,7 +51,6 @@
       pkgs.gnupg
       pkgs.htop
       pkgs.jq
-      pkgs.kitty
       pkgs.mosh
       pkgs.ripgrep
       pkgs.shellcheck
