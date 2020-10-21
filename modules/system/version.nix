@@ -59,6 +59,12 @@ in
       description = "The full darwin version (e.g. <literal>darwin4.master</literal>).";
     };
 
+    system.darwinVersionSuffix = mkOption {
+      internal = true;
+      type = types.str;
+      description = "The short darwin version suffix (e.g. <literal>.2abdb5a</literal>).";
+    };
+
     system.darwinRevision = mkOption {
       internal = true;
       type = types.str;
@@ -78,6 +84,12 @@ in
       description = "The full nixpkgs version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
     };
 
+    system.nixpkgsVersionSuffix = mkOption {
+      internal = true;
+      type = types.str;
+      description = "The short nixpkgs version suffix (e.g. <literal>.1160.f2d4ee1</literal>).";
+    };
+
     system.nixpkgsRevision = mkOption {
       internal = true;
       type = types.str;
@@ -89,12 +101,14 @@ in
 
     # These defaults are set here rather than up there so that
     # changing them would not rebuild the manual
-    system.darwinLabel = "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
-    system.darwinVersion = "darwin" + toString cfg.stateVersion + "." + darwin.shortRev;
+    system.darwinLabel = mkDefault "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
+    system.darwinVersion = mkDefault "darwin${toString cfg.stateVersion}${cfg.darwinVersionSuffix}";
+    system.darwinVersionSuffix = mkDefault ".${darwin.shortRev}";
     system.darwinRevision = mkIf (darwin ? rev) (mkDefault darwin.rev);
 
-    system.nixpkgsVersion = mkDefault (cfg.nixpkgsRelease + nixpkgsSuffix);
+    system.nixpkgsVersion = mkDefault "${cfg.nixpkgsRelease}${cfg.nixpkgsVersionSuffix}";
     system.nixpkgsRelease = mkDefault (fileContents releaseFile);
+    system.nixpkgsVersionSuffix = mkDefault nixpkgsSuffix;
     system.nixpkgsRevision = mkIf (nixpkgs ? rev) (mkDefault nixpkgs.rev);
 
     assertions = [ { assertion = cfg.stateVersion <= defaultStateVersion; message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value"; } ];

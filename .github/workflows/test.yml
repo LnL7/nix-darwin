@@ -30,3 +30,22 @@ jobs:
     - run: |
         nix-shell -A uninstaller
         nix-shell -A uninstaller.check
+  install-flake:
+    runs-on: macos-10.15
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - run: |
+        nix-channel --update
+        echo "FIXME workaround channel permission error"
+        nix-shell -A installer
+        echo "TODO installed doesn't support flakes, handle multi-user install"
+    - run: |
+        nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" registry add darwin $PWD'
+        nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" build ./modules/examples#darwinConfigurations.simple.system'
+    - run: |
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple
+    - run: |
+        . /etc/static/bashrc
+        darwin-rebuild build --flake ./modules/examples#simple
