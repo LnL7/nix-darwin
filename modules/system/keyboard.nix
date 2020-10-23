@@ -32,6 +32,12 @@ in
       description = "Whether to remap the Tilde key on non-us keyboards.";
     };
 
+    system.keyboard.swapLeftCommandAndLeftAlt = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to swap the left Command key and left Alt key.";
+    };
+
     system.keyboard.userKeyMapping = mkOption {
       internal = true;
       type = types.listOf (types.attrsOf types.int);
@@ -52,6 +58,14 @@ in
       (mkIf cfg.remapCapsLockToControl { HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771296; })
       (mkIf cfg.remapCapsLockToEscape { HIDKeyboardModifierMappingSrc = 30064771129; HIDKeyboardModifierMappingDst = 30064771113; })
       (mkIf cfg.nonUS.remapTilde { HIDKeyboardModifierMappingSrc = 30064771172; HIDKeyboardModifierMappingDst = 30064771125; })
+      (mkIf cfg.swapLeftCommandAndLeftAlt {
+        HIDKeyboardModifierMappingSrc = 30064771299;
+        HIDKeyboardModifierMappingDst = 30064771298;
+      })
+      (mkIf cfg.swapLeftCommandAndLeftAlt {
+        HIDKeyboardModifierMappingSrc = 30064771298;
+        HIDKeyboardModifierMappingDst = 30064771299;
+      })
     ];
 
     system.activationScripts.keyboard.text = optionalString cfg.enableKeyMapping ''
