@@ -8,6 +8,8 @@ in
 
 {
   config = {
+    system.checks.verifyNixPath = mkDefault false;
+
     system.darwinVersionSuffix = ".${darwin.shortRev or "dirty"}";
     system.darwinRevision = mkIf (darwin ? rev) darwin.rev;
 
