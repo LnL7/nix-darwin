@@ -63,7 +63,7 @@ Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modu
 
 ## Flakes (experimental)
 
-There is also preliminary support for building your configuration using a flake.  This
+There is also preliminary support for building your configuration using a [flake](https://nixos.wiki/wiki/Flakes).  This
 is mostly based on the flake support that was added to NixOS.
 
 A minimal example of using an existing configuration.nix:
