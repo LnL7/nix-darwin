@@ -25,25 +25,18 @@ let
           ${optionalString cfg.useDaemon ''
             build-users-group = nixbld
           ''}
-          ${if isNix20 then "max-jobs" else "build-max-jobs"} = ${toString (cfg.maxJobs)}
-          ${if isNix20 then "cores" else "build-cores"} = ${toString (cfg.buildCores)}
-          ${if isNix20 then "sandbox" else "build-use-sandbox"} = ${if (builtins.isBool cfg.useSandbox) then boolToString cfg.useSandbox else cfg.useSandbox}
+          max-jobs = ${toString (cfg.maxJobs)}
+          cores = ${toString (cfg.buildCores)}
+          sandbox = ${if (builtins.isBool cfg.useSandbox) then boolToString cfg.useSandbox else cfg.useSandbox}
           ${optionalString (cfg.sandboxPaths != []) ''
-            ${if isNix20 then "extra-sandbox-paths" else "build-sandbox-paths"} = ${toString cfg.sandboxPaths}
+            extra-sandbox-paths = ${toString cfg.sandboxPaths}
           ''}
-          ${if isNix20 then "substituters" else "binary-caches"} = ${toString cfg.binaryCaches}
-          ${if isNix20 then "trusted-substituters" else "trusted-binary-caches"} = ${toString cfg.trustedBinaryCaches}
-          ${if isNix20 then "trusted-public-keys" else "binary-cache-public-keys"} = ${toString cfg.binaryCachePublicKeys}
-          ${if isNix20 then ''
-            require-sigs = ${if cfg.requireSignedBinaryCaches then "true" else "false"}
-          '' else ''
-            signed-binary-caches = ${if cfg.requireSignedBinaryCaches then "*" else ""}
-          ''}
+          substituters = ${toString cfg.binaryCaches}
+          trusted-substituters = ${toString cfg.trustedBinaryCaches}
+          trusted-public-keys = ${toString cfg.binaryCachePublicKeys}
+          require-sigs = ${if cfg.requireSignedBinaryCaches then "true" else "false"}
           trusted-users = ${toString cfg.trustedUsers}
           allowed-users = ${toString cfg.allowedUsers}
-          ${optionalString (isNix20 && !cfg.distributedBuilds) ''
-            builders =
-          ''}
           $extraOptions
           END
         '';
@@ -410,25 +403,7 @@ in
           ) cfg.buildMachines;
       };
 
-    nix.envVars =
-      optionalAttrs (!isNix20) {
-        NIX_CONF_DIR = "/etc/nix";
-
-        # Enable the copy-from-other-stores substituter, which allows
-        # builds to be sped up by copying build results from remote
-        # Nix stores.  To do this, mount the remote file system on a
-        # subdirectory of /run/nix/remote-stores.
-        NIX_OTHER_STORES = "/run/nix/remote-stores/*/nix";
-      }
-      // optionalAttrs cfg.distributedBuilds {
-        NIX_CURRENT_LOAD = "/run/nix/current-load";
-      }
-      // optionalAttrs (cfg.distributedBuilds && !isNix20) {
-        NIX_BUILD_HOOK = "${cfg.package}/libexec/nix/build-remote.pl";
-        NIX_REMOTE_SYSTEMS = "/etc/nix/machines";
-      };
-
-    environment.extraInit = optionalString (!isNix20) ''
+    environment.extraInit = ''
       # Set up secure multi-user builds: non-root users build through the
       # Nix daemon.
       if [ ! -w /nix/var/nix/db ]; then
@@ -440,12 +415,6 @@ in
     environment.variables = cfg.envVars //
       { NIX_PATH = concatStringsSep ":" cfg.nixPath;
       };
-
-    system.activationScripts.nix.text = mkIf cfg.distributedBuilds ''
-      if [ ! -d ${cfg.envVars.NIX_CURRENT_LOAD} ]; then
-          mkdir -p ${cfg.envVars.NIX_CURRENT_LOAD}
-      fi
-    '';
 
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
