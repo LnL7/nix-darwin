@@ -38,7 +38,6 @@
       config.services.chunkwm.package
 
       pkgs.awscli
-      pkgs.bear
       pkgs.brotli
       pkgs.ctags
       pkgs.curl
@@ -47,16 +46,13 @@
       pkgs.fzf
       pkgs.gettext
       pkgs.git
-      pkgs.gitAndTools.gh
       pkgs.gnupg
       pkgs.htop
       pkgs.jq
       pkgs.mosh
       pkgs.ripgrep
       pkgs.shellcheck
-      pkgs.silver-searcher
       pkgs.vault
-      pkgs.youtube-dl
 
       pkgs.qes
       pkgs.darwin-zsh-completions
@@ -100,10 +96,9 @@
 
   nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
   nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
-  nix.trustedUsers = [ "@admin" ];
 
   nix.useSandbox = true;
-  nix.sandboxPaths = [ "/System/Library/Frameworks" "/System/Library/PrivateFrameworks" "/usr/lib" "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
+  nix.sandboxPaths = [ "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
 
   programs.nix-index.enable = true;
 
@@ -229,135 +224,6 @@
   '';
 
   programs.zsh.loginShellInit = ''
-    :a() {
-        nix repl ''${@:-<dotpkgs>}
-    }
-
-    :d() {
-        eval "$(direnv hook zsh)"
-    }
-
-    :r() {
-        direnv reload
-    }
-
-    :u() {
-        local exports
-
-        exports=$(direnv apply_dump <(nix-shell -E "with import <nixpkgs> {}; mkShell { buildInputs = [ $* ]; }" --run 'direnv dump'))
-        eval "$exports"
-
-        name+="''${name:+ }$*"
-        typeset -U PATH
-    }
-
-    z() {
-        local dir
-
-        dir=$(find ~/Code -mindepth 2 -maxdepth 2 | fzf --preview-window right:50% --preview 'git -C {} log --pretty=color --color=always -16')
-        cd "$dir"
-    }
-
-    fzf-store() {
-        find /nix/store -type d -mindepth 1 -maxdepth 1 | fzf -m --preview-window right:50% --preview 'nix-store -q --tree {}'
-    }
-
-    xi() {
-        curl -F 'f:1=<-' ix.io
-    }
-
-    ls() {
-        ${pkgs.coreutils}/bin/ls --color=auto "$@"
-    }
-
-    install_name_tool() {
-        ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
-    }
-
-    nm() {
-        ${pkgs.darwin.cctools}/bin/nm "$@"
-    }
-
-    otool() {
-        ${pkgs.darwin.cctools}/bin/otool "$@"
-    }
-
-    vat() {
-        TERM=vt100 nvim -R "$@" "+setl updatetime=0" "+autocmd CursorHold * :q"
-    }
-
-    nixq() {
-        nix eval --json "(
-        with builtins;
-        with import <nixpkgs/lib>;
-        let
-          _ = fromJSON (readFile /dev/stdin);
-          _0 = head _;
-          _1 = head _0;
-          _2 = head _1;
-        in
-        $*
-        )"
-    }
-
-    nix-unpack() {
-        nix-shell --run 'phases=unpackPhase genericBuild' "$@"
-    }
-
-    hydra-bad-machines() {
-        local url=https://hydra.nixos.org
-        curl -fsSL -H 'Accept: application/json' $url/queue-runner-status | jq -r '.machines | to_entries | .[] | select(.value.consecutiveFailures>0) | .key'
-    }
-
-    hydra-job-revision() {
-        local jobseteval job=$1
-        shift 1
-        case "$job" in
-            *'/'*) ;;
-            *) job="nixpkgs/trunk/$job" ;;
-        esac
-        case "$job" in
-            'http://'*|'https://'*) ;;
-            *) job="https://hydra.nixos.org/job/$job" ;;
-        esac
-        jobseteval=$(curl -fsSL -H 'Content-Type: application/json' "$job/latest" | jq '.jobsetevals[0]')
-        curl -fsSL -H 'Accept: application/json' "''${job%/job*}/eval/$jobseteval" | jq -r '.jobsetevalinputs.nixpkgs.revision'
-    }
-
-    hydra-job-bisect() {
-        local job=$1
-        shift 1
-        nix-build ./pkgs/top-level/release.nix -A "''${job##*/}" --dry-run "$@" || return
-        git bisect start HEAD "$(hydra-job-revision "$job")"
-        git bisect run nix-build ./pkgs/top-level/release.nix -A "''${job##*/}" "$@"
-    }
-
-    hydra-job-outputs() {
-        local job=$1
-        shift 1
-        curl -fsSL -H 'Accept: application/json' "$job/latest" | jq -r '.buildoutputs | to_entries | .[].value.path'
-    }
-
-    hydra-build-log() {
-        local build=$1
-        shift 1
-        nix log "$(curl -fsSL -H 'Accept: application/json' "$build/api/get-info" | jq -r .drvPath)"
-    }
-
-    rev-darwin() {
-        echo "https://github.com/LnL7/nix-darwin/archive/''${@:-master}.tar.gz"
-    }
-
-    rev-nixpkgs() {
-        echo "https://github.com/NixOS/nixpkgs/archive/''${@:-master}.tar.gz"
-    }
-
-    pr-nixpkgs() {
-        local pr=$1
-        shift 1
-        rev-nixpkgs "$(curl "https://api.github.com/repos/NixOS/nixpkgs/pulls/$pr/commits" | jq -r '.[-1].sha')"
-    }
-
     reexec() {
         unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
         unset __ETC_ZPROFILE_SOURCED __ETC_ZSHENV_SOURCED __ETC_ZSHRC_SOURCED
@@ -377,33 +243,20 @@
         exec /usr/bin/sandbox-exec -f /etc/nix/user-sandbox.sb $SHELL -l
     }
 
-    tmux-run() {
-        tmux split-window -c '#{pane_current_path}' -p 25
-        if [ $# -gt 0 ]; then
-            tmux send-keys -t . "$*" Enter
-        fi
+    ls() {
+        ${pkgs.coreutils}/bin/ls --color=auto "$@"
     }
 
-    gh-darwin-debug() {
-        curl -X POST -fsSL \
-            -H "Accept: application/vnd.github.everest-preview+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{"event_type": "debug"}' \
-            https://api.github.com/repos/LnL7/nix-darwin/dispatches
+    install_name_tool() {
+        ${pkgs.darwin.cctools}/bin/install_name_tool "$@"
     }
 
-    pushover() {
-        local i
-        "$@"
-        i=$?
-        curl -fsSL -XPOST \
-            --form-string "token=$PUSHOVER_TOKEN" \
-            --form-string "user=$PUSHOVER_USER" \
-            --form-string "expire=60" \
-            --form-string "sound=intermission" \
-            --form-string "message=$*: completed with status $i" \
-            https://api.pushover.net/1/messages.json > /dev/null
-        return "$i"
+    nm() {
+        ${pkgs.darwin.cctools}/bin/nm "$@"
+    }
+
+    otool() {
+        ${pkgs.darwin.cctools}/bin/otool "$@"
     }
   '';
 
