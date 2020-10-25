@@ -13,8 +13,6 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-or if you run into problems with that, try the older bootstrap.sh script
-
 > NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
 > updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
 > Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
