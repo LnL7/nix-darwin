@@ -77,7 +77,7 @@ in
 
     environment.loginShell = mkOption {
       type = types.str;
-      default = "$SHELL";
+      default = "$SHELL -l";
       description = "Configure default login shell.";
     };
 

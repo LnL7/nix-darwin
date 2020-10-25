@@ -22,8 +22,6 @@
 
      echo >&2 "checking setEnvironment in /etc/zshenv"
      fgrep '. ${config.system.build.setEnvironment}' ${config.out}/etc/zshenv
-     echo >&2 "checking SHELL in setEnvironment"
-     grep 'export SHELL="${pkgs.zsh}/bin/zsh"' ${config.system.build.setEnvironment}
      echo >&2 "checking nix-shell return /etc/zshenv"
      grep 'if test -n "$IN_NIX_SHELL"; then return; fi' ${config.out}/etc/zshenv
      echo >&2 "checking zshenv.d in /etc/zshenv"

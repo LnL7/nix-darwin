@@ -45,9 +45,6 @@ in
         "/share/bash-completion/completions"
       ];
 
-    environment.loginShell = mkDefault "bash -l";
-    environment.variables.SHELL = mkDefault "${pkgs.bashInteractive}/bin/bash";
-
     environment.etc."bashrc".text = ''
       # /etc/bashrc: DO NOT EDIT -- this file has been generated automatically.
       # This file is read for interactive shells.
