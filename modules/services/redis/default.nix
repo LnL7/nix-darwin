@@ -52,6 +52,12 @@ in
       default = false;
       description = "By default data is only periodically persisted to disk, enable this option to use an append-only file for improved persistence.";
     };
+
+    services.redis.extraConfig = mkOption {
+      type = types.lines;
+      default = "";
+      description = "Additional text to be appended to <filename>redis.conf</filename>.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -69,6 +75,7 @@ in
       ${optionalString (cfg.unixSocket != null) "unixsocket ${cfg.unixSocket}"}
       dir ${cfg.dataDir}
       appendOnly ${if cfg.appendOnly then "yes" else "no"}
+      ${cfg.extraConfig}
     '';
 
   };
