@@ -32,7 +32,7 @@ in
     environment.systemPackages = [ pkgs.lorri ];
     launchd.user.agents.lorri = {
       command = with pkgs; "${lorri}/bin/lorri daemon";
-      path = with pkgs; [ nix ];
+      path = with pkgs; [ config.nix.package git gnutar gzip ];
       serviceConfig = {
         KeepAlive = true;
         RunAtLoad = true;
