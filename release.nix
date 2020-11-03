@@ -121,6 +121,7 @@ let
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
+    tests.services-redis = makeTest ./tests/services-redis.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
     tests.services-spacebar = makeTest ./tests/services-spacebar.nix;
     tests.services-synapse-bt = makeTest ./tests/services-synapse-bt.nix;
