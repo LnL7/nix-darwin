@@ -5,45 +5,51 @@ on:
 jobs:
   tests:
     runs-on: macos-10.15
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v9
-    - run: nix-build ./release.nix -I darwin=. -A tests
-    - run: nix-build ./release.nix -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I darwin=. -A examples.simple
+    - uses: cachix/install-nix-action@v12
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A tests
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A examples.simple
   install:
     runs-on: macos-10.15
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v8
+    - uses: cachix/install-nix-action@v12
     - run: |
+        nix-channel --add https://nixos.org/channels/nixpkgs-20.09-darwin nixpkgs
         nix-channel --update
         echo "FIXME workaround channel permission error"
     - run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
         nix-shell -A installer
         nix-shell -A installer.check
     - run: |
         . /etc/static/bashrc
         darwin-rebuild switch -I darwin=.
     - run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
         nix-shell -A uninstaller
         nix-shell -A uninstaller.check
   install-flake:
     runs-on: macos-10.15
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v8
+    - uses: cachix/install-nix-action@v12
     - run: |
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
         echo "FIXME workaround channel permission error"
-        nix-shell -A installer
+    - run: |
+        NIX_PATH=$HOME/.nix-defexpr/channels nix-shell -A installer
         echo "TODO installed doesn't support flakes, handle multi-user install"
     - run: |
-        nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" registry add darwin $PWD'
-        nix-shell -p nixFlakes --run 'nix --experimental-features "nix-command flakes" build ./modules/examples#darwinConfigurations.simple.system'
+        nix-build channel:nixpkgs-unstable -A nixUnstable -o nix-unstable
+        ./nix-unstable/bin/nix --experimental-features 'nix-command flakes' registry add darwin $PWD
+        ./nix-unstable/bin/nix --experimental-features 'nix-command flakes' build ./modules/examples#darwinConfigurations.simple.system
     - run: |
         ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple
     - run: |
