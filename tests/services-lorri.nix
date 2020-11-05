@@ -1,35 +1,27 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
-  lorri = pkgs.runCommand "lorri-0.0.0" {} "mkdir $out";
   plistPath = "${config.out}/user/Library/LaunchAgents/org.nixos.lorri.plist";
-  actual = pkgs.runCommand "convert-plist-to-json" { buildInputs = [ pkgs.xcbuild ]; }
-    "plutil -convert json -o $out ${plistPath}";
-  actualJson = builtins.fromJSON (builtins.readFile "${actual.out}");
-  expectedJson = builtins.fromJSON ''
-  {
-    "EnvironmentVariables": {
-            "NIX_PATH": "${"nixpkgs="+ toString pkgs.path}",
-            "PATH": "${builtins.unsafeDiscardStringContext pkgs.nix}/bin"
-    },
-    "KeepAlive": true,
-    "Label": "org.nixos.lorri",
-    "ProcessType": "Background",
-    "ProgramArguments": [
-            "/bin/sh",
-            "-c",
-            "exec ${builtins.unsafeDiscardStringContext pkgs.lorri}/bin/lorri daemon"
-    ],
-    "RunAtLoad": true
-  }
-  '';
-  testResult = toString (actualJson == expectedJson);
+  expectedPath = "${lib.makeBinPath [config.nix.package pkgs.git pkgs.gnutar pkgs.gzip]}";
+  expectedNixPath = "${"nixpkgs="+ toString pkgs.path}";
 in
 {
   services.lorri.enable = true;
   test = ''
-    ${pkgs.xcbuild}/bin/plutil -lint ${plistPath}
-    [ ${testResult} ];
+    PATH=${lib.makeBinPath [ pkgs.xcbuild pkgs.jq ]}:$PATH
+
+    plutil -lint ${plistPath}
+    plutil -convert json -o service.json ${plistPath}
+
+    <service.json jq -e ".EnvironmentVariables.PATH     == \"${expectedPath}\""
+    <service.json jq -e ".EnvironmentVariables.NIX_PATH == \"${expectedNixPath}\""
+    <service.json jq -e ".KeepAlive                     == true"
+    <service.json jq -e ".Label                         == \"org.nixos.lorri\""
+    <service.json jq -e ".ProcessType                   == \"Background\""
+    <service.json jq -e ".ProgramArguments|length       == 3"
+    <service.json jq -e ".ProgramArguments[0]           == \"/bin/sh\""
+    <service.json jq -e ".ProgramArguments[1]           == \"-c\""
+    <service.json jq -e ".ProgramArguments[2]           == \"exec ${pkgs.lorri}/bin/lorri daemon\""
+    <service.json jq -e ".RunAtLoad                     == true"
   '';
 }
-
