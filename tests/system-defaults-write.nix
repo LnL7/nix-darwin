@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
+  system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleFontSmoothing = 1;
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = true;
@@ -44,6 +46,8 @@
     grep "defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server 'ServerDescription' -string 'Darwin.*s iMac'" ${config.out}/activate
 
     echo >&2 "checking defaults write in /activate-user"
+    grep "defaults write -g 'AppleEnableMouseSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
+    grep "defaults write -g 'AppleEnableSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleFontSmoothing' -int 1" ${config.out}/activate-user
     grep "defaults write -g 'AppleKeyboardUIMode' -int 3" ${config.out}/activate-user
     grep "defaults write -g 'ApplePressAndHoldEnabled' -bool YES" ${config.out}/activate-user

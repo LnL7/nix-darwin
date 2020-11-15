@@ -15,6 +15,22 @@ let
 in {
   options = {
 
+    system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enables swiping left or right with two fingers to navigate backward or forward. The default is true.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enables swiping left or right with two fingers to navigate backward or forward. The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleFontSmoothing = mkOption {
       type = types.nullOr (types.enum [ 0 1 2 ]);
       default = null;
