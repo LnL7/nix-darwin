@@ -1,8 +1,11 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+
+with lib;
 
 let
-
   inherit (pkgs) stdenv;
+
+  extraPath = lib.makeBinPath [ config.nix.package pkgs.coreutils pkgs.jq ];
 
   writeProgram = name: env: src:
     pkgs.substituteAll ({
@@ -22,10 +25,9 @@ let
     {
       inherit (config.system) profile;
       inherit (stdenv) shell;
-      path = "${pkgs.coreutils}/bin:${config.nix.package}/bin:${config.environment.systemPath}";
+      path = "${extraPath}:${config.environment.systemPath}";
     }
     ../../pkgs/nix-tools/darwin-rebuild.sh;
-
 in
 
 {
