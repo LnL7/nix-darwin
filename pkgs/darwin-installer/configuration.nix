@@ -68,6 +68,7 @@ with lib;
                   echo "setting up /etc/synthetic.conf..."
                   echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf >/dev/null
                   /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B 2>/dev/null || true
+                  /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t 2>/dev/null || true
               fi
               if ! test -L /run; then
                   echo "setting up /run..."
