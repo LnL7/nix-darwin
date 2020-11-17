@@ -33,6 +33,7 @@ let
   SoftwareUpdate = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
+  textedit = defaultsToList "com.apple.TextEdit" cfg.textedit;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
 
@@ -66,6 +67,7 @@ in
         ${concatStringsSep "\n" finder}
         ${concatStringsSep "\n" screencapture}
         ${concatStringsSep "\n" spaces}
+        ${concatStringsSep "\n" textedit}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
       '';

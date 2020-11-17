@@ -20,6 +20,7 @@
   ./system/defaults/smb.nix
   ./system/defaults/SoftwareUpdate.nix
   ./system/defaults/spaces.nix
+  ./system/defaults/textedit.nix
   ./system/defaults/trackpad.nix
   ./system/etc.nix
   ./system/keyboard.nix
