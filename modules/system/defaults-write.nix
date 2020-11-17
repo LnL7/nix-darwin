@@ -36,6 +36,7 @@ let
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   textedit = defaultsToList "com.apple.TextEdit" cfg.textedit;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
+  timemachine = [];  # defaultsToList "/Library/Preferences/com.apple.TimeMachine" cfg.timemachine;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != {}) list);
@@ -44,12 +45,13 @@ in
 {
   config = {
 
-    system.activationScripts.defaults.text = mkIfAttrs [ alf loginwindow smb SoftwareUpdate ]
+    system.activationScripts.defaults.text = mkIfAttrs [ alf loginwindow timemachine smb SoftwareUpdate ]
       ''
         # Set defaults
         echo >&2 "system defaults..."
         ${concatStringsSep "\n" alf}
         ${concatStringsSep "\n" loginwindow}
+        #${concatStringsSep "\n" timemachine}
         ${concatStringsSep "\n" smb}
         ${concatStringsSep "\n" SoftwareUpdate}
       '';

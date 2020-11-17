@@ -21,6 +21,8 @@
   ./system/defaults/SoftwareUpdate.nix
   ./system/defaults/spaces.nix
   ./system/defaults/textedit.nix
+  # timemachine is not writable
+  #./system/defaults/timemachine.nix
   ./system/defaults/trackpad.nix
   ./system/etc.nix
   ./system/keyboard.nix
