@@ -57,7 +57,7 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain GlobalPreferences LaunchServices desktopservices dock finder screencapture spaces trackpad trackpadBluetooth ]
+      [ NSGlobalDomain GlobalPreferences LaunchServices desktopservices dock finder screencapture spaces textedit trackpad trackpadBluetooth ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
