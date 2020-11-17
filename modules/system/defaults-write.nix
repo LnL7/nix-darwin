@@ -14,6 +14,7 @@ let
     if isInt value then "-int ${toString value}" else
     if isFloat value then "-float ${toString value}" else
     if isString value then "-string '${value}'" else
+    if isList value then "-array ${concatStringsSep " " (map (v: writeValue v)value)}" else
     throw "invalid value type";
 
   writeDefault = domain: key: value:
