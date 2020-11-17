@@ -24,6 +24,7 @@ let
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
+  desktopservices = defaultsToList "com.apple.desktopservices" cfg.desktopservices;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
@@ -52,7 +53,7 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture spaces trackpad trackpadBluetooth ]
+      [ NSGlobalDomain GlobalPreferences LaunchServices desktopservices dock finder screencapture spaces trackpad trackpadBluetooth ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
@@ -60,6 +61,7 @@ in
         ${concatStringsSep "\n" NSGlobalDomain}
         ${concatStringsSep "\n" GlobalPreferences}
         ${concatStringsSep "\n" LaunchServices}
+        ${concatStringsSep "\n" desktopservices}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
         ${concatStringsSep "\n" screencapture}
