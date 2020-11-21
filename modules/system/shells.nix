@@ -31,6 +31,7 @@ in
 
       /bin/bash
       /bin/csh
+      /bin/dash
       /bin/ksh
       /bin/sh
       /bin/tcsh
