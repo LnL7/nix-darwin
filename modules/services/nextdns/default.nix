@@ -28,12 +28,10 @@ in {
 
     environment.systemPackages = [ nextdns ];
 
-    launchd.user.agents.nextdns = {
+    launchd.daemons.nextdns = {
       path = [ nextdns ];
-      script = ''
-        "${pkgs.nextdns}/bin/nextdns run ${escapeShellArgs cfg.arguments}";
-      '';
-
+      serviceConfig.ProgramArguments =
+        [ "${pkgs.nextdns}/bin/nextdns" "run" (escapeShellArgs cfg.arguments) ];
       serviceConfig.KeepAlive = true;
       serviceConfig.RunAtLoad = true;
     };
