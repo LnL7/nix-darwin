@@ -93,6 +93,8 @@ in
           if [ ! $(${cfg.package}/bin/yabai --check-sa) ]; then
             ${cfg.package}/bin/yabai --install-sa
           fi
+
+          ${cfg.package}/bin/yabai --load-sa
         '';
 
         serviceConfig.RunAtLoad = true;
