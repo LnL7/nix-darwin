@@ -11,7 +11,7 @@ in
     programs.nix-index.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable nix-index and it's command-not-found helper.";
+      description = "Whether to enable nix-index and its command-not-found helper.";
     };
 
     programs.nix-index.package = mkOption {
