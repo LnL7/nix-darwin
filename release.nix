@@ -118,6 +118,7 @@ let
     tests.sockets-nix-daemon = makeTest ./tests/sockets-nix-daemon.nix;
     tests.services-dnsmasq = makeTest ./tests/services-dnsmasq.nix;
     tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
+    tests.services-nextdns = makeTest ./tests/services-nextdns.nix;
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
