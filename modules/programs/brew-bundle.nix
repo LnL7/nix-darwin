@@ -172,10 +172,10 @@ in
         # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
         brew "mysql@5.6", restart_service: true, link: true, conflicts_with: ["mysql"]
 
-        # 'brew install --with-rmtp', 'brew services restart' on version changes
-        brew "denji/nginx/nginx-full", args: ["with-rmtp"], restart_service: :changed
-        # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
-        brew "mysql@5.6", restart_service: true, link: true, conflicts_with: ["mysql"]
+        # 'brew cask install --appdir=~/my-apps/Applications'
+        cask "firefox", args: { appdir: "~/my-apps/Applications" }
+        # 'brew cask install' only if '/usr/libexec/java_home --failfast' fails
+        cask "java" unless system "/usr/libexec/java_home --failfast"
       '';
       description = "Extra lines to be added verbatim to the generated Brewfile.";
     };
