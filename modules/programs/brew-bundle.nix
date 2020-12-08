@@ -182,6 +182,19 @@ in
   };
 
   config = {
+    assertions = mkIf cfg.enable [
+      {
+        assertion = builtins.pathExists /usr/local/bin/brew;
+        message = ''
+          Homebrew not installed.
+
+          Please install Homebrew yourself before using the programs.brew-bundle module.
+
+          See installation instructions at: https://brew.sh
+        '';
+      }
+    ];
+
     programs.brew-bundle.brews =
       optional (cfg.masApps != {}) "mas" ++
       optional (cfg.whalebrews != []) "whalebrew";
