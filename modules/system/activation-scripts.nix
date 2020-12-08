@@ -65,7 +65,6 @@ in
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
-      ${cfg.activationScripts.brew-bundle.text}
 
       ${cfg.activationScripts.postActivation.text}
 
@@ -106,6 +105,7 @@ in
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
+      ${cfg.activationScripts.brew-bundle.text}
 
       ${cfg.activationScripts.postUserActivation.text}
 
