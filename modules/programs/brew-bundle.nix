@@ -28,8 +28,10 @@ let
     (if cfg.extraConfig != "" then "# Extra config\n" + cfg.extraConfig else "")
   );
 
-  brew-bunble-options =
-    "--file='${brewfile}' --no-lock" +
+  brew-bundle-command =
+    "HOMEBREW_NO_AUTO_UPDATE=" +
+    (if cfg.noAutoUpdate then "1" else "0") +
+    " brew bundle --file='${brewfile}' --no-lock" +
     (if cfg.cleanupType == "uninstall" || cfg.cleanupType == "zap" then " --cleanup" else "") +
     (if cfg.cleanupType == "zap" then " --zap" else "");
 
@@ -45,8 +47,19 @@ in
       installation instructions: https://brew.sh
     '';
 
+    noAutoUpdate = mkOption {
+      type = types.bool;
+      default = true;
+      example = false;
+      description = ''
+        Sets the <literal>HOMEBREW_NO_AUTO_UPDATE</literal> environment variable when running the
+        <command>brew bundle</command> command. The default is <literal>true</literal> so that
+        repeated invocations of <command>darwin-rebuild switch</command> are idempotent.
+      '';
+    };
+
     cleanupType = mkOption {
-      type = with types; enum [ "none" "uninstall" "zap" ];
+      type = types.enum [ "none" "uninstall" "zap" ];
       default = "none";
       example = "uninstall";
       description = ''
@@ -205,8 +218,7 @@ in
     system.activationScripts.brew-bundle.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
-      PATH=/usr/local/bin:$PATH brew update > /dev/null
-      PATH=/usr/local/bin:$PATH brew bundle ${brew-bunble-options}
+      PATH=/usr/local/bin:$PATH ${brew-bundle-command}
     '';
   };
 
