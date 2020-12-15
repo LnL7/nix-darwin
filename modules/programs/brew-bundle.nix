@@ -32,8 +32,8 @@ let
     "HOMEBREW_NO_AUTO_UPDATE=" +
     (if cfg.noAutoUpdate then "1" else "0") +
     " brew bundle --file='${brewfile}' --no-lock" +
-    (if cfg.cleanupType == "uninstall" || cfg.cleanupType == "zap" then " --cleanup" else "") +
-    (if cfg.cleanupType == "zap" then " --zap" else "");
+    (if cfg.cleanup == "uninstall" || cfg.cleanup == "zap" then " --cleanup" else "") +
+    (if cfg.cleanup == "zap" then " --zap" else "");
 
 in
 
@@ -58,7 +58,7 @@ in
       '';
     };
 
-    cleanupType = mkOption {
+    cleanup = mkOption {
       type = types.enum [ "none" "uninstall" "zap" ];
       default = "none";
       example = "uninstall";
@@ -146,7 +146,7 @@ in
         Note that you need to be signed into the Mac App Store for <command>mas</command> to
         successfully install and upgrade applications, and that unfortunately apps removed from this
         option will not be uninstalled automatically even if
-        <option>programs.brew-bundle.cleanupType</option> is set to <literal>"uninstall"</literal>
+        <option>programs.brew-bundle.cleanup</option> is set to <literal>"uninstall"</literal>
         or <literal>"zap"</literal> (this is currently a limitation of Homebrew Bundle).
 
         For more information on <command>mas</command> see: https://github.com/mas-cli/mas
