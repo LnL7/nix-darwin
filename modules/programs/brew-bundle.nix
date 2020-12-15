@@ -29,9 +29,8 @@ let
   );
 
   brew-bundle-command =
-    "HOMEBREW_NO_AUTO_UPDATE=" +
-    (if cfg.noAutoUpdate then "1" else "0") +
-    " brew bundle --file='${brewfile}' --no-lock" +
+    (if cfg.autoUpdate then "" else "HOMEBREW_NO_AUTO_UPDATE=1 ") +
+    "brew bundle --file='${brewfile}' --no-lock" +
     (if cfg.cleanup == "uninstall" || cfg.cleanup == "zap" then " --cleanup" else "") +
     (if cfg.cleanup == "zap" then " --zap" else "");
 
@@ -47,14 +46,13 @@ in
       installation instructions: https://brew.sh
     '';
 
-    noAutoUpdate = mkOption {
+    autoUpdate = mkOption {
       type = types.bool;
-      default = true;
-      example = false;
+      default = false;
       description = ''
-        Sets the <literal>HOMEBREW_NO_AUTO_UPDATE</literal> environment variable when running the
-        <command>brew bundle</command> command. The default is <literal>true</literal> so that
-        repeated invocations of <command>darwin-rebuild switch</command> are idempotent.
+        When enabled, Homebrew is allowed to auto-update during <command>nix-darwin</command>
+        activation. The default is <literal>false</literal> so that repeated invocations of
+        <command>darwin-rebuild switch</command> are idempotent.
       '';
     };
 
