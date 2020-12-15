@@ -86,26 +86,28 @@ in
       '';
     };
 
-    setNoLockEnvvar = mkOption {
+    userConfig.brewfile = mkOption {
       type = types.bool;
       default = true;
       description = ''
-        Sets the <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> enviroment variable, by adding it to
-        <option>environment.variables</option>, so that lock files aren't generated when/if you run
-        the <command>brew bundle</command> command yourself.
-      '';
-    };
+        When enabled, when you manually invoke <command>brew bundle</command>, it will automatically
+        use the Brewfile in the Nix store that this module generates.
 
-    setBrewfileEnvvar = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
         Sets the <literal>HOMEBREW_BUNDLE_FILE</literal> enviroment variable to the path of the
         Brewfile in the Nix store that this module generates, by adding it to
         <option>environment.variables</option>.
+      '';
+    };
 
-        With this option enabled, <command>brew bundle</command> commands will automatically use
-        the Brewfile in the Nix store that this module generates.
+    userConfig.noLock = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        When enabled, lock files aren't generated when you manually invoke
+        <command>brew bundle</command>.
+
+        Sets the <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> enviroment variable, by adding it to
+        <option>environment.variables</option>.
       '';
     };
 
@@ -211,8 +213,8 @@ in
       optional (cfg.whalebrews != []) "whalebrew";
 
     environment.variables = mkIf cfg.enable (
-      (if cfg.setNoLockEnvvar then { HOMEBREW_BUNDLE_NO_LOCK = "1"; } else {}) //
-      (if cfg.setBrewfileEnvvar then { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } else {})
+      (if cfg.userConfig.brewfile then { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } else {}) //
+      (if cfg.userConfig.noLock then { HOMEBREW_BUNDLE_NO_LOCK = "1"; } else {})
     );
 
     system.activationScripts.brew-bundle.text = mkIf cfg.enable ''
