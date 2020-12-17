@@ -59,7 +59,6 @@
   ./services/yabai
   ./services/nextdns
   ./programs/bash
-  ./programs/brew-bundle.nix
   ./programs/fish.nix
   ./programs/gnupg.nix
   ./programs/man.nix
@@ -69,6 +68,7 @@
   ./programs/tmux.nix
   ./programs/vim.nix
   ./programs/zsh
+  ./homebrew.nix
   ./users
   ./users/nixbld
 ]

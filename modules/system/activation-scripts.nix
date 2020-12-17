@@ -105,7 +105,7 @@ in
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
-      ${cfg.activationScripts.brew-bundle.text}
+      ${cfg.activationScripts.homebrew.text}
 
       ${cfg.activationScripts.postUserActivation.text}
 

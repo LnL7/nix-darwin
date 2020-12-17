@@ -5,7 +5,7 @@
 with lib;
 
 let
-  cfg = config.programs.brew-bundle;
+  cfg = config.homebrew;
 
   brewfileSection = heading: type: entries:
     if entries != [] then
@@ -37,7 +37,7 @@ let
 in
 
 {
-  options.programs.brew-bundle = {
+  options.homebrew = {
     enable = mkEnableOption ''
       configuring your Brewfile, and installing/updating the formulas therein via
       the <command>brew bundle</command> command, using <command>nix-darwin</command>.
@@ -141,12 +141,12 @@ in
         Applications to install from Mac App Store using <command>mas</command>.
 
         When this option is used, <literal>"mas"</literal> is automatically added to
-        <option>programs.brew-bundle.brews</option>.
+        <option>homebrew.brews</option>.
 
         Note that you need to be signed into the Mac App Store for <command>mas</command> to
         successfully install and upgrade applications, and that unfortunately apps removed from this
         option will not be uninstalled automatically even if
-        <option>programs.brew-bundle.cleanup</option> is set to <literal>"uninstall"</literal>
+        <option>homebrew.cleanup</option> is set to <literal>"uninstall"</literal>
         or <literal>"zap"</literal> (this is currently a limitation of Homebrew Bundle).
 
         For more information on <command>mas</command> see: https://github.com/mas-cli/mas
@@ -161,7 +161,7 @@ in
         Docker images to install using <command>whalebrew</command>.
 
         When this option is used, <literal>"whalebrew"</literal> is automatically added to
-        <option>programs.brew-bundle.brews</option>.
+        <option>homebrew.brews</option>.
 
         For more information on <command>whalebrew</command> see:
         https://github.com/whalebrew/whalebrew
@@ -199,14 +199,14 @@ in
         message = ''
           Homebrew not installed.
 
-          Please install Homebrew yourself before using the programs.brew-bundle module.
+          Please install Homebrew yourself before using the <option>homebrew</option> module.
 
           See installation instructions at: https://brew.sh
         '';
       }
     ];
 
-    programs.brew-bundle.brews =
+    homebrew.brews =
       optional (cfg.masApps != {}) "mas" ++
       optional (cfg.whalebrews != []) "whalebrew";
 
@@ -215,7 +215,7 @@ in
       (if cfg.userConfig.noLock then { HOMEBREW_BUNDLE_NO_LOCK = "1"; } else {})
     );
 
-    system.activationScripts.brew-bundle.text = mkIf cfg.enable ''
+    system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
       PATH=/usr/local/bin:$PATH ${brew-bundle-command}
