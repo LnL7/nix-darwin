@@ -7,32 +7,30 @@ with lib;
 let
   cfg = config.homebrew;
 
-  brewfileSection = heading: type: entries:
-    if entries != [] then
-      "# ${heading}\n" + (concatMapStrings (name: "${type} \"${name}\"\n") entries) + "\n"
-    else "";
+  brewfileSection = heading: type: entries: optionalString (entries != [])
+    "# ${heading}\n" + (concatMapStrings (name: "${type} \"${name}\"\n") entries) + "\n";
 
-  masBrewfileSection = entries:
-    if entries != {} then
-      "# Mac App Store apps\n" +
-      concatStringsSep "\n" (mapAttrsToList (name: id: ''mas "${name}", id: ${toString id}'') entries) +
-      "\n"
-    else "";
-
-  brewfile = pkgs.writeText "Brewfile" (
-    (brewfileSection "Taps" "tap" cfg.taps) +
-    (brewfileSection "Brews" "brew" cfg.brews) +
-    (brewfileSection "Casks" "cask" cfg.casks) +
-    (masBrewfileSection cfg.masApps) +
-    (brewfileSection "Docker contrainers" "whalebrew" cfg.whalebrews) +
-    (if cfg.extraConfig != "" then "# Extra config\n" + cfg.extraConfig else "")
+  masBrewfileSection = entries: optionalString (entries != {}) (
+    "# Mac App Store apps\n" +
+    concatStringsSep "\n" (mapAttrsToList (name: id: ''mas "${name}", id: ${toString id}'') entries) +
+    "\n"
   );
 
-  brew-bundle-command =
-    (if cfg.autoUpdate then "" else "HOMEBREW_NO_AUTO_UPDATE=1 ") +
-    "brew bundle --file='${brewfile}' --no-lock" +
-    (if cfg.cleanup == "uninstall" || cfg.cleanup == "zap" then " --cleanup" else "") +
-    (if cfg.cleanup == "zap" then " --zap" else "");
+  brewfile = pkgs.writeText "Brewfile" (
+    brewfileSection "Taps" "tap" cfg.taps +
+    brewfileSection "Brews" "brew" cfg.brews +
+    brewfileSection "Casks" "cask" cfg.casks +
+    masBrewfileSection cfg.masApps +
+    brewfileSection "Docker contrainers" "whalebrew" cfg.whalebrews +
+    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
+  );
+
+  brew-bundle-command = concatStringsSep " " (
+    optional (!cfg.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1" ++
+    [ "brew bundle --file='${brewfile}' --no-lock" ] ++
+    optional (cfg.cleanup == "uninstall" || cfg.cleanup == "zap") "--cleanup" ++
+    optional (cfg.cleanup == "zap") "--zap"
+  );
 
 in
 
@@ -211,8 +209,8 @@ in
       optional (cfg.whalebrews != []) "whalebrew";
 
     environment.variables = mkIf cfg.enable (
-      (if cfg.userConfig.brewfile then { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } else {}) //
-      (if cfg.userConfig.noLock then { HOMEBREW_BUNDLE_NO_LOCK = "1"; } else {})
+      optionalAttrs cfg.userConfig.brewfile { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } //
+      optionalAttrs cfg.userConfig.noLock { HOMEBREW_BUNDLE_NO_LOCK = "1"; }
     );
 
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
