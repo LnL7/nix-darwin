@@ -109,7 +109,9 @@ stdenv.mkDerivation {
         echo >&2 "checking /etc"
         readlink /etc/static
         test -e /etc/static
+        echo >&2 "checking /etc/static in bashrc"
         grep /etc/static/bashrc /etc/bashrc
+        echo >&2 "checking /etc/static in zshrc"
         grep /etc/static/zshrc /etc/zshrc
         grep -v nix-daemon.sh /etc/profile
         echo >&2 "checking /run/current-system"
@@ -117,7 +119,7 @@ stdenv.mkDerivation {
         test -e /run
         readlink /run/current-system
         test -e /run/current-system
-        echo >&2 "checking profile"
+        echo >&2 "checking system profile"
         readlink /nix/var/nix/profiles/system
         test -e /nix/var/nix/profiles/system
         echo >&2 ok
