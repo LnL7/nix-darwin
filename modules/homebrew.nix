@@ -31,7 +31,6 @@ let
     optional (cfg.cleanup == "uninstall" || cfg.cleanup == "zap") "--cleanup" ++
     optional (cfg.cleanup == "zap") "--zap"
   );
-
 in
 
 {
@@ -191,19 +190,6 @@ in
   };
 
   config = {
-    assertions = mkIf cfg.enable [
-      {
-        assertion = builtins.pathExists /usr/local/bin/brew;
-        message = ''
-          Homebrew not installed.
-
-          Please install Homebrew yourself before using the <option>homebrew</option> module.
-
-          See installation instructions at: https://brew.sh
-        '';
-      }
-    ];
-
     homebrew.brews =
       optional (cfg.masApps != {}) "mas" ++
       optional (cfg.whalebrews != []) "whalebrew";
@@ -216,8 +202,11 @@ in
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
-      PATH=/usr/local/bin:$PATH ${brew-bundle-command}
+      if [ -f /usr/local/bin/brew ]; then
+        PATH=/usr/local/bin:$PATH ${brew-bundle-command}
+      else
+        echo -e "\e[1;31merror: Homebrew is not installed, skipping...\e[0m" >&2
+      fi
     '';
   };
-
 }
