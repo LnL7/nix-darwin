@@ -110,9 +110,13 @@ stdenv.mkDerivation {
         readlink /etc/static
         test -e /etc/static
         echo >&2 "checking /etc/static in bashrc"
+        cat /etc/bashrc
         grep /etc/static/bashrc /etc/bashrc
         echo >&2 "checking /etc/static in zshrc"
+        cat /etc/zshrc
         grep /etc/static/zshrc /etc/zshrc
+        echo >&2 "checking profile"
+        cat /etc/profile
         grep -v nix-daemon.sh /etc/profile
         echo >&2 "checking /run/current-system"
         readlink /run
@@ -122,6 +126,19 @@ stdenv.mkDerivation {
         echo >&2 "checking system profile"
         readlink /nix/var/nix/profiles/system
         test -e /nix/var/nix/profiles/system
+
+        echo >&2 "checking bash environment"
+        env -i USER=john HOME=/Users/john bash -li -c 'echo $PATH'
+        env -i USER=john HOME=/Users/john bash -li -c 'echo $PATH' | grep /Users/john/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin
+        env -i USER=john HOME=/Users/john bash -li -c 'echo $NIX_PATH'
+        env -i USER=john HOME=/Users/john bash -li -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels:/Users/john/.nix-defexpr/channels
+
+        echo >&2 "checking zsh environment"
+        env -i USER=john HOME=/Users/john zsh -l -c 'echo $PATH'
+        env -i USER=john HOME=/Users/john zsh -l -c 'echo $PATH' | grep /Users/john/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin
+        env -i USER=john HOME=/Users/john zsh -l -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels:/Users/john/.nix-defexpr/channels
+        env -i USER=john HOME=/Users/john zsh -l -c 'echo $NIX_PATH'
+
         echo >&2 ok
         exit
     '';
