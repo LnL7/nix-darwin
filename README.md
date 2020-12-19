@@ -100,7 +100,8 @@ configuration can be built.  The `hostname(1)` of your system will be used to de
 which darwin configuration is applied if it's not specified explicitly in the flake ref.
 
 ```sh
-darwin-rebuild switch --flake ~/.config/darwin
+nix build ~/.config/darwin\#darwinConfigurations.Johns-MacBook.system
+./result/sw/bin/darwin-rebuild switch --flake ~/.config/darwin
 ```
 
 ## Manual Install
