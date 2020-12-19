@@ -49,17 +49,6 @@ with lib;
         esac
     fi
 
-    if ! test -L /etc/profile && grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
-        if test -t 1; then
-            read -p "Would you like to remove nix-daemon.sh configuration in /etc/profile? [y/n] " i
-        fi
-        case "$i" in
-            y|Y)
-                sudo patch -d /etc -p1 < '${./profile.patch}'
-                ;;
-        esac
-    fi
-
     if ! test -L /run; then
       if test -t 1; then
           read -p "Would you like to create /run? [y/n] " i
