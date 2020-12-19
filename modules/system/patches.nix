@@ -29,6 +29,10 @@ in
       description = ''
         Set of patches to apply to <filename>/</filename>.
 
+        <warning>
+        <para>This can modify everything so use with caution.</para>
+        </warning>
+
         Useful for safely changing system files.  Unlike the etc module this
         won't remove or modify files with unexpected content.
       '';
@@ -56,12 +60,12 @@ in
           fi
       done
 
-        ${concatMapStringsSep "\n" (f: ''
-          f="$(basename ${f})"
-          if ! diff "${cfg.build.patches}/patches/$f" "/run/current-system/patches/$f" &> /dev/null; then
-              patch --forward --backup -d / -p1 < '${f}' || true
-          fi
-        '') cfg.patches}
+      ${concatMapStringsSep "\n" (f: ''
+        f="$(basename ${f})"
+        if ! patch --reverse --dry-run -d / -p1 < '${f}' &> /dev/null; then
+            patch --forward --backup -d / -p1 < '${f}' || true
+        fi
+      '') cfg.patches}
     '';
 
   };
