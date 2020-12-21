@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v9
     - run: |
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
-        echo "FIXME workaround channel permission error"
     - run: |
         nix-shell -A installer
         nix-shell -A installer.check

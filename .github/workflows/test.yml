@@ -42,7 +42,6 @@ jobs:
     - run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
-        echo "FIXME workaround channel permission error"
     - run: |
         NIX_PATH=$HOME/.nix-defexpr/channels nix-shell -A installer
         echo "TODO installed doesn't support flakes, handle multi-user install"

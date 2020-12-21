@@ -11,20 +11,7 @@ with lib;
   system.activationScripts.preUserActivation.text = mkBefore ''
     PATH=/nix/var/nix/profiles/default/bin:$PATH
 
-    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
     i=y
-    if ! test -e "$darwinPath"; then
-        if test -t 1; then
-            read -p "Would you like to manage <darwin> with nix-channel? [y/n] " i
-        fi
-        case "$i" in
-            y|Y)
-                nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-                nix-channel --update
-                ;;
-        esac
-    fi
-
     if ! test -L /etc/bashrc && ! tail -n1 /etc/bashrc | grep -q /etc/static/bashrc; then
         if test -t 1; then
             read -p "Would you like to load darwin configuration in /etc/bashrc? [y/n] " i
