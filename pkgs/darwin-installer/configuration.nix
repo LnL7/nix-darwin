@@ -45,8 +45,9 @@ with lib;
               if ! grep -q '^run\b' /etc/synthetic.conf 2>/dev/null; then
                   echo "setting up /etc/synthetic.conf..."
                   echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf >/dev/null
-                  /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B 2>/dev/null || true
-                  /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t 2>/dev/null || true
+                  /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B &>/dev/null \
+                      || /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t &>/dev/null \
+                      || echo "warning: failed to execute apfs.util"
               fi
               if ! test -L /run; then
                   echo "setting up /run..."
