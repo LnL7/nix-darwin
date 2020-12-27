@@ -8,6 +8,9 @@ let
   exportVariables =
     mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
 
+  exportVariablesFish =
+    mapAttrsToList (n: v: ''set -g -x ${n} "${v}"'') cfg.variables;
+
   aliasCommands =
     mapAttrsFlatten (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
 
@@ -168,6 +171,8 @@ in
        export NIX_PROFILES="${concatStringsSep " " (reverseList cfg.profiles)}"
     '';
 
+    environment.etc."fish/foreign-env/extraInit".text = cfg.extraInit;
+
     environment.variables =
       {
         XDG_CONFIG_DIRS = map (path: path + "/etc/xdg") cfg.profiles;
@@ -191,6 +196,21 @@ in
 
       # Extra initialisation
       ${cfg.extraInit}
+    '';
+
+    system.build.setEnvironmentFish = pkgs.writeText "set-environment-fish" ''
+      # Prevent this file from being sourced by child shells.
+      set -g -x __NIX_DARWIN_SET_ENVIRONMENT_DONE 1
+
+      set -g -x PATH ${config.environment.systemPath}
+      ${concatStringsSep "\n" exportVariablesFish}
+
+      # Extra initialisation
+      set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $__fish_datadir/functions
+      fenv "source /etc/fish/foreign-env/extraInit" > /dev/null
+
+      # clear fish_function_path so that it will be correctly set when we return to $__fish_datadir/config.fish
+      set -e fish_function_path
     '';
 
     system.build.setAliases = pkgs.writeText "set-aliases" ''
