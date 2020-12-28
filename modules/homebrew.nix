@@ -20,7 +20,7 @@ let
     brewfileSection "Brews" "brew" cfg.brews +
     brewfileSection "Casks" "cask" cfg.casks +
     masBrewfileSection cfg.masApps +
-    brewfileSection "Docker contrainers" "whalebrew" cfg.whalebrews +
+    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews +
     optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
   );
 
