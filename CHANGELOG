@@ -1,4 +1,4 @@
-2020-12-18
+2020-12-30
 - Added `homebrew` module, to manage formulas installed by Homebrew via `brew bundle`.
 
 2020-10-25
