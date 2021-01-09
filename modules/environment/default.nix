@@ -206,7 +206,7 @@ in
       ${concatStringsSep "\n" exportVariablesFish}
 
       # Extra initialisation
-      set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/functions $__fish_datadir/functions
+      set fish_function_path ${pkgs.fish-foreign-env}/share/fish-foreign-env/vendor_functions.d $__fish_datadir/functions
       fenv "source /etc/fish/foreign-env/extraInit" > /dev/null
 
       # clear fish_function_path so that it will be correctly set when we return to $__fish_datadir/config.fish
