@@ -81,32 +81,32 @@ in
     };
 
     global.brewfile = mkOption {
-       type = types.bool;
-       default = false;
-       description = ''
-         When enabled, when you manually invoke <command>brew bundle</command>, it will
-         automatically use the Brewfile in the Nix store that this module generates.
+      type = types.bool;
+      default = false;
+      description = ''
+      When enabled, when you manually invoke <command>brew bundle</command>, it will automatically
+      use the Brewfile in the Nix store that this module generates.
 
-         Sets the <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the
-         Brewfile in the Nix store that this module generates, by adding it to
-         <option>environment.variables</option>.
-       '';
-     };
+      Sets the <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the
+      Brewfile in the Nix store that this module generates, by adding it to
+      <option>environment.variables</option>.
+      '';
+    };
 
-     global.noLock = mkOption {
-       type = types.bool;
-       default = false;
-       description = ''
-         When enabled, lockfiles aren't generated when you manually invoke
-         <command>brew bundle [install]</command>. This is often desirable when
-         <option>homebrew.global.brewfile</option> is enabled, since
-         <command>brew bundle [install]</command> will try to write the lockfile in the Nix store,
-         and complain that it can't (though the command will run successfully regardless).
+    global.noLock = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+      When enabled, lockfiles aren't generated when you manually invoke
+      <command>brew bundle [install]</command>. This is often desirable when
+      <option>homebrew.global.brewfile</option> is enabled, since
+      <command>brew bundle [install]</command> will try to write the lockfile in the Nix store,
+      and complain that it can't (though the command will run successfully regardless).
 
-         Sets the <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
-         <option>environment.variables</option>.
-       '';
-     };
+      Sets the <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
+      <option>environment.variables</option>.
+      '';
+    };
 
     taps = mkOption {
       type = with types; listOf str;
