@@ -45,6 +45,7 @@
   ./services/kwm
   ./services/lorri.nix
   ./services/mail/offlineimap.nix
+  ./services/mail/mbsync.nix
   ./services/mopidy.nix
   ./services/nix-daemon.nix
   ./services/nix-gc

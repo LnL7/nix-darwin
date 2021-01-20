@@ -121,6 +121,7 @@ let
     tests.services-nextdns = makeTest ./tests/services-nextdns.nix;
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
+    tests.services-mbsync = makeTest ./tests/services-mbsync.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
     tests.services-redis = makeTest ./tests/services-redis.nix;
     tests.services-skhd = makeTest ./tests/services-skhd.nix;
