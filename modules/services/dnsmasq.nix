@@ -63,7 +63,10 @@ in
       name = "resolver/${domain}";
       value = {
         enable = true;
-        text = "nameserver ${cfg.bind}.${toString cfg.port}";
+        text = ''
+          port ${toString cfg.port}
+          nameserver ${cfg.bind}
+          '';
       };
     }) (builtins.attrNames cfg.addresses));
   };
