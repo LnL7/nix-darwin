@@ -117,10 +117,6 @@ in
       # Don't execute this file when running in a pure nix-shell.
       if test -n "$IN_NIX_SHELL"; then return; fi
 
-      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
-        . ${config.system.build.setEnvironment}
-      fi
-
       ${cfg.shellInit}
 
       # Read system-wide modifications.
@@ -155,6 +151,13 @@ in
       # Only execute this file once per shell.
       if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
       __ETC_ZSHRC_SOURCED=1
+
+      # Don't execute this file when running in a pure nix-shell.
+      if test -n "$IN_NIX_SHELL"; then return; fi
+
+      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
+        . ${config.system.build.setEnvironment}
+      fi
 
       # history defaults
       SAVEHIST=2000
