@@ -20,6 +20,7 @@ in
     grep -F -- "--address=/localhost/127.0.0.1" ${config.out}/Library/LaunchDaemons/org.nixos.dnsmasq.plist
 
     echo >&2 "checking resolver config"
-    grep -F "nameserver 127.0.0.1.53" ${config.out}/etc/resolver/localhost
+    grep -F "port 53" ${config.out}/etc/resolver/localhost
+    grep -F "nameserver 127.0.0.1" ${config.out}/etc/resolver/localhost
   '';
 }
