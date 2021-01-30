@@ -32,7 +32,7 @@ in
     programs.fish.interactiveShellInit = ''
       function __fish_command_not_found_handler --on-event="fish_command_not_found"
         ${pkgs.bashInteractive}/bin/bash -c \
-          "source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh; command_not_found_handle $argv"
+          "source ${cfg.package}/etc/profile.d/command-not-found.sh; command_not_found_handle $argv"
       end
     '';
 
