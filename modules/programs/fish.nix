@@ -18,7 +18,7 @@ let
 
   envInteractiveShellInit = pkgs.writeText "interactiveShellInit" cfge.interactiveShellInit;
 
-  fenv = pkgs.fish-foreign-env or pkgs.fishPlugins.foreign-env;
+  fenv = pkgs.fishPlugins.foreign-env or pkgs.fish-foreign-env;
 
   sourceEnv = file:
   if cfg.useBabelfish then
