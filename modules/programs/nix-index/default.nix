@@ -4,6 +4,7 @@ with lib;
 
 let
   cfg = config.programs.nix-index;
+  command-not-found-script = "${cfg.package}/etc/profile.d/command-not-found.sh";
 in
 
 {
@@ -27,12 +28,16 @@ in
 
     environment.systemPackages = [ cfg.package ];
 
-    environment.interactiveShellInit = "source ${cfg.package}/etc/profile.d/command-not-found.sh";
+    environment.interactiveShellInit = "source ${command-not-found-script}";
 
     programs.fish.interactiveShellInit = ''
       function __fish_command_not_found_handler --on-event="fish_command_not_found"
+        ${if config.programs.fish.useBabelfish then ''
+        command_not_found_handle $argv
+        '' else ''
         ${pkgs.bashInteractive}/bin/bash -c \
-          "source ${cfg.package}/etc/profile.d/command-not-found.sh; command_not_found_handle $argv"
+          "source ${command-not-found-script}; command_not_found_handle $argv"
+        ''}
       end
     '';
 
