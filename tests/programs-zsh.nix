@@ -20,13 +20,13 @@
      echo >&2 "checking for share/zsh in /sw"
      test -e ${config.out}/sw/share/zsh
 
-     echo >&2 "checking setEnvironment in /etc/zshenv"
-     fgrep '. ${config.system.build.setEnvironment}' ${config.out}/etc/zshenv
      echo >&2 "checking nix-shell return /etc/zshenv"
      grep 'if test -n "$IN_NIX_SHELL"; then return; fi' ${config.out}/etc/zshenv
      echo >&2 "checking zshenv.d in /etc/zshenv"
      grep 'source /etc/zshenv.d/\*.conf' ${config.out}/etc/zshenv
 
+     echo >&2 "checking setEnvironment in /etc/zshrc"
+     fgrep '. ${config.system.build.setEnvironment}' ${config.out}/etc/zshrc
      echo >&2 "checking environment.d in /etc/zshrc"
      grep 'source /etc/environment.d/\*.conf' ${config.out}/etc/zshrc
      echo >&2 "checking zshrc.d in /etc/zshrc"
