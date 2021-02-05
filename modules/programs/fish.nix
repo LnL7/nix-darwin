@@ -20,12 +20,17 @@ let
 
   fenv = pkgs.fishPlugins.foreign-env or pkgs.fish-foreign-env;
 
+  # fishPlugins.foreign-env and fish-foreign-env have different function paths
+  fenvFunctionsDir = if (pkgs ? fishPlugins.foreign-env)
+    then "${fenv}/share/fish/vendor_functions.d"
+    else "${fenv}/share/fish-foreign-env/functions";
+
   sourceEnv = file:
   if cfg.useBabelfish then
     "source /etc/fish/${file}.fish"
   else
     ''
-      set fish_function_path ${fenv}/share/fish-foreign-env/functions $fish_function_path
+      set fish_function_path ${fenvFunctionsDir} $fish_function_path
       fenv source /etc/fish/foreign-env/${file} > /dev/null
       set -e fish_function_path[1]
     '';
@@ -167,7 +172,7 @@ in
         else ''
           # This happens before $__fish_datadir/config.fish sets fish_function_path, so it is currently
           # unset. We set it and then completely erase it, leaving its configuration to $__fish_datadir/config.fish
-          set fish_function_path ${fenv}/share/fish-foreign-env/functions $__fish_datadir/functions
+          set fish_function_path ${fenvFunctionsDir} $__fish_datadir/functions
 
           # source the NixOS environment config
           if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]
