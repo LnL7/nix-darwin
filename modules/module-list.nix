@@ -50,6 +50,7 @@
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/gitlab-runner.nix
+  ./services/hercules-ci-agent
   ./services/karabiner-elements
   ./services/khd
   ./services/kwm
