@@ -3,7 +3,7 @@
 with lib;
 let
   cfg = config.services.hercules-ci-agent;
-  user = config.users.users.hercules-ci-agent;
+  user = config.users.users._hercules-ci-agent;
 in
 {
   imports = [ ./common.nix ];
@@ -30,8 +30,8 @@ in
       serviceConfig.RunAtLoad = true;
       serviceConfig.StandardErrorPath = cfg.logFile;
       serviceConfig.StandardOutPath = cfg.logFile;
-      serviceConfig.GroupName = "hercules-ci-agent";
-      serviceConfig.UserName = "hercules-ci-agent";
+      serviceConfig.GroupName = "_hercules-ci-agent";
+      serviceConfig.UserName = "_hercules-ci-agent";
       serviceConfig.WorkingDirectory = user.home;
       serviceConfig.WatchPaths = [
         cfg.settings.staticSecretsDirectory
@@ -45,22 +45,24 @@ in
 
     # Trusted user allows simplified configuration and better performance
     # when operating in a cluster.
-    nix.trustedUsers = [ "hercules-ci-agent" ];
+    nix.trustedUsers = [ "_hercules-ci-agent" ];
     services.hercules-ci-agent.settings.nixUserIsTrusted = true;
 
-    users.knownGroups = [ "hercules-ci-agent" ];
-    users.knownUsers = [ "hercules-ci-agent" ];
+    users.knownGroups = [ "hercules-ci-agent" "_hercules-ci-agent" ];
+    users.knownUsers = [ "hercules-ci-agent" "_hercules-ci-agent" ];
 
-    users.users.hercules-ci-agent = {
-      uid = mkDefault 532;
-      gid = mkDefault config.users.groups.hercules-ci-agent.gid;
+    users.users._hercules-ci-agent = {
+      uid = mkDefault 399;
+      gid = mkDefault config.users.groups._hercules-ci-agent.gid;
       home = mkDefault cfg.settings.baseDirectory;
+      name = "_hercules-ci-agent";
       createHome = true;
       shell = "/bin/bash";
       description = "System user for the Hercules CI Agent";
     };
-    users.groups.hercules-ci-agent = {
-      gid = mkDefault 532;
+    users.groups._hercules-ci-agent = {
+      gid = mkDefault 399;
+      name = "_hercules-ci-agent";
       description = "System group for the Hercules CI Agent";
     };
   };
