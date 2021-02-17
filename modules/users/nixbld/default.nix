@@ -13,9 +13,9 @@ let
   mkUsers = f: genList (x: f (x + 1)) cfg.nix.nrBuildUsers;
 
   buildUsers = mkUsers (i: {
-    name = "nixbld${toString i}";
-    uid = 30000 + i;
-    gid = 30000;
+    name = "_nixbld${toString i}";
+    uid = 300 + i;
+    gid = 300;
     description = "Nix build user ${toString i}";
   });
 
@@ -52,7 +52,7 @@ in
 
     assertions = [
       { assertion = elem "nixbld" cfg.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
-      { assertion = elem "nixbld1" cfg.knownUsers -> elem "nixbld1" createdUsers; message = "refusing to delete user nixbld1 in users.knownUsers, this would break nix"; }
+      { assertion = elem "_nixbld1" cfg.knownUsers -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
       { assertion = cfg.groups ? "nixbld" -> cfg.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
     ];
 
@@ -60,7 +60,10 @@ in
     users.users = mkIf cfg.nix.configureBuildUsers (named buildUsers);
 
     users.knownGroups = mkIf cfg.nix.configureBuildUsers [ "nixbld" ];
-    users.knownUsers = mkIf cfg.nix.configureBuildUsers (mkUsers (i: "nixbld${toString i}"));
+    users.knownUsers = mkIf cfg.nix.configureBuildUsers (mkMerge [
+      (mkUsers (i: "_nixbld${toString i}"))
+      (mkUsers (i: "nixbld${toString i}"))  # delete old style nixbld users
+    ]);
 
   };
 }

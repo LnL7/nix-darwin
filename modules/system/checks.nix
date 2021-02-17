@@ -44,14 +44,29 @@ let
     fi
   '';
 
+  oldBuildUsers = ''
+    if dscl . -list /Users | grep -q '^nixbld'; then
+        echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
+        echo "These can cause migration problems when upgrading to certain macOS versions" >&2
+        echo "Running the installer again will remove and recreate the users in a way that avoids these problems" >&2
+        echo >&2
+        echo "$ darwin-install" >&2
+        echo >&2
+        echo "or enable to automatically manage the users" >&2
+        echo >&2
+        echo "    users.nix.configureBuildUsers = true;" >&2
+        echo >&2
+    fi
+  '';
+
   buildUsers = ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
     if [ -z $buildUser ]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
         echo "Create the build users or disable the daemon:" >&2
-        echo "$ ./bootstrap -u" >&2
+        echo "$ darwin-install" >&2
         echo >&2
-        echo "or set" >&2
+        echo "or set (this requires some manual intervention to restore permissions)" >&2
         echo >&2
         echo "    services.nix-daemon.enable = false;" >&2
         echo >&2
@@ -200,6 +215,7 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
+      oldBuildUsers
       (mkIf config.nix.useDaemon buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
