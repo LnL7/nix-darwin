@@ -68,6 +68,7 @@
   ./programs/tmux.nix
   ./programs/vim.nix
   ./programs/zsh
+  ./homebrew.nix
   ./users
   ./users/nixbld
 ]
