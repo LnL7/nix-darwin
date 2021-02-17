@@ -34,7 +34,7 @@ in
         "${pkgs.gnupg}/bin/gpg-connect-agent" "/bye"
       ];
       RunAtLoad = cfg.agent.enableSSHSupport;
-      KeepAlive = true;
+      KeepAlive.SuccessfulExit = false;
     };
 
     environment.extraInit = ''
