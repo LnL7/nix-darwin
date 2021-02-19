@@ -526,23 +526,23 @@ in
 
     users.users.gitlab-runner =
       { name = "gitlab-runner";
-        uid = mkDefault 532;
-        gid = mkDefault config.users.groups.gitlab-runner.gid;
+        # uid = mkDefault 532;
+        # gid = mkDefault config.users.groups.gitlab-runner.gid;
         home = mkDefault "/var/lib/gitlab-runner";
         shell = "/bin/bash";
         description = "Gitlab agent user";
       };
     users.groups.gitlab-runner =
       { name = "gitlab-runner";
-        gid = mkDefault 532;
+        # gid = mkDefault 532;
         description = "Gitlab agent user group";
       };
 
 
-    system.activationScripts.preActivation.text = let user = config.users.users.gitlab-runner; in ''
-      mkdir -p '${user.home}'
-      chown ${toString user.uid}:${toString user.gid} '${user.home}'
-    '';
+    # system.activationScripts.preActivation.text = let user = config.users.users.gitlab-runner; in ''
+    #  mkdir -p '${user.home}'
+    #  chown ${toString user.uid}:${toString user.gid} '${user.home}'
+    #'';
 
 
     warnings = optional (cfg.configFile != null) "services.gitlab-runner.`configFile` is deprecated, please use services.gitlab-runner.`services`.";
@@ -574,8 +574,8 @@ in
             ProcessType = "Interactive";
             ThrottleInterval = 30;
 
-          StandardOutPath = "/var/lib/gitlab-runner/out.log";
-          StandardErrorPath = "/var/lib/gitlab-runner/err.log";
+          # StandardOutPath = "/var/lib/gitlab-runner/out.log";
+          # StandardErrorPath = "/var/lib/gitlab-runner/err.log";
           # The combination of KeepAlive.NetworkState and WatchPaths
           # will ensure that buildkite-agent is started on boot, but
           # after networking is available (so the hostname is
