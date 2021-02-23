@@ -7,7 +7,7 @@ let
     filter = name: _type: name != toString ./default.nix;
   };
 
-  nixPath = stdenv.lib.concatStringsSep ":" [
+  nixPath = pkgs.lib.concatStringsSep ":" [
     "darwin-config=${configuration}/configuration.nix"
     "darwin=${nix-darwin}"
     "nixpkgs=${pkgs.path}"
