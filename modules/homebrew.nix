@@ -204,8 +204,10 @@ in
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
-      if [ -f /usr/local/bin/brew ] || [ -f /opt/homebrew/bin/brew ]; then
+      if [ -f /usr/local/bin/brew ]; then
         PATH=/usr/local/bin:$PATH ${brew-bundle-command}
+      elif [ -f /opt/homebrew/bin/brew ]; then
+        PATH=/opt/homebrew/bin:$PATH ${brew-bundle-command}
       else
         echo -e "\e[1;31merror: Homebrew is not installed, skipping...\e[0m" >&2
       fi
