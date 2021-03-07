@@ -8,6 +8,10 @@ in
 {
   imports = [ ./common.nix ];
 
+  meta.maintainers = [
+    lib.maintainers.roberth or "roberth"
+  ];
+
   options.services.hercules-ci-agent = {
 
     logFile = mkOption {
