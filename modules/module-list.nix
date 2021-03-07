@@ -1,6 +1,7 @@
 [
   ./alias.nix
   ./documentation
+  ./meta.nix
   ./misc/ids.nix
   ./misc/lib.nix
   ./security/pam.nix
