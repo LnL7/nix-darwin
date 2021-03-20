@@ -5,7 +5,9 @@ with lib;
 let
   inherit (pkgs) stdenv;
 
-  extraPath = lib.makeBinPath [ config.nix.package pkgs.coreutils pkgs.jq ];
+  cfg = config.darwin-rebuild;
+
+  extraPath = lib.makeBinPath [ cfg.nixPackage pkgs.coreutils pkgs.jq ];
 
   writeProgram = name: env: src:
     pkgs.substituteAll ({
@@ -31,6 +33,18 @@ let
 in
 
 {
+  options = {
+    darwin-rebuild.nixPackage = mkOption {
+      type = types.either types.package types.path;
+      default = config.nix.package;
+      defaultText = "config.nix.package";
+      example = literalExample "pkgs.nixUnstable";
+      description = ''
+        This option specifies the package or profile that contains the version of Nix used by <literal>darwin-rebuild</literal>. The default is to use the system version of Nix.
+      '';
+    };
+  };
+
   config = {
 
     environment.systemPackages =
