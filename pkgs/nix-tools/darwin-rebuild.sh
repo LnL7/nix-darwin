@@ -126,7 +126,7 @@ if [ -n "$flake" ]; then
 fi
 
 if [ -n "$flake" ]; then
-    flake=$(nix "${flakeFlags[@]}" flake info --json "${extraBuildFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
+    flake=$(nix "${flakeFlags[@]}" flake metadata --json "${extraBuildFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
 fi
 
 if [ "$action" != build ] && [ -z "$flake" ]; then
