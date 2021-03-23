@@ -126,7 +126,7 @@ if [ -n "$flake" ]; then
 fi
 
 if [ -n "$flake" ]; then
-    if nix flake metadata &>/dev/null; then
+    if nix "${flakeFlags[@]}" flake metadata --version &>/dev/null; then
         cmd=metadata
     else
         cmd=info
