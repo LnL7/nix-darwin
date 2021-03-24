@@ -21,7 +21,6 @@ jobs:
     - run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-20.09-darwin nixpkgs
         nix-channel --update
-        echo "FIXME workaround channel permission error"
     - run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
         nix-shell -A installer
@@ -45,6 +44,13 @@ jobs:
          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210207_fd6eaa1/install
          extra_nix_config: |
            experimental-features = nix-command flakes
+           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        nix-channel --update
+    - run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
+        nix-shell -A installer
     - run: |
         nix registry add darwin $PWD
         nix build ./modules/examples#darwinConfigurations.simple.system
