@@ -38,17 +38,16 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: cachix/install-nix-action@v12
+      with:
+         install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210207_fd6eaa1/install
+         extra_nix_config: |
+           experimental-features = nix-command flakes
     - run: |
-        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-        nix-channel --update
-    - run: |
-        NIX_PATH=$HOME/.nix-defexpr/channels nix-shell -A installer
-        echo "TODO installed doesn't support flakes, handle multi-user install"
-    - run: |
-        nix-build channel:nixpkgs-unstable -A nixUnstable -o nix-unstable
-        ./nix-unstable/bin/nix --experimental-features 'nix-command flakes' registry add darwin $PWD
-        ./nix-unstable/bin/nix --experimental-features 'nix-command flakes' build ./modules/examples#darwinConfigurations.simple.system
+        nix registry add darwin $PWD
+        nix build ./modules/examples#darwinConfigurations.simple.system
     - run: |
         ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple
     - run: |
