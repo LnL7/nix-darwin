@@ -17,9 +17,7 @@ in
       default = [ ];
       example = literalExample
         ''
-          [
-          "497799835" # Xcode
-          ]
+          [ "497799835" # Xcode ]
         '';
       description = "List of App Store applications for mas to install.";
     };
@@ -32,7 +30,7 @@ in
 
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
-    user.activationScripts.mas.text = ''
+    users.activationScripts.mas.text = ''
       echo "setting up App Store applications..."
       ${cfg.package}/bin/mas install ${lib.concatStringsSep " " cfg.applications}
       ${cfg.package}/bin/mas upgrade ${lib.concatStringsSep " " cfg.applications}
