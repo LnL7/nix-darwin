@@ -6,9 +6,10 @@
 }:
 
 let
-  evalConfig = import ./eval-config.nix { inherit lib system; };
+  evalConfig = import ./eval-config.nix { inherit lib; };
 
   eval = evalConfig {
+    inherit system;
     modules = [ configuration ];
     inputs = { inherit nixpkgs; };
   };

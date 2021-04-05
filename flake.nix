@@ -7,7 +7,8 @@
       # TODO handle multiple architectures.
       evalConfig = import ./eval-config.nix { inherit (nixpkgs) lib; };
 
-      darwinSystem = { modules, inputs ? {}, ... }@args: self.lib.evalConfig (args // {
+      darwinSystem = { modules, system, inputs ? { }, ... }@args: self.lib.evalConfig (args // {
+        inherit system;
         inputs = { inherit nixpkgs; darwin = self; } // inputs;
         modules = modules ++ [ self.darwinModules.flakeOverrides ];
       });
@@ -20,6 +21,7 @@
     darwinModules.simple = ./modules/examples/simple.nix;
 
     checks.x86_64-darwin.simple = (self.lib.darwinSystem {
+      system = "x86_64-darwin";
       modules = [ self.darwinModules.simple ];
     }).system;
 
