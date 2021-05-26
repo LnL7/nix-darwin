@@ -27,7 +27,7 @@ let
         echo "Create a symlink to /var/run with:" >&2
         if test -e /etc/synthetic.conf; then
             echo >&2
-            echo "$ echo "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf" >&2
+            echo "$ echo 'run\tprivate/var/run' | sudo tee -a /etc/synthetic.conf" >&2
             echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B" >&2
             echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t" >&2
             echo >&2
