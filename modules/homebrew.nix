@@ -52,6 +52,14 @@ in
       '';
     };
 
+    brewPrefix = mkOption {
+      type = types.str;
+      default = "/usr/local/bin";
+      description = ''
+        Customize path prefix where executable of <command>brew</command> is searched for.
+      '';
+    };
+
     cleanup = mkOption {
       type = types.enum [ "none" "uninstall" "zap" ];
       default = "none";
@@ -204,8 +212,8 @@ in
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
-      if [ -f /usr/local/bin/brew ]; then
-        PATH=/usr/local/bin:$PATH ${brew-bundle-command}
+      if [ -f "${cfg.brewPrefix}/brew" ]; then
+        PATH="${cfg.brewPrefix}":$PATH ${brew-bundle-command}
       else
         echo -e "\e[1;31merror: Homebrew is not installed, skipping...\e[0m" >&2
       fi
