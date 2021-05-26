@@ -42,7 +42,8 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstalle
 
 ## Example configuration
 
-Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
+[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
 
 ```nix
 { pkgs, ... }:
