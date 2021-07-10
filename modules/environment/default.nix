@@ -185,6 +185,11 @@ in
     system.build.setEnvironment = pkgs.writeText "set-environment" ''
       # Prevent this file from being sourced by child shells.
       export __NIX_DARWIN_SET_ENVIRONMENT_DONE=1
+      # Work around multi-user Nix.
+      if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+          # As far as Nix is concerned, with all we set here, this is true.
+          export __ETC_PROFILE_NIX_SOURCED=1
+      fi
 
       export PATH=${config.environment.systemPath}
       ${concatStringsSep "\n" exportVariables}
