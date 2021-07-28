@@ -43,6 +43,7 @@
   ./services/emacs.nix
   ./services/khd
   ./services/kwm
+  ./services/ipfs.nix
   ./services/lorri.nix
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
