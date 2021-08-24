@@ -16,6 +16,7 @@
   ./system/defaults/screencapture.nix
   ./system/defaults/alf.nix
   ./system/defaults/loginwindow.nix
+  ./system/defaults/magicmouse.nix
   ./system/defaults/smb.nix
   ./system/defaults/SoftwareUpdate.nix
   ./system/defaults/spaces.nix

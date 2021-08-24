@@ -34,6 +34,8 @@ let
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
+  magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
+  magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != {}) list);
 in
@@ -52,7 +54,7 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture spaces trackpad trackpadBluetooth ]
+      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture spaces trackpad trackpadBluetooth magicmouse magicmouseBluetooth ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
@@ -66,6 +68,8 @@ in
         ${concatStringsSep "\n" spaces}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
+        ${concatStringsSep "\n" magicmouse}
+        ${concatStringsSep "\n" magicmouseBluetooth}
       '';
 
   };
