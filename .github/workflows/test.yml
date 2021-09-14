@@ -52,10 +52,9 @@ jobs:
         export NIX_PATH=$HOME/.nix-defexpr/channels
         nix-shell -A installer
     - run: |
-        nix registry add darwin $PWD
-        nix build ./modules/examples#darwinConfigurations.simple.system
+        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
     - run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
     - run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#simple
+        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
