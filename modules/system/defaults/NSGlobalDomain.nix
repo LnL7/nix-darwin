@@ -47,6 +47,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleInterfaceStyleSwitchesAutomatically = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to automatically switch between light and dark mode. The default is false.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleKeyboardUIMode = mkOption {
       type = types.nullOr (types.enum [ 3 ]);
       default = null;
