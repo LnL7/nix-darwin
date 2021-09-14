@@ -16,6 +16,8 @@ with lib;
   system.activationScripts.postUserActivation.text = mkAfter ''
     if test -L ~/Applications; then
         rm ~/Applications
+    elif test -L ~/Applications/Nix\ Apps; then
+        rm ~/Applications/Nix\ Apps
     fi
 
     if test -L ~/.nix-defexpr/channels/darwin; then
