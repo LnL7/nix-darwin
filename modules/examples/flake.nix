@@ -18,11 +18,11 @@
   in
   {
     # Build darwin flake using:
-    # $ darwin-rebuild build --flake ./modules/examples#darwinConfigurations.simple.system \
+    # $ darwin-rebuild build --flake ./modules/examples#simple \
     #       --override-input darwin .
     darwinConfigurations."simple" = darwin.lib.darwinSystem {
-      system = "x86_64-darwin";
       modules = [ configuration darwin.darwinModules.simple ];
+      system = "x86_64-darwin";
     };
 
     # Expose the package set, including overlays, for convenience.
