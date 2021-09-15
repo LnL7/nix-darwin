@@ -1,9 +1,10 @@
-{ lib, system ? builtins.currentSystem or "x86_64-darwin" }:
+{ lib }:
 
-{ modules
+{ system ? builtins.currentSystem or "x86_64-darwin"
+, modules
 , inputs
 , baseModules ? import ./modules/module-list.nix
-, specialArgs ? {}
+, specialArgs ? { }
 }@args:
 
 let
@@ -18,11 +19,14 @@ let
     _file = ./eval-config.nix;
     config = {
       _module.args.pkgs = import inputs.nixpkgs config.nixpkgs;
-      nixpkgs.system = system;
+
+      # This permits the configuration to override the passed-in
+      # system.
+      nixpkgs.system = lib.mkDefault system;
     };
   };
 
-  eval = lib.evalModules (builtins.removeAttrs args ["inputs"] // {
+  eval = lib.evalModules (builtins.removeAttrs args [ "inputs" "system" ] // {
     modules = modules ++ [ inputsModule pkgsModule ] ++ baseModules;
     args = { inherit baseModules modules; };
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
