@@ -17,7 +17,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-          Disable drop shadow border around screencaptures. The default is false;
+          Disable drop shadow border around screencaptures. The default is false.
         '';
     };
   };

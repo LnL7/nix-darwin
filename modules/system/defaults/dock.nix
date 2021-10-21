@@ -45,7 +45,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to hide Dashboard as a Space. The default is false;
+        Whether to hide Dashboard as a Space. The default is false.
       '';
     };
 
@@ -53,7 +53,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Enable spring loading for all Dock items. The default is false;
+        Enable spring loading for all Dock items. The default is false.
       '';
     };
 
