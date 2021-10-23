@@ -43,7 +43,7 @@ in {
       type = types.nullOr (types.enum [ "Dark" ]);
       default = null;
       description = ''
-        Set to 'Dark' to enable dark mode, or leave unset for normal mod.
+        Set to 'Dark' to enable dark mode, or leave unset for normal mode.
       '';
     };
 
@@ -75,7 +75,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to show all file extensions in finder. The default is false.
+        Whether to show all file extensions in Finder. The default is false.
       '';
     };
 
