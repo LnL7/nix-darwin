@@ -62,7 +62,7 @@
                   <emphasis>Example:</emphasis>
                   <xsl:text> </xsl:text>
                   <xsl:choose>
-                    <xsl:when test="attr[@name = 'example']/attrs[attr[@name = '_type' and string[@value = 'literalExample']]]">
+                    <xsl:when test="attr[@name = 'example']/attrs[attr[@name = '_type' and string[@value = 'literalExpression']]]">
                       <programlisting><xsl:value-of select="attr[@name = 'example']/attrs/attr[@name = 'text']/string/@value" /></programlisting>
                     </xsl:when>
                     <xsl:otherwise>
@@ -162,7 +162,7 @@
   </xsl:template>
 
 
-  <xsl:template match="attrs[attr[@name = '_type' and string[@value = 'literalExample']]]">
+  <xsl:template match="attrs[attr[@name = '_type' and string[@value = 'literalExpression']]]">
     <xsl:value-of select="attr[@name = 'text']/string/@value" />
   </xsl:template>
 

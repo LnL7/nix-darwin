@@ -17,7 +17,7 @@ in
 
     services.chunkwm.package = mkOption {
       type = types.package;
-      example = literalExample "pkgs.chunkwm";
+      example = literalExpression "pkgs.chunkwm";
       description = "This option specifies the chunkwm package to use.";
     };
 

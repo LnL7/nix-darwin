@@ -50,7 +50,7 @@ in
   options = {
     nixpkgs.config = mkOption {
       default = {};
-      example = literalExample
+      example = literalExpression
         ''
           { firefox.enableGeckoMediaPlayer = true;
             packageOverrides = pkgs: {
@@ -75,7 +75,7 @@ in
     nixpkgs.overlays = mkOption {
       type = types.listOf overlayType;
       default = [];
-      example = literalExample ''
+      example = literalExpression ''
         [ (self: super: {
             openssh = super.openssh.override {
               hpnSupport = true;

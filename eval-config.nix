@@ -26,7 +26,13 @@ let
     };
   };
 
-  eval = lib.evalModules (builtins.removeAttrs args [ "inputs" "system" ] // {
+  libExtended = lib.extend (self: super: {
+    # Added in nixpkgs #136909, adds forward compatibility until 22.03 is deprecated.
+    literalExpression = super.literalExpression or super.literalExample;
+    literalDocBook = super.literalDocBook or super.literalExample;
+  });
+
+  eval = libExtended.evalModules (builtins.removeAttrs args [ "inputs" "system" ] // {
     modules = modules ++ [ inputsModule pkgsModule ] ++ baseModules;
     args = { inherit baseModules modules; };
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;

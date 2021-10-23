@@ -42,7 +42,7 @@ in
     services.yabai.config = mkOption {
       type = attrs;
       default = {};
-      example = literalExample ''
+      example = literalExpression ''
         {
           focus_follows_mouse = "autoraise";
           mouse_follows_focus = "off";
@@ -63,7 +63,7 @@ in
     services.yabai.extraConfig = mkOption {
       type = str;
       default = "";
-      example = literalExample ''
+      example = literalExpression ''
         yabai -m rule --add app='System Preferences' manage=off
       '';
       description = "Extra arbitrary configuration to append to the configuration file";

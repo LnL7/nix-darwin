@@ -22,7 +22,7 @@ in
     services.privoxy.package = mkOption {
       type = types.package;
       default = pkgs.privoxy;
-      example = literalExample "pkgs.privoxy";
+      example = literalExpression "pkgs.privoxy";
       description = "This option specifies the privoxy package to use.";
     };
 

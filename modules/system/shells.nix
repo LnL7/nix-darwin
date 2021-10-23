@@ -11,7 +11,7 @@ in
     environment.shells = mkOption {
       type = types.listOf (types.either types.shellPackage types.path);
       default = [];
-      example = literalExample "[ pkgs.bashInteractive pkgs.zsh ]";
+      example = literalExpression "[ pkgs.bashInteractive pkgs.zsh ]";
       description = ''
         A list of permissible login shells for user accounts.
         No need to mention <literal>/bin/sh</literal>

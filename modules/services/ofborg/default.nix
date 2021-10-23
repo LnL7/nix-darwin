@@ -17,7 +17,7 @@ in
 
     services.ofborg.package = mkOption {
       type = types.package;
-      example = literalExample "pkgs.ofborg";
+      example = literalExpression "pkgs.ofborg";
       description = ''
         This option specifies the ofborg package to use. eg.
 

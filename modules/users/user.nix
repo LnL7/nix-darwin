@@ -60,14 +60,14 @@ with lib;
     shell = mkOption {
       type = types.either types.shellPackage types.path;
       default = "/sbin/nologin";
-      example = literalExample "pkgs.bashInteractive";
+      example = literalExpression "pkgs.bashInteractive";
       description = "The user's shell.";
     };
 
     packages = mkOption {
       type = types.listOf types.package;
       default = [];
-      example = literalExample "[ pkgs.firefox pkgs.thunderbird ]";
+      example = literalExpression "[ pkgs.firefox pkgs.thunderbird ]";
       description = ''
         The set of packages that should be made availabe to the user.
         This is in contrast to <option>environment.systemPackages</option>,

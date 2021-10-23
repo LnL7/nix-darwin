@@ -31,7 +31,7 @@ in
     programs.vim.extraKnownPlugins = mkOption {
       type = types.attrsOf types.package;
       default = {};
-      example = literalExample
+      example = literalExpression
         ''
         {
           vim-jsx = pkgs.vimUtils.buildVimPluginFrom2Nix {

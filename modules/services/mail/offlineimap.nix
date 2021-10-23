@@ -19,14 +19,13 @@ in {
     path = mkOption {
       type = types.listOf types.path;
       default = [];
-      example = literalExample "[ pkgs.pass pkgs.bash pkgs.notmuch ]";
+      example = literalExpression "[ pkgs.pass pkgs.bash pkgs.notmuch ]";
       description = "List of derivations to put in Offlineimap's path.";
     };
 
     startInterval = mkOption {
       type = types.nullOr types.int;
       default = 300;
-      example = literalExample "300";
       description = "Optional key to start offlineimap services each N seconds";
     };
 

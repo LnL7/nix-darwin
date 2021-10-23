@@ -12,7 +12,7 @@ in
     system.patches = mkOption {
       type = types.listOf types.path;
       default = [];
-      example = literalExample ''
+      example = literalExpression ''
         [
           (pkgs.writeText "bashrc.patch" ''''
             --- a/etc/bashrc

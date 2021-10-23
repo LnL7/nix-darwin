@@ -62,7 +62,7 @@ if [ "$(evalOpt "_type")" = '"option"' ]; then
   evalOpt "default" || evalOptText "defaultText" || echo "no default"
   echo
   echo "Example:"
-  if [ "$(evalOpt "example._type")" = '"literalExample"' ]; then
+  if [ "$(evalOpt "example._type")" = '"literalExpression"' ]; then
     evalOptText "example.text" || echo "no example"
   else
     evalOpt "example" || echo "no example"

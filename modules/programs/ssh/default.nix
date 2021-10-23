@@ -58,7 +58,7 @@ in
       description = ''
         The set of system-wide known SSH hosts.
       '';
-      example = literalExample ''
+      example = literalExpression ''
         [
           {
             hostNames = [ "myhost" "myhost.mydomain.com" "10.10.1.4" ];

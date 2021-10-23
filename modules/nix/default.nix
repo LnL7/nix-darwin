@@ -48,7 +48,7 @@ in
       type = types.either types.package types.path;
       default = pkgs.nix;
       defaultText = "pkgs.nix";
-      example = literalExample "pkgs.nixUnstable";
+      example = literalExpression "pkgs.nixUnstable";
       description = ''
         This option specifies the package or profile that contains the version of Nix to use throughout the system.
         To keep the version of nix originally installed the default profile can be used.
@@ -366,7 +366,7 @@ in
             flake = mkOption {
               type = types.unspecified;
               default = null;
-              example = literalExample "nixpkgs";
+              example = literalExpression "nixpkgs";
               description = ''
                 The flake input to which <option>from></option> is to be rewritten.
               '';
