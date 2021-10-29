@@ -59,6 +59,7 @@
   ./services/synapse-bt.nix
   ./services/synergy
   ./services/yabai
+  ./services/yubikey-agent.nix
   ./services/nextdns
   ./programs/bash
   ./programs/fish.nix
