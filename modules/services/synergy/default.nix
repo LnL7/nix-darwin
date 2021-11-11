@@ -92,8 +92,12 @@ in
       launchd.user.agents."synergy-client" = {
         path = [ config.environment.systemPath ];
         serviceConfig.ProgramArguments = [
-          "${cfg.package}/bin/synergyc" "-f" "${cfg.client.serverAddress}"
-        ] ++ optionals (cfg.client.screenName != "") [ "-n" cfg.client.screenName ];
+          "${cfg.package}/bin/synergyc" "-f"
+        ] ++ optionals (cfg.client.screenName != "") [
+           "-n" cfg.client.screenName 
+        ] ++ [
+          "${cfg.client.serverAddress}"
+        ];
         serviceConfig.KeepAlive = true;
         serviceConfig.RunAtLoad = cfg.client.autoStart;
         serviceConfig.ProcessType = "Interactive";
