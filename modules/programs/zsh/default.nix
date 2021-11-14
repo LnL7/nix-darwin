@@ -96,12 +96,24 @@ in
   };
 
   config = mkIf cfg.enable {
-
     environment.systemPackages =
-      [ # Include zsh package
+      let
+        completions =
+          if lib.versionAtLeast (lib.getVersion config.nix.package) "2.4pre"
+          then
+            pkgs.nix-zsh-completions.overrideAttrs
+              (oldAttrs: {
+                installPhase = oldAttrs.installPhase + ''
+                  rm $out/share/zsh/site-functions/_nix
+                '';
+              })
+          else pkgs.nix-zsh-completions;
+      in
+      [
+        # Include zsh package
         pkgs.zsh
-      ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
-        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
+      ] ++ optional cfg.enableCompletion completions
+      ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
 
     environment.pathsToLink = [ "/share/zsh" ];
 
