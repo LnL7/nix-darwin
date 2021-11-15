@@ -69,5 +69,13 @@ in
       name = "_hercules-ci-agent";
       description = "System group for the Hercules CI Agent";
     };
+
+    services.hercules-ci-agent.settings.labels = {
+      darwin.label = config.system.darwinLabel;
+      darwin.revision = config.system.darwinRevision;
+      darwin.version = config.system.darwinVersion;
+      darwin.nix.useDaemon = config.nix.useDaemon;
+      darwin.nix.useSandbox = config.nix.useSandbox;
+    };
   };
 }
