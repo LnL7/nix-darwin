@@ -3,6 +3,7 @@
   ./documentation
   ./security/pki
   ./security/sandbox
+  ./security/age
   ./system
   ./system/checks.nix
   ./system/activation-scripts.nix
