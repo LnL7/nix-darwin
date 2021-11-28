@@ -48,6 +48,7 @@
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
   ./services/nix-daemon.nix
+  ./services/nix-serve.nix
   ./services/nix-gc
   ./services/ofborg
   ./services/postgresql
