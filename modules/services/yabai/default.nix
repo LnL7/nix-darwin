@@ -99,6 +99,7 @@ in
 
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive.SuccessfulExit = false;
+        serviceConfig.UserName = "root";
       };
     })
   ];
