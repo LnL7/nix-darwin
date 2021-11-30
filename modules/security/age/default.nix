@@ -61,7 +61,7 @@ let
         type = types.str;
         default = "0400";
         description = ''
-          Permissions mode of the in octal.
+          Permissions mode of the decrypted secret in octal format.
         '';
       };
       owner = mkOption {
