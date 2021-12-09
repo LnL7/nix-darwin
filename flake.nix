@@ -2,7 +2,42 @@
   # WARNING this is very much still experimental.
   description = "A collection of darwin modules";
 
-  outputs = { self, nixpkgs }: {
+  inputs = {
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs = { self, flake-utils, nixpkgs }:
+    let
+      darwinSystems =
+        builtins.filter
+          (sys: builtins.isList (builtins.match "^[[:alnum:]_]+-darwin$" sys))
+          flake-utils.lib.allSystems;
+
+      portable = flake-utils.lib.eachSystem darwinSystems
+        (system:
+          let pkgs = import nixpkgs { inherit system; };
+
+          in rec {
+            defaultApp = apps.darwin-installer;
+
+            apps = {
+              darwin-installer = flake-utils.lib.mkApp {
+                drv = pkgs.callPackage ./pkgs/darwin-installer/default.nix {
+                  nix-darwin = self;
+                };
+              };
+
+              darwin-uninstaller = flake-utils.lib.mkApp {
+                drv = pkgs.callPackage ./pkgs/darwin-uninstaller/default.nix {
+                  nix-darwin = self;
+                };
+              };
+            };
+          });
+
+    in {
+    inherit (portable) defaultApp apps;
+
     lib = {
       # TODO handle multiple architectures.
       evalConfig = import ./eval-config.nix { inherit (nixpkgs) lib; };
