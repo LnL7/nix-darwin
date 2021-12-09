@@ -8,6 +8,9 @@ Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
 ## Install
 
+There is a plain nix installer and a flake installer app.
+
+### Plain Nix
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
@@ -20,6 +23,11 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 - `mv /etc/bashrc /etc/bashrc.orig`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | tee -a ~/.bashrc`
+
+### With Flakes
+``` bash
+nix run github:LnL7/nix-darwin
+```
 
 ## Updating
 
