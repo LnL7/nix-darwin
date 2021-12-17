@@ -9,6 +9,7 @@ in
 {
   config = {
     system.checks.verifyNixPath = mkDefault false;
+    system.checks.verifyNixChannels = mkDefault false;
 
     system.darwinVersionSuffix = ".${darwin.shortRev or "dirty"}";
     system.darwinRevision = mkIf (darwin ? rev) darwin.rev;
