@@ -5,6 +5,17 @@ with lib;
 let
   cfg = config.documentation;
 
+  # To reference the regular configuration from inside the docs evaluation further down.
+  # While not strictly necessary, this extra binding avoids accidental name capture in
+  # the future.
+  regularConfig = config;
+
+  argsModule = {
+    config._module.args = regularConfig._module.args // {
+      modules = [ ];
+    };
+  };
+
   /* For the purpose of generating docs, evaluate options with each derivation
     in `pkgs` (recursively) replaced by a fake with path "\${pkgs.attribute.path}".
     It isn't perfect, but it seems to cover a vast majority of use cases.
@@ -17,8 +28,7 @@ let
     options =
       let
         scrubbedEval = evalModules {
-          modules = baseModules;
-          args = (config._module.args) // { modules = [ ]; };
+          modules = baseModules ++ [ argsModule ];
           specialArgs = { pkgs = scrubDerivations "pkgs" pkgs; };
         };
         scrubDerivations = namePrefix: pkgSet: mapAttrs
