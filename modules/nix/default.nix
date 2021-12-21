@@ -434,7 +434,9 @@ in
     environment.etc."nix/nix.conf".source = nixConf;
 
     environment.etc."nix/nix.conf".knownSha256Hashes = [
-      "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"  # nix installer
+      "7c2d80499b39256b03ee9abd3d6258343718306aca8d472c26ac32c9b0949093"  # nix installer
+      "19299897fa312d9d32b3c968c2872dd143085aa727140cec51f57c59083e93b9"
+      "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"
     ];
 
     environment.etc."nix/registry.json".text = builtins.toJSON {
