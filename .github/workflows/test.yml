@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v12
+    - uses: cachix/install-nix-action@v15
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A tests
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A examples.simple
@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v12
+    - uses: cachix/install-nix-action@v15
     - run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-20.09-darwin nixpkgs
         nix-channel --update
@@ -32,6 +32,12 @@ jobs:
         export NIX_PATH=$HOME/.nix-defexpr/channels
         nix-shell -A uninstaller
         nix-shell -A uninstaller.check
+    - name: Debugging tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 15
+      with:
+        limit-access-to-actor: true
   install-flake:
     runs-on: macos-10.15
     timeout-minutes: 60
@@ -39,7 +45,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: cachix/install-nix-action@v12
+    - uses: cachix/install-nix-action@v15
       with:
          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210207_fd6eaa1/install
          extra_nix_config: |

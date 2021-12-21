@@ -13,11 +13,11 @@ jobs:
     runs-on: macos-10.15
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v9
+    - uses: cachix/install-nix-action@v15
     - run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
     - run: |
         nix-shell -A installer
         nix-shell -A installer.check
-    - uses: mxschmitt/action-tmate@v2
+    - uses: mxschmitt/action-tmate@v3
