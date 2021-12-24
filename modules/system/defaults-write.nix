@@ -37,13 +37,18 @@ let
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
   magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
 
-  mkIfAttrs = list: mkIf (any (attrs: attrs != {}) list);
+  mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
 
 {
   config = {
 
-    system.activationScripts.defaults.text = mkIfAttrs [ alf loginwindow smb SoftwareUpdate ]
+    system.activationScripts.defaults.text = mkIfAttrs [
+      alf
+      loginwindow
+      smb
+      SoftwareUpdate
+    ]
       ''
         # Set defaults
         echo >&2 "system defaults..."
@@ -54,7 +59,19 @@ in
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
-      [ NSGlobalDomain GlobalPreferences LaunchServices dock finder screencapture spaces trackpad trackpadBluetooth magicmouse magicmouseBluetooth ]
+      [
+        NSGlobalDomain
+        GlobalPreferences
+        LaunchServices
+        dock
+        finder
+        screencapture
+        spaces
+        trackpad
+        trackpadBluetooth
+        magicmouse
+        magicmouseBluetooth
+      ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
