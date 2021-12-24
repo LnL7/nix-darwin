@@ -21,6 +21,7 @@
   ./system/defaults/SoftwareUpdate.nix
   ./system/defaults/spaces.nix
   ./system/defaults/trackpad.nix
+  ./system/defaults/universalaccess.nix
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix

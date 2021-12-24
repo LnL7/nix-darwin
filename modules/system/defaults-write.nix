@@ -39,6 +39,7 @@ let
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
+  universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -74,6 +75,7 @@ in
         spaces
         trackpad
         trackpadBluetooth
+        universalaccess
       ]
       ''
         # Set defaults
@@ -91,6 +93,7 @@ in
         ${concatStringsSep "\n" spaces}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
+        ${concatStringsSep "\n" universalaccess}
       '';
 
   };
