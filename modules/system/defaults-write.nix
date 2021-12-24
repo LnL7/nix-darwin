@@ -21,21 +21,24 @@ let
 
   defaultsToList = domain: attrs: mapAttrsToList (writeDefault domain) (filterAttrs (n: v: v != null) attrs);
 
-  NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
-  GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
-  LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
-  dock = defaultsToList "com.apple.dock" cfg.dock;
-  finder = defaultsToList "com.apple.finder" cfg.finder;
+  # defaults
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   loginwindow = defaultsToList "/Library/Preferences/com.apple.loginwindow" cfg.loginwindow;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
   SoftwareUpdate = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
+
+  # userDefaults
+  GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
+  LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
+  NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
+  dock = defaultsToList "com.apple.dock" cfg.dock;
+  finder = defaultsToList "com.apple.finder" cfg.finder;
+  magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
+  magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
-  magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
-  magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -60,33 +63,34 @@ in
 
     system.activationScripts.userDefaults.text = mkIfAttrs
       [
-        NSGlobalDomain
         GlobalPreferences
         LaunchServices
+        NSGlobalDomain
         dock
         finder
+        magicmouse
+        magicmouseBluetooth
         screencapture
         spaces
         trackpad
         trackpadBluetooth
-        magicmouse
-        magicmouseBluetooth
       ]
       ''
         # Set defaults
         echo >&2 "user defaults..."
 
         ${concatStringsSep "\n" NSGlobalDomain}
+
         ${concatStringsSep "\n" GlobalPreferences}
         ${concatStringsSep "\n" LaunchServices}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
+        ${concatStringsSep "\n" magicmouse}
+        ${concatStringsSep "\n" magicmouseBluetooth}
         ${concatStringsSep "\n" screencapture}
         ${concatStringsSep "\n" spaces}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
-        ${concatStringsSep "\n" magicmouse}
-        ${concatStringsSep "\n" magicmouseBluetooth}
       '';
 
   };
