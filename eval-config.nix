@@ -8,10 +8,12 @@
 }@args:
 
 let
-  inputsModule = {
+  argsModule = {
     _file = ./eval-config.nix;
     config = {
-      _module.args.inputs = inputs;
+      _module.args = {
+        inherit baseModules inputs modules;
+      };
     };
   };
 
@@ -33,8 +35,7 @@ let
   });
 
   eval = libExtended.evalModules (builtins.removeAttrs args [ "inputs" "system" ] // {
-    modules = modules ++ [ inputsModule pkgsModule ] ++ baseModules;
-    args = { inherit baseModules modules; };
+    modules = modules ++ [ argsModule pkgsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });
 
