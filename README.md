@@ -113,9 +113,9 @@ nix build ~/.config/darwin\#darwinConfigurations.Johns-MacBook.system
 # Before 10.15 Catalina
 sudo ln -s private/var/run /run
 # After 10.15 Catalina
-echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf >/dev/null
-/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B &>/dev/null \
-    || /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t &>/dev/null
+echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf
+/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B
+/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t
 
 # Configure the channel
 nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
