@@ -54,7 +54,7 @@ in
 
     brewPrefix = mkOption {
       type = types.str;
-      default = "/usr/local/bin";
+      default = if pkgs.stdenv.hostPlatform.darwinArch == "aarch64" then "/opt/homebrew/bin" else "/usr/local/bin";
       description = ''
         Customize path prefix where executable of <command>brew</command> is searched for.
       '';
