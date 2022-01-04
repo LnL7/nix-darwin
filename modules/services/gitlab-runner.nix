@@ -533,7 +533,7 @@ in
         description = "Gitlab agent user";
       };
     users.groups.gitlab-runner =
-      # { name = "gitlab-runner";
+      { name = "gitlab-runner";
         gid = mkDefault 532;
         description = "Gitlab agent user group";
       };
