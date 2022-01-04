@@ -526,15 +526,15 @@ in
 
     users.users.gitlab-runner =
       { name = "gitlab-runner";
-        # uid = mkDefault 532;
+        uid = mkDefault 532;
         # gid = mkDefault config.users.groups.gitlab-runner.gid;
         home = mkDefault "/var/lib/gitlab-runner";
         shell = "/bin/bash";
         description = "Gitlab agent user";
       };
     users.groups.gitlab-runner =
-      { name = "gitlab-runner";
-        # gid = mkDefault 532;
+      # { name = "gitlab-runner";
+        gid = mkDefault 532;
         description = "Gitlab agent user group";
       };
 
@@ -559,7 +559,7 @@ in
         jq
         moreutils
         remarshal
-        util-linux
+        # util-linux
         cfg.package
         coreutils
         gnugrep
