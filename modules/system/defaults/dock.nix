@@ -162,5 +162,97 @@ in {
       '';
     };
 
+    system.defaults.dock.wvous-tl-corner = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Hot corner action for top left corner. Valid values include:
+
+        <itemizedlist>
+        <listitem><para><literal>1</literal>: Disabled</para></listitem>
+        <listitem><para><literal>2</literal>: Mission Control</para></listitem>
+        <listitem><para><literal>3</literal>: Application Windows</para></listitem>
+        <listitem><para><literal>4</literal>: Desktop</para></listitem>
+        <listitem><para><literal>5</literal>: Start Screen Saver</para></listitem>
+        <listitem><para><literal>6</literal>: Disable Screen Saver</para></listitem>
+        <listitem><para><literal>7</literal>: Dashboard</para></listitem>
+        <listitem><para><literal>10</literal>: Put Display to Sleep</para></listitem>
+        <listitem><para><literal>11</literal>: Launchpad</para></listitem>
+        <listitem><para><literal>12</literal>: Notification Center</para></listitem>
+        <listitem><para><literal>13</literal>: Lock Screen</para></listitem>
+        <listitem><para><literal>14</literal>: Quick Note</para></listitem>
+        </itemizedlist>
+      '';
+    };
+
+    system.defaults.dock.wvous-bl-corner = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Hot corner action for bottom left corner. Valid values include:
+
+        <itemizedlist>
+        <listitem><para><literal>1</literal>: Disabled</para></listitem>
+        <listitem><para><literal>2</literal>: Mission Control</para></listitem>
+        <listitem><para><literal>3</literal>: Application Windows</para></listitem>
+        <listitem><para><literal>4</literal>: Desktop</para></listitem>
+        <listitem><para><literal>5</literal>: Start Screen Saver</para></listitem>
+        <listitem><para><literal>6</literal>: Disable Screen Saver</para></listitem>
+        <listitem><para><literal>7</literal>: Dashboard</para></listitem>
+        <listitem><para><literal>10</literal>: Put Display to Sleep</para></listitem>
+        <listitem><para><literal>11</literal>: Launchpad</para></listitem>
+        <listitem><para><literal>12</literal>: Notification Center</para></listitem>
+        <listitem><para><literal>13</literal>: Lock Screen</para></listitem>
+        <listitem><para><literal>14</literal>: Quick Note</para></listitem>
+        </itemizedlist>
+      '';
+    };
+
+    system.defaults.dock.wvous-tr-corner = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Hot corner action for top right corner. Valid values include:
+
+        <itemizedlist>
+        <listitem><para><literal>1</literal>: Disabled</para></listitem>
+        <listitem><para><literal>2</literal>: Mission Control</para></listitem>
+        <listitem><para><literal>3</literal>: Application Windows</para></listitem>
+        <listitem><para><literal>4</literal>: Desktop</para></listitem>
+        <listitem><para><literal>5</literal>: Start Screen Saver</para></listitem>
+        <listitem><para><literal>6</literal>: Disable Screen Saver</para></listitem>
+        <listitem><para><literal>7</literal>: Dashboard</para></listitem>
+        <listitem><para><literal>10</literal>: Put Display to Sleep</para></listitem>
+        <listitem><para><literal>11</literal>: Launchpad</para></listitem>
+        <listitem><para><literal>12</literal>: Notification Center</para></listitem>
+        <listitem><para><literal>13</literal>: Lock Screen</para></listitem>
+        <listitem><para><literal>14</literal>: Quick Note</para></listitem>
+        </itemizedlist>
+      '';
+    };
+
+    system.defaults.dock.wvous-br-corner = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = ''
+        Hot corner action for bottom right corner. Valid values include:
+
+        <itemizedlist>
+        <listitem><para><literal>1</literal>: Disabled</para></listitem>
+        <listitem><para><literal>2</literal>: Mission Control</para></listitem>
+        <listitem><para><literal>3</literal>: Application Windows</para></listitem>
+        <listitem><para><literal>4</literal>: Desktop</para></listitem>
+        <listitem><para><literal>5</literal>: Start Screen Saver</para></listitem>
+        <listitem><para><literal>6</literal>: Disable Screen Saver</para></listitem>
+        <listitem><para><literal>7</literal>: Dashboard</para></listitem>
+        <listitem><para><literal>10</literal>: Put Display to Sleep</para></listitem>
+        <listitem><para><literal>11</literal>: Launchpad</para></listitem>
+        <listitem><para><literal>12</literal>: Notification Center</para></listitem>
+        <listitem><para><literal>13</literal>: Lock Screen</para></listitem>
+        <listitem><para><literal>14</literal>: Quick Note</para></listitem>
+        </itemizedlist>
+      '';
+    };
+
     };
 }
