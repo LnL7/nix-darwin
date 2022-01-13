@@ -163,7 +163,7 @@ in {
     };
 
     system.defaults.dock.wvous-tl-corner = mkOption {
-      type = types.nullOr types.int;
+      type = types.nullOr types.ints.positive;
       default = null;
       description = ''
         Hot corner action for top left corner. Valid values include:
@@ -186,7 +186,7 @@ in {
     };
 
     system.defaults.dock.wvous-bl-corner = mkOption {
-      type = types.nullOr types.int;
+      type = types.nullOr types.ints.positive;
       default = null;
       description = ''
         Hot corner action for bottom left corner. Valid values include:
@@ -209,7 +209,7 @@ in {
     };
 
     system.defaults.dock.wvous-tr-corner = mkOption {
-      type = types.nullOr types.int;
+      type = types.nullOr types.ints.positive;
       default = null;
       description = ''
         Hot corner action for top right corner. Valid values include:
@@ -232,7 +232,7 @@ in {
     };
 
     system.defaults.dock.wvous-br-corner = mkOption {
-      type = types.nullOr types.int;
+      type = types.nullOr types.ints.positive;
       default = null;
       description = ''
         Hot corner action for bottom right corner. Valid values include:
