@@ -5,6 +5,7 @@
 , inputs
 , baseModules ? import ./modules/module-list.nix
 , specialArgs ? { }
+, check ? true
 }@args:
 
 let
