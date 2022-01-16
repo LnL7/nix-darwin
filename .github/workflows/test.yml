@@ -9,9 +9,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v15
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A tests
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-20.09-darwin -I darwin=. -A examples.simple
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A tests
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A examples.simple
   install:
     runs-on: macos-10.15
     timeout-minutes: 30
@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v15
     - run: |
-        nix-channel --add https://nixos.org/channels/nixpkgs-20.09-darwin nixpkgs
+        nix-channel --add https://nixos.org/channels/nixpkgs-21.05-darwin nixpkgs
         nix-channel --update
     - run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
