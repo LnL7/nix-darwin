@@ -4,10 +4,10 @@ with lib;
 
 let
   isConfig = x:
-    builtins.isAttrs x || builtins.isFunction x;
+    builtins.isAttrs x || lib.isFunction x;
 
   optCall = f: x:
-    if builtins.isFunction f
+    if lib.isFunction f
     then f x
     else f;
 
@@ -41,7 +41,7 @@ let
   overlayType = mkOptionType {
     name = "nixpkgs-overlay";
     description = "nixpkgs overlay";
-    check = builtins.isFunction;
+    check = lib.isFunction;
     merge = lib.mergeOneOption;
   };
 in
