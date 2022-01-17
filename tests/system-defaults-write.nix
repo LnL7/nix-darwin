@@ -39,6 +39,9 @@
   system.defaults.screencapture.location = "/tmp";
   system.defaults.smb.NetBIOSName = "IMAC-000000";
   system.defaults.smb.ServerDescription = ''Darwin\\\\U2019s iMac'';
+  system.defaults.universalaccess.reduceTransparency = true;
+  system.defaults.universalaccess.closeViewScrollWheelToggle = true;
+  system.defaults.universalaccess.closeViewZoomFollowsFocus = true;
 
   test = ''
     echo >&2 "checking defaults write in /activate"
@@ -82,5 +85,8 @@
     grep "defaults write com.apple.dock 'autohide-delay' -float 0.24" ${config.out}/activate-user
     grep "defaults write com.apple.dock 'orientation' -string 'left'" ${config.out}/activate-user
     grep "defaults write com.apple.screencapture 'location' -string '/tmp'" ${config.out}/activate-user
+    grep "defaults write com.apple.universalaccess 'reduceTransparency' -bool YES" ${config.out}/activate-user
+    grep "defaults write com.apple.universalaccess 'closeViewScrollWheelToggle' -bool YES" ${config.out}/activate-user
+    grep "defaults write com.apple.universalaccess 'closeViewZoomFollowsFocus' -bool YES" ${config.out}/activate-user
   '';
 }
