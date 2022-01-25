@@ -14,6 +14,7 @@
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
+  system.defaults.NSGlobalDomain.NSAutomaticWindowAnimationsEnabled = false;
   system.defaults.NSGlobalDomain.NSDisableAutomaticTermination = true;
   system.defaults.NSGlobalDomain.NSDocumentSaveNewDocumentsToCloud = false;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
@@ -63,6 +64,7 @@
     grep "defaults write -g 'NSAutomaticPeriodSubstitutionEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSAutomaticQuoteSubstitutionEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSAutomaticSpellingCorrectionEnabled' -bool NO" ${config.out}/activate-user
+    grep "defaults write -g 'NSAutomaticWindowAnimationsEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSDisableAutomaticTermination' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSDocumentSaveNewDocumentsToCloud' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSNavPanelExpandedStateForSaveMode' -bool YES" ${config.out}/activate-user
