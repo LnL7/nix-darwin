@@ -5,6 +5,7 @@
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleFontSmoothing = 1;
+  system.defaults.NSGlobalDomain.AppleICUForce24HourTime = true;
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = true;
   system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
@@ -67,6 +68,7 @@
     grep "defaults write -g 'AppleEnableMouseSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleEnableSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleFontSmoothing' -int 1" ${config.out}/activate-user
+    grep "defaults write -g 'AppleICUForce24HourTime' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleKeyboardUIMode' -int 3" ${config.out}/activate-user
     grep "defaults write -g 'ApplePressAndHoldEnabled' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleShowAllExtensions' -bool YES" ${config.out}/activate-user
