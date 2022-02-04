@@ -1,6 +1,7 @@
 { lib }:
 
 { system ? builtins.currentSystem or "x86_64-darwin"
+, pkgs ? null
 , modules
 , inputs
 , baseModules ? import ./modules/module-list.nix
@@ -21,7 +22,15 @@ let
   pkgsModule = { config, inputs, ... }: {
     _file = ./eval-config.nix;
     config = {
-      _module.args.pkgs = import inputs.nixpkgs config.nixpkgs;
+      assertions = [ {
+        # Ensure that nixpkgs.* options are not set when pkgs is set
+        assertion = pkgs == null || (config.nixpkgs.config == { } && config.nixpkgs.overlays == [ ]);
+        message = ''
+          `nixpkgs` options are disabled when `pkgs` is supplied through `darwinSystem`.
+        '';
+      } ];
+
+      _module.args.pkgs = if pkgs != null then pkgs else import inputs.nixpkgs config.nixpkgs;
 
       # This permits the configuration to override the passed-in
       # system.
@@ -35,7 +44,7 @@ let
     literalDocBook = super.literalDocBook or super.literalExample;
   });
 
-  eval = libExtended.evalModules (builtins.removeAttrs args [ "inputs" "system" ] // {
+  eval = libExtended.evalModules (builtins.removeAttrs args [ "inputs" "pkgs" "system" ] // {
     modules = modules ++ [ argsModule pkgsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });

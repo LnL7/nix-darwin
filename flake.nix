@@ -29,6 +29,5 @@
       system = "x86_64-darwin";
       modules = [ self.darwinModules.simple ];
     }).system;
-
   };
 }
