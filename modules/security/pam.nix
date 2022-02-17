@@ -19,18 +19,19 @@ let
   let
     file   = "/etc/pam.d/sudo";
     option = "security.pam.enableSudoTouchIdAuth";
+    sed = "${pkgs.gnused}/bin/sed";
   in ''
     ${if isEnabled then ''
       # Enable sudo Touch ID authentication, if not already enabled
       if ! grep 'pam_tid.so' ${file} > /dev/null; then
-        sed -i "" '2i\
+        ${sed} -i '2i\
       auth       sufficient     pam_tid.so # nix-darwin: ${option}
         ' ${file}
       fi
     '' else ''
       # Disable sudo Touch ID authentication, if added by nix-darwin
       if grep '${option}' ${file} > /dev/null; then
-        sed -i "" '/${option}/d' ${file}
+        ${sed} -i '/${option}/d' ${file}
       fi
     ''}
   '';
