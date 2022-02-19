@@ -109,7 +109,7 @@ in
 
   config = {
 
-    # _module.args.pkgs is defined in ../../default.nix
+    # _module.args.pkgs is defined in ../../eval-config.nix
 
   };
 }
