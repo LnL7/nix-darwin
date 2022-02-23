@@ -30,7 +30,7 @@ in {
       '';
       type = types.package;
       default = pkgs.cachix;
-      defaultText = literalExample "pkgs.cachix";
+      defaultText = literalExpression "pkgs.cachix";
     };
 
     credentialsFile = mkOption {
