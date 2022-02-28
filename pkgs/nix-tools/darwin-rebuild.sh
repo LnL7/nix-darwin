@@ -112,7 +112,7 @@ done
 
 if [ -z "$action" ]; then showSyntax; fi
 
-flakeFlags=(--experimental-features 'nix-command flakes')
+flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
 if [ -n "$flake" ]; then
     if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then

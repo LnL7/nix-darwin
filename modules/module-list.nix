@@ -42,6 +42,7 @@
   ./services/autossh.nix
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
+  ./services/cachix-agent.nix
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/khd
@@ -49,6 +50,7 @@
   ./services/lorri.nix
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
+  ./services/monitoring/telegraf.nix
   ./services/nix-daemon.nix
   ./services/nix-gc
   ./services/ofborg
