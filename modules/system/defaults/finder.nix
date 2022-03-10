@@ -13,6 +13,41 @@ with lib;
       '';
     };
 
+    system.defaults.finder.ShowStatusBar = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Show status bar at bottom of finder windows with item/disk space stats. The default is false.
+      '';
+    };
+
+    system.defaults.finder.ShowPathbar = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Show path breadcrumbs in finder windows. The default is false.
+      '';
+    };
+
+    system.defaults.finder.FXDefaultSearchScope = mkOption {
+      type = types.nullOr types.string;
+      default = null;
+      description = ''
+        Change the default search scope. Use "SCcf" to default to current folder.
+        The default is unset ("This Mac").
+      '';
+    };
+
+    system.defaults.finder.FXPreferredViewStyle = mkOption {
+      type = types.nullOr types.string;
+      default = "Nlsv";
+      description = ''
+        Change the default finder view.
+        "icnv" = Icon view, "Nlsv" = List view, "clmv" = Column View, "Flwv" = Gallery View
+        The default is icnv.
+      '';
+    };
+
     system.defaults.finder.AppleShowAllExtensions = mkOption {
       type = types.nullOr types.bool;
       default = null;
