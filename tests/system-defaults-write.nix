@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 {
+  system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleFontSmoothing = 1;
@@ -49,6 +50,7 @@
     grep "defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server 'ServerDescription' -string 'Darwin.*s iMac'" ${config.out}/activate
 
     echo >&2 "checking defaults write in /activate-user"
+    grep "defaults write -g 'AppleShowAllFiles' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleEnableMouseSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleEnableSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleFontSmoothing' -int 1" ${config.out}/activate-user
