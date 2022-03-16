@@ -121,6 +121,11 @@ in
         . ${config.system.build.setEnvironment}
       fi
 
+      # Tell zsh how to find installed completions
+      for p in ''${(z)NIX_PROFILES}; do
+        fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions)
+      done
+
       ${cfg.shellInit}
 
       # Read system-wide modifications.
@@ -167,11 +172,6 @@ in
 
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
-
-      # Tell zsh how to find installed completions
-      for p in ''${(z)NIX_PROFILES}; do
-        fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions)
-      done
 
       ${cfg.promptInit}
 
