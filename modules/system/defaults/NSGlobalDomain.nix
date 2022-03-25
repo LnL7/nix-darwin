@@ -15,6 +15,14 @@ let
 in {
   options = {
 
+    system.defaults.NSGlobalDomain.AppleShowAllFiles = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to always show hidden files. The default is false.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = mkOption {
       type = types.nullOr types.bool;
       default = null;
