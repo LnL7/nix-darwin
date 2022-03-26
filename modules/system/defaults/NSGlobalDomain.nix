@@ -135,6 +135,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.NSAutomaticWindowAnimationsEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to animate opening and closing of windows and popovers.  The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.NSDisableAutomaticTermination = mkOption {
       type = types.nullOr types.bool;
       default = null;
