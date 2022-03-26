@@ -40,7 +40,7 @@ with lib;
 
     system.defaults.finder.FXPreferredViewStyle = mkOption {
       type = types.nullOr types.string;
-      default = "Nlsv";
+      default = null;
       description = ''
         Change the default finder view.
         "icnv" = Icon view, "Nlsv" = List view, "clmv" = Column View, "Flwv" = Gallery View
