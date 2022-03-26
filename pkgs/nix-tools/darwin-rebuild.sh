@@ -120,9 +120,9 @@ if [ -n "$flake" ]; then
        flakeAttr="${BASH_REMATCH[2]}"
     fi
     if [ -z "$flakeAttr" ]; then
-      flakeAttr=$(hostname)
+      flakeAttr=$(hostname -s)
     fi
-    flakeAttr=darwinConfigurations.${flakeAttr%.local}
+    flakeAttr=darwinConfigurations.${flakeAttr}
 fi
 
 if [ -n "$flake" ]; then
