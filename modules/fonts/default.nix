@@ -7,8 +7,12 @@ let
 in
 
 {
+  imports = [
+    (mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
+  ];
+
   options = {
-    fonts.enableFontDir = mkOption {
+    fonts.fontDir.enable = mkOption {
       default = false;
       description = ''
         Whether to enable font management and install configured fonts to
