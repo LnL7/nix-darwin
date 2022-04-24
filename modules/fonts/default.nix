@@ -43,7 +43,7 @@ in
         done
       '';
 
-    system.activationScripts.fonts.text = optionalString cfg.enableFontDir ''
+    system.activationScripts.fonts.text = optionalString cfg.fontDir.enable ''
       # Set up fonts.
       echo "configuring fonts..." >&2
       find -L "$systemConfig/Library/Fonts" -type f -print0 | while IFS= read -rd "" l; do
