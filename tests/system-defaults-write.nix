@@ -44,6 +44,11 @@
   system.defaults.universalaccess.reduceTransparency = true;
   system.defaults.universalaccess.closeViewScrollWheelToggle = true;
   system.defaults.universalaccess.closeViewZoomFollowsFocus = true;
+  system.defaults.ActivityMonitor.ShowCategory = 103;
+  system.defaults.ActivityMonitor.IconType = 3;
+  system.defaults.ActivityMonitor.SortColumn = "CPUUsage";
+  system.defaults.ActivityMonitor.SortDirection = 0;
+  system.defaults.ActivityMonitor.OpenMainWindow = true;
 
   test = ''
     echo >&2 "checking defaults write in /activate"
@@ -92,5 +97,10 @@
     grep "defaults write com.apple.universalaccess 'reduceTransparency' -bool YES" ${config.out}/activate-user
     grep "defaults write com.apple.universalaccess 'closeViewScrollWheelToggle' -bool YES" ${config.out}/activate-user
     grep "defaults write com.apple.universalaccess 'closeViewZoomFollowsFocus' -bool YES" ${config.out}/activate-user
+    grep "defaults write com.apple.ActivityMonitor 'ShowCategory' -int 103" ${config.out}/activate-user
+    grep "defaults write com.apple.ActivityMonitor 'IconType' -int 3" ${config.out}/activate-user
+    grep "defaults write com.apple.ActivityMonitor 'SortColumn' -string 'CPUUsage'" ${config.out}/activate-user
+    grep "defaults write com.apple.ActivityMonitor 'SortDirection' -int 0" ${config.out}/activate-user
+    grep "defaults write com.apple.ActivityMonitor 'OpenMainWindow' -bool YES" ${config.out}/activate-user
   '';
 }
