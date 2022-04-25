@@ -27,9 +27,9 @@ let
         echo "Create a symlink to /var/run with:" >&2
         if test -e /etc/synthetic.conf; then
             echo >&2
-            echo "$ echo 'run\tprivate/var/run' | sudo tee -a /etc/synthetic.conf" >&2
-            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B" >&2
-            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t" >&2
+            echo "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf" >&2
+            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
+            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
             echo >&2
             echo "The current contents of /etc/synthetic.conf is:" >&2
             echo >&2
