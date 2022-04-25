@@ -1,6 +1,7 @@
 [
   ./alias.nix
   ./documentation
+  ./misc/lib.nix
   ./security/pki
   ./security/sandbox
   ./system
