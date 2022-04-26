@@ -40,6 +40,7 @@
   ./fonts
   ./launchd
   ./services/activate-system
+  ./services/caddy
   ./services/autossh.nix
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
