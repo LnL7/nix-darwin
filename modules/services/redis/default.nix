@@ -22,7 +22,7 @@ in
     };
 
     services.redis.dataDir = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
       default = "/var/lib/redis";
       description = "Data directory for the redis database.";
     };
@@ -73,7 +73,7 @@ in
       port ${toString cfg.port}
       ${optionalString (cfg.bind != null) "bind ${cfg.bind}"}
       ${optionalString (cfg.unixSocket != null) "unixsocket ${cfg.unixSocket}"}
-      dir ${cfg.dataDir}
+      ${optionalString (cfg.dataDir != null) "dir ${cfg.dataDir}"}
       appendOnly ${if cfg.appendOnly then "yes" else "no"}
       ${cfg.extraConfig}
     '';
