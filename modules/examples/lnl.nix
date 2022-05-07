@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, inputs, pkgs, ... }:
 
 {
   # imports = [ ~/.config/nixpkgs/darwin/local-configuration.nix ];
@@ -35,7 +35,6 @@
 
   environment.systemPackages =
     [ config.programs.vim.package
-      config.services.chunkwm.package
 
       pkgs.awscli
       pkgs.brotli
@@ -344,28 +343,19 @@
   ];
 
   # Dotfiles.
-  # nixpkgs.overlays = mkAfter [
-  #   (import <dotfiles/nixpkgs/overlays/20-trivial-overrides.nix>)
-  #   (import <dotfiles/nixpkgs/overlays/50-trivial-packages.nix>)
-  # ];
-
-  services.chunkwm.package = pkgs.chunkwm;
-  services.chunkwm.hotload = false;
-  services.chunkwm.plugins.dir = "${lib.getOutput "out" pkgs.chunkwm}/lib/chunkwm/plugins";
-  services.chunkwm.plugins.list = [ "ffm" "tiling" ];
-  services.chunkwm.plugins."tiling".config = ''
-    chunkc set global_desktop_mode   bsp
-  '';
+  # nixpkgs.overlays = mkAfter inputs.dotfiles.darwinOverlays;
 
   # Dotfiles.
-  # services.chunkwm.extraConfig = builtins.readFile <dotfiles/chunkwm/chunkwmrc>;
-  # services.skhd.skhdConfig = builtins.readFile <dotfiles/skhd/skhdrc>;
+  # services.yabai.enable = true;
+  # services.yabai.package = pkgs.yabai;
+  # services.skhd.skhdConfig = builtins.readFile "${inputs.dotfiles}/skhd/skhdrc";
+  # services.yabai.extraConfig = builtins.readFile "${inputs.dotfiles}/yabai/yabairc";
 
   # Dotfiles.
   # $ cat ~/.gitconfig
   # [include]
   #     path = /etc/per-user/lnl/gitconfig
-  # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile <dotfiles/git/gitconfig>;
+  # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile "${inputs.dotfiles}/git/gitconfig";
 
   users.nix.configureBuildUsers = true;
   users.nix.nrBuildUsers = 32;
