@@ -216,6 +216,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.NSWindowShouldDragOnGesture = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable dragging a window by clicking anywhere in it with Ctrl+Cmd pressed. The default is false.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.InitialKeyRepeat = mkOption {
       type = types.nullOr types.int;
       default = null;
