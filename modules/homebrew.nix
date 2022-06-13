@@ -101,6 +101,18 @@ in
       '';
     };
 
+    global.githubToken = mkOption {
+      type = types.str;
+      default = "";
+      description = ''
+        When provided, <command>brew bundle</command>, will provide authentication to github api
+        calls.
+
+        Sets the <literal>HOMEBREW_GITHUB_API_TOKEN</literal> environment variable to the provided
+        token, by adding it to <option>environment.variables</option>.
+      '';
+    };
+
     global.noLock = mkOption {
       type = types.bool;
       default = false;
@@ -207,6 +219,7 @@ in
     environment.variables = mkIf cfg.enable (
        optionalAttrs cfg.global.brewfile { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } //
        optionalAttrs cfg.global.noLock { HOMEBREW_BUNDLE_NO_LOCK = "1"; }
+       optionalAttrs cfg.global.githubApiToken { HOMEBREW_GITHUB_API_TOKEN = "${cfg.global.githubToken}"; }
      );
 
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
