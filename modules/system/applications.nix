@@ -24,20 +24,21 @@ in
       # Set up applications.
       echo "setting up /Applications/Nix Apps..." >&2
 
+      ourLink () {
+        local link
+        link=$(readlink "$1")
+        [ -L "$1" ] && [ "''${link#*-}" = 'system-applications/Applications' ]
+      }
+
       # Clean up for links created at the old location in HOME
-      if [ -L ~/Applications
-           -a $(readlink ~/Applications | grep --quiet
-                 '/nix/store/.*-system-applications/Applications')
-         ]
+      if ourLink ~/Applications; then
         rm ~/Applications
-      elif [ -L '~/Applications/Nix Apps'
-             -a $(readlink '~/Applications/Nix Apps' | grep --quiet
-                   '/nix/store/.*-system-applications/Applications')
-           ]
-        rm '~/Applications/Nix Apps'
+      elif ourLink ~/Applications/'Nix Apps'; then
+        rm ~/Applications/'Nix Apps'
       fi
 
-      if [ ! -e '/Applications/Nix Apps' -o -L '/Applications/Nix Apps' ]; then
+      if [ ! -e '/Applications/Nix Apps' ] \
+         || ourLink '/Applications/Nix Apps'; then
         ln -sfn ${cfg.build.applications}/Applications '/Applications/Nix Apps'
       else
         echo "warning: /Applications/Nix Apps is not owned by nix-darwin, skipping App linking..." >&2
