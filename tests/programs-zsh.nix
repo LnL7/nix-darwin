@@ -43,6 +43,6 @@
      echo >&2 "checking zsh variables in /etc/zprofile"
      grep 'FOO="42"' ${config.out}/etc/zprofile
      echo >&2 "checking shell aliases in /etc/zprofile"
-     grep 'alias ls="ls -G"' ${config.out}/etc/zprofile
+     grep "alias ls='ls -G'" ${config.out}/etc/zprofile
    '';
 }

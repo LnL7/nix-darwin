@@ -9,7 +9,8 @@ let
     mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
 
   aliasCommands =
-    mapAttrsFlatten (n: v: ''alias ${n}="${v}"'') cfg.shellAliases;
+    mapAttrsFlatten (n: v: ''alias ${n}=${escapeShellArg v}'')
+      (filterAttrs (k: v: v != null) cfg.shellAliases);
 
   makeDrvBinPath = concatMapStringsSep ":" (p: if isDerivation p then "${p}/bin" else p);
 in
