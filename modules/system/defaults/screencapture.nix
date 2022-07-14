@@ -13,6 +13,14 @@ with lib;
         '';
     };
 
+    system.defaults.screencapture.type = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+          The image format to use, such as "jpg".
+        '';
+    };
+
     system.defaults.screencapture.disable-shadow = mkOption {
       type = types.nullOr types.bool;
       default = null;
