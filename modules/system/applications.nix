@@ -25,7 +25,7 @@ in
       echo "setting up ~/Applications..." >&2
       mkdir -p ~/Applications
 
-      nix_apps=~/Applications/Nix\ Darwin
+      nix_apps=~/Applications/Nix\ Apps
       if [ -d  "$nix_apps" ]; then
         # If there's already a folder, delete it in order to create a symlink
         rm -rf "$nix_apps"
