@@ -23,14 +23,15 @@ in
     system.activationScripts.applications.text = ''
       # Set up applications.
       echo "setting up ~/Applications..." >&2
+      mkdir -p ~/Applications
 
-      if [ ! -e ~/Applications -o -L ~/Applications ]; then
-        ln -sfn ${cfg.build.applications}/Applications ~/Applications
-      elif [ ! -e ~/Applications/Nix\ Apps -o -L ~/Applications/Nix\ Apps ]; then
-        ln -sfn ${cfg.build.applications}/Applications ~/Applications/Nix\ Apps
-      else
-        echo "warning: ~/Applications and ~/Applications/Nix Apps are directories, skipping App linking..." >&2
+      nix_apps=~/Applications/Nix\ Darwin
+      if [ -d  "$nix_apps" ]; then
+        # If there's already a folder, delete it in order to create a symlink
+        rm -rf "$nix_apps"
       fi
+
+      ln -sfn ${cfg.build.applications}/Applications "$nix_apps"
     '';
 
   };
