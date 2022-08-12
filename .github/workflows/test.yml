@@ -4,7 +4,7 @@ on:
   push:
 jobs:
   tests:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
@@ -13,7 +13,7 @@ jobs:
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A examples.simple
   install:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
       with:
         limit-access-to-actor: true
   install-flake:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
