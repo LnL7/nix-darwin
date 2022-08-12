@@ -31,7 +31,7 @@ in
       nix_apps=~/Applications/Nix\ Apps
       if [ -d  "$nix_apps" ]; then
         # If there's already a folder, delete it in order to create a symlink
-        rm -rf "$nix_apps"
+        sudo rm -rf "$nix_apps"
       fi
 
       ln -sfn ${cfg.build.applications}/Applications "$nix_apps"
