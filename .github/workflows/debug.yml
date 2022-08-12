@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-12
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v15
+    - uses: cachix/install-nix-action@v17
     - run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
