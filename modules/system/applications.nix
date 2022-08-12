@@ -25,6 +25,9 @@ in
       echo "setting up ~/Applications..." >&2
       mkdir -p ~/Applications
 
+      echo "TODO: REMOVE THIS"
+      ls -la ~/Applications
+
       nix_apps=~/Applications/Nix\ Apps
       if [ -d  "$nix_apps" ]; then
         # If there's already a folder, delete it in order to create a symlink
