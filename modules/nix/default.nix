@@ -6,7 +6,7 @@ let
 
   cfg = config.nix;
 
-  isNix20 = versionAtLeast (cfg.version or "<unknown>") "1.12pre";
+  nixPackage = cfg.package.out;
 
   nixConf =
     let
@@ -61,9 +61,10 @@ let
 in
 
 {
-  imports = mapAttrsToList (oldConf: newConf:
-    mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]
-  ) legacyConfMappings;
+  imports = [
+    (mkRemovedOptionModule [ "nix" "profile" ] "Use `nix.package` instead.")
+    (mkRemovedOptionModule [ "nix" "version" ] "Consider using `nix.package.version` instead.")
+  ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
   ###### interface
 
@@ -72,24 +73,12 @@ in
     nix = {
 
       package = mkOption {
-        type = types.either types.package types.path;
+        type = types.package;
         default = pkgs.nix;
-        defaultText = "pkgs.nix";
-        example = literalExpression "pkgs.nixUnstable";
+        defaultText = literalExpression "pkgs.nix";
         description = ''
-          This option specifies the package or profile that contains the version of Nix to use throughout the system.
-          To keep the version of nix originally installed the default profile can be used.
-
-          eg. /nix/var/nix/profiles/default
+          This option specifies the Nix package instance to use throughout the system.
         '';
-      };
-
-      # Not in NixOS module
-      version = mkOption {
-        type = types.str;
-        default = "<unknown>";
-        example = "1.11.6";
-        description = "The version of nix. Used to determine what settings to configure in nix.conf";
       };
 
       # Not in NixOS module
@@ -475,14 +464,12 @@ in
       ]))
     ];
 
-
-    nix.package = mkIf (config.system.stateVersion < 3)
-      (mkDefault "/nix/var/nix/profiles/default");
-
-    nix.version = mkIf (isDerivation cfg.package) cfg.package.version or "<unknown>";
-
-    environment.systemPackages = mkIf (isDerivation cfg.package)
-      [ cfg.package ];
+    environment.systemPackages =
+      [
+        nixPackage
+        pkgs.nix-info
+      ]
+      ++ optional (config.programs.bash.enableCompletion) pkgs.nix-bash-completions;
 
     environment.etc."nix/nix.conf".source = nixConf;
 
