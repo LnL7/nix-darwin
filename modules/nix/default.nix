@@ -25,24 +25,44 @@ let
           ${optionalString cfg.useDaemon ''
             build-users-group = nixbld
           ''}
-          max-jobs = ${toString (cfg.maxJobs)}
-          cores = ${toString (cfg.buildCores)}
-          sandbox = ${if (builtins.isBool cfg.useSandbox) then boolToString cfg.useSandbox else cfg.useSandbox}
-          ${optionalString (cfg.sandboxPaths != []) ''
-            extra-sandbox-paths = ${toString cfg.sandboxPaths}
+          max-jobs = ${toString cfg.settings.max-jobs}
+          auto-optimise-store = ${if cfg.settings.auto-optimise-store then "true" else "false"}
+          cores = ${toString cfg.settings.cores}
+          sandbox = ${if (builtins.isBool cfg.settings.sandbox) then boolToString cfg.settings.sandbox else cfg.settings.sandbox}
+          ${optionalString (cfg.settings.extra-sandbox-paths != []) ''
+            extra-sandbox-paths = ${toString cfg.settings.extra-sandbox-paths}
           ''}
-          substituters = ${toString cfg.binaryCaches}
-          trusted-substituters = ${toString cfg.trustedBinaryCaches}
-          trusted-public-keys = ${toString cfg.binaryCachePublicKeys}
-          require-sigs = ${if cfg.requireSignedBinaryCaches then "true" else "false"}
-          trusted-users = ${toString cfg.trustedUsers}
-          allowed-users = ${toString cfg.allowedUsers}
+          substituters = ${toString cfg.settings.substituters}
+          trusted-substituters = ${toString cfg.settings.trusted-substituters}
+          trusted-public-keys = ${toString cfg.settings.trusted-public-keys}
+          require-sigs = ${if cfg.settings.require-sigs then "true" else "false"}
+          trusted-users = ${toString cfg.settings.trusted-users}
+          allowed-users = ${toString cfg.settings.allowed-users}
           $extraOptions
           END
         '';
+
+  legacyConfMappings = {
+    useSandbox = "sandbox";
+    buildCores = "cores";
+    maxJobs = "max-jobs";
+    sandboxPaths = "extra-sandbox-paths";
+    binaryCaches = "substituters";
+    trustedBinaryCaches = "trusted-substituters";
+    binaryCachePublicKeys = "trusted-public-keys";
+    autoOptimiseStore = "auto-optimise-store";
+    requireSignedBinaryCaches = "require-sigs";
+    trustedUsers = "trusted-users";
+    allowedUsers = "allowed-users";
+    # systemFeatures = "system-features";
+  };
 in
 
 {
+  imports = mapAttrsToList (oldConf: newConf:
+    mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]
+  ) legacyConfMappings;
+
   options = {
     nix.package = mkOption {
       type = types.either types.package types.path;
@@ -74,8 +94,8 @@ in
       ";
     };
 
-    nix.maxJobs = mkOption {
-      type = types.either types.int (types.enum ["auto"]);
+    nix.settings.max-jobs = mkOption {
+      type = types.either types.int (types.enum [ "auto" ]);
       default = "auto";
       example = 64;
       description = ''
@@ -87,7 +107,19 @@ in
       '';
     };
 
-    nix.buildCores = mkOption {
+    nix.settings.auto-optimise-store = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = ''
+        If set to true, Nix automatically detects files in the store that have
+        identical contents, and replaces them with hard links to a single copy.
+        This saves disk space. If set to false (the default), you can still run
+        nix-store --optimise to get rid of duplicate files.
+      '';
+    };
+
+    nix.settings.cores = mkOption {
       type = types.int;
       default = 0;
       example = 64;
@@ -101,26 +133,29 @@ in
       '';
     };
 
-    nix.useSandbox = mkOption {
-      type = types.either types.bool (types.enum ["relaxed"]);
+    nix.settings.sandbox = mkOption {
+      type = types.either types.bool (types.enum [ "relaxed" ]);
       default = false;
-      description = "
+      description = ''
         If set, Nix will perform builds in a sandboxed environment that it
-        will set up automatically for each build.  This prevents
-        impurities in builds by disallowing access to dependencies
-        outside of the Nix store.
-      ";
+        will set up automatically for each build. This prevents impurities
+        in builds by disallowing access to dependencies outside of the Nix
+        store by using network and mount namespaces in a chroot environment.
+        This is enabled by default even though it has a possible performance
+        impact due to the initial setup time of a sandbox for each build. It
+        doesn't affect derivation hashes, so changing this option will not
+        trigger a rebuild of packages.
+      '';
     };
 
-    nix.sandboxPaths = mkOption {
+    nix.settings.extra-sandbox-paths = mkOption {
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
       example = [ "/dev" "/proc" ];
-      description =
-        ''
-          Directories from the host filesystem to be included
-          in the sandbox.
-        '';
+      description = ''
+        Directories from the host filesystem to be included
+        in the sandbox.
+      '';
     };
 
     nix.extraOptions = mkOption {
@@ -228,45 +263,46 @@ in
       '';
     };
 
-    nix.binaryCaches = mkOption {
+    nix.settings.substituters = mkOption {
       type = types.listOf types.str;
-      example = [ https://cache.example.org/ ];
       description = ''
         List of binary cache URLs used to obtain pre-built binaries
         of Nix packages.
+
+        By default https://cache.nixos.org/ is added.
       '';
     };
 
-    nix.trustedBinaryCaches = mkOption {
+    nix.settings.trusted-substituters = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      example = [ https://hydra.example.org/ ];
+      example = [ "https://hydra.nixos.org/" ];
       description = ''
         List of binary cache URLs that non-root users can use (in
         addition to those specified using
-        <option>nix.binaryCaches</option>) by passing
+        <option>nix.settings.substituters</option>) by passing
         <literal>--option binary-caches</literal> to Nix commands.
       '';
     };
 
-    nix.requireSignedBinaryCaches = mkOption {
+    nix.settings.require-sigs = mkOption {
       type = types.bool;
       default = true;
       description = ''
         If enabled (the default), Nix will only download binaries from binary caches if
         they are cryptographically signed with any of the keys listed in
-        <option>nix.binaryCachePublicKeys</option>. If disabled, signatures are neither
+        <option>nix.settings.trusted-public-keys</option>. If disabled, signatures are neither
         required nor checked, so it's strongly recommended that you use only
         trustworthy caches and https to prevent man-in-the-middle attacks.
       '';
     };
 
-    nix.binaryCachePublicKeys = mkOption {
+    nix.settings.trusted-public-keys = mkOption {
       type = types.listOf types.str;
       example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
       description = ''
         List of public keys used to sign binary caches. If
-        <option>nix.requireSignedBinaryCaches</option> is enabled,
+        <option>nix.settings.trusted-public-keys</option> is enabled,
         then Nix will use a binary from a binary cache if and only
         if it is signed by <emphasis>any</emphasis> of the keys
         listed here. By default, only the key for
@@ -274,7 +310,7 @@ in
       '';
     };
 
-    nix.trustedUsers = mkOption {
+    nix.settings.trusted-users = mkOption {
       type = types.listOf types.str;
       default = [ "root" ];
       example = [ "root" "alice" "@wheel" ];
@@ -289,14 +325,14 @@ in
       '';
     };
 
-    nix.allowedUsers = mkOption {
+    nix.settings.allowed-users = mkOption {
       type = types.listOf types.str;
       default = [ "*" ];
       example = [ "@wheel" "@builders" "alice" "bob" ];
       description = ''
         A list of names of users (separated by whitespace) that are
         allowed to connect to the Nix daemon. As with
-        <option>nix.trustedUsers</option>, you can specify groups by
+        <option>nix.settings.trusted-users</option>, you can specify groups by
         prefixing them with <literal>@</literal>. Also, you can
         allow all users by specifying <literal>*</literal>. The
         default is <literal>*</literal>. Note that trusted users are
@@ -406,8 +442,8 @@ in
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
 
-    nix.binaryCaches = mkAfter [ https://cache.nixos.org/ ];
-    nix.binaryCachePublicKeys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+    nix.settings.substituters = mkAfter [ https://cache.nixos.org/ ];
+    nix.settings.trusted-public-keys = mkAfter [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
 
     nix.nixPath = mkMerge [
       (mkIf (config.system.stateVersion < 2) (mkDefault
