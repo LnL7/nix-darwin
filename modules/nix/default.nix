@@ -512,23 +512,10 @@ in
   ###### implementation
 
   config = {
-
+    # Not in NixOS module
     warnings = [
       (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
-    ];
-
-    nix.nixPath = mkMerge [
-      (mkIf (config.system.stateVersion < 2) (mkDefault
-      [ "darwin=$HOME/.nix-defexpr/darwin"
-        "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ]))
-      (mkIf (config.system.stateVersion > 3) (mkOrder 1200
-      [ { darwin-config = "${config.environment.darwinConfig}"; }
-        "/nix/var/nix/profiles/per-user/root/channels"
-        "$HOME/.nix-defexpr/channels"
-      ]))
     ];
 
     environment.systemPackages =
@@ -570,6 +557,24 @@ in
           ) cfg.buildMachines;
       };
 
+    # Not in NixOS module
+    nix.nixPath = mkMerge [
+      (mkIf (config.system.stateVersion < 2) (mkDefault
+      [ "darwin=$HOME/.nix-defexpr/darwin"
+        "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+        "/nix/var/nix/profiles/per-user/root/channels"
+      ]))
+      (mkIf (config.system.stateVersion > 3) (mkOrder 1200
+      [ { darwin-config = "${config.environment.darwinConfig}"; }
+        "/nix/var/nix/profiles/per-user/root/channels"
+        "$HOME/.nix-defexpr/channels"
+      ]))
+    ];
+
+    # Set up the environment variables for running Nix.
+    environment.variables = cfg.envVars // { NIX_PATH = concatStringsSep ":" cfg.nixPath; };
+
+    # Unreladed to use in NixOS module
     environment.extraInit = ''
       # Set up secure multi-user builds: non-root users build through the
       # Nix daemon.
@@ -578,11 +583,7 @@ in
       fi
     '';
 
-    # Set up the environment variables for running Nix.
-    environment.variables = cfg.envVars //
-      { NIX_PATH = concatStringsSep ":" cfg.nixPath;
-      };
-
+    # Unreladed to use in NixOS module
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
           echo "reloading nix-daemon..." >&2
