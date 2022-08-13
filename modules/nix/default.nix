@@ -88,6 +88,29 @@ let
     in
     attrsOf (either confAtom (listOf confAtom));
 
+  # Not in NixOS module
+  nixPathType = mkOptionType {
+    name = "nix path";
+    merge = loc: defs:
+      let
+        values = flatten (map (def:
+          (map (x:
+            if isAttrs x then (mapAttrsToList nameValuePair x)
+            else if isString x then x
+            else throw "The option value `${showOption loc}` in `${def.file}` is not a attset or string.")
+            (if isList def.value then def.value else [def.value]))) defs);
+
+        namedPaths = mapAttrsToList (n: v: "${n}=${(head v).value}")
+          (zipAttrs
+            (map (x: { "${x.name}" = { inherit (x) value; }; })
+            (filter isAttrs values)));
+
+        searchPaths = unique
+          (filter isString values);
+      in
+        namedPaths ++ searchPaths;
+  };
+
 in
 
 {
@@ -291,36 +314,14 @@ in
         '';
       };
 
+      # Definition differs substantially from NixOS module
       nixPath = mkOption {
-        type = mkOptionType {
-          name = "nix path";
-          merge = loc: defs:
-            let
-              values = flatten (map (def:
-                (map (x:
-                  if isAttrs x then (mapAttrsToList nameValuePair x)
-                  else if isString x then x
-                  else throw "The option value `${showOption loc}` in `${def.file}` is not a attset or string.")
-                  (if isList def.value then def.value else [def.value]))) defs);
-
-              namedPaths = mapAttrsToList (n: v: "${n}=${(head v).value}")
-                (zipAttrs
-                  (map (x: { "${x.name}" = { inherit (x) value; }; })
-                  (filter isAttrs values)));
-
-              searchPaths = unique
-                (filter isString values);
-            in
-              namedPaths ++ searchPaths;
-        };
-        default =
-          [ # Include default path <darwin-config>.
+        type = nixPathType;
+        default = [
+            # Include default path <darwin-config>.
             { darwin-config = "${config.environment.darwinConfig}"; }
             "/nix/var/nix/profiles/per-user/root/channels"
             "$HOME/.nix-defexpr/channels"
-          ];
-        example =
-          [ { trunk = "/src/nixpkgs"; }
           ];
         description = ''
           The default Nix expression search path, used by the Nix
@@ -664,7 +665,7 @@ in
     ];
 
     # Set up the environment variables for running Nix.
-    environment.variables = cfg.envVars // { NIX_PATH = concatStringsSep ":" cfg.nixPath; };
+    environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
     # Unreladed to use in NixOS module
     environment.extraInit = ''
