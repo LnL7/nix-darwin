@@ -77,6 +77,7 @@ in
       '';
     };
 
+    # Not in NixOS module
     nix.version = mkOption {
       type = types.str;
       default = "<unknown>";
@@ -84,6 +85,7 @@ in
       description = "The version of nix. Used to determine what settings to configure in nix.conf";
     };
 
+    # Not in NixOS module
     nix.useDaemon = mkOption {
       type = types.bool;
       default = false;
@@ -92,80 +94,6 @@ in
         Use this instead of services.nix-daemon.enable if you don't wan't the
         daemon service to be managed for you.
       ";
-    };
-
-    nix.settings.max-jobs = mkOption {
-      type = types.either types.int (types.enum [ "auto" ]);
-      default = "auto";
-      example = 64;
-      description = ''
-        This option defines the maximum number of jobs that Nix will try to
-        build in parallel. The default is auto, which means it will use all
-        available logical cores. It is recommend to set it to the total
-        number of logical cores in your system (e.g., 16 for two CPUs with 4
-        cores each and hyper-threading).
-      '';
-    };
-
-    nix.settings.auto-optimise-store = mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = ''
-        If set to true, Nix automatically detects files in the store that have
-        identical contents, and replaces them with hard links to a single copy.
-        This saves disk space. If set to false (the default), you can still run
-        nix-store --optimise to get rid of duplicate files.
-      '';
-    };
-
-    nix.settings.cores = mkOption {
-      type = types.int;
-      default = 0;
-      example = 64;
-      description = ''
-        This option defines the maximum number of concurrent tasks during
-        one build. It affects, e.g., -j option for make.
-        The special value 0 means that the builder should use all
-        available CPU cores in the system. Some builds may become
-        non-deterministic with this option; use with care! Packages will
-        only be affected if enableParallelBuilding is set for them.
-      '';
-    };
-
-    nix.settings.sandbox = mkOption {
-      type = types.either types.bool (types.enum [ "relaxed" ]);
-      default = false;
-      description = ''
-        If set, Nix will perform builds in a sandboxed environment that it
-        will set up automatically for each build. This prevents impurities
-        in builds by disallowing access to dependencies outside of the Nix
-        store by using network and mount namespaces in a chroot environment.
-        This is enabled by default even though it has a possible performance
-        impact due to the initial setup time of a sandbox for each build. It
-        doesn't affect derivation hashes, so changing this option will not
-        trigger a rebuild of packages.
-      '';
-    };
-
-    nix.settings.extra-sandbox-paths = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-      example = [ "/dev" "/proc" ];
-      description = ''
-        Directories from the host filesystem to be included
-        in the sandbox.
-      '';
-    };
-
-    nix.extraOptions = mkOption {
-      type = types.lines;
-      default = "";
-      example = ''
-        gc-keep-outputs = true
-        gc-keep-derivations = true
-      '';
-      description = "Additional text appended to <filename>nix.conf</filename>.";
     };
 
     nix.distributedBuilds = mkOption {
@@ -180,6 +108,7 @@ in
       '';
     };
 
+    # Not in NixOS module
     nix.daemonNiceLevel = mkOption {
       type = types.int;
       default = 0;
@@ -189,6 +118,7 @@ in
       '';
     };
 
+    # Not in NixOS module
     nix.daemonIONice = mkOption {
       type = types.bool;
       default = false;
@@ -260,83 +190,6 @@ in
         by making <filename>/nix/store</filename> a read-only bind
         mount.  Nix will automatically make the store writable when
         needed.
-      '';
-    };
-
-    nix.settings.substituters = mkOption {
-      type = types.listOf types.str;
-      description = ''
-        List of binary cache URLs used to obtain pre-built binaries
-        of Nix packages.
-
-        By default https://cache.nixos.org/ is added.
-      '';
-    };
-
-    nix.settings.trusted-substituters = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-      example = [ "https://hydra.nixos.org/" ];
-      description = ''
-        List of binary cache URLs that non-root users can use (in
-        addition to those specified using
-        <option>nix.settings.substituters</option>) by passing
-        <literal>--option binary-caches</literal> to Nix commands.
-      '';
-    };
-
-    nix.settings.require-sigs = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
-        If enabled (the default), Nix will only download binaries from binary caches if
-        they are cryptographically signed with any of the keys listed in
-        <option>nix.settings.trusted-public-keys</option>. If disabled, signatures are neither
-        required nor checked, so it's strongly recommended that you use only
-        trustworthy caches and https to prevent man-in-the-middle attacks.
-      '';
-    };
-
-    nix.settings.trusted-public-keys = mkOption {
-      type = types.listOf types.str;
-      example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
-      description = ''
-        List of public keys used to sign binary caches. If
-        <option>nix.settings.trusted-public-keys</option> is enabled,
-        then Nix will use a binary from a binary cache if and only
-        if it is signed by <emphasis>any</emphasis> of the keys
-        listed here. By default, only the key for
-        <uri>cache.nixos.org</uri> is included.
-      '';
-    };
-
-    nix.settings.trusted-users = mkOption {
-      type = types.listOf types.str;
-      default = [ "root" ];
-      example = [ "root" "alice" "@wheel" ];
-      description = ''
-        A list of names of users that have additional rights when
-        connecting to the Nix daemon, such as the ability to specify
-        additional binary caches, or to import unsigned NARs. You
-        can also specify groups by prefixing them with
-        <literal>@</literal>; for instance,
-        <literal>@wheel</literal> means all users in the wheel
-        group.
-      '';
-    };
-
-    nix.settings.allowed-users = mkOption {
-      type = types.listOf types.str;
-      default = [ "*" ];
-      example = [ "@wheel" "@builders" "alice" "bob" ];
-      description = ''
-        A list of names of users (separated by whitespace) that are
-        allowed to connect to the Nix daemon. As with
-        <option>nix.settings.trusted-users</option>, you can specify groups by
-        prefixing them with <literal>@</literal>. Also, you can
-        allow all users by specifying <literal>*</literal>. The
-        default is <literal>*</literal>. Note that trusted users are
-        always allowed to connect.
       '';
     };
 
@@ -431,6 +284,157 @@ in
       default = {};
       description = ''
         A system-wide flake registry.
+      '';
+    };
+
+    nix.extraOptions = mkOption {
+      type = types.lines;
+      default = "";
+      example = ''
+        gc-keep-outputs = true
+        gc-keep-derivations = true
+      '';
+      description = "Additional text appended to <filename>nix.conf</filename>.";
+    };
+
+    nix.settings.max-jobs = mkOption {
+      type = types.either types.int (types.enum [ "auto" ]);
+      default = "auto";
+      example = 64;
+      description = ''
+        This option defines the maximum number of jobs that Nix will try to
+        build in parallel. The default is auto, which means it will use all
+        available logical cores. It is recommend to set it to the total
+        number of logical cores in your system (e.g., 16 for two CPUs with 4
+        cores each and hyper-threading).
+      '';
+    };
+
+    nix.settings.auto-optimise-store = mkOption {
+      type = types.bool;
+      default = false;
+      example = true;
+      description = ''
+        If set to true, Nix automatically detects files in the store that have
+        identical contents, and replaces them with hard links to a single copy.
+        This saves disk space. If set to false (the default), you can still run
+        nix-store --optimise to get rid of duplicate files.
+      '';
+    };
+
+    nix.settings.cores = mkOption {
+      type = types.int;
+      default = 0;
+      example = 64;
+      description = ''
+        This option defines the maximum number of concurrent tasks during
+        one build. It affects, e.g., -j option for make.
+        The special value 0 means that the builder should use all
+        available CPU cores in the system. Some builds may become
+        non-deterministic with this option; use with care! Packages will
+        only be affected if enableParallelBuilding is set for them.
+      '';
+    };
+
+    nix.settings.sandbox = mkOption {
+      type = types.either types.bool (types.enum [ "relaxed" ]);
+      default = false;
+      description = ''
+        If set, Nix will perform builds in a sandboxed environment that it
+        will set up automatically for each build. This prevents impurities
+        in builds by disallowing access to dependencies outside of the Nix
+        store by using network and mount namespaces in a chroot environment.
+        This is enabled by default even though it has a possible performance
+        impact due to the initial setup time of a sandbox for each build. It
+        doesn't affect derivation hashes, so changing this option will not
+        trigger a rebuild of packages.
+      '';
+    };
+
+    nix.settings.extra-sandbox-paths = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      example = [ "/dev" "/proc" ];
+      description = ''
+        Directories from the host filesystem to be included
+        in the sandbox.
+      '';
+    };
+
+    nix.settings.substituters = mkOption {
+      type = types.listOf types.str;
+      description = ''
+        List of binary cache URLs used to obtain pre-built binaries
+        of Nix packages.
+
+        By default https://cache.nixos.org/ is added.
+      '';
+    };
+
+    nix.settings.trusted-substituters = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      example = [ "https://hydra.nixos.org/" ];
+      description = ''
+        List of binary cache URLs that non-root users can use (in
+        addition to those specified using
+        <option>nix.settings.substituters</option>) by passing
+        <literal>--option binary-caches</literal> to Nix commands.
+      '';
+    };
+
+    nix.settings.require-sigs = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        If enabled (the default), Nix will only download binaries from binary caches if
+        they are cryptographically signed with any of the keys listed in
+        <option>nix.settings.trusted-public-keys</option>. If disabled, signatures are neither
+        required nor checked, so it's strongly recommended that you use only
+        trustworthy caches and https to prevent man-in-the-middle attacks.
+      '';
+    };
+
+    nix.settings.trusted-public-keys = mkOption {
+      type = types.listOf types.str;
+      example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
+      description = ''
+        List of public keys used to sign binary caches. If
+        <option>nix.settings.trusted-public-keys</option> is enabled,
+        then Nix will use a binary from a binary cache if and only
+        if it is signed by <emphasis>any</emphasis> of the keys
+        listed here. By default, only the key for
+        <uri>cache.nixos.org</uri> is included.
+      '';
+    };
+
+    nix.settings.trusted-users = mkOption {
+      type = types.listOf types.str;
+      default = [ "root" ];
+      example = [ "root" "alice" "@wheel" ];
+      description = ''
+        A list of names of users that have additional rights when
+        connecting to the Nix daemon, such as the ability to specify
+        additional binary caches, or to import unsigned NARs. You
+        can also specify groups by prefixing them with
+        <literal>@</literal>; for instance,
+        <literal>@wheel</literal> means all users in the wheel
+        group.
+      '';
+    };
+
+    nix.settings.allowed-users = mkOption {
+      type = types.listOf types.str;
+      default = [ "*" ];
+      example = [ "@wheel" "@builders" "alice" "bob" ];
+      description = ''
+        A list of names of users (separated by whitespace) that are
+        allowed to connect to the Nix daemon. As with
+        <option>nix.settings.trusted-users</option>, you can specify groups by
+        prefixing them with <literal>@</literal>. Also, you can
+        allow all users by specifying <literal>*</literal>. The
+        default is <literal>*</literal>. Note that trusted users are
+        always allowed to connect.
       '';
     };
   };
