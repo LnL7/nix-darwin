@@ -35,8 +35,7 @@ let
       name = "nix.conf";
       text = ''
         # WARNING: this file is generated from the nix.* options in
-        # your NixOS configuration, typically
-        # /etc/nixos/configuration.nix.  Do not edit it!
+        # your nix-darwin configuration. Do not edit it!
         ${mkKeyValuePairs cfg.settings}
         ${cfg.extraOptions}
       '';
@@ -327,8 +326,8 @@ in
         type = types.lines;
         default = "";
         example = ''
-          gc-keep-outputs = true
-          gc-keep-derivations = true
+          keep-outputs = true
+          keep-derivations = true
         '';
         description = "Additional text appended to <filename>nix.conf</filename>.";
       };
@@ -384,9 +383,7 @@ in
                 If set, Nix will perform builds in a sandboxed environment that it
                 will set up automatically for each build. This prevents impurities
                 in builds by disallowing access to dependencies outside of the Nix
-                store by using network and mount namespaces in a chroot environment.
-                This is enabled by default even though it has a possible performance
-                impact due to the initial setup time of a sandbox for each build. It
+                store by using network and mount namespaces in a chroot environment. It
                 doesn't affect derivation hashes, so changing this option will not
                 trigger a rebuild of packages.
               '';
@@ -452,14 +449,14 @@ in
             trusted-users = mkOption {
               type = types.listOf types.str;
               default = [ "root" ];
-              example = [ "root" "alice" "@wheel" ];
+              example = [ "root" "alice" "@admin" ];
               description = ''
                 A list of names of users that have additional rights when
                 connecting to the Nix daemon, such as the ability to specify
                 additional binary caches, or to import unsigned NARs. You
                 can also specify groups by prefixing them with
                 <literal>@</literal>; for instance,
-                <literal>@wheel</literal> means all users in the wheel
+                <literal>@admin</literal> means all users in the wheel
                 group.
               '';
             };
@@ -482,7 +479,7 @@ in
             allowed-users = mkOption {
               type = types.listOf types.str;
               default = [ "*" ];
-              example = [ "@wheel" "@builders" "alice" "bob" ];
+              example = [ "@admin" "@builders" "alice" "bob" ];
               description = ''
                 A list of names of users (separated by whitespace) that are
                 allowed to connect to the Nix daemon. As with
@@ -496,27 +493,11 @@ in
           };
         };
         default = { };
-        example = literalExpression ''
-          {
-            use-sandbox = true;
-            show-trace = true;
-
-            system-features = [ "big-parallel" "kvm" "recursive-nix" ];
-            sandbox-paths = { "/bin/sh" = "''${pkgs.busybox-sandbox-shell.out}/bin/busybox"; };
-          }
-        '';
         description = ''
           Configuration for Nix, see
-          <link xlink:href="https://nixos.org/manual/nix/stable/#sec-conf-file"/> or
-          <citerefentry>
-            <refentrytitle>nix.conf</refentrytitle>
-            <manvolnum>5</manvolnum>
-          </citerefentry> for avalaible options.
+          <link xlink:href="https://nixos.org/manual/nix/stable/#sec-conf-file"/>
+          for avalaible options.
           The value declared here will be translated directly to the key-value pairs Nix expects.
-          </para>
-          <para>
-          You can use <command>nix-instantiate --eval --strict '&lt;nixpkgs/nixos&gt;' -A config.nix.settings</command>
-          to view the current value. By default it is empty.
           </para>
           <para>
           Nix configurations defined under <option>nix.*</option> will be translated and applied to this
