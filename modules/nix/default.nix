@@ -204,7 +204,7 @@ in
       envVars = mkOption {
         type = types.attrs;
         internal = true;
-        default = {};
+        default = { };
         description = "Environment variables used by Nix.";
       };
 
@@ -212,7 +212,7 @@ in
         type = types.bool;
         default = true;
         description = ''
-          If set, NixOS will enforce the immutability of the Nix store
+          If set, Nix will enforce the immutability of the Nix store
           by making <filename>/nix/store</filename> a read-only bind
           mount.  Nix will automatically make the store writable when
           needed.
