@@ -3,6 +3,7 @@
 with lib;
 
 let
+
   cfg = config.nix;
 
   isNix20 = versionAtLeast (cfg.version or "<unknown>") "1.12pre";
@@ -56,6 +57,7 @@ let
     allowedUsers = "allowed-users";
     # systemFeatures = "system-features";
   };
+
 in
 
 {
@@ -63,381 +65,392 @@ in
     mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]
   ) legacyConfMappings;
 
+  ###### interface
+
   options = {
-    nix.package = mkOption {
-      type = types.either types.package types.path;
-      default = pkgs.nix;
-      defaultText = "pkgs.nix";
-      example = literalExpression "pkgs.nixUnstable";
-      description = ''
-        This option specifies the package or profile that contains the version of Nix to use throughout the system.
-        To keep the version of nix originally installed the default profile can be used.
 
-        eg. /nix/var/nix/profiles/default
-      '';
-    };
+    nix = {
 
-    # Not in NixOS module
-    nix.version = mkOption {
-      type = types.str;
-      default = "<unknown>";
-      example = "1.11.6";
-      description = "The version of nix. Used to determine what settings to configure in nix.conf";
-    };
+      package = mkOption {
+        type = types.either types.package types.path;
+        default = pkgs.nix;
+        defaultText = "pkgs.nix";
+        example = literalExpression "pkgs.nixUnstable";
+        description = ''
+          This option specifies the package or profile that contains the version of Nix to use throughout the system.
+          To keep the version of nix originally installed the default profile can be used.
 
-    # Not in NixOS module
-    nix.useDaemon = mkOption {
-      type = types.bool;
-      default = false;
-      description = "
-        If set, Nix will use the daemon to perform operations.
-        Use this instead of services.nix-daemon.enable if you don't wan't the
-        daemon service to be managed for you.
-      ";
-    };
-
-    nix.distributedBuilds = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Whether to distribute builds to the machines listed in
-        <option>nix.buildMachines</option>.
-
-        NOTE: This requires services.nix-daemon.enable for a
-        multi-user install.
-      '';
-    };
-
-    # Not in NixOS module
-    nix.daemonNiceLevel = mkOption {
-      type = types.int;
-      default = 0;
-      description = ''
-        Nix daemon process priority. This priority propagates to build processes.
-        0 is the default Unix process priority, 19 is the lowest.
-      '';
-    };
-
-    # Not in NixOS module
-    nix.daemonIONice = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Whether the Nix daemon process should considered to be low priority when
-        doing file system I/O.
-      '';
-    };
-
-    nix.buildMachines = mkOption {
-      type = types.listOf types.attrs;
-      default = [];
-      example = [
-        { hostName = "voila.labs.cs.uu.nl";
-          sshUser = "nix";
-          sshKey = "/root/.ssh/id_buildfarm";
-          system = "powerpc-darwin";
-          maxJobs = 1;
-        }
-        { hostName = "linux64.example.org";
-          sshUser = "buildfarm";
-          sshKey = "/root/.ssh/id_buildfarm";
-          system = "x86_64-linux";
-          maxJobs = 2;
-          supportedFeatures = [ "kvm" ];
-          mandatoryFeatures = [ "perf" ];
-        }
-      ];
-      description = ''
-        This option lists the machines to be used if distributed
-        builds are enabled (see
-        <option>nix.distributedBuilds</option>).  Nix will perform
-        derivations on those machines via SSH by copying the inputs
-        to the Nix store on the remote machine, starting the build,
-        then copying the output back to the local Nix store.  Each
-        element of the list should be an attribute set containing
-        the machine's host name (<varname>hostname</varname>), the
-        user name to be used for the SSH connection
-        (<varname>sshUser</varname>), the Nix system type
-        (<varname>system</varname>, e.g.,
-        <literal>"i686-linux"</literal>), the maximum number of
-        jobs to be run in parallel on that machine
-        (<varname>maxJobs</varname>), the path to the SSH private
-        key to be used to connect (<varname>sshKey</varname>), a
-        list of supported features of the machine
-        (<varname>supportedFeatures</varname>) and a list of
-        mandatory features of the machine
-        (<varname>mandatoryFeatures</varname>). The SSH private key
-        should not have a passphrase, and the corresponding public
-        key should be added to
-        <filename>~<replaceable>sshUser</replaceable>/authorized_keys</filename>
-        on the remote machine.
-      '';
-    };
-
-    # Environment variables for running Nix.
-    nix.envVars = mkOption {
-      type = types.attrs;
-      internal = true;
-      default = {};
-      description = "Environment variables used by Nix.";
-    };
-
-    nix.readOnlyStore = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
-        If set, NixOS will enforce the immutability of the Nix store
-        by making <filename>/nix/store</filename> a read-only bind
-        mount.  Nix will automatically make the store writable when
-        needed.
-      '';
-    };
-
-    nix.nixPath = mkOption {
-      type = mkOptionType {
-        name = "nix path";
-        merge = loc: defs:
-          let
-            values = flatten (map (def:
-              (map (x:
-                if isAttrs x then (mapAttrsToList nameValuePair x)
-                else if isString x then x
-                else throw "The option value `${showOption loc}` in `${def.file}` is not a attset or string.")
-                (if isList def.value then def.value else [def.value]))) defs);
-
-            namedPaths = mapAttrsToList (n: v: "${n}=${(head v).value}")
-              (zipAttrs
-                (map (x: { "${x.name}" = { inherit (x) value; }; })
-                (filter isAttrs values)));
-
-            searchPaths = unique
-              (filter isString values);
-          in
-            namedPaths ++ searchPaths;
+          eg. /nix/var/nix/profiles/default
+        '';
       };
-      default =
-        [ # Include default path <darwin-config>.
-          { darwin-config = "${config.environment.darwinConfig}"; }
-          "/nix/var/nix/profiles/per-user/root/channels"
-          "$HOME/.nix-defexpr/channels"
+
+      # Not in NixOS module
+      version = mkOption {
+        type = types.str;
+        default = "<unknown>";
+        example = "1.11.6";
+        description = "The version of nix. Used to determine what settings to configure in nix.conf";
+      };
+
+      # Not in NixOS module
+      useDaemon = mkOption {
+        type = types.bool;
+        default = false;
+        description = "
+          If set, Nix will use the daemon to perform operations.
+          Use this instead of services.nix-daemon.enable if you don't wan't the
+          daemon service to be managed for you.
+        ";
+      };
+
+      distributedBuilds = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to distribute builds to the machines listed in
+          <option>nix.buildMachines</option>.
+
+          NOTE: This requires services.nix-daemon.enable for a
+          multi-user install.
+        '';
+      };
+
+      # Not in NixOS module
+      daemonNiceLevel = mkOption {
+        type = types.int;
+        default = 0;
+        description = ''
+          Nix daemon process priority. This priority propagates to build processes.
+          0 is the default Unix process priority, 19 is the lowest.
+        '';
+      };
+
+      # Not in NixOS module
+      daemonIONice = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether the Nix daemon process should considered to be low priority when
+          doing file system I/O.
+        '';
+      };
+
+      buildMachines = mkOption {
+        type = types.listOf types.attrs;
+        default = [];
+        example = [
+          { hostName = "voila.labs.cs.uu.nl";
+            sshUser = "nix";
+            sshKey = "/root/.ssh/id_buildfarm";
+            system = "powerpc-darwin";
+            maxJobs = 1;
+          }
+          { hostName = "linux64.example.org";
+            sshUser = "buildfarm";
+            sshKey = "/root/.ssh/id_buildfarm";
+            system = "x86_64-linux";
+            maxJobs = 2;
+            supportedFeatures = [ "kvm" ];
+            mandatoryFeatures = [ "perf" ];
+          }
         ];
-      example =
-        [ { trunk = "/src/nixpkgs"; }
-        ];
-      description = ''
-        The default Nix expression search path, used by the Nix
-        evaluator to look up paths enclosed in angle brackets
-        (e.g. <literal>&lt;nixpkgs&gt;</literal>).
+        description = ''
+          This option lists the machines to be used if distributed
+          builds are enabled (see
+          <option>nix.distributedBuilds</option>).  Nix will perform
+          derivations on those machines via SSH by copying the inputs
+          to the Nix store on the remote machine, starting the build,
+          then copying the output back to the local Nix store.  Each
+          element of the list should be an attribute set containing
+          the machine's host name (<varname>hostname</varname>), the
+          user name to be used for the SSH connection
+          (<varname>sshUser</varname>), the Nix system type
+          (<varname>system</varname>, e.g.,
+          <literal>"i686-linux"</literal>), the maximum number of
+          jobs to be run in parallel on that machine
+          (<varname>maxJobs</varname>), the path to the SSH private
+          key to be used to connect (<varname>sshKey</varname>), a
+          list of supported features of the machine
+          (<varname>supportedFeatures</varname>) and a list of
+          mandatory features of the machine
+          (<varname>mandatoryFeatures</varname>). The SSH private key
+          should not have a passphrase, and the corresponding public
+          key should be added to
+          <filename>~<replaceable>sshUser</replaceable>/authorized_keys</filename>
+          on the remote machine.
+        '';
+      };
 
-        Named entries can be specified using an attribute set, if an
-        entry is configured multiple times the value with the lowest
-        ordering will be used.
-      '';
-    };
+      # Environment variables for running Nix.
+      envVars = mkOption {
+        type = types.attrs;
+        internal = true;
+        default = {};
+        description = "Environment variables used by Nix.";
+      };
 
-    nix.registry = mkOption {
-      type = types.attrsOf (types.submodule (
-        let
-          inputAttrs = types.attrsOf (types.oneOf [types.str types.int types.bool types.package]);
-        in
-        { config, name, ... }:
-        { options = {
-            from = mkOption {
-              type = inputAttrs;
-              example = { type = "indirect"; id = "nixpkgs"; };
-              description = "The flake reference to be rewritten.";
+      readOnlyStore = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          If set, NixOS will enforce the immutability of the Nix store
+          by making <filename>/nix/store</filename> a read-only bind
+          mount.  Nix will automatically make the store writable when
+          needed.
+        '';
+      };
+
+      nixPath = mkOption {
+        type = mkOptionType {
+          name = "nix path";
+          merge = loc: defs:
+            let
+              values = flatten (map (def:
+                (map (x:
+                  if isAttrs x then (mapAttrsToList nameValuePair x)
+                  else if isString x then x
+                  else throw "The option value `${showOption loc}` in `${def.file}` is not a attset or string.")
+                  (if isList def.value then def.value else [def.value]))) defs);
+
+              namedPaths = mapAttrsToList (n: v: "${n}=${(head v).value}")
+                (zipAttrs
+                  (map (x: { "${x.name}" = { inherit (x) value; }; })
+                  (filter isAttrs values)));
+
+              searchPaths = unique
+                (filter isString values);
+            in
+              namedPaths ++ searchPaths;
+        };
+        default =
+          [ # Include default path <darwin-config>.
+            { darwin-config = "${config.environment.darwinConfig}"; }
+            "/nix/var/nix/profiles/per-user/root/channels"
+            "$HOME/.nix-defexpr/channels"
+          ];
+        example =
+          [ { trunk = "/src/nixpkgs"; }
+          ];
+        description = ''
+          The default Nix expression search path, used by the Nix
+          evaluator to look up paths enclosed in angle brackets
+          (e.g. <literal>&lt;nixpkgs&gt;</literal>).
+
+          Named entries can be specified using an attribute set, if an
+          entry is configured multiple times the value with the lowest
+          ordering will be used.
+        '';
+      };
+
+      registry = mkOption {
+        type = types.attrsOf (types.submodule (
+          let
+            inputAttrs = types.attrsOf (types.oneOf [types.str types.int types.bool types.package]);
+          in
+          { config, name, ... }:
+          { options = {
+              from = mkOption {
+                type = inputAttrs;
+                example = { type = "indirect"; id = "nixpkgs"; };
+                description = "The flake reference to be rewritten.";
+              };
+              to = mkOption {
+                type = inputAttrs;
+                example = { type = "github"; owner = "my-org"; repo = "my-nixpkgs"; };
+                description = "The flake reference to which <option>from></option> is to be rewritten.";
+              };
+              flake = mkOption {
+                type = types.unspecified;
+                default = null;
+                example = literalExpression "nixpkgs";
+                description = ''
+                  The flake input to which <option>from></option> is to be rewritten.
+                '';
+              };
+              exact = mkOption {
+                type = types.bool;
+                default = true;
+                description = ''
+                  Whether the <option>from</option> reference needs to match exactly. If set,
+                  a <option>from</option> reference like <literal>nixpkgs</literal> does not
+                  match with a reference like <literal>nixpkgs/nixos-20.03</literal>.
+                '';
+              };
             };
-            to = mkOption {
-              type = inputAttrs;
-              example = { type = "github"; owner = "my-org"; repo = "my-nixpkgs"; };
-              description = "The flake reference to which <option>from></option> is to be rewritten.";
+            config = {
+              from = mkDefault { type = "indirect"; id = name; };
+              to = mkIf (config.flake != null)
+                ({ type = "path";
+                   path = config.flake.outPath;
+                 } // lib.filterAttrs
+                   (n: v: n == "lastModified" || n == "rev" || n == "revCount" || n == "narHash")
+                   config.flake);
             };
-            flake = mkOption {
-              type = types.unspecified;
-              default = null;
-              example = literalExpression "nixpkgs";
-              description = ''
-                The flake input to which <option>from></option> is to be rewritten.
-              '';
-            };
-            exact = mkOption {
-              type = types.bool;
-              default = true;
-              description = ''
-                Whether the <option>from</option> reference needs to match exactly. If set,
-                a <option>from</option> reference like <literal>nixpkgs</literal> does not
-                match with a reference like <literal>nixpkgs/nixos-20.03</literal>.
-              '';
-            };
-          };
-          config = {
-            from = mkDefault { type = "indirect"; id = name; };
-            to = mkIf (config.flake != null)
-              ({ type = "path";
-                 path = config.flake.outPath;
-               } // lib.filterAttrs
-                 (n: v: n == "lastModified" || n == "rev" || n == "revCount" || n == "narHash")
-                 config.flake);
-          };
-        }
-      ));
-      default = {};
-      description = ''
-        A system-wide flake registry.
-      '';
-    };
+          }
+        ));
+        default = {};
+        description = ''
+          A system-wide flake registry.
+        '';
+      };
 
-    nix.extraOptions = mkOption {
-      type = types.lines;
-      default = "";
-      example = ''
-        gc-keep-outputs = true
-        gc-keep-derivations = true
-      '';
-      description = "Additional text appended to <filename>nix.conf</filename>.";
-    };
+      extraOptions = mkOption {
+        type = types.lines;
+        default = "";
+        example = ''
+          gc-keep-outputs = true
+          gc-keep-derivations = true
+        '';
+        description = "Additional text appended to <filename>nix.conf</filename>.";
+      };
 
-    nix.settings.max-jobs = mkOption {
-      type = types.either types.int (types.enum [ "auto" ]);
-      default = "auto";
-      example = 64;
-      description = ''
-        This option defines the maximum number of jobs that Nix will try to
-        build in parallel. The default is auto, which means it will use all
-        available logical cores. It is recommend to set it to the total
-        number of logical cores in your system (e.g., 16 for two CPUs with 4
-        cores each and hyper-threading).
-      '';
-    };
+      settings = {
+        max-jobs = mkOption {
+          type = types.either types.int (types.enum [ "auto" ]);
+          default = "auto";
+          example = 64;
+          description = ''
+            This option defines the maximum number of jobs that Nix will try to
+            build in parallel. The default is auto, which means it will use all
+            available logical cores. It is recommend to set it to the total
+            number of logical cores in your system (e.g., 16 for two CPUs with 4
+            cores each and hyper-threading).
+          '';
+        };
 
-    nix.settings.auto-optimise-store = mkOption {
-      type = types.bool;
-      default = false;
-      example = true;
-      description = ''
-        If set to true, Nix automatically detects files in the store that have
-        identical contents, and replaces them with hard links to a single copy.
-        This saves disk space. If set to false (the default), you can still run
-        nix-store --optimise to get rid of duplicate files.
-      '';
-    };
+        auto-optimise-store = mkOption {
+          type = types.bool;
+          default = false;
+          example = true;
+          description = ''
+            If set to true, Nix automatically detects files in the store that have
+            identical contents, and replaces them with hard links to a single copy.
+            This saves disk space. If set to false (the default), you can still run
+            nix-store --optimise to get rid of duplicate files.
+          '';
+        };
 
-    nix.settings.cores = mkOption {
-      type = types.int;
-      default = 0;
-      example = 64;
-      description = ''
-        This option defines the maximum number of concurrent tasks during
-        one build. It affects, e.g., -j option for make.
-        The special value 0 means that the builder should use all
-        available CPU cores in the system. Some builds may become
-        non-deterministic with this option; use with care! Packages will
-        only be affected if enableParallelBuilding is set for them.
-      '';
-    };
+        cores = mkOption {
+          type = types.int;
+          default = 0;
+          example = 64;
+          description = ''
+            This option defines the maximum number of concurrent tasks during
+            one build. It affects, e.g., -j option for make.
+            The special value 0 means that the builder should use all
+            available CPU cores in the system. Some builds may become
+            non-deterministic with this option; use with care! Packages will
+            only be affected if enableParallelBuilding is set for them.
+          '';
+        };
 
-    nix.settings.sandbox = mkOption {
-      type = types.either types.bool (types.enum [ "relaxed" ]);
-      default = false;
-      description = ''
-        If set, Nix will perform builds in a sandboxed environment that it
-        will set up automatically for each build. This prevents impurities
-        in builds by disallowing access to dependencies outside of the Nix
-        store by using network and mount namespaces in a chroot environment.
-        This is enabled by default even though it has a possible performance
-        impact due to the initial setup time of a sandbox for each build. It
-        doesn't affect derivation hashes, so changing this option will not
-        trigger a rebuild of packages.
-      '';
-    };
+        sandbox = mkOption {
+          type = types.either types.bool (types.enum [ "relaxed" ]);
+          default = false;
+          description = ''
+            If set, Nix will perform builds in a sandboxed environment that it
+            will set up automatically for each build. This prevents impurities
+            in builds by disallowing access to dependencies outside of the Nix
+            store by using network and mount namespaces in a chroot environment.
+            This is enabled by default even though it has a possible performance
+            impact due to the initial setup time of a sandbox for each build. It
+            doesn't affect derivation hashes, so changing this option will not
+            trigger a rebuild of packages.
+          '';
+        };
 
-    nix.settings.extra-sandbox-paths = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-      example = [ "/dev" "/proc" ];
-      description = ''
-        Directories from the host filesystem to be included
-        in the sandbox.
-      '';
-    };
+        extra-sandbox-paths = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          example = [ "/dev" "/proc" ];
+          description = ''
+            Directories from the host filesystem to be included
+            in the sandbox.
+          '';
+        };
 
-    nix.settings.substituters = mkOption {
-      type = types.listOf types.str;
-      description = ''
-        List of binary cache URLs used to obtain pre-built binaries
-        of Nix packages.
+        substituters = mkOption {
+          type = types.listOf types.str;
+          description = ''
+            List of binary cache URLs used to obtain pre-built binaries
+            of Nix packages.
 
-        By default https://cache.nixos.org/ is added.
-      '';
-    };
+            By default https://cache.nixos.org/ is added.
+          '';
+        };
 
-    nix.settings.trusted-substituters = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-      example = [ "https://hydra.nixos.org/" ];
-      description = ''
-        List of binary cache URLs that non-root users can use (in
-        addition to those specified using
-        <option>nix.settings.substituters</option>) by passing
-        <literal>--option binary-caches</literal> to Nix commands.
-      '';
-    };
+        trusted-substituters = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          example = [ "https://hydra.nixos.org/" ];
+          description = ''
+            List of binary cache URLs that non-root users can use (in
+            addition to those specified using
+            <option>nix.settings.substituters</option>) by passing
+            <literal>--option binary-caches</literal> to Nix commands.
+          '';
+        };
 
-    nix.settings.require-sigs = mkOption {
-      type = types.bool;
-      default = true;
-      description = ''
-        If enabled (the default), Nix will only download binaries from binary caches if
-        they are cryptographically signed with any of the keys listed in
-        <option>nix.settings.trusted-public-keys</option>. If disabled, signatures are neither
-        required nor checked, so it's strongly recommended that you use only
-        trustworthy caches and https to prevent man-in-the-middle attacks.
-      '';
-    };
+        require-sigs = mkOption {
+          type = types.bool;
+          default = true;
+          description = ''
+            If enabled (the default), Nix will only download binaries from binary caches if
+            they are cryptographically signed with any of the keys listed in
+            <option>nix.settings.trusted-public-keys</option>. If disabled, signatures are neither
+            required nor checked, so it's strongly recommended that you use only
+            trustworthy caches and https to prevent man-in-the-middle attacks.
+          '';
+        };
 
-    nix.settings.trusted-public-keys = mkOption {
-      type = types.listOf types.str;
-      example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
-      description = ''
-        List of public keys used to sign binary caches. If
-        <option>nix.settings.trusted-public-keys</option> is enabled,
-        then Nix will use a binary from a binary cache if and only
-        if it is signed by <emphasis>any</emphasis> of the keys
-        listed here. By default, only the key for
-        <uri>cache.nixos.org</uri> is included.
-      '';
-    };
+        trusted-public-keys = mkOption {
+          type = types.listOf types.str;
+          example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
+          description = ''
+            List of public keys used to sign binary caches. If
+            <option>nix.settings.trusted-public-keys</option> is enabled,
+            then Nix will use a binary from a binary cache if and only
+            if it is signed by <emphasis>any</emphasis> of the keys
+            listed here. By default, only the key for
+            <uri>cache.nixos.org</uri> is included.
+          '';
+        };
 
-    nix.settings.trusted-users = mkOption {
-      type = types.listOf types.str;
-      default = [ "root" ];
-      example = [ "root" "alice" "@wheel" ];
-      description = ''
-        A list of names of users that have additional rights when
-        connecting to the Nix daemon, such as the ability to specify
-        additional binary caches, or to import unsigned NARs. You
-        can also specify groups by prefixing them with
-        <literal>@</literal>; for instance,
-        <literal>@wheel</literal> means all users in the wheel
-        group.
-      '';
-    };
+        trusted-users = mkOption {
+          type = types.listOf types.str;
+          default = [ "root" ];
+          example = [ "root" "alice" "@wheel" ];
+          description = ''
+            A list of names of users that have additional rights when
+            connecting to the Nix daemon, such as the ability to specify
+            additional binary caches, or to import unsigned NARs. You
+            can also specify groups by prefixing them with
+            <literal>@</literal>; for instance,
+            <literal>@wheel</literal> means all users in the wheel
+            group.
+          '';
+        };
 
-    nix.settings.allowed-users = mkOption {
-      type = types.listOf types.str;
-      default = [ "*" ];
-      example = [ "@wheel" "@builders" "alice" "bob" ];
-      description = ''
-        A list of names of users (separated by whitespace) that are
-        allowed to connect to the Nix daemon. As with
-        <option>nix.settings.trusted-users</option>, you can specify groups by
-        prefixing them with <literal>@</literal>. Also, you can
-        allow all users by specifying <literal>*</literal>. The
-        default is <literal>*</literal>. Note that trusted users are
-        always allowed to connect.
-      '';
+        allowed-users = mkOption {
+          type = types.listOf types.str;
+          default = [ "*" ];
+          example = [ "@wheel" "@builders" "alice" "bob" ];
+          description = ''
+            A list of names of users (separated by whitespace) that are
+            allowed to connect to the Nix daemon. As with
+            <option>nix.settings.trusted-users</option>, you can specify groups by
+            prefixing them with <literal>@</literal>. Also, you can
+            allow all users by specifying <literal>*</literal>. The
+            default is <literal>*</literal>. Note that trusted users are
+            always allowed to connect.
+          '';
+        };
+      };
     };
   };
+
+
+  ###### implementation
 
   config = {
 
@@ -527,4 +540,5 @@ in
     '';
 
   };
+
 }
