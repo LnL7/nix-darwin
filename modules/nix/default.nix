@@ -346,26 +346,32 @@ in
       registry = mkOption {
         type = types.attrsOf (types.submodule (
           let
-            inputAttrs = types.attrsOf (types.oneOf [types.str types.int types.bool types.package]);
+            referenceAttrs = with types; attrsOf (oneOf [
+              str
+              int
+              bool
+              package
+            ]);
           in
           { config, name, ... }:
-          { options = {
+          {
+            options = {
               from = mkOption {
-                type = inputAttrs;
+                type = referenceAttrs;
                 example = { type = "indirect"; id = "nixpkgs"; };
                 description = "The flake reference to be rewritten.";
               };
               to = mkOption {
-                type = inputAttrs;
+                type = referenceAttrs;
                 example = { type = "github"; owner = "my-org"; repo = "my-nixpkgs"; };
-                description = "The flake reference to which <option>from></option> is to be rewritten.";
+                description = "The flake reference <option>from</option> is rewritten to.";
               };
               flake = mkOption {
-                type = types.unspecified;
+                type = types.nullOr types.attrs;
                 default = null;
                 example = literalExpression "nixpkgs";
                 description = ''
-                  The flake input to which <option>from></option> is to be rewritten.
+                  The flake input <option>from</option> is rewritten to.
                 '';
               };
               exact = mkOption {
@@ -380,16 +386,17 @@ in
             };
             config = {
               from = mkDefault { type = "indirect"; id = name; };
-              to = mkIf (config.flake != null)
-                ({ type = "path";
-                   path = config.flake.outPath;
-                 } // lib.filterAttrs
-                   (n: v: n == "lastModified" || n == "rev" || n == "revCount" || n == "narHash")
-                   config.flake);
+              to = mkIf (config.flake != null) (mkDefault
+                {
+                  type = "path";
+                  path = config.flake.outPath;
+                } // filterAttrs
+                (n: _: n == "lastModified" || n == "rev" || n == "revCount" || n == "narHash")
+                config.flake);
             };
           }
         ));
-        default = {};
+        default = { };
         description = ''
           A system-wide flake registry.
         '';
