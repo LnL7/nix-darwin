@@ -145,13 +145,13 @@ stdenv.mkDerivation {
         env -i USER=john HOME=/Users/john bash -li -c 'echo $PATH'
         env -i USER=john HOME=/Users/john bash -li -c 'echo $PATH' | grep /Users/john/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin
         env -i USER=john HOME=/Users/john bash -li -c 'echo $NIX_PATH'
-        env -i USER=john HOME=/Users/john bash -li -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels:/Users/john/.nix-defexpr/channels
+        env -i USER=john HOME=/Users/john bash -li -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels
 
         echo >&2 "checking zsh environment"
         env -i USER=john HOME=/Users/john zsh -l -c 'echo $PATH'
         env -i USER=john HOME=/Users/john zsh -l -c 'echo $PATH' | grep /Users/john/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin
-        env -i USER=john HOME=/Users/john zsh -l -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels:/Users/john/.nix-defexpr/channels
         env -i USER=john HOME=/Users/john zsh -l -c 'echo $NIX_PATH'
+        env -i USER=john HOME=/Users/john zsh -l -c 'echo $NIX_PATH' | grep darwin-config=/Users/john/.nixpkgs/darwin-configuration.nix:/nix/var/nix/profiles/per-user/root/channels
 
         echo >&2 ok
         exit

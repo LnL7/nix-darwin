@@ -378,7 +378,6 @@ in
             # Include default path <darwin-config>.
             { darwin-config = "${config.environment.darwinConfig}"; }
             "/nix/var/nix/profiles/per-user/root/channels"
-            "$HOME/.nix-defexpr/channels"
           ];
         description = ''
           The default Nix expression search path, used by the Nix
@@ -734,21 +733,26 @@ in
       (mkIf (config.system.stateVersion > 3) (mkOrder 1200
       [ { darwin-config = "${config.environment.darwinConfig}"; }
         "/nix/var/nix/profiles/per-user/root/channels"
-        "$HOME/.nix-defexpr/channels"
       ]))
     ];
 
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
-    # Unreladed to use in NixOS module
-    environment.extraInit = ''
-      # Set up secure multi-user builds: non-root users build through the
-      # Nix daemon.
-      if [ ! -w /nix/var/nix/db ]; then
-          export NIX_REMOTE=daemon
-      fi
-    '';
+    environment.extraInit =
+      ''
+        if [ -e "$HOME/.nix-defexpr/channels" ]; then
+          export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
+        fi
+      '' +
+      # Not in NixOS module
+      ''
+        # Set up secure multi-user builds: non-root users build through the
+        # Nix daemon.
+        if [ ! -w /nix/var/nix/db ]; then
+            export NIX_REMOTE=daemon
+        fi
+      '';
 
     nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
 
