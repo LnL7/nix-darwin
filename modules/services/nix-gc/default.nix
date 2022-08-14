@@ -9,6 +9,11 @@ let
 in
 
 {
+  imports = [
+    (mkRemovedOptionModule [ "nix" "gc" "dates" ] "Use `nix.gc.interval` instead.")
+    (mkRemovedOptionModule [ "nix" "gc" "randomizedDelaySec" ] "No `nix-darwin` equivilant to this NixOS option.")
+    (mkRemovedOptionModule [ "nix" "gc" "persistent" ] "No `nix-darwin` equivilant to this NixOS option.")
+  ];
 
   ###### interface
 
@@ -17,11 +22,12 @@ in
     nix.gc = {
 
       automatic = mkOption {
-        type = types.bool;
         default = false;
+        type = types.bool;
         description = "Automatically run the garbage collector at a specific time.";
       };
 
+      # Not in NixOS module
       user = mkOption {
         type = types.nullOr types.str;
         default = null;
@@ -35,9 +41,9 @@ in
       };
 
       options = mkOption {
-        type = types.str;
         default = "";
         example = "--max-freed $((64 * 1024**3))";
+        type = types.str;
         description = ''
           Options given to <filename>nix-collect-garbage</filename> when the
           garbage collector is run automatically.
