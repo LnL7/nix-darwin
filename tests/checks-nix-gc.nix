@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  nix = pkgs.runCommand "nix-0.0.0" {} "mkdir -p $out";
+  nix = pkgs.runCommand "nix-2.2" {} "mkdir -p $out";
 in
 
 {
