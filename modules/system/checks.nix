@@ -54,7 +54,7 @@ let
         echo >&2
         echo "or enable to automatically manage the users" >&2
         echo >&2
-        echo "    users.nix.configureBuildUsers = true;" >&2
+        echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
     fi
   '';

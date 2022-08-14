@@ -10,6 +10,23 @@ let
 
   isNixAtLeast = versionAtLeast (getVersion nixPackage);
 
+  makeNixBuildUser = nr: {
+    name = "_nixbld${toString nr}";
+    value = {
+      description = "Nix build user ${toString nr}";
+
+      /*
+        For consistency with the setgid(2), setuid(2), and setgroups(2)
+        calls in `libstore/build.cc', don't add any supplementary group
+        here except "nixbld".
+      */
+      uid = builtins.add config.ids.uids.nixbld nr;
+      gid = config.ids.gids.nixbld;
+    };
+  };
+
+  nixbldUsers = listToAttrs (map makeNixBuildUser (range 1 cfg.nrBuildUsers));
+
   nixConf =
     assert isNixAtLeast "2.2";
     let
@@ -117,6 +134,8 @@ in
   imports = [
     (mkRemovedOptionModule [ "nix" "profile" ] "Use `nix.package` instead.")
     (mkRemovedOptionModule [ "nix" "version" ] "Consider using `nix.package.version` instead.")
+    (mkRenamedOptionModule [ "users" "nix" "configureBuildUsers" ] [ "nix" "configureBuildUsers" ])
+    (mkRenamedOptionModule [ "users" "nix" "nrBuildUsers" ] [ "nix" "nrBuildUsers" ])
   ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
   ###### interface
@@ -301,6 +320,25 @@ in
         internal = true;
         default = { };
         description = "Environment variables used by Nix.";
+      };
+
+      # Not in NixOS module
+      configureBuildUsers = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Enable configuration for nixbld group and users.
+        '';
+      };
+
+      nrBuildUsers = mkOption {
+        type = types.int;
+        description = ''
+          Number of <literal>nixbld</literal> user accounts created to
+          perform secure concurrent builds.  If you receive an error
+          message saying that “all build users are currently in use”,
+          you should increase this value.
+        '';
       };
 
       readOnlyStore = mkOption {
@@ -592,12 +630,6 @@ in
   ###### implementation
 
   config = {
-    # Not in NixOS module
-    warnings = [
-      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
-      (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
-    ];
-
     environment.systemPackages =
       [
         nixPackage
@@ -641,7 +673,12 @@ in
     };
 
     assertions =
-      let badMachine = m: m.system == null && m.systems == [ ];
+      let
+        badMachine = m: m.system == null && m.systems == [ ];
+
+        # Not in NixOS module
+        createdGroups = mapAttrsToList (n: v: v.name) config.users.groups;
+        createdUsers = mapAttrsToList (n: v: v.name) config.users.users;
       in
       [
         {
@@ -655,7 +692,18 @@ in
             (map (m: m.hostName)
               (filter (badMachine) cfg.buildMachines)));
         }
+
+        # Not in NixOS module
+        { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
+        { assertion = elem "_nixbld1" config.users.knownGroups -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
+        { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
       ];
+
+    # Not in NixOS module
+    warnings = [
+      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
+      (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
+    ];
 
     # Not in NixOS module
     nix.nixPath = mkMerge [
@@ -682,6 +730,25 @@ in
           export NIX_REMOTE=daemon
       fi
     '';
+
+    nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
+
+    users.users = mkIf cfg.configureBuildUsers nixbldUsers;
+
+    # Not in NixOS module
+    users.groups.nixbld = mkIf cfg.configureBuildUsers {
+      description = "Nix build group for nix-daemon";
+      gid = config.ids.gids.nixbld;
+      members = attrNames nixbldUsers;
+    };
+    users.knownUsers =
+      let nixbldUserNames = attrNames nixbldUsers;
+      in
+      mkIf cfg.configureBuildUsers (mkMerge [
+        nixbldUserNames
+        (map (removePrefix "_") nixbldUserNames) # delete old style nixbld users
+      ]);
+    users.knownGroups = mkIf cfg.configureBuildUsers [ "nixbld" ];
 
     # Unreladed to use in NixOS module
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''

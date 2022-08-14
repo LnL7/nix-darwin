@@ -1,6 +1,7 @@
 [
   ./alias.nix
   ./documentation
+  ./misc/ids.nix
   ./misc/lib.nix
   ./security/pki
   ./security/sandbox
@@ -76,5 +77,4 @@
   ./programs/zsh
   ./homebrew.nix
   ./users
-  ./users/nixbld
 ]
