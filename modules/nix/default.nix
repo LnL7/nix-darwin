@@ -131,12 +131,26 @@ let
 in
 
 {
-  imports = [
-    (mkRemovedOptionModule [ "nix" "profile" ] "Use `nix.package` instead.")
-    (mkRemovedOptionModule [ "nix" "version" ] "Consider using `nix.package.version` instead.")
-    (mkRenamedOptionModule [ "users" "nix" "configureBuildUsers" ] [ "nix" "configureBuildUsers" ])
-    (mkRenamedOptionModule [ "users" "nix" "nrBuildUsers" ] [ "nix" "nrBuildUsers" ])
-  ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
+  imports =
+    let
+      altOption = alt: "No `nix-darwin` equivilant to this NixOS option, consider using `${alt}` instead.";
+      consider = alt: "Consider using `${alt}` instead.";
+    in
+    [
+      # Only ever in NixOS
+      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivilant to this NixOS option.")
+      (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
+      (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
+      (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
+
+      # Option changes in `nix-darwin`
+      (mkRemovedOptionModule [ "nix" "profile" ] "Use `nix.package` instead.")
+      (mkRemovedOptionModule [ "nix" "version" ] (consider "nix.package.version"))
+      (mkRenamedOptionModule [ "users" "nix" "configureBuildUsers" ] [ "nix" "configureBuildUsers" ])
+      (mkRenamedOptionModule [ "users" "nix" "nrBuildUsers" ] [ "nix" "nrBuildUsers" ])
+      (mkRenamedOptionModule [ "nix" "daemonIONice" ] [ "nix" "daemonIOLowPriority" ])
+      (mkRemovedOptionModule [ "nix" "daemonNiceLevel" ] (consider "nix.daemonProcessType"))
+    ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
   ###### interface
 
@@ -177,17 +191,22 @@ in
       };
 
       # Not in NixOS module
-      daemonNiceLevel = mkOption {
-        type = types.int;
-        default = 0;
+      daemonProcessType = mkOption {
+        type = types.enum [ "Background" "Standard" "Adaptive" "Interactive" ];
+        default = "Standard";
         description = ''
-          Nix daemon process priority. This priority propagates to build processes.
-          0 is the default Unix process priority, 19 is the lowest.
+          Nix daemon process resource limits class. These limits propagate to
+          build processes. <literal>Standard</literal> is the default process type
+          and will apply light resource limits, throttling its CPU usage and I/O
+          bandwidth.
+
+          See <command>man launchd.plist</command> for explanation of other
+          process types.
         '';
       };
 
       # Not in NixOS module
-      daemonIONice = mkOption {
+      daemonIOLowPriority = mkOption {
         type = types.bool;
         default = false;
         description = ''
