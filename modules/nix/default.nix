@@ -1,3 +1,5 @@
+# Based off: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/misc/nix-daemon.nix
+# When making changes please try to keep it in sync and keep the diff NixOS module clean.
 { config, lib, pkgs, ... }:
 
 with lib;

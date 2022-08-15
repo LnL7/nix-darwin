@@ -1,3 +1,26 @@
+2022-08-14
+- nix module updated to bring it back in sync with it's NixOS counterpart
+  It should now be much more fiesable to share code for this module between
+  `nix-darwin` and NixOS configs.
+
+  `nix-darwin` now requires Nix >= 2.2.
+
+  `nix.package` can no longer be a path to a profile.
+
+  `nix.version` option has been removed. Use `nix.package.version` if you want
+  to reference the version Nix installed/used by your config.
+
+  Many options moved/renamed from `nix.*` to `nix.settings.*`. For example
+  `nix.binaryCaches` is now `nix.settings.substituters`.
+
+  You can use `nix.settings` to set any option in `nix.conf`.
+
+  `users.nix.*` options moved to `nix.*`.
+
+  `nix.daemonIONice` was renamed to `nix.daemonIOLowPriority`, and
+  `nix.daemonNiceLevel` was removed in favor a new option
+  `nix.nix.daemonProcessType`.
+
 2021-01-16
 - Added `homebrew` module, to manage formulas installed by Homebrew via `brew bundle`.
 
