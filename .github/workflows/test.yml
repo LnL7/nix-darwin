@@ -4,22 +4,22 @@ on:
   push:
 jobs:
   tests:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v15
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A tests
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.05-darwin -I darwin=. -A examples.simple
+    - uses: cachix/install-nix-action@v17
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A tests
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A examples.simple
   install:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v15
+    - uses: cachix/install-nix-action@v17
     - run: |
-        nix-channel --add https://nixos.org/channels/nixpkgs-21.05-darwin nixpkgs
+        nix-channel --add https://nixos.org/channels/nixpkgs-22.05-darwin nixpkgs
         nix-channel --update
     - run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
@@ -39,15 +39,15 @@ jobs:
       with:
         limit-access-to-actor: true
   install-flake:
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - uses: cachix/install-nix-action@v15
+    - uses: cachix/install-nix-action@v17
       with:
-         install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210207_fd6eaa1/install
+         install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.10.0pre20220808_73fde9e/install
          extra_nix_config: |
            experimental-features = nix-command flakes
            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}

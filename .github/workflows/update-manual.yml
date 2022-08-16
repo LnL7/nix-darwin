@@ -8,7 +8,7 @@ on:
 
 jobs:
   update-manual:
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -17,14 +17,14 @@ jobs:
         fetch-depth: 0
 
     - name: Install Nix
-      uses: cachix/install-nix-action@v16
+      uses: cachix/install-nix-action@v17
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-21.11-darwin -I darwin=. -A manualHTML
+        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A manualHTML
 
     - name: Push update to manual
       run: |

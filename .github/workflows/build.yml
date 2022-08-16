@@ -10,9 +10,9 @@ on:
         - build
 jobs:
   build:
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v9
+    - uses: cachix/install-nix-action@v17
     - run: |
         nix build ${{ github.event.client_payload.args }} -vL
