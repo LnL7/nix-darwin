@@ -216,6 +216,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.NSWindowShouldDragOnGesture = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable moving window by holding anywhere on it like on Linux. The default is false.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.InitialKeyRepeat = mkOption {
       type = types.nullOr types.int;
       default = null;
