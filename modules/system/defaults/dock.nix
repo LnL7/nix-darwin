@@ -15,6 +15,14 @@ let
 in {
   options = {
 
+    system.defaults.dock.appswitcher-all-displays = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to display the appswitcher on all displays or only the main one. The default is false.
+      '';
+    };
+
     system.defaults.dock.autohide = mkOption {
       type = types.nullOr types.bool;
       default = null;
