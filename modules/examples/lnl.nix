@@ -93,11 +93,11 @@
     log-lines = 128
   '';
 
-  nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
-  nix.trustedBinaryCaches = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
+  nix.settings.trusted-public-keys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
+  nix.settings.trusted-substituters = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
 
-  nix.useSandbox = true;
-  nix.sandboxPaths = [ "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
+  nix.settings.sandbox = true;
+  nix.settings.extra-sandbox-paths = [ "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
 
   programs.nix-index.enable = true;
 
@@ -357,6 +357,6 @@
   #     path = /etc/per-user/lnl/gitconfig
   # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile "${inputs.dotfiles}/git/gitconfig";
 
-  users.nix.configureBuildUsers = true;
-  users.nix.nrBuildUsers = 32;
+  nix.configureBuildUsers = true;
+  nix.nrBuildUsers = 32;
 }

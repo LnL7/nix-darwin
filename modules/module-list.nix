@@ -1,6 +1,7 @@
 [
   ./alias.nix
   ./documentation
+  ./misc/ids.nix
   ./misc/lib.nix
   ./security/pki
   ./security/sandbox
@@ -34,7 +35,6 @@
   ./networking
   ./nix
   ./nix/nix-darwin.nix
-  ./nix/nix-info.nix
   ./nix/nixpkgs.nix
   ./environment
   ./fonts
@@ -77,5 +77,4 @@
   ./programs/zsh
   ./homebrew.nix
   ./users
-  ./users/nixbld
 ]

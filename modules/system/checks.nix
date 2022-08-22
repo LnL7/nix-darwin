@@ -54,7 +54,7 @@ let
         echo >&2
         echo "or enable to automatically manage the users" >&2
         echo >&2
-        echo "    users.nix.configureBuildUsers = true;" >&2
+        echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
     fi
   '';
@@ -125,7 +125,9 @@ let
   '';
 
   nixPath = ''
-    darwinConfig=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file darwin-config) || true
+    nixPath=${concatStringsSep ":" config.nix.nixPath}:$HOME/.nix-defexpr/channels
+
+    darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
         echo "Create ''${darwinConfig:-~/.nixpkgs/darwin-configuration.nix} or set environment.darwinConfig:" >&2
@@ -139,7 +141,7 @@ let
         exit 2
     fi
 
-    darwinPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file darwin) || true
+    darwinPath=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin) || true
     if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set nix.nixPath:" >&2
@@ -153,7 +155,7 @@ let
         exit 2
     fi
 
-    nixpkgsPath=$(NIX_PATH=${concatStringsSep ":" config.nix.nixPath} nix-instantiate --find-file nixpkgs) || true
+    nixpkgsPath=$(NIX_PATH=$nixPath nix-instantiate --find-file nixpkgs) || true
     if ! test -e "$nixpkgsPath"; then
         echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
         echo "Add a nixpkgs channel or set nix.nixPath:" >&2
