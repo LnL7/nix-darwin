@@ -16,12 +16,13 @@ let
   );
 
   brewfile = pkgs.writeText "Brewfile" (
-    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig) +
     brewfileSection "Taps" "tap" cfg.taps +
+    (if cfg.caskArgs.brewfileLine == null then "" else "# Arguments for all casks\n${cfg.caskArgs.brewfileLine}\n\n") +
     brewfileSection "Brews" "brew" cfg.brews +
     brewfileSection "Casks" "cask" cfg.casks +
     masBrewfileSection cfg.masApps +
-    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews
+    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews +
+    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
   );
 
   brew-bundle-command = concatStringsSep " " (
@@ -30,6 +31,154 @@ let
     optional (cfg.cleanup == "uninstall" || cfg.cleanup == "zap") "--cleanup" ++
     optional (cfg.cleanup == "zap") "--zap"
   );
+
+  mkBrewfileLineValueString = v:
+    if isInt v then toString v
+    else if isFloat v then strings.floatToString v
+    else if isBool v then boolToString v
+    else if isString v then ''"${v}"''
+    else if isAttrs v then "{ ${concatStringsSep ", " (mapAttrsToList (n: v': "${n}: ${mkBrewfileLineValueString v'}") v)} }"
+    else if isList v then "[${concatMapStringsSep ", " mkBrewfileLineValueString v}]"
+    else abort "The value: ${generators.toPretty v} is not a valid Brewfile value.";
+
+  mkBrewfileLineOptionsListString = attrs:
+    concatStringsSep ", " (mapAttrsToList (n: v: "${n}: ${mkBrewfileLineValueString v}") attrs);
+
+  mkNullOrBoolOption = args: mkOption (args // {
+    type = types.nullOr types.bool;
+    default = null;
+  });
+
+  mkNullOrStrOption = args: mkOption (args // {
+    type = types.nullOr types.str;
+    default = null;
+  });
+
+  # Sourced from https://docs.brew.sh/Manpage#global-cask-options
+  # and valid values for `HOMEBREW_CASK_OPTS`.
+  caskArgsOptions = { config, ... }: {
+    options = {
+      appdir = mkNullOrStrOption {
+        description = ''
+          Target location for Applications
+          (default: <filename class='directory'>/Applications</filename>)
+        '';
+      };
+      colorpickerdir = mkNullOrStrOption {
+        description = ''
+          Target location for Color Pickers
+          (default: <filename class='directory'>~/Library/ColorPickers</filename>)
+        '';
+      };
+      prefpanedir = mkNullOrStrOption {
+        description = ''
+          Target location for Preference Panes
+          (default: <filename class='directory'>~/Library/PreferencePanes</filename>)
+        '';
+      };
+      qlplugindir = mkNullOrStrOption {
+        description = ''
+          Target location for QuickLook Plugins
+          (default: <filename class='directory'>~/Library/QuickLook</filename>)
+        '';
+      };
+      mdimporterdir = mkNullOrStrOption {
+        description = ''
+          Target location for Spotlight Plugins
+          (default: <filename class='directory'>~/Library/Spotlight</filename>)
+        '';
+      };
+      dictionarydir = mkNullOrStrOption {
+        description = ''
+          Target location for Dictionaries
+          (default: <filename class='directory'>~/Library/Dictionaries</filename>)
+        '';
+      };
+      fontdir = mkNullOrStrOption {
+        description = ''
+          Target location for Fonts
+          (default: <filename class='directory'>~/Library/Fonts</filename>)
+        '';
+      };
+      servicedir = mkNullOrStrOption {
+        description = ''
+          Target location for Services
+          (default: <filename class='directory'>~/Library/Services</filename>)
+        '';
+      };
+      input_methoddir = mkNullOrStrOption {
+        description = ''
+          Target location for Input Methods
+          (default: <filename class='directory'>~/Library/Input Methods</filename>)
+        '';
+      };
+      internet_plugindir = mkNullOrStrOption {
+        description = ''
+          Target location for Internet Plugins
+          (default: <filename class='directory'>~/Library/Internet Plug-Ins</filename>)
+        '';
+      };
+      audio_unit_plugindir = mkNullOrStrOption {
+        description = ''
+          Target location for Audio Unit Plugins
+          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/Components</filename>)
+        '';
+      };
+      vst_plugindir = mkNullOrStrOption {
+        description = ''
+          Target location for VST Plugins
+          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/VST</filename>)
+        '';
+      };
+      vst3_plugindir = mkNullOrStrOption {
+        description = ''
+          Target location for VST3 Plugins
+          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/VST3</filename>)
+        '';
+      };
+      screen_saverdir = mkNullOrStrOption {
+        description = ''
+          Target location for Screen Savers
+          (default: <filename class='directory'>~/Library/Screen Savers</filename>)
+        '';
+      };
+      language = mkNullOrStrOption {
+        description = ''
+          Comma-separated list of language codes to prefer for cask installation. The first matching
+          language is used, otherwise it reverts to the cask’s default language. The default value
+          is the language of your system.
+        '';
+        example = "zh-TW";
+      };
+      require_sha = mkNullOrBoolOption {
+        description = "Whether to require cask(s) to have a checksum.";
+      };
+      no_quarantine = mkNullOrBoolOption {
+        description = "Whether to disable quarantining of downloads.";
+      };
+      no_binaries = mkNullOrBoolOption {
+        description = "Whether to disable linking of helper executables.";
+      };
+
+      brewfileLine = mkOption {
+        type = types.nullOr types.str;
+        visible = false;
+        internal = true;
+        readOnly = true;
+      };
+    };
+
+    config =
+      let
+        configuredOptions = filterAttrs (_: v: v != null) (removeAttrs config [ "_module" "brewfileLine" ]);
+      in
+      {
+        brewfileLine =
+          if configuredOptions == {}
+          then null
+          else "cask_args " + mkBrewfileLineOptionsListString configuredOptions;
+      };
+  };
 in
 
 {
@@ -130,6 +279,16 @@ in
       description = "Homebrew brews to install.";
     };
 
+    caskArgs = mkOption {
+      type = types.submodule caskArgsOptions;
+      default = {};
+      example = {
+        appdir = "~/Applications";
+        require_sha = true;
+      };
+      description = "Arguments to apply to all <option>homebrew.casks</option>.";
+    };
+
     casks = mkOption {
       type = with types; listOf str;
       default = [];
@@ -181,9 +340,6 @@ in
       example = ''
         # 'brew tap' with custom Git URL
         tap "user/tap-repo", "https://user@bitbucket.org/user/homebrew-tap-repo.git"
-
-        # set arguments for all 'brew cask install' commands
-        cask_args appdir: "~/Applications", require_sha: true
 
         # 'brew install --with-rmtp', 'brew services restart' on version changes
         brew "denji/nginx/nginx-full", args: ["with-rmtp"], restart_service: :changed
