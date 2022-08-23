@@ -223,6 +223,75 @@ let
           else "cask_args " + mkBrewfileLineOptionsListString configuredOptions;
       };
   };
+
+  brewOptions = { config, ... }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        description = "The name of the formula to install.";
+      };
+      args = mkOption {
+        type = with types; nullOr (listOf str);
+        default = null;
+        description = ''
+          Arguments to pass to <command>brew install</command>.
+        '';
+      };
+      conflicts_with = mkOption {
+        type = with types; nullOr (listOf str);
+        default = null;
+        description = ''
+          List of formulae that should be unlinked and their services stopped (if they are
+          installed).
+        '';
+      };
+      restart_service = mkOption {
+        type = with types; nullOr (either bool (enum [ "changed" ]));
+        default = null;
+        description = ''
+          Whether to run <command>brew services restart</command> for the formula and register it to
+          launch at login (or boot). If set to <literal>changed</literal>, the service will only be
+          restarted on version changes.
+
+          Homebrew's default is <literal>false</literal>.
+        '';
+      };
+      start_service = mkNullOrBoolOption {
+        description = ''
+          Whether to run <command>brew services start</command> for the formula and register it to
+          launch at login (or boot).
+
+          Homebrew's default is <literal>false</literal>.
+        '';
+      };
+      link = mkNullOrBoolOption {
+        description = ''
+          Whether to link the formula to the Homebrew prefix. When this option is
+          <literal>null</literal>, Homebrew will use it's default behavior which is to link the
+          formula it's currently unlinked and not keg-only, and to unlink the formula if it's
+          currently linked and keg-only.
+        '';
+      };
+
+      brewfileLine = mkBrewfileLineOption;
+    };
+
+    config =
+      let
+        configuredOptions = filterAttrs (_: v: v != null)
+          (removeAttrs config [ "_module" "brewfileLine" "name" "restart_service" ]);
+      in
+      {
+        brewfileLine = ''brew "${config.name}"''
+          + optionalString (configuredOptions != {})
+            ", ${mkBrewfileLineOptionsListString configuredOptions}"
+          + optionalString (config.restart_service != null) (
+            if isBool config.restart_service then
+              ", restart_service: ${boolToString config.restart_service}"
+            else ", restart_service: :${config.restart_service}"
+          );
+      };
+  };
 in
 
 {
@@ -335,10 +404,35 @@ in
     };
 
     brews = mkOption {
-      type = with types; listOf str;
+      type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule brewOptions));
       default = [];
-      example = [ "mas" ];
-      description = "Homebrew brews to install.";
+      example = literalExpression ''
+        # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
+        [
+          # 'brew install'
+          "imagemagick"
+          # 'brew install --with-rmtp', 'brew services restart' on version changes
+          {
+            name = "denji/nginx/nginx-full";
+            args = [ "with-rmtp" ];
+            restart_service = "changed";
+          }
+          # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
+          {
+            name = "mysql@5.6";
+            restart_service = true;
+            link = true;
+            conflicts_with = [ "mysql" ];
+          }
+        ]
+      '';
+      description = ''
+        Homebrew brews to install.
+
+        Brews defined as strings, e.g., <literal>"imagemagick"</literal>, are a shorthand for:
+
+        <code>{ name = "imagemagick"; }</code>
+      '';
     };
 
     caskArgs = mkOption {
@@ -400,11 +494,6 @@ in
       type = types.lines;
       default = "";
       example = ''
-        # 'brew install --with-rmtp', 'brew services restart' on version changes
-        brew "denji/nginx/nginx-full", args: ["with-rmtp"], restart_service: :changed
-        # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
-        brew "mysql@5.6", restart_service: true, link: true, conflicts_with: ["mysql"]
-
         # 'brew cask install --appdir=~/my-apps/Applications'
         cask "firefox", args: { appdir: "~/my-apps/Applications" }
         # 'brew cask install' only if '/usr/libexec/java_home --failfast' fails
