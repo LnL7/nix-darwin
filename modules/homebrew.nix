@@ -6,35 +6,22 @@ with lib;
 let
   cfg = config.homebrew;
 
-  mkBrewfileSectionString = heading: type: entries: optionalString (entries != []) ''
-    # ${heading}
-    ${concatMapStringsSep "\n" (v: v.brewfileLine or ''${type} "${v}"'') entries}
-
-  '';
-
-  mkMasBrewfileSectionString = entries: optionalString (entries != {}) (
-    "# Mac App Store apps\n" +
-    concatStringsSep "\n" (mapAttrsToList (name: id: ''mas "${name}", id: ${toString id}'') entries) +
-    "\n"
-  );
-
-  brewfile = pkgs.writeText "Brewfile" (
-    mkBrewfileSectionString "Taps" "tap" cfg.taps +
-    mkBrewfileSectionString "Arguments for all casks" "cask_args"
-      (optional (cfg.caskArgs.brewfileLine != null) cfg.caskArgs) +
-    mkBrewfileSectionString "Brews" "brew" cfg.brews +
-    mkBrewfileSectionString "Casks" "cask" cfg.casks +
-    mkMasBrewfileSectionString cfg.masApps +
-    mkBrewfileSectionString "Docker containers" "whalebrew" cfg.whalebrews +
-    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
-  );
+  brewfileFile = pkgs.writeText "Brewfile" cfg.brewfile;
 
   brew-bundle-command = concatStringsSep " " (
-    optional (!cfg.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1" ++
-    [ "brew bundle --file='${brewfile}' --no-lock" ] ++
-    optional (cfg.cleanup == "uninstall" || cfg.cleanup == "zap") "--cleanup" ++
-    optional (cfg.cleanup == "zap") "--zap"
+    optional (!cfg.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1"
+    ++ [ "brew bundle --file='${brewfileFile}' --no-lock" ]
+    ++ optional (cfg.cleanup == "uninstall" || cfg.cleanup == "zap") "--cleanup"
+    ++ optional (cfg.cleanup == "zap") "--zap"
   );
+
+  # Brewfile creation helper functions -------------------------------------------------------------
+
+  mkBrewfileSectionString = heading: entries: optionalString (entries != [ ]) ''
+    # ${heading}
+    ${concatMapStringsSep "\n" (v: v.brewfileLine or v) entries}
+
+  '';
 
   mkBrewfileLineValueString = v:
     if isInt v then toString v
@@ -46,7 +33,10 @@ let
     else abort "The value: ${generators.toPretty v} is not a valid Brewfile value.";
 
   mkBrewfileLineOptionsListString = attrs:
-    concatStringsSep ", " (mapAttrsToList (n: v: "${n}: ${mkBrewfileLineValueString v}") attrs);
+    concatStringsSep ", " (mapAttrsToList (n: v: "${n}: ${v}") attrs);
+
+
+  # Submodule helper functions ---------------------------------------------------------------------
 
   mkNullOrBoolOption = args: mkOption (args // {
     type = types.nullOr types.bool;
@@ -65,6 +55,18 @@ let
     readOnly = true;
   };
 
+  mkProcessedSubmodConfig = attrs: mapAttrs (_: mkBrewfileLineValueString)
+    (filterAttrsRecursive (n: v: n != "_module" && n != "brewfileLine" && v != null) attrs);
+
+
+  # Submodules -------------------------------------------------------------------------------------
+  # Option values and descriptions of Brewfile entries are sourced/derived from:
+  #   * `brew` manpage: https://docs.brew.sh/Manpage
+  #   * `brew bundle` source files (at https://github.com/Homebrew/homebrew-bundle/tree/9fffe077f1a5a722ed5bd26a87ed622e8cb64e0c):
+  #     * lib/bundle/dsl.rb
+  #     * lib/bundle/{brew,cask,tap}_installer.rb
+  #     * spec/bundle/{brew,cask,tap}_installer_spec.rb
+
   tapOptions = { config, ... }: {
     options = {
       name = mkOption {
@@ -72,8 +74,8 @@ let
         example = "homebrew/cask-fonts";
         description = ''
           When <option>clone_target</option> is unspecified, this is the name of a formula
-          repository to tap from GitHub using HTTPS. For example, <literal>"user/repo"</literal> will
-          tap https://github.com/user/homebrew-repo.
+          repository to tap from GitHub using HTTPS. For example, <literal>"user/repo"</literal>
+          will tap https://github.com/user/homebrew-repo.
         '';
       };
       clone_target = mkNullOrStrOption {
@@ -94,12 +96,17 @@ let
       brewfileLine = mkBrewfileLineOption;
     };
 
-    config = {
-      brewfileLine = ''tap "${config.name}"''
-        + optionalString (config.clone_target != null) '', "${config.clone_target}"''
-        + optionalString (config.force_auto_update != null)
-          ", force_auto_update: ${boolToString config.force_auto_update}";
-    };
+    config =
+      let
+        sCfg = mkProcessedSubmodConfig config;
+      in
+      {
+        brewfileLine =
+          "tap ${sCfg.name}"
+          + optionalString (sCfg ? clone_target) ", ${sCfg.clone_target}"
+          + optionalString (sCfg ? force_auto_update)
+            ", force_auto_update: ${sCfg.force_auto_update}";
+      };
   };
 
   # Sourced from https://docs.brew.sh/Manpage#global-cask-options
@@ -108,86 +115,100 @@ let
     options = {
       appdir = mkNullOrStrOption {
         description = ''
-          Target location for Applications
-          (default: <filename class='directory'>/Applications</filename>)
+          Target location for Applications.
+
+          Homebrew's default is <filename class='directory'>/Applications</filename>.
         '';
       };
       colorpickerdir = mkNullOrStrOption {
         description = ''
-          Target location for Color Pickers
-          (default: <filename class='directory'>~/Library/ColorPickers</filename>)
+          Target location for Color Pickers.
+
+          Homebrew's default is <filename class='directory'>~/Library/ColorPickers</filename>.
         '';
       };
       prefpanedir = mkNullOrStrOption {
         description = ''
-          Target location for Preference Panes
-          (default: <filename class='directory'>~/Library/PreferencePanes</filename>)
+          Target location for Preference Panes.
+
+          Homebrew's default is <filename class='directory'>~/Library/PreferencePanes</filename>.
         '';
       };
       qlplugindir = mkNullOrStrOption {
         description = ''
-          Target location for QuickLook Plugins
-          (default: <filename class='directory'>~/Library/QuickLook</filename>)
+          Target location for QuickLook Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/QuickLook</filename>.
         '';
       };
       mdimporterdir = mkNullOrStrOption {
         description = ''
-          Target location for Spotlight Plugins
-          (default: <filename class='directory'>~/Library/Spotlight</filename>)
+          Target location for Spotlight Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/Spotlight</filename>.
         '';
       };
       dictionarydir = mkNullOrStrOption {
         description = ''
-          Target location for Dictionaries
-          (default: <filename class='directory'>~/Library/Dictionaries</filename>)
+          Target location for Dictionaries.
+
+          Homebrew's default is <filename class='directory'>~/Library/Dictionaries</filename>.
         '';
       };
       fontdir = mkNullOrStrOption {
         description = ''
-          Target location for Fonts
-          (default: <filename class='directory'>~/Library/Fonts</filename>)
+          Target location for Fonts.
+
+          Homebrew's default is <filename class='directory'>~/Library/Fonts</filename>.
         '';
       };
       servicedir = mkNullOrStrOption {
         description = ''
-          Target location for Services
-          (default: <filename class='directory'>~/Library/Services</filename>)
+          Target location for Services.
+
+          Homebrew's default is <filename class='directory'>~/Library/Services</filename>.
         '';
       };
       input_methoddir = mkNullOrStrOption {
         description = ''
-          Target location for Input Methods
-          (default: <filename class='directory'>~/Library/Input Methods</filename>)
+          Target location for Input Methods.
+
+          Homebrew's default is <filename class='directory'>~/Library/Input Methods</filename>.
         '';
       };
       internet_plugindir = mkNullOrStrOption {
         description = ''
-          Target location for Internet Plugins
-          (default: <filename class='directory'>~/Library/Internet Plug-Ins</filename>)
+          Target location for Internet Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/Internet Plug-Ins</filename>.
         '';
       };
       audio_unit_plugindir = mkNullOrStrOption {
         description = ''
-          Target location for Audio Unit Plugins
-          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/Components</filename>)
+          Target location for Audio Unit Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/Audio/Plug-Ins/Components</filename>.
         '';
       };
       vst_plugindir = mkNullOrStrOption {
         description = ''
-          Target location for VST Plugins
-          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/VST</filename>)
+          Target location for VST Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/Audio/Plug-Ins/VST</filename>.
         '';
       };
       vst3_plugindir = mkNullOrStrOption {
         description = ''
-          Target location for VST3 Plugins
-          (default: <filename class='directory'>~/Library/Audio/Plug-Ins/VST3</filename>)
+          Target location for VST3 Plugins.
+
+          Homebrew's default is <filename class='directory'>~/Library/Audio/Plug-Ins/VST3</filename>.
         '';
       };
       screen_saverdir = mkNullOrStrOption {
         description = ''
-          Target location for Screen Savers
-          (default: <filename class='directory'>~/Library/Screen Savers</filename>)
+          Target location for Screen Savers.
+
+          Homebrew's default is <filename class='directory'>~/Library/Screen Savers</filename>.
         '';
       };
       language = mkNullOrStrOption {
@@ -213,13 +234,10 @@ let
 
     config =
       let
-        configuredOptions = filterAttrs (_: v: v != null)
-          (removeAttrs config [ "_module" "brewfileLine" ]);
+        sCfg = mkProcessedSubmodConfig config;
       in
       {
-        brewfileLine =
-          if configuredOptions == {} then null
-          else "cask_args " + mkBrewfileLineOptionsListString configuredOptions;
+        brewfileLine = if sCfg == { } then null else "cask_args ${mkBrewfileLineOptionsListString sCfg}";
       };
   };
 
@@ -233,7 +251,8 @@ let
         type = with types; nullOr (listOf str);
         default = null;
         description = ''
-          Arguments to pass to <command>brew install</command>.
+          Arguments flags to pass to <command>brew install</command>. Values should not include the
+          leading <literal>"--"</literal>.
         '';
       };
       conflicts_with = mkOption {
@@ -249,8 +268,8 @@ let
         default = null;
         description = ''
           Whether to run <command>brew services restart</command> for the formula and register it to
-          launch at login (or boot). If set to <literal>changed</literal>, the service will only be
-          restarted on version changes.
+          launch at login (or boot). If set to <literal>"changed"</literal>, the service will only
+          be restarted on version changes.
 
           Homebrew's default is <literal>false</literal>.
         '';
@@ -267,7 +286,7 @@ let
         description = ''
           Whether to link the formula to the Homebrew prefix. When this option is
           <literal>null</literal>, Homebrew will use it's default behavior which is to link the
-          formula it's currently unlinked and not keg-only, and to unlink the formula if it's
+          formula if it's currently unlinked and not keg-only, and to unlink the formula if it's
           currently linked and keg-only.
         '';
       };
@@ -277,22 +296,25 @@ let
 
     config =
       let
-        configuredOptions = filterAttrs (_: v: v != null)
-          (removeAttrs config [ "_module" "brewfileLine" "name" "restart_service" ]);
+        sCfg = mkProcessedSubmodConfig config;
+        sCfgSubset = removeAttrs sCfg [ "name" "restart_service" ];
       in
       {
-        brewfileLine = ''brew "${config.name}"''
-          + optionalString (configuredOptions != {})
-            ", ${mkBrewfileLineOptionsListString configuredOptions}"
-          + optionalString (config.restart_service != null) (
-            if isBool config.restart_service then
-              ", restart_service: ${boolToString config.restart_service}"
-            else ", restart_service: :${config.restart_service}"
+        brewfileLine =
+          "brew ${sCfg.name}"
+          + optionalString (sCfgSubset != { }) ", ${mkBrewfileLineOptionsListString sCfgSubset}"
+          # We need to handle the `restart_service` option seperately since it can be either bool
+          # or the string value "changed".
+          + optionalString (sCfg ? restart_service) (
+            ", restart_service: " + (
+              if isBool config.restart_service then sCfg.restart_service
+              else ":${config.restart_service}"
+            )
           );
       };
   };
 
-  caskOptions = { config, ...  }: {
+  caskOptions = { config, ... }: {
     options = {
       name = mkOption {
         type = types.str;
@@ -304,38 +326,44 @@ let
       };
       greedy = mkNullOrBoolOption {
         description = ''
-          Whether to always upgrade auto-updated or unversioned cask to latest version even if
-          already installed.
+          Whether to always upgrade auto-updated or unversioned cask to the latest version even if
+          it's already installed.
         '';
       };
 
       brewfileLine = mkBrewfileLineOption;
     };
 
-    config = {
-      brewfileLine = ''cask "${config.name}"''
-      + optionalString (config.args != null)
-        '', args: { ${removePrefix "cask_args " config.args.brewfileLine} }''
-      + optionalString (config.greedy != null) ", greedy: ${boolToString config.greedy}";
-    };
+    config =
+      let
+        sCfg = mkProcessedSubmodConfig config;
+        sCfgSubset = removeAttrs sCfg [ "name" ];
+      in
+      {
+        brewfileLine =
+          "cask ${sCfg.name}"
+          + optionalString (sCfgSubset != { }) ", ${mkBrewfileLineOptionsListString sCfgSubset}";
+      };
   };
 in
 
 {
+  # Interface --------------------------------------------------------------------------------------
+
   options.homebrew = {
     enable = mkEnableOption ''
       configuring your Brewfile, and installing/updating the formulas therein via
       the <command>brew bundle</command> command, using <command>nix-darwin</command>.
 
-      Note that enabling this option does not install Homebrew. See the Homebrew website for
-      installation instructions: https://brew.sh
+      Note that enabling this option does not install Homebrew. See the Homebrew
+      <link xlink:href="https://brew.sh">website</link> for installation instructions
     '';
 
     autoUpdate = mkOption {
       type = types.bool;
       default = false;
       description = ''
-        When enabled, Homebrew is allowed to auto-update during <command>nix-darwin</command>
+        Whether to enable Homebrew to auto-update during <command>nix-darwin</command>
         activation. The default is <literal>false</literal> so that repeated invocations of
         <command>darwin-rebuild switch</command> are idempotent.
       '';
@@ -344,8 +372,14 @@ in
     brewPrefix = mkOption {
       type = types.str;
       default = if pkgs.stdenv.hostPlatform.isAarch64 then "/opt/homebrew/bin" else "/usr/local/bin";
+      defaultText = literalExpression ''
+        if pkgs.stdenv.hostPlatform.isAarch64 then "/opt/homebrew/bin"
+        else "/usr/local/bin"
+      '';
       description = ''
-        Customize path prefix where executable of <command>brew</command> is searched for.
+        The path prefix where the <command>brew</command> executable is located. This will be set to
+        the correct value based on your system's platform, and should only need to be changed if you
+        manually installed Homebrew in a non-standard location.
       '';
     };
 
@@ -381,11 +415,12 @@ in
       type = types.bool;
       default = false;
       description = ''
-        When enabled, when you manually invoke <command>brew bundle</command>, it will automatically
-        use the Brewfile in the Nix store that this module generates.
+        Whether to enable Homebrew to automatically use the Brewfile in the Nix store that this
+        module generates, when you manually invoke <command>brew bundle</command>.
 
-        Sets the <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the
-        Brewfile in the Nix store that this module generates, by adding it to
+        Implementation note: when enabled, this option sets the
+        <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the Brewfile in
+        the Nix store that this module generates, by adding it to
         <option>environment.variables</option>.
       '';
     };
@@ -394,26 +429,28 @@ in
       type = types.bool;
       default = false;
       description = ''
-        When enabled, lockfiles aren't generated when you manually invoke
+        Whether to disable lockfile generation when you manually invoke
         <command>brew bundle [install]</command>. This is often desirable when
         <option>homebrew.global.brewfile</option> is enabled, since
         <command>brew bundle [install]</command> will try to write the lockfile in the Nix store,
         and complain that it can't (though the command will run successfully regardless).
 
-        Sets the <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
+        Implementation note: when enabled, this option sets the
+        <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
         <option>environment.variables</option>.
       '';
     };
 
     taps = mkOption {
       type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule tapOptions));
-      default = [];
+      default = [ ];
       example = literalExpression ''
         # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
         [
-          # 'brew tap'
+          # `brew tap`
           "homebrew/cask"
-          # 'brew tap' with custom Git URL and arguments
+
+          # `brew tap` with custom Git URL and arguments
           {
             name = "user/tap-repo";
             clone_target = "https://user@bitbucket.org/user/homebrew-tap-repo.git";
@@ -430,21 +467,35 @@ in
       '';
     };
 
+    caskArgs = mkOption {
+      type = types.submodule caskArgsOptions;
+      default = { };
+      example = literalExpression ''
+        {
+          appdir = "~/Applications";
+          require_sha = true;
+        }
+      '';
+      description = "Arguments to apply to all <option>homebrew.casks</option>.";
+    };
+
     brews = mkOption {
       type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule brewOptions));
-      default = [];
+      default = [ ];
       example = literalExpression ''
         # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
         [
-          # 'brew install'
+          # `brew install`
           "imagemagick"
-          # 'brew install --with-rmtp', 'brew services restart' on version changes
+
+          # `brew install --with-rmtp`, `brew services restart` on version changes
           {
             name = "denji/nginx/nginx-full";
             args = [ "with-rmtp" ];
             restart_service = "changed";
           }
-          # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
+
+          # `brew install`, always `brew services restart`, `brew link`, `brew unlink mysql` (if it is installed)
           {
             name = "mysql@5.6";
             restart_service = true;
@@ -462,29 +513,21 @@ in
       '';
     };
 
-    caskArgs = mkOption {
-      type = types.submodule caskArgsOptions;
-      default = {};
-      example = {
-        appdir = "~/Applications";
-        require_sha = true;
-      };
-      description = "Arguments to apply to all <option>homebrew.casks</option>.";
-    };
-
     casks = mkOption {
       type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule caskOptions));
-      default = [];
+      default = [ ];
       example = literalExpression ''
         # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
         [
-          # 'brew install --cask'
+          # `brew install --cask`
           "google-chrome"
-          # 'brew install --cask --appdir=~/my-apps/Applications'
+
+          # `brew install --cask --appdir=~/my-apps/Applications`
           {
             name = "firefox";
             args = { appdir = "~/my-apps/Applications"; };
           }
+
           # always upgrade auto-updated or unversioned cask to latest version even if already installed
           {
             name = "opera";
@@ -502,12 +545,14 @@ in
     };
 
     masApps = mkOption {
-      type = with types; attrsOf ints.positive;
-      default = {};
-      example = {
-        "1Password" = 1107421413;
-        Xcode = 497799835;
-      };
+      type = types.attrsOf types.ints.positive;
+      default = { };
+      example = literalExpression ''
+        {
+          "1Password for Safari" = 1569813296;
+          Xcode = 497799835;
+        }
+      '';
       description = ''
         Applications to install from Mac App Store using <command>mas</command>.
 
@@ -520,13 +565,14 @@ in
         <option>homebrew.cleanup</option> is set to <literal>"uninstall"</literal>
         or <literal>"zap"</literal> (this is currently a limitation of Homebrew Bundle).
 
-        For more information on <command>mas</command> see: https://github.com/mas-cli/mas.
+        For more information on <command>mas</command> see:
+        <link xlink:href="https://github.com/mas-cli/mas">github.com/mas-cli/mas</link>.
       '';
     };
 
     whalebrews = mkOption {
       type = with types; listOf str;
-      default = [];
+      default = [ ];
       example = [ "whalebrew/wget" ];
       description = ''
         Docker images to install using <command>whalebrew</command>.
@@ -535,7 +581,7 @@ in
         <option>homebrew.brews</option>.
 
         For more information on <command>whalebrew</command> see:
-        https://github.com/whalebrew/whalebrew.
+        <link xlink:href="https://github.com/whalebrew/whalebrew">github.com/whalebrew/whalebrew</link>.
       '';
     };
 
@@ -548,17 +594,40 @@ in
       '';
       description = "Extra lines to be added verbatim to bottom of the generated Brewfile.";
     };
+
+    brewfile = mkOption {
+      type = types.str;
+      visible = false;
+      internal = true;
+      readOnly = true;
+      description = "String reprensentation of the generated Brewfile useful for debugging.";
+    };
   };
+
+
+  # Implementation ---------------------------------------------------------------------------------
 
   config = {
     homebrew.brews =
-      optional (cfg.masApps != {}) "mas" ++
-      optional (cfg.whalebrews != []) "whalebrew";
+      optional (cfg.masApps != { }) "mas"
+      ++ optional (cfg.whalebrews != [ ]) "whalebrew";
+
+    homebrew.brewfile =
+      "# Created by `nix-darwin`'s `homebrew` module\n\n"
+      + mkBrewfileSectionString "Taps" cfg.taps
+      + mkBrewfileSectionString "Arguments for all casks"
+        (optional (cfg.caskArgs.brewfileLine != null) cfg.caskArgs)
+      + mkBrewfileSectionString "Brews" cfg.brews
+      + mkBrewfileSectionString "Casks" cfg.casks
+      + mkBrewfileSectionString "Mac App Store apps"
+        (mapAttrsToList (n: id: ''mas "${n}", id: ${toString id}'') cfg.masApps)
+      + mkBrewfileSectionString "Docker containers" (map (v: ''whalebrew "${v}"'') cfg.whalebrews)
+      + optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig);
 
     environment.variables = mkIf cfg.enable (
-       optionalAttrs cfg.global.brewfile { HOMEBREW_BUNDLE_FILE = "${brewfile}"; } //
-       optionalAttrs cfg.global.noLock { HOMEBREW_BUNDLE_NO_LOCK = "1"; }
-     );
+      optionalAttrs cfg.global.brewfile { HOMEBREW_BUNDLE_FILE = "${brewfileFile}"; }
+      // optionalAttrs cfg.global.noLock { HOMEBREW_BUNDLE_NO_LOCK = "1"; }
+    );
 
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
