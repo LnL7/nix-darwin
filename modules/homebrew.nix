@@ -18,7 +18,6 @@ let
     "\n"
   );
 
-
   brewfile = pkgs.writeText "Brewfile" (
     mkBrewfileSectionString "Taps" "tap" cfg.taps +
     mkBrewfileSectionString "Arguments for all casks" "cask_args"
@@ -292,6 +291,34 @@ let
           );
       };
   };
+
+  caskOptions = { config, ...  }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        description = "The name of the cask to install.";
+      };
+      args = mkOption {
+        type = types.nullOr (types.submodule caskArgsOptions);
+        default = null;
+      };
+      greedy = mkNullOrBoolOption {
+        description = ''
+          Whether to always upgrade auto-updated or unversioned cask to latest version even if
+          already installed.
+        '';
+      };
+
+      brewfileLine = mkBrewfileLineOption;
+    };
+
+    config = {
+      brewfileLine = ''cask "${config.name}"''
+      + optionalString (config.args != null)
+        '', args: { ${removePrefix "cask_args " config.args.brewfileLine} }''
+      + optionalString (config.greedy != null) ", greedy: ${boolToString config.greedy}";
+    };
+  };
 in
 
 {
@@ -446,10 +473,32 @@ in
     };
 
     casks = mkOption {
-      type = with types; listOf str;
+      type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule caskOptions));
       default = [];
-      example = [ "hammerspoon" "virtualbox" ];
-      description = "Homebrew casks to install.";
+      example = literalExpression ''
+        # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
+        [
+          # 'brew install --cask'
+          "google-chrome"
+          # 'brew install --cask --appdir=~/my-apps/Applications'
+          {
+            name = "firefox";
+            args = { appdir = "~/my-apps/Applications"; };
+          }
+          # always upgrade auto-updated or unversioned cask to latest version even if already installed
+          {
+            name = "opera";
+            greedy = true;
+          }
+        ]
+      '';
+      description = ''
+        Homebrew casks to install.
+
+        Casks defined as strings, e.g., <literal>"google-chrome"</literal>, are a shorthand for:
+
+        <code>{ name = "google-chrome"; }</code>
+      '';
     };
 
     masApps = mkOption {
@@ -494,12 +543,10 @@ in
       type = types.lines;
       default = "";
       example = ''
-        # 'brew cask install --appdir=~/my-apps/Applications'
-        cask "firefox", args: { appdir: "~/my-apps/Applications" }
         # 'brew cask install' only if '/usr/libexec/java_home --failfast' fails
         cask "java" unless system "/usr/libexec/java_home --failfast"
       '';
-      description = "Extra lines to be added verbatim to the generated Brewfile.";
+      description = "Extra lines to be added verbatim to bottom of the generated Brewfile.";
     };
   };
 
