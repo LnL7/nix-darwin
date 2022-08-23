@@ -6,22 +6,27 @@ with lib;
 let
   cfg = config.homebrew;
 
-  brewfileSection = heading: type: entries: optionalString (entries != [])
-    "# ${heading}\n" + (concatMapStrings (name: "${type} \"${name}\"\n") entries) + "\n";
+  mkBrewfileSectionString = heading: type: entries: optionalString (entries != []) ''
+    # ${heading}
+    ${concatMapStringsSep "\n" (v: v.brewfileLine or ''${type} "${v}"'') entries}
 
-  masBrewfileSection = entries: optionalString (entries != {}) (
+  '';
+
+  mkMasBrewfileSectionString = entries: optionalString (entries != {}) (
     "# Mac App Store apps\n" +
     concatStringsSep "\n" (mapAttrsToList (name: id: ''mas "${name}", id: ${toString id}'') entries) +
     "\n"
   );
 
+
   brewfile = pkgs.writeText "Brewfile" (
-    brewfileSection "Taps" "tap" cfg.taps +
-    (if cfg.caskArgs.brewfileLine == null then "" else "# Arguments for all casks\n${cfg.caskArgs.brewfileLine}\n\n") +
-    brewfileSection "Brews" "brew" cfg.brews +
-    brewfileSection "Casks" "cask" cfg.casks +
-    masBrewfileSection cfg.masApps +
-    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews +
+    mkBrewfileSectionString "Taps" "tap" cfg.taps +
+    mkBrewfileSectionString "Arguments for all casks" "cask_args"
+      (optional (cfg.caskArgs.brewfileLine != null) cfg.caskArgs) +
+    mkBrewfileSectionString "Brews" "brew" cfg.brews +
+    mkBrewfileSectionString "Casks" "cask" cfg.casks +
+    mkMasBrewfileSectionString cfg.masApps +
+    mkBrewfileSectionString "Docker containers" "whalebrew" cfg.whalebrews +
     optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
   );
 
@@ -53,6 +58,50 @@ let
     type = types.nullOr types.str;
     default = null;
   });
+
+  mkBrewfileLineOption = mkOption {
+    type = types.nullOr types.str;
+    visible = false;
+    internal = true;
+    readOnly = true;
+  };
+
+  tapOptions = { config, ... }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        example = "homebrew/cask-fonts";
+        description = ''
+          When <option>clone_target</option> is unspecified, this is the name of a formula
+          repository to tap from GitHub using HTTPS. For example, <literal>"user/repo"</literal> will
+          tap https://github.com/user/homebrew-repo.
+        '';
+      };
+      clone_target = mkNullOrStrOption {
+        description = ''
+          Use this option to tap a formula repository from anywhere, using any transport protocol
+          that <command>git</command> handles. When <option>clone_target</option> is specified, taps
+          can be cloned from places other than GitHub and using protocols other than HTTPS, e.g.,
+          SSH, git, HTTP, FTP(S), rsync.
+        '';
+      };
+      force_auto_update = mkNullOrBoolOption {
+        description = ''
+          Whether to auto-update the tap even if it is not hosted on GitHub. By default, only taps
+          hosted on GitHub are auto-updated (for performance reasons).
+        '';
+      };
+
+      brewfileLine = mkBrewfileLineOption;
+    };
+
+    config = {
+      brewfileLine = ''tap "${config.name}"''
+        + optionalString (config.clone_target != null) '', "${config.clone_target}"''
+        + optionalString (config.force_auto_update != null)
+          ", force_auto_update: ${boolToString config.force_auto_update}";
+    };
+  };
 
   # Sourced from https://docs.brew.sh/Manpage#global-cask-options
   # and valid values for `HOMEBREW_CASK_OPTS`.
@@ -160,22 +209,17 @@ let
         description = "Whether to disable linking of helper executables.";
       };
 
-      brewfileLine = mkOption {
-        type = types.nullOr types.str;
-        visible = false;
-        internal = true;
-        readOnly = true;
-      };
+      brewfileLine = mkBrewfileLineOption;
     };
 
     config =
       let
-        configuredOptions = filterAttrs (_: v: v != null) (removeAttrs config [ "_module" "brewfileLine" ]);
+        configuredOptions = filterAttrs (_: v: v != null)
+          (removeAttrs config [ "_module" "brewfileLine" ]);
       in
       {
         brewfileLine =
-          if configuredOptions == {}
-          then null
+          if configuredOptions == {} then null
           else "cask_args " + mkBrewfileLineOptionsListString configuredOptions;
       };
   };
@@ -266,10 +310,28 @@ in
     };
 
     taps = mkOption {
-      type = with types; listOf str;
+      type = with types; listOf (coercedTo str (name: { inherit name; }) (submodule tapOptions));
       default = [];
-      example = [ "homebrew/cask-fonts" ];
-      description = "Homebrew formula repositories to tap.";
+      example = literalExpression ''
+        # Adapted examples from https://github.com/Homebrew/homebrew-bundle#usage
+        [
+          # 'brew tap'
+          "homebrew/cask"
+          # 'brew tap' with custom Git URL and arguments
+          {
+            name = "user/tap-repo";
+            clone_target = "https://user@bitbucket.org/user/homebrew-tap-repo.git";
+            force_auto_update = true;
+          }
+        ]
+      '';
+      description = ''
+        Homebrew formula repositories to tap.
+
+        Taps defined as strings, e.g., <literal>"user/repo"</literal>, are a shorthand for:
+
+        <code>{ name = "user/repo"; }</code>
+      '';
     };
 
     brews = mkOption {
@@ -338,9 +400,6 @@ in
       type = types.lines;
       default = "";
       example = ''
-        # 'brew tap' with custom Git URL
-        tap "user/tap-repo", "https://user@bitbucket.org/user/homebrew-tap-repo.git"
-
         # 'brew install --with-rmtp', 'brew services restart' on version changes
         brew "denji/nginx/nginx-full", args: ["with-rmtp"], restart_service: :changed
         # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
