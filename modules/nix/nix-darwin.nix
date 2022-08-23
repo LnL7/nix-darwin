@@ -5,7 +5,7 @@ with lib;
 let
   inherit (pkgs) stdenv;
 
-  extraPath = lib.makeBinPath [ config.nix.package pkgs.coreutils pkgs.jq ];
+  extraPath = lib.makeBinPath [ config.nix.package pkgs.coreutils pkgs.jq pkgs.git ];
 
   writeProgram = name: env: src:
     pkgs.substituteAll ({

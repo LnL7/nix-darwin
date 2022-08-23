@@ -19,10 +19,10 @@ in
 
   services.nix-daemon.enable = true;
 
-  nix.binaryCaches = [ http://cache1 ];
-  nix.binaryCachePublicKeys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
+  nix.settings.substituters = [ http://cache1 ];
+  nix.settings.trusted-public-keys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
 
-  nix.trustedUsers = [ "@admin" "@hydra" ];
+  nix.settings.trusted-users = [ "@admin" "@hydra" ];
 
   nix.extraOptions = ''
     pre-build-hook =
