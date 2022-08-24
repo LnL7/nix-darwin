@@ -194,6 +194,21 @@ with lib;
             '';
           };
 
+          Crashed = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+            description = ''
+              If true, the the job will be restarted as long as it exited due to a signal which is typically
+              associated with a crash (SIGILL, SIGSEGV, etc.). If false, the job will be restarted in the
+              inverse condition.
+            '';
+          };
+
+          AfterInitialDemand = mkOption {
+            type = types.nullOr types.bool;
+            default = null;
+          };
+
         };
       }));
       default = null;
