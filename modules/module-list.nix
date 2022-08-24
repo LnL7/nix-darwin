@@ -47,6 +47,7 @@
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/gitlab-runner.nix
+  ./services/karabiner-elements
   ./services/khd
   ./services/kwm
   ./services/lorri.nix
