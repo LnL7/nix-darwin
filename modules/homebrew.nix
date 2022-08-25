@@ -16,12 +16,12 @@ let
   );
 
   brewfile = pkgs.writeText "Brewfile" (
+    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig) +
     brewfileSection "Taps" "tap" cfg.taps +
     brewfileSection "Brews" "brew" cfg.brews +
     brewfileSection "Casks" "cask" cfg.casks +
     masBrewfileSection cfg.masApps +
-    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews +
-    optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig)
+    brewfileSection "Docker containers" "whalebrew" cfg.whalebrews
   );
 
   brew-bundle-command = concatStringsSep " " (
