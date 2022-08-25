@@ -29,7 +29,10 @@ let
     concatStringsSep ", " (mapAttrsToList (n: v: "${n}: ${v}") attrs);
 
 
-  # Submodule helper functions ---------------------------------------------------------------------
+  # Option and submodule helper functions ----------------------------------------------------------
+
+  mkDocOptionLink = optionName:
+    ''<link xlink:href="#opt-${optionName}"><option>${optionName}</option></link>'';
 
   mkNullOrBoolOption = args: mkOption (args // {
     type = types.nullOr types.bool;
@@ -41,12 +44,11 @@ let
     default = null;
   });
 
-  mkBrewfileLineOption = mkOption {
-    type = types.nullOr types.str;
+  mkInternalOption = args: mkOption (args // {
     visible = false;
     internal = true;
     readOnly = true;
-  };
+  });
 
   mkProcessedSubmodConfig = attrs: mapAttrs (_: mkBrewfileLineValueString)
     (filterAttrsRecursive (n: v: n != "_module" && n != "brewfileLine" && v != null) attrs);
@@ -110,12 +112,7 @@ let
         '';
       };
 
-      brewBundleCmd = mkOption {
-        type = types.str;
-        visible = false;
-        internal = true;
-        readOnly = true;
-      };
+      brewBundleCmd = mkInternalOption { type = types.str; };
     };
 
     config = {
@@ -126,6 +123,90 @@ let
         ++ optional (config.cleanup == "uninstall") "--cleanup"
         ++ optional (config.cleanup == "zap") "--cleanup --zap"
       );
+    };
+  };
+
+  globalOptions = { config, ... }: {
+    options = {
+      brewfile = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to enable Homebrew to automatically use the Brewfile that this module generates in
+          the Nix store, when you manually invoke <command>brew bundle</command>.
+
+          Enabling this option will change the default value of
+          ${mkDocOptionLink "homebrew.global.lockfiles"} to <literal>false</literal> since, with
+          this option enabled, <command>brew bundle [install]</command> will default to using the
+          Brewfile that this module generates in the Nix store, unless you explicitly point it at
+          another Brewfile using the <literal>--file</literal> flag. As a result, it will try to
+          write the lockfile in the Nix store, and complain that it can't (though the command will
+          run successfully regardless).
+
+          Implementation note: when enabled, this option sets the
+          <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the Brewfile
+          that this module generates in the Nix store, by adding it to
+          ${mkDocOptionLink "environment.variables"}.
+        '';
+      };
+      autoUpdate = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Whether to enable Homebrew to auto-update itself and all formulae when you manually invoke
+          commands like <command>brew install</command>, <command>brew upgrade</command>,
+          <command>brew tap</command>, and <command>brew bundle [install]</command>.
+
+          Note that Homebrew auto-updates when you manually invoke commands like the ones mentioned
+          above if it's been more then 5 minutes since it last updated.
+
+          You may want to consider disabling this option if you have
+          ${mkDocOptionLink "homebrew.onActivation.upgrade"} enabled, and
+          ${mkDocOptionLink "homebrew.onActivation.autoUpdate"} disabled, if you want to ensure that
+          your installed formulae will only be upgraded during <command>nix-darwin</command> system
+          activation, after you've explicitly run <command>brew update</command>.
+
+          Implementation note: when disabled, this option sets the
+          <literal>HOMEBREW_NO_AUTO_UPDATE</literal> environment variable, by adding it to
+          ${mkDocOptionLink "environment.variables"}.
+        '';
+      };
+      lockfiles = mkOption {
+        type = types.bool;
+        default = !config.brewfile;
+        defaultText = literalExpression "!config.homebrew.global.brewfile";
+        description = ''
+          Whether to enable Homebrew to generate lockfiles when you manually invoke
+          <command>brew bundle [install]</command>.
+
+          This option will default to <literal>false</literal> if
+          ${mkDocOptionLink "homebrew.global.brewfile"} is enabled since, with that option enabled,
+          <command>brew bundle [install]</command> will default to using the Brewfile that this
+          module generates in the Nix store, unless you explicitly point it at another Brewfile
+          using the <literal>--file</literal> flag. As a result, it will try to write the
+          lockfile in the Nix store, and complain that it can't (though the command will run
+          successfully regardless).
+
+          Implementation note: when disabled, this option sets the
+          <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
+          ${mkDocOptionLink "environment.variables"}.
+        '';
+      };
+
+      # The `noLock` option was replaced by `lockfiles`. Due to `homebrew.global` being a submodule,
+      # we can't use `mkRemovedOptionModule`, so we leave this option definition here, and trigger
+      # and error message with an assertion below if it's set by the user.
+      noLock = mkOption { visible = false; default = null; };
+
+      homebrewEnvironmentVariables = mkInternalOption { type = types.attrs; };
+    };
+
+    config = {
+      homebrewEnvironmentVariables = {
+        HOMEBREW_BUNDLE_FILE = mkIf config.brewfile "${brewfileFile}";
+        HOMEBREW_NO_AUTO_UPDATE = mkIf (!config.autoUpdate) "1";
+        HOMEBREW_BUNDLE_NO_LOCK = mkIf (!config.lockfiles) "1";
+      };
     };
   };
 
@@ -155,7 +236,7 @@ let
         '';
       };
 
-      brewfileLine = mkBrewfileLineOption;
+      brewfileLine = mkInternalOption { type = types.nullOr types.str; };
     };
 
     config =
@@ -291,7 +372,7 @@ let
         description = "Whether to disable linking of helper executables.";
       };
 
-      brewfileLine = mkBrewfileLineOption;
+      brewfileLine = mkInternalOption { type = types.nullOr types.str; };
     };
 
     config =
@@ -299,7 +380,9 @@ let
         sCfg = mkProcessedSubmodConfig config;
       in
       {
-        brewfileLine = if sCfg == { } then null else "cask_args ${mkBrewfileLineOptionsListString sCfg}";
+        brewfileLine =
+          if sCfg == { } then null
+          else "cask_args ${mkBrewfileLineOptionsListString sCfg}";
       };
   };
 
@@ -353,7 +436,7 @@ let
         '';
       };
 
-      brewfileLine = mkBrewfileLineOption;
+      brewfileLine = mkInternalOption { type = types.nullOr types.str; };
     };
 
     config =
@@ -393,7 +476,7 @@ let
         '';
       };
 
-      brewfileLine = mkBrewfileLineOption;
+      brewfileLine = mkInternalOption { type = types.nullOr types.str; };
     };
 
     config =
@@ -449,33 +532,11 @@ in
       '';
     };
 
-    global.brewfile = mkOption {
-      type = types.bool;
-      default = false;
+    global = mkOption {
+      type = types.submodule globalOptions;
+      default = { };
       description = ''
-        Whether to enable Homebrew to automatically use the Brewfile in the Nix store that this
-        module generates, when you manually invoke <command>brew bundle</command>.
-
-        Implementation note: when enabled, this option sets the
-        <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the Brewfile in
-        the Nix store that this module generates, by adding it to
-        <option>environment.variables</option>.
-      '';
-    };
-
-    global.noLock = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Whether to disable lockfile generation when you manually invoke
-        <command>brew bundle [install]</command>. This is often desirable when
-        <option>homebrew.global.brewfile</option> is enabled, since
-        <command>brew bundle [install]</command> will try to write the lockfile in the Nix store,
-        and complain that it can't (though the command will run successfully regardless).
-
-        Implementation note: when enabled, this option sets the
-        <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
-        <option>environment.variables</option>.
+        Options for configuring the behavior of Homebrew commands when you manually invoke them.
       '';
     };
 
@@ -633,11 +694,8 @@ in
       description = "Extra lines to be added verbatim to bottom of the generated Brewfile.";
     };
 
-    brewfile = mkOption {
+    brewfile = mkInternalOption {
       type = types.str;
-      visible = false;
-      internal = true;
-      readOnly = true;
       description = "String reprensentation of the generated Brewfile useful for debugging.";
     };
   };
@@ -646,6 +704,11 @@ in
   # Implementation ---------------------------------------------------------------------------------
 
   config = {
+
+    assertions = [
+      # See comment above `homebrew.global.noLock` option declaration for why this is required.
+      { assertion = cfg.global.noLock == null; message = "The option `homebrew.global.noLock' was removed, use `homebrew.global.lockfiles' in it's place."; }
+    ];
 
     warnings = [
       (mkIf (options.homebrew.autoUpdate.isDefined || options.homebrew.cleanup.isDefined) "The `homebrew' module no longer upgrades outdated formulae and apps by default during `nix-darwin' activation. To enable upgrading, set `homebrew.onActivation.upgrade = true'.")
@@ -667,10 +730,7 @@ in
       + mkBrewfileSectionString "Docker containers" (map (v: ''whalebrew "${v}"'') cfg.whalebrews)
       + optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig);
 
-    environment.variables = mkIf cfg.enable (
-      optionalAttrs cfg.global.brewfile { HOMEBREW_BUNDLE_FILE = "${brewfileFile}"; }
-      // optionalAttrs cfg.global.noLock { HOMEBREW_BUNDLE_NO_LOCK = "1"; }
-    );
+    environment.variables = mkIf cfg.enable cfg.global.homebrewEnvironmentVariables;
 
     system.activationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
