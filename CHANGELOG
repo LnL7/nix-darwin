@@ -1,3 +1,24 @@
+2022-08-24
+- Major changes to `homebrew` module
+  `homebrew.cleanup` was renamed to `homebrew.onActivation.cleanup`.
+
+  `homebrew.autoUpdate` was renamed to `homebrew.onActivation.autoUpdate`.
+
+  `homebrew.onActivation.upgrade` was added, and the default behavior of the
+  module was changed to not upgrade installed formulae and apps.
+
+  `homebrew.global.autoUpdate` was added.
+
+  `homebrew.global.noLock` was replaced with `hombrew.global.lockfiles`.
+
+  `homebrew.caskArgs` submodule was added for configuring arguments to be used
+  for all casks.
+
+  `homebrew.{taps,brews,casks}` were reimplemented as lists of submodules,
+  instead of lists of strings, with well documented options for all available
+  arguments for these Brewfile entry types, while preserving backwards
+  compatibility with the previous implementation.
+
 2022-08-14
 - nix module updated to bring it back in sync with it's NixOS counterpart
   It should now be much more fiesable to share code for this module between
