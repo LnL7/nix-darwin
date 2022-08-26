@@ -8,7 +8,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Settings > Dekstop & Dock > Stage Manager
+        # Apple menu > System Settings > Dekstop and Dock > Stage Manager
         Stage Manager arranges your recent windows into a single strip for reduced clutter and quick access. Default is false.
       '';
     };
@@ -17,7 +17,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Settings > Dekstop & Dock > Stage Manager
+        # Apple menu > System Settings > Dekstop and Dock > Stage Manager
         Default is true.
       '';
     };
@@ -26,7 +26,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Settings > Dekstop & Dock > Stage Manager
+        # Apple menu > System Settings > Dekstop and Dock > Stage Manager
         Do not show Recent Apps. Default is false.
       '';
     };
@@ -35,7 +35,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Settings > Dekstop & Dock > Stage Manager
+        # Apple menu > System Settings > Dekstop and Dock > Stage Manager
         Hide dekstop items. Default is false.
       '';
     };
