@@ -14,19 +14,19 @@ with lib;
       default = null;
       description = ''
         This optional key is used as a hint to <literal>launchctl(1)</literal> that it should not submit this job to launchd when
-        loading a job or jobs. The value of this key does NOT reflect the current state of the job on the run-ning running
-        ning system. If you wish to know whether a job is loaded in launchd, reading this key from a configura-tion configuration
-        tion file yourself is not a sufficient test. You should query launchd for the presence of the job using
+        loading a job or jobs. The value of this key does NOT reflect the current state of the job on the running
+        system. If you wish to know whether a job is loaded in launchd, reading this key from a configuration
+        file yourself is not a sufficient test. You should query launchd for the presence of the job using
         the <literal>launchctl(1)</literal> list subcommand or use the ServiceManagement framework's
         <literal>SMJobCopyDictionary()</literal> method.
 
         Note that as of Mac OS X v10.6, this key's value in a configuration file conveys a default value, which
         is changed with the [-w] option of the <literal>launchctl(1)</literal> load and unload subcommands. These subcommands no
-        longer modify the configuration file, so the value displayed in the configuration file is not necessar-ily necessarily
-        ily the value that <literal>launchctl(1)</literal> will apply. See <literal>launchctl(1)</literal> for more information.
+        longer modify the configuration file, so the value displayed in the configuration file is not necessarily
+        the value that <literal>launchctl(1)</literal> will apply. See <literal>launchctl(1)</literal> for more information.
 
-        Please also be mindful that you should only use this key if the provided on-demand and KeepAlive crite-ria criteria
-        ria are insufficient to describe the conditions under which your job needs to run. The cost to have a
+        Please also be mindful that you should only use this key if the provided on-demand and KeepAlive criteria
+        are insufficient to describe the conditions under which your job needs to run. The cost to have a
         job loaded in launchd is negligible, so there is no harm in loading a job which only runs once or very
         rarely.
       '';
@@ -76,8 +76,8 @@ with lib;
       type = types.nullOr (types.listOf types.str);
       default = null;
       description = ''
-        This configuration file only applies to the hosts listed with this key. Note: One should set kern.host-name kern.hostname
-        name in <literal>sysctl.conf(5)</literal> for this feature to work reliably.
+        This configuration file only applies to the hosts listed with this key. Note: One should set kern.hostname
+        in <literal>sysctl.conf(5)</literal> for this feature to work reliably.
       '';
     };
 
@@ -85,8 +85,8 @@ with lib;
       type = types.nullOr (types.listOf types.str);
       default = null;
       description = ''
-        This configuration file only applies to hosts NOT listed with this key. Note: One should set kern.host-name kern.hostname
-        name in <literal>sysctl.conf(5)</literal> for this feature to work reliably.
+        This configuration file only applies to hosts NOT listed with this key. Note: One should set kern.hostname
+        in <literal>sysctl.conf(5)</literal> for this feature to work reliably.
       '';
     };
 
@@ -122,8 +122,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        This flag causes launchd to use the <literal>glob(3)</literal> mechanism to update the program arguments before invoca-tion. invocation.
-        tion.
+        This flag causes launchd to use the <literal>glob(3)</literal> mechanism to update the program arguments before invocation.
       '';
     };
 
@@ -200,8 +199,8 @@ with lib;
       description = ''
         This optional key is used to control whether your job is to be kept continuously running or to let
         demand and conditions control the invocation. The default is false and therefore only demand will start
-        the job. The value may be set to true to unconditionally keep the job alive. Alternatively, a dictio-nary dictionary
-        nary of conditions may be specified to selectively control whether launchd keeps a job alive or not. If
+        the job. The value may be set to true to unconditionally keep the job alive. Alternatively, a dictionary
+        of conditions may be specified to selectively control whether launchd keeps a job alive or not. If
         multiple keys are provided, launchd ORs them, thus providing maximum flexibility to the job to refine
         the logic and stall if necessary. If launchd finds no reason to restart the job, it falls back on
         demand based invocation.  Jobs that exit quickly and frequently when configured to be kept alive will
@@ -478,8 +477,8 @@ with lib;
             default = null;
             description = ''
               The maximum number of open files for this process.  Setting this value in a system wide daemon
-              will set the <literal>sysctl(3)</literal> kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResource-Limits) (HardResourceLimits)
-              Limits) value in addition to the <literal>setrlimit(2)</literal> values.
+              will set the <literal>sysctl(3)</literal> kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResourceLimits)
+              value in addition to the <literal>setrlimit(2)</literal> values.
             '';
           };
 
@@ -570,8 +569,8 @@ with lib;
             default = null;
             description = ''
               The maximum number of open files for this process.  Setting this value in a system wide daemon
-              will set the <literal>sysctl(3)</literal> kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResource-Limits) (HardResourceLimits)
-              Limits) value in addition to the <literal>setrlimit(2)</literal> values.
+              will set the <literal>sysctl(3)</literal> kern.maxfiles (SoftResourceLimits) or kern.maxfilesperproc (HardResourceLimits)
+              value in addition to the <literal>setrlimit(2)</literal> values.
             '';
           };
 
@@ -637,8 +636,8 @@ with lib;
            XPC connections. See <literal>xpc_transaction_begin(3)</literal> for details.
 
            Interactive
-           Interactive jobs run with the same resource limitations as apps, that is to say, none. Interac-tive Interactive
-           tive jobs are critical to maintaining a responsive user experience, and this key should only be
+           Interactive jobs run with the same resource limitations as apps, that is to say, none. Interactive
+           jobs are critical to maintaining a responsive user experience, and this key should only be
            used if an app's ability to be responsive depends on it, and cannot be made Adaptive.
       '';
     };
@@ -647,8 +646,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        When a job dies, launchd kills any remaining processes with the same process group ID as the job.  Set-ting Setting
-        ting this key to true disables that behavior.
+        When a job dies, launchd kills any remaining processes with the same process group ID as the job. Setting
+        this key to true disables that behavior.
       '';
     };
 
@@ -689,8 +688,8 @@ with lib;
             description = ''
               If this boolean is false, the port is recycled, thus leaving clients to remain oblivious to the
               demand nature of job. If the value is set to true, clients receive port death notifications when
-              the job lets go of the receive right. The port will be recreated atomically with respect to boot-strap_look_up() bootstrap_look_up()
-              strap_look_up() calls, so that clients can trust that after receiving a port death notification,
+              the job lets go of the receive right. The port will be recreated atomically with respect to bootstrap_look_up()
+              calls, so that clients can trust that after receiving a port death notification,
               the new port will have already been recreated. Setting the value to true should be done with
               care. Not all clients may be able to handle this behavior. The default value is false.
             '';
@@ -714,7 +713,7 @@ with lib;
       description = ''
         Specifies higher-level event types to be used as launch-on-demand event
         sources.  Each sub-dictionary defines events for a particular event
-        subsystem, such as "com.apple.iokit.match-ing", which can be used to
+        subsystem, such as "com.apple.iokit.matching", which can be used to
         launch jobs based on the appearance of nodes in the IORegistry. Each
         dictionary within the sub-dictionary specifies an event descriptor that
         is specified to each event subsystem. With this key, the job promises to
@@ -738,9 +737,9 @@ with lib;
       description = ''
         This optional key is used to specify launch on demand sockets that can be used to let launchd know when
         to run the job. The job must check-in to get a copy of the file descriptors using APIs outlined in
-        launch(3).  The keys of the top level Sockets dictionary can be anything. They are meant for the appli-cation application
-        cation developer to use to differentiate which descriptors correspond to which application level proto-cols protocols
-        cols (e.g. http vs. ftp vs. DNS...).  At check-in time, the value of each Sockets dictionary key will
+        launch(3).  The keys of the top level Sockets dictionary can be anything. They are meant for the application
+        developer to use to differentiate which descriptors correspond to which application level protocols
+        (e.g. http vs. ftp vs. DNS...).  At check-in time, the value of each Sockets dictionary key will
         be an array of descriptors. Daemon/Agent writers should consider all descriptors of a given key to be
         to be effectively equivalent, even though each file descriptor likely represents a different networking
         protocol which conforms to the criteria specified in the job configuration file.
@@ -814,8 +813,8 @@ with lib;
             default = null;
             description = ''
               This optional key is a variant of SockPathName. Instead of binding to a known path, a securely
-              generated socket is created and the path is assigned to the environment variable that is inher-ited inherited
-              ited by all jobs spawned by launchd.
+              generated socket is created and the path is assigned to the environment variable that is inherited
+              by all jobs spawned by launchd.
             '';
           };
 
@@ -833,8 +832,7 @@ with lib;
             default = null;
             description = ''
               This optional key can be used to request that the service be registered with the
-              <literal>mDNSResponder(8)</literal>.  If the value is boolean, the service name is inferred from the SockService-Name. SockServiceName.
-              Name.
+              <literal>mDNSResponder(8)</literal>.  If the value is boolean, the service name is inferred from the SockServiceName.
             '';
           };
 
@@ -844,8 +842,8 @@ with lib;
             description = ''
               This optional key can be used to request that the datagram socket join a multicast group.  If the
               value is a hostname, then <literal>getaddrinfo(3)</literal> will be used to join the correct multicast address for a
-              given socket family.  If an explicit IPv4 or IPv6 address is given, it is required that the Sock-Family SockFamily
-              Family family also be set, otherwise the results are undefined.
+              given socket family.  If an explicit IPv4 or IPv6 address is given, it is required that the SockFamily
+              family also be set, otherwise the results are undefined.
             '';
           };
         };
