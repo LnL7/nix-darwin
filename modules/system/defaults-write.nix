@@ -5,14 +5,12 @@ with lib;
 let
   cfg = config.system.defaults;
 
-  isFloat = x: isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null;
-
   boolValue = x: if x then "YES" else "NO";
 
   writeValue = value:
     if isBool value then "-bool ${boolValue value}" else
     if isInt value then "-int ${toString value}" else
-    if isFloat value then "-float ${toString value}" else
+    if isFloat value then "-float ${strings.floatToString value}" else
     if isString value then "-string '${value}'" else
     throw "invalid value type";
 
@@ -47,6 +45,15 @@ in
 
 {
   config = {
+
+    # Type used for `system.defaults.<domain>.*` options that previously accepted float values as a
+    # string.
+    lib.defaults.types.floatWithDeprecationError = types.float // {
+      check = x:
+        if isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null
+        then throw "Using strings for `system.defaults.<domain>.*' options of type float is no longer permitted, use native float values instead."
+        else types.float.check x;
+    };
 
     system.activationScripts.defaults.text = mkIfAttrs [
       alf

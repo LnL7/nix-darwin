@@ -23,7 +23,7 @@
   system.defaults.NSGlobalDomain.NSTextShowsControlCharacters = true;
   system.defaults.NSGlobalDomain.NSUseAnimatedFocusRing = false;
   system.defaults.NSGlobalDomain.NSScrollAnimationEnabled = true;
-  system.defaults.NSGlobalDomain.NSWindowResizeTime = "0.01";
+  system.defaults.NSGlobalDomain.NSWindowResizeTime = 0.01;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
   system.defaults.NSGlobalDomain.KeyRepeat = 1;
   system.defaults.NSGlobalDomain.PMPrintingExpandedStateForPrint = true;
@@ -33,11 +33,11 @@
   system.defaults.NSGlobalDomain."com.apple.trackpad.enableSecondaryClick" = true;
   system.defaults.NSGlobalDomain."com.apple.trackpad.trackpadCornerClickBehavior" = 1;
   system.defaults.NSGlobalDomain."com.apple.springing.enabled" = true;
-  system.defaults.NSGlobalDomain."com.apple.springing.delay" = "0.0";
+  system.defaults.NSGlobalDomain."com.apple.springing.delay" = 0.0;
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.".GlobalPreferences"."com.apple.sound.beep.sound" = "/System/Library/Sounds/Funk.aiff";
   system.defaults.dock.appswitcher-all-displays = false;
-  system.defaults.dock.autohide-delay = "0.24";
+  system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
   system.defaults.screencapture.location = "/tmp";
   system.defaults.smb.NetBIOSName = "IMAC-000000";
