@@ -3,15 +3,8 @@
 with lib;
 
 let
-  isFloat = x: isString x && builtins.match "^[+-]?([0-9]*[.])?[0-9]+$" x != null;
-
-  float = mkOptionType {
-    name = "float";
-    description = "float";
-    check = isFloat;
-    merge = options.mergeOneOption;
-  };
-
+  # Should only be used with options that previously used floats defined as strings.
+  inherit (config.lib.defaults.types) floatWithDeprecationError;
 in {
   options = {
 
@@ -208,9 +201,9 @@ in {
     };
 
     system.defaults.NSGlobalDomain.NSWindowResizeTime = mkOption {
-      type = types.nullOr float;
+      type = types.nullOr floatWithDeprecationError;
       default = null;
-      example = "0.20";
+      example = 0.20;
       description = ''
         Sets the speed speed of window resizing. The default is given in the example.
       '';
@@ -273,14 +266,16 @@ in {
     };
 
     system.defaults.NSGlobalDomain."com.apple.sound.beep.volume" = mkOption {
-      type = types.nullOr float;
+      type = types.nullOr floatWithDeprecationError;
       default = null;
       description = ''
         # Apple menu > System Preferences > Sound
         Sets the beep/alert volume level from 0.000 (muted) to 1.000 (100% volume).
 
         75% = 0.7788008
+
         50% = 0.6065307
+
         25% = 0.4723665
       '';
     };
@@ -312,7 +307,7 @@ in {
     };
 
     system.defaults.NSGlobalDomain."com.apple.trackpad.scaling" = mkOption {
-      type = types.nullOr float;
+      type = types.nullOr floatWithDeprecationError;
       default = null;
       description = ''
         Configures the trackpad tracking speed (0 to 3).  The default is "1".
@@ -328,9 +323,9 @@ in {
     };
 
     system.defaults.NSGlobalDomain."com.apple.springing.delay" = mkOption {
-      type = types.nullOr float;
+      type = types.nullOr floatWithDeprecationError;
       default = null;
-      example = "1.0";
+      example = 1.0;
       description = ''
         Set the spring loading delay for directories. The default is given in the example.
       '';
