@@ -160,7 +160,7 @@ fi
 
 if [ "$action" = list ] || [ "$action" = rollback ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p "$profile" "${extraProfileFlags[@]}"
+    sudo -H nix-env -p "$profile" "${extraProfileFlags[@]}"
   else
     nix-env -p "$profile" "${extraProfileFlags[@]}"
   fi
@@ -178,7 +178,7 @@ if [ -z "$systemConfig" ]; then exit 0; fi
 
 if [ "$action" = switch ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p "$profile" --set "$systemConfig"
+    sudo -H nix-env -p "$profile" --set "$systemConfig"
   else
     nix-env -p "$profile" --set "$systemConfig"
   fi
