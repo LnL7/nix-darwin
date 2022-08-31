@@ -24,6 +24,7 @@
   system.defaults.NSGlobalDomain.NSUseAnimatedFocusRing = false;
   system.defaults.NSGlobalDomain.NSScrollAnimationEnabled = true;
   system.defaults.NSGlobalDomain.NSWindowResizeTime = "0.01";
+  system.defaults.NSGlobalDomain.NSWindowShouldDragOnGesture = true;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
   system.defaults.NSGlobalDomain.KeyRepeat = 1;
   system.defaults.NSGlobalDomain.PMPrintingExpandedStateForPrint = true;
@@ -80,6 +81,7 @@
     grep "defaults write -g 'NSUseAnimatedFocusRing' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSScrollAnimationEnabled' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSWindowResizeTime' -float 0.01" ${config.out}/activate-user
+    grep "defaults write -g 'NSWindowShouldDragOnGesture' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'InitialKeyRepeat' -int 10" ${config.out}/activate-user
     grep "defaults write -g 'KeyRepeat' -int 1" ${config.out}/activate-user
     grep "defaults write -g 'PMPrintingExpandedStateForPrint' -bool YES" ${config.out}/activate-user
