@@ -30,11 +30,13 @@ in
     # refuse to run again until they've been unloaded and loaded back in so we can
     # use a helper daemon to start them.
     launchd.daemons.start_karabiner_daemons = {
-      script = ''
-        /bin/wait4path ${pkgs.karabiner-elements}
-        launchctl kickstart system/org.pqrs.karabiner.karabiner_grabber
-        launchctl kickstart system/org.pqrs.karabiner.karabiner_observer
-      '';
+      serviceConfig.ProgramArguments = [
+        "/bin/sh" "-c"
+        "/bin/wait4path /nix/store &amp;&amp; ${pkgs.writeScript "start_karabiner_daemons" ''
+          launchctl kickstart system/org.pqrs.karabiner.karabiner_grabber
+          launchctl kickstart system/org.pqrs.karabiner.karabiner_observer
+        ''}"
+      ];
       # Due to the daemons being loaded in alphabetical order during darwin-rebuild switch
       # we need to set the label so that this daemon will be loaded after karabiner_grabber
       # and karabiner_observer so that no reboot is required to start these daemons.
@@ -68,7 +70,7 @@ in
       serviceConfig.ProgramArguments = [
         "/bin/sh" "-c"
         # For unknown reasons this daemon will fail if VirtualHIDDeviceClient is not exec'd.
-        "/bin/wait4path ${pkgs.karabiner-elements.driver} &amp;&amp; exec \"${pkgs.karabiner-elements.driver}/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-DriverKit-VirtualHIDDeviceClient.app/Contents/MacOS/Karabiner-DriverKit-VirtualHIDDeviceClient\""
+        "/bin/wait4path /nix/store &amp;&amp; exec \"${pkgs.karabiner-elements.driver}/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-DriverKit-VirtualHIDDeviceClient.app/Contents/MacOS/Karabiner-DriverKit-VirtualHIDDeviceClient\""
       ];
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Label = "org.pqrs.Karabiner-DriverKit-VirtualHIDDeviceClient";
@@ -88,13 +90,14 @@ in
     # every reboot and the extraActivation script only gets run on darwin-rebuild
     # switch.
     launchd.daemons.setsuid_karabiner_session_monitor = {
-      script = ''
-        set -e
-        /bin/wait4path ${pkgs.karabiner-elements}
-        rm -rf /run/wrappers
-        mkdir -p /run/wrappers/bin
-        install -m4555 "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
-      '';
+      serviceConfig.ProgramArguments = [
+        "/bin/sh" "-c"
+        "/bin/wait4path /nix/store &amp;&amp; ${pkgs.writeScript "setsuid_karabiner_session_monitor" ''
+          rm -rf /run/wrappers
+          mkdir -p /run/wrappers/bin
+          install -m4555 "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
+        ''}"
+      ];
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive.SuccessfulExit = false;
     };
