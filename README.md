@@ -6,9 +6,12 @@
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
+This project aims to bring the convenience of a declarative system approach to macOS.
+Nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOs](https://nixos.org/).
+
 ## Install
 
-To install nix-darwin, a working installation of [nix](https://github.com/NixOS/nix#installation) is required.
+To install nix-darwin, a working installation of [Nix](https://github.com/NixOS/nix#installation) is required.
 
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
@@ -32,7 +35,7 @@ nix-channel --update darwin
 darwin-rebuild changelog
 ```
 
-> NOTE: If you are using nix as a daemon service the channel for that will be owned by root.
+> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
 > Use `sudo -i nix-channel --update darwin` instead.
 
 ## Uninstalling
@@ -45,7 +48,7 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstalle
 ./result/bin/darwin-uninstaller
 ```
 
-> NOTE: This will also uninstall nix alongside nix-darwin.
+> NOTE: This will also uninstall Nix alongside nix-darwin.
 
 ## Example configuration
 
@@ -173,13 +176,13 @@ $
 
 ## Documentation
 
-Reference documentation of all the options is available here
-https://lnl7.github.io/nix-darwin/manual/index.html#sec-options.
+Reference documentation of all the options is available [here](https://lnl7.github.io/nix-darwin/manual/index.html#sec-options).--
 This can also be accessed locally using `man 5 configuration.nix`.
 
-`darwin-help` will open a html version of the manpage in the default browser.
+`darwin-help` will open a HTML version of the manpage in the default browser.
 
-Furthermore there's `darwin-option` to introspect the settings of a system and it's available options.
+Furthermore there's `darwin-option` to introspect the settings of a system and its available options.
+> NOTE: `darwin-option` is only available to non-flake installations.
 
 ```
 $ darwin-option services.activate-system.enable
@@ -205,9 +208,9 @@ There are basic tests that run sanity checks for some of the modules,
 you can run them like this:
 
 ```bash
-> run all tests
+# run all tests
 nix-build release.nix -A tests
-> or just a subset
+# or just a subset
 nix-build release.nix -A tests.environment-path
 ```
 
