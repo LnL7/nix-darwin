@@ -8,6 +8,8 @@ Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
 ## Install
 
+To install nix-darwin, a working installation of [nix](https://github.com/NixOS/nix#installation) is required.
+
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
@@ -30,6 +32,9 @@ nix-channel --update darwin
 darwin-rebuild changelog
 ```
 
+> NOTE: If you are using nix as a daemon service the channel for that will be owned by root.
+> Use `sudo -i nix-channel --update darwin` instead.
+
 ## Uninstalling
 
 There's also an uninstaller if you don't like the project and want to
@@ -39,6 +44,8 @@ remove the configured files and services.
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstaller
 ./result/bin/darwin-uninstaller
 ```
+
+> NOTE: This will also uninstall nix alongside nix-darwin.
 
 ## Example configuration
 
@@ -164,6 +171,16 @@ writing defaults...
 $
 ```
 
+## Documentation
+
+Reference documentation of all the options is available here
+https://lnl7.github.io/nix-darwin/manual/index.html#sec-options.
+This can also be accessed locally using `man 5 configuration.nix`.
+
+`darwin-help` will open a html version of the manpage in the default browser.
+
+Furthermore there's `darwin-option` to introspect the settings of a system and it's available options.
+
 ```
 $ darwin-option services.activate-system.enable
 Value:
@@ -179,12 +196,6 @@ Description:
 Whether to activate system at boot time.
 ```
 
-## Documentation
-
-Reference documentation of all the options is available here
-https://lnl7.github.io/nix-darwin/manual/index.html#sec-options.
-This can also be accessed locally using `man 5 configuration.nix`.
-
 There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
 specific topics, like macOS upgrades.
 
@@ -194,6 +205,9 @@ There are basic tests that run sanity checks for some of the modules,
 you can run them like this:
 
 ```bash
+> run all tests
+nix-build release.nix -A tests
+> or just a subset
 nix-build release.nix -A tests.environment-path
 ```
 
@@ -204,7 +218,7 @@ Don't hesitate to contribute modules or open an issue.
 
 To build your configuration with local changes you can run this. This
 flag can also be used to override darwin-config or nixpkgs, for more
-information on the `-I` flag look at the nix-build manpage.
+information on the `-I` flag look at the nix-build [manpage](https://nixos.org/manual/nix/stable/command-ref/nix-build.html).
 
 ```bash
 darwin-rebuild switch -I darwin=.
