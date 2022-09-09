@@ -86,8 +86,8 @@ stdenv.mkDerivation {
         fi
         case "$i" in
             y|Y)
-                nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-                nix-channel --update
+                sudo -i nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+                sudo -i nix-channel --update
                 ;;
         esac
     fi

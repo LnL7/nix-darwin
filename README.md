@@ -28,15 +28,12 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 
 ## Updating
 
-The installer will configure a channel for this repository.
+The installer will configure a channel for this repository, which will be owned by root by default.
 
 ```bash
-nix-channel --update darwin
+sudo -i nix-channel --update darwin
 darwin-rebuild changelog
 ```
-
-> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
-> Use `sudo -i nix-channel --update darwin` instead.
 
 ## Uninstalling
 
@@ -128,8 +125,8 @@ echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf
 /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t
 
 # Configure the channel
-nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-nix-channel --update
+sudo -i nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+sudo -i nix-channel --update
 export NIX_PATH=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
 
 # Or use a local git repository

@@ -145,8 +145,8 @@ let
     if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set nix.nixPath:" >&2
-        echo "$ nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin" >&2
-        echo "$ nix-channel --update" >&2
+        echo "$ sudo -i nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin" >&2
+        echo "$ sudo -i nix-channel --update" >&2
         echo >&2
         echo "or set" >&2
         echo >&2
@@ -159,8 +159,8 @@ let
     if ! test -e "$nixpkgsPath"; then
         echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
         echo "Add a nixpkgs channel or set nix.nixPath:" >&2
-        echo "$ nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs" >&2
-        echo "$ nix-channel --update" >&2
+        echo "$ sudo -i nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs" >&2
+        echo "$ sudo -i nix-channel --update" >&2
         echo >&2
         echo "or set" >&2
         echo >&2
