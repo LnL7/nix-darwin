@@ -65,6 +65,7 @@
   ./services/spotifyd.nix
   ./services/synapse-bt.nix
   ./services/synergy
+  ./services/tailscale.nix
   ./services/yabai
   ./services/nextdns
   ./programs/bash
