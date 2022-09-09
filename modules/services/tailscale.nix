@@ -11,20 +11,20 @@ in
     domain = mkOption {
       type = types.str;
       default = "";
-      description = lib.mdDoc "The Tailscale domain. This is displayed at the top left of https://login.tailscale.com/admin, next to the Tailscale logo.";
+      description = "The Tailscale domain. This is displayed at the top left of https://login.tailscale.com/admin, next to the Tailscale logo.";
     };
 
-    enable = mkEnableOption (lib.mdDoc "Tailscale client daemon");
+    enable = mkEnableOption "Tailscale client daemon";
 
     package = mkOption {
       type = types.package;
       default = pkgs.tailscale;
       defaultText = literalExpression "pkgs.tailscale";
-      description = lib.mdDoc "The package to use for tailscale";
+      description = "The package to use for tailscale";
     };
 
     magicDNS = {
-      enable = mkEnableOption (lib.mdDoc "Whether to configure networking to work with Tailscale's MagicDNS.");
+      enable = mkEnableOption "Whether to configure networking to work with Tailscale's MagicDNS.";
     };
   };
 
