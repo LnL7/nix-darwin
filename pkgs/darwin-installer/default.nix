@@ -118,8 +118,8 @@ stdenv.mkDerivation {
         test -f ~/.nixpkgs/darwin-configuration.nix
         test -w ~/.nixpkgs/darwin-configuration.nix
         echo >&2 "checking darwin channel"
-        readlink ~/.nix-defexpr/channels/darwin
-        test -e ~/.nix-defexpr/channels/darwin
+        readlink /nix/var/nix/profiles/per-user/root/channels/darwin
+        test -e /nix/var/nix/profiles/per-user/root/channels/darwin
         echo >&2 "checking /etc"
         readlink /etc/static
         test -e /etc/static
