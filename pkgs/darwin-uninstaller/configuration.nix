@@ -21,6 +21,9 @@ with lib;
     fi
 
     if test -L ~/.nix-defexpr/channels/darwin; then
+        nix-channel --remove darwin || true
+    fi
+    if test -L /nix/var/nix/profiles/per-user/root/channels/darwin; then
         sudo -i nix-channel --remove darwin || true
     fi
   '';
