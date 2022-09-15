@@ -8,8 +8,8 @@ with lib;
   services.ofborg.enable = true;
   # services.ofborg.configFile = "/var/lib/ofborg/config.json";
 
-  # $ nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
-  # $ nix-channel --update
+  # $ sudo -i nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
+  # $ sudo -i nix-channel --update
   services.ofborg.package = (import <ofborg> {}).ofborg.rs;
 
   # Keep nix-daemon updated.

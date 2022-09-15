@@ -23,8 +23,8 @@ in
 
         (import &lt;ofborg&gt; {}).ofborg.rs
 
-        $ nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
-        $ nix-channel --update
+        $ sudo -i nix-channel --add https://github.com/NixOS/ofborg/archive/released.tar.gz ofborg
+        $ sudo -i nix-channel --update
       '';
     };
 
