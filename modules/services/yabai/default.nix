@@ -27,6 +27,7 @@ in
 
     services.yabai.package = mkOption {
       type = path;
+      default = pkgs.yabai;
       description = "The yabai package to use.";
     };
 
