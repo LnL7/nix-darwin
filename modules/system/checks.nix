@@ -106,6 +106,22 @@ let
         exit 2
         ;;
     esac
+    channelsLink=$(readlink "$HOME/.nix-defexpr/channels_root") || true
+    case "$channelsLink" in
+      *"root"*)
+        ;;
+      "")
+        ;;
+      *)
+        echo "[1;31merror: The ~/.nix-defexpr/channels_root symlink does not point to roots channels, aborting activation[0m" >&2
+        echo "Running nix-channel will regenerate it" >&2
+        echo >&2
+        echo "    rm ~/.nix-defexpr/channels_root" >&2
+        echo "    sudo -i nix-channel --update" >&2
+        echo >&2
+        exit 2
+        ;;
+    esac
   '';
 
   nixInstaller = ''
