@@ -8,9 +8,9 @@ let
 in
 
 {
-  fonts.enableFontDir = true;
+  fonts.fontDir.enable = true;
   fonts.fonts = [ font ];
- 
+
   test = ''
     echo "checking fonts in /Library/Fonts" >&2
     test -e ${config.out}/Library/Fonts/Font.ttf
@@ -21,4 +21,3 @@ in
     grep 'rm "/Library/Fonts/.*"' ${config.out}/activate
   '';
 }
-
