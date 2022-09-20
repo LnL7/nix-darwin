@@ -29,6 +29,16 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [ {
+      assertion = !cfg.magicDNS.enable || config.networking.dns != [ "100.100.100.100" ];
+      message = ''
+        When MagicDNS is enabled, fallback DNS servers need to be set with `networking.dns`.
+
+        Otherwise, Tailscale will take a long time to connect and all DNS queries
+        will fail until Tailscale has connected.
+      '';
+    } ];
+
     environment.systemPackages = [ cfg.package ];
 
     launchd.daemons.tailscaled = {
