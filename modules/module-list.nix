@@ -3,6 +3,7 @@
   ./documentation
   ./misc/ids.nix
   ./misc/lib.nix
+  ./security/pam.nix
   ./security/pki
   ./security/sandbox
   ./system
