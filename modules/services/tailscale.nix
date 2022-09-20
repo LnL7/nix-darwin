@@ -29,20 +29,31 @@ in
   };
 
   config = mkIf cfg.enable {
-    warnings = [
-      (mkIf (cfg.magicDNS.enable && cfg.domain == "") "${showOption cfg.domain} isn't empty, Tailscale MagicDNS search path won't be configured.")
-    ];
+    assertions = [ {
+      assertion = !cfg.magicDNS.enable || config.networking.dns != [ "100.100.100.100" ];
+      message = ''
+        When MagicDNS is enabled, fallback DNS servers need to be set with `networking.dns`.
+
+        Otherwise, Tailscale will take a long time to connect and all DNS queries
+        will fail until Tailscale has connected.
+      '';
+    } ];
 
     environment.systemPackages = [ cfg.package ];
-    launchd.user.agents.tailscaled = {
+
+    launchd.daemons.tailscaled = {
       # derived from
       # https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/install_darwin.go#L30
       serviceConfig = {
         Label = "com.tailscale.tailscaled";
-        ProgramArguments = [ "${lib.getBin cfg.package}/bin/tailscaled" ];
+        ProgramArguments = [
+          "/bin/sh" "-c"
+          "/bin/wait4path ${cfg.package} &amp;&amp; ${cfg.package}/bin/tailscaled"
+        ];
         RunAtLoad = true;
       };
     };
+
     networking = mkIf cfg.magicDNS.enable {
       dns = [ "100.100.100.100" ];
       search =
