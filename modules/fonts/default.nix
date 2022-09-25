@@ -24,7 +24,7 @@ in
 
     fonts.fonts = mkOption {
       type = types.listOf types.path;
-      default = [];
+      default = [ ];
       example = literalExpression "[ pkgs.dejavu_fonts ]";
       description = "List of fonts to install.";
     };
@@ -32,7 +32,7 @@ in
 
   config = {
 
-    system.build.fonts = pkgs.runCommandNoCC "fonts"
+    system.build.fonts = pkgs.runCommand "fonts"
       { paths = cfg.fonts; preferLocalBuild = true; }
       ''
         mkdir -p $out/Library/Fonts

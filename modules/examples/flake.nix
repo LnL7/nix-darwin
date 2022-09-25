@@ -10,7 +10,7 @@
   outputs = { self, darwin, nixpkgs }:
   let
     configuration = { pkgs, ... }: {
-      nix.package = pkgs.nixFlakes;
+      nix.package = pkgs.nixVersions.stable;
 
       # FIXME: for github actions, this shouldn't be in the example.
       services.nix-daemon.enable = true;
