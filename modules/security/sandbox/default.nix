@@ -12,7 +12,7 @@ let
         profile = mkOption {
           type = types.lines;
           internal = true;
-          apply = text: pkgs.runCommandNoCC "sandbox.sb" {} ''
+          apply = text: pkgs.runCommand "sandbox.sb" { } ''
             for f in $(< ${config.closure}/store-paths); do
                 storePaths+="(subpath \"$f\")"
             done
@@ -25,20 +25,20 @@ let
 
         closure = mkOption {
           type = types.listOf types.package;
-          default = [];
+          default = [ ];
           apply = paths: pkgs.closureInfo { rootPaths = paths; };
           description = "List of store paths to make accessible.";
         };
 
         readablePaths = mkOption {
           type = types.listOf types.path;
-          default = [];
+          default = [ ];
           description = "List of paths that should be read-only inside the sandbox.";
         };
 
         writablePaths = mkOption {
           type = types.listOf types.path;
-          default = [];
+          default = [ ];
           description = "List of paths that should be read/write inside the sandbox.";
         };
 
@@ -132,11 +132,10 @@ in
   options = {
     security.sandbox.profiles = mkOption {
       type = types.attrsOf (types.submodule profile);
-      default = {};
+      default = { };
       description = "Definition of sandbox profiles.";
     };
   };
 
-  config = {
-  };
+  config = { };
 }
