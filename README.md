@@ -107,8 +107,8 @@ darwin.lib.darwinSystem {
 }
 ```
 
-Since the installer doesn't work with flakes out of the box yet nix-darwin will need to
-be to be bootstrapped using the installer or manually.  Afterwards the flake based
+Since the installer doesn't work with flakes out of the box yet, nix-darwin will need to
+be bootstrapped using the installer or manually.  Afterwards the flake based
 configuration can be built.  The `hostname(1)` of your system will be used to decide
 which darwin configuration is applied if it's not specified explicitly in the flake ref.
 
