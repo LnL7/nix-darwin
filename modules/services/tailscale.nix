@@ -11,7 +11,7 @@ in
     domain = mkOption {
       type = types.str;
       default = "";
-      description = "The Tailscale domain. This is displayed at the top left of https://login.tailscale.com/admin, next to the Tailscale logo.";
+      description = "Your tailnet's name. This can be found on https://login.tailscale.com/admin/settings/general under General > Name.";
     };
 
     enable = mkEnableOption "Tailscale client daemon";
@@ -39,11 +39,15 @@ in
       '';
     } ];
 
+    warnings = [
+      (mkIf (cfg.magicDNS.enable && cfg.domain == "") "${showOption cfg.domain} is empty, Tailscale MagicDNS search path won't be configured.")
+    ];
+
     environment.systemPackages = [ cfg.package ];
 
+    # derived from
+    # https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/install_darwin.go#L30
     launchd.daemons.tailscaled = {
-      # derived from
-      # https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/install_darwin.go#L30
       serviceConfig = {
         Label = "com.tailscale.tailscaled";
         ProgramArguments = [
