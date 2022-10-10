@@ -26,6 +26,7 @@
   ./system/defaults/trackpad.nix
   ./system/defaults/universalaccess.nix
   ./system/defaults/ActivityMonitor.nix
+  ./system/defaults/windowmanager.nix
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix

@@ -39,6 +39,7 @@ let
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
+  windowmanager = defaultsToList "com.apple.WindowManager" cfg.windowmanager;
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -85,6 +86,7 @@ in
         trackpadBluetooth
         universalaccess
         ActivityMonitor
+        windowmanager
       ]
       ''
         # Set defaults
@@ -104,6 +106,7 @@ in
         ${concatStringsSep "\n" trackpadBluetooth}
         ${concatStringsSep "\n" universalaccess}
         ${concatStringsSep "\n" ActivityMonitor}
+        ${concatStringsSep "\n" windowmanager}
       '';
 
   };
