@@ -19,6 +19,7 @@ showSyntax() {
 
 # Parse the command line.
 origArgs=("$@")
+extraMetadataFlags=()
 extraBuildFlags=()
 extraLockFlags=()
 extraProfileFlags=()
@@ -35,7 +36,11 @@ while [ $# -gt 0 ]; do
     edit|switch|activate|build|check|changelog)
       action=$i
       ;;
-    --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
+    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback)
+      extraMetadataFlags+=("$i")
+      extraBuildFlags+=("$i")
+      ;;
+    --no-build-hook|--dry-run|-k|-K|-Q)
       extraBuildFlags+=("$i")
       ;;
     -j[0-9]*)
@@ -57,6 +62,7 @@ while [ $# -gt 0 ]; do
       j=$1
       k=$2
       shift 2
+      extraMetadataFlags+=("$i" "$j" "$k")
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
     --flake)
@@ -132,7 +138,7 @@ if [ -n "$flake" ]; then
         cmd=info
     fi
 
-    flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraBuildFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
+    flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
 fi
 
 if [ "$action" != build ] && [ -z "$flake" ]; then
