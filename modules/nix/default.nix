@@ -135,7 +135,7 @@ in
 {
   imports =
     let
-      altOption = alt: "No `nix-darwin` equivilant to this NixOS option, consider using `${alt}` instead.";
+      altOption = alt: "No `nix-darwin` equivalent to this NixOS option, consider using `${alt}` instead.";
       consider = alt: "Consider using `${alt}` instead.";
     in
     [
