@@ -144,6 +144,7 @@ in
       (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
+      (mkRemovedOptionModule [ "nix" "readOnlyStore" ] "No `nix-darwin` equivalent to this NixOS option.")
 
       # Option changes in `nix-darwin`
       (mkRemovedOptionModule [ "nix" "profile" ] "Use `nix.package` instead.")
@@ -372,17 +373,6 @@ in
           perform secure concurrent builds.  If you receive an error
           message saying that “all build users are currently in use”,
           you should increase this value.
-        '';
-      };
-
-      readOnlyStore = mkOption {
-        type = types.bool;
-        default = true;
-        description = lib.mdDoc ''
-          If set, Nix will enforce the immutability of the Nix store
-          by making {file}`/nix/store` a read-only bind
-          mount.  Nix will automatically make the store writable when
-          needed.
         '';
       };
 
