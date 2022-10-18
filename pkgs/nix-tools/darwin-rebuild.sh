@@ -121,9 +121,16 @@ if [ -z "$action" ]; then showSyntax; fi
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
 if [ -n "$flake" ]; then
-    if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then
-       flake="${BASH_REMATCH[1]}"
-       flakeAttr="${BASH_REMATCH[2]}"
+    # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
+    if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
+       scheme=${BASH_REMATCH[2]}
+       authority=${BASH_REMATCH[4]}
+       path=${BASH_REMATCH[5]}
+       queryWithQuestion=${BASH_REMATCH[6]}
+       fragment=${BASH_REMATCH[9]}
+
+       flake=${scheme}${authority}${path}${queryWithQuestion}
+       flakeAttr=${fragment}
     fi
     if [ -z "$flakeAttr" ]; then
       flakeAttr=$(hostname -s)
@@ -138,7 +145,16 @@ if [ -n "$flake" ]; then
         cmd=info
     fi
 
-    flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
+    metadata=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake")
+    flake=$(jq -r .url <<<"${metadata}")
+
+    if [ "$(jq -r .resolved.submodules <<<"${metadata}")" = "true" ]; then
+      if [[ "$flake" == *'?'* ]]; then
+        flake="${flake}&submodules=1"
+      else
+        flake="${flake}?submodules=1"
+      fi
+    fi
 fi
 
 if [ "$action" != build ] && [ -z "$flake" ]; then
