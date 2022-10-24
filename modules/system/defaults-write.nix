@@ -39,6 +39,8 @@ let
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
+  CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
+  CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -60,6 +62,7 @@ in
       loginwindow
       smb
       SoftwareUpdate
+      CustomSystemPreferences
     ]
       ''
         # Set defaults
@@ -68,6 +71,7 @@ in
         ${concatStringsSep "\n" loginwindow}
         ${concatStringsSep "\n" smb}
         ${concatStringsSep "\n" SoftwareUpdate}
+        ${concatStringsSep "\n" CustomSystemPreferences}
       '';
 
     system.activationScripts.userDefaults.text = mkIfAttrs
@@ -85,6 +89,7 @@ in
         trackpadBluetooth
         universalaccess
         ActivityMonitor
+        CustomUserPreferences
       ]
       ''
         # Set defaults
@@ -104,6 +109,7 @@ in
         ${concatStringsSep "\n" trackpadBluetooth}
         ${concatStringsSep "\n" universalaccess}
         ${concatStringsSep "\n" ActivityMonitor}
+        ${concatStringsSep "\n" CustomUserPreferences}
       '';
 
   };
