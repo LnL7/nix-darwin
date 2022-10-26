@@ -58,20 +58,22 @@ in
           fi
       done
 
-      fontrestore default -n 2>&1 | while read -r f; do
-          case $f in
-              /Library/Fonts/*)
-                  font=''${f##*/}
-                  if [ ! -e "$systemConfig/Library/Fonts/$font" ]; then
-                      echo "removing font $font..." >&2
-                      rm "/Library/Fonts/$font"
-                  fi
-                  ;;
-              /*)
-                  # ignoring unexpected fonts
-                  ;;
-          esac
-      done
+      if [[ "`sw_vers -productVersion`" < "13.0" ]]; then
+        fontrestore default -n 2>&1 | while read -r f; do
+            case $f in
+                /Library/Fonts/*)
+                    font=''${f##*/}
+                    if [ ! -e "$systemConfig/Library/Fonts/$font" ]; then
+                        echo "removing font $font..." >&2
+                        rm "/Library/Fonts/$font"
+                    fi
+                    ;;
+                /*)
+                    # ignoring unexpected fonts
+                    ;;
+            esac
+        done
+      fi
     '';
 
   };
