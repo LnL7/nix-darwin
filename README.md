@@ -7,7 +7,7 @@
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
 This project aims to bring the convenience of a declarative system approach to macOS.
-Nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOs](https://nixos.org/).
+Nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOS](https://nixos.org/).
 
 ## Install
 
