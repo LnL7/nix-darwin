@@ -52,13 +52,13 @@ let
     modules = modules ++ [ argsModule pkgsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });
+in
 
+rec {
   # Was moved in nixpkgs #82751, so both need to be handled here until 20.03 is deprecated.
   # https://github.com/NixOS/nixpkgs/commits/dcdd232939232d04c1132b4cc242dd3dac44be8c
   _module = eval._module or eval.config._module;
-in
 
-{
   inherit (_module.args) pkgs;
   inherit (eval) options config;
 
