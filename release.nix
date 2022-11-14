@@ -135,6 +135,7 @@ let
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;
     tests.system-packages = makeTest ./tests/system-packages.nix;
     tests.system-path = makeTest ./tests/system-path.nix;
+    tests.system-screencapture = makeTest ./tests/system-screencapture.nix;
     tests.system-shells = makeTest ./tests/system-shells.nix;
     tests.users-groups = makeTest ./tests/users-groups.nix;
     tests.users-packages = makeTest ./tests/users-packages.nix;

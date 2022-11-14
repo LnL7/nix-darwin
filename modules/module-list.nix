@@ -31,6 +31,7 @@
   ./system/keyboard.nix
   ./system/launchd.nix
   ./system/patches.nix
+  ./system/screencapture.nix
   ./system/shells.nix
   ./system/version.nix
   ./time

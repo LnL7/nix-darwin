@@ -104,6 +104,7 @@ in
 
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraUserActivation.text}
+      ${cfg.activationScripts.screencapture.text}
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.homebrew.text}
