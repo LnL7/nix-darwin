@@ -82,7 +82,7 @@ A minimal example of using an existing configuration.nix:
   description = "John's darwin system";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-20.09-darwin";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-22.05-darwin";
     darwin.url = "github:lnl7/nix-darwin/master";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -176,7 +176,7 @@ $
 
 ## Documentation
 
-Reference documentation of all the options is available [here](https://lnl7.github.io/nix-darwin/manual/index.html#sec-options).--
+Reference documentation of all the options is available [here](https://lnl7.github.io/nix-darwin/manual/index.html#sec-options).  
 This can also be accessed locally using `man 5 configuration.nix`.
 
 `darwin-help` will open a HTML version of the manpage in the default browser.
