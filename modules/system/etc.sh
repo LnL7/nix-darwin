@@ -4,9 +4,10 @@ echo "setting up /etc..." >&2
 declare -A etcSha256Hashes
 @etcSha256Hashes@
 
-ln -sfn "$(readlink -f $systemConfig/etc)" /etc/static
+# shellcheck disable=SC2154
+ln -sfn "$(readlink -f "$systemConfig/etc")" /etc/static
 
-for f in $(find /etc/static/* -type l); do
+while IFS= read -r -d '' f; do # for f in find /etc/static/* -type l
   l=/etc/''${f#/etc/static/}
   d=''${l%/*}
   if [ ! -e "$d" ]; then
@@ -36,12 +37,13 @@ for f in $(find /etc/static/* -type l); do
   else
     ln -s "$f" "$l"
   fi
-done
+done < <(find /etc/static/* -type l -print0)
 
-for l in $(find /etc/* -type l 2> /dev/null); do
-  f="$(echo $l | sed 's,/etc/,/etc/static/,')"
+while IFS= read -r -d '' l; do # for l in find /etc/* -type l
+  # shellcheck disable=SC2001
+  f="$(echo "$l" | sed 's,/etc/,/etc/static/,')"
   f=/etc/static/''${l#/etc/}
-  if [ "$(readlink "$l")" = "$f" -a ! -e "$(readlink -f "$l")" ]; then
+  if [ "$(readlink "$l")" = "$f" ] && [ ! -e "$(readlink -f "$l")" ]; then
     rm "$l"
   fi
-done
+done < <(find /etc/* -type l 2> /dev/null)
