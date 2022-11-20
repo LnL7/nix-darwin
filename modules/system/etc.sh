@@ -14,7 +14,7 @@ while IFS= read -r -d '' f; do # for f in find /etc/static/* -type l
     mkdir -p "$d"
   fi
   if [ -e "$l" ]; then
-    if [ "$(readlink "$l")" != "$f" ]; then
+    if [ "$(readlink "$l")" != "$f" ] && [ -f "$l" ]; then
       if ! grep -q /etc/static "$l"; then
         o=''$(shasum -a256 "$l")
         o=''${o%% *}
