@@ -141,8 +141,17 @@ if [ -n "$flake" ]; then
     flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
 fi
 
-if [ "$action" != build ] && [ -z "$flake" ]; then
-  extraBuildFlags+=("--no-out-link")
+outLinkDir=result
+unset tmpDir
+
+if [ "$action" != build ]; then
+  if [ -z "$flake" ]; then
+    extraBuildFlags+=("--no-out-link")
+  else
+    tmpDir=$(mktemp -d -t darwin-rebuild.XXXXXX)
+    outLinkDir="$tmpDir/result"
+    extraBuildFlags+=(--out-link "$outLinkDir")
+  fi
 fi
 
 if [ "$action" = edit ]; then
@@ -160,7 +169,7 @@ if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ]; the
     systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
   else
     nix "${flakeFlags[@]}" build "$flake#$flakeAttr.system" "${extraBuildFlags[@]}" "${extraLockFlags[@]}"
-    systemConfig=$(readlink -f result)
+    systemConfig=$(readlink -f "$outLinkDir")
   fi
 fi
 
@@ -211,4 +220,8 @@ fi
 if [ "$action" = check ]; then
   export checkActivation=1
   "$systemConfig/activate-user"
+fi
+
+if [ -d "$tmpDir" ]; then
+  rm -rf "$tmpDir"
 fi
