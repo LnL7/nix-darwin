@@ -141,7 +141,7 @@ if [ -n "$flake" ]; then
     flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
 fi
 
-if [ "$action" != build ] && [ -z "$flake" ]; then
+if [ "$action" != build ]; then
   if [ -n "$flake" ]; then
     extraBuildFlags+=("--no-link")
   else
