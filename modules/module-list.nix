@@ -69,6 +69,7 @@
   ./services/synapse-bt.nix
   ./services/synergy
   ./services/tailscale.nix
+  ./services/wg-quick.nix
   ./services/yabai
   ./services/nextdns
   ./programs/bash
