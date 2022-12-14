@@ -141,8 +141,12 @@ if [ -n "$flake" ]; then
     flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
 fi
 
-if [ "$action" != build ] && [ -z "$flake" ]; then
-  extraBuildFlags+=("--no-out-link")
+if [ "$action" != build ]; then
+  if [ -n "$flake" ]; then
+    extraBuildFlags+=("--no-link")
+  else
+    extraBuildFlags+=("--no-out-link")
+  fi
 fi
 
 if [ "$action" = edit ]; then
@@ -159,8 +163,10 @@ if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ]; the
   if [ -z "$flake" ]; then
     systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
   else
-    nix "${flakeFlags[@]}" build "$flake#$flakeAttr.system" "${extraBuildFlags[@]}" "${extraLockFlags[@]}"
-    systemConfig=$(readlink -f result)
+    systemConfig=$(nix "${flakeFlags[@]}" build --json \
+      "${extraBuildFlags[@]}" "${extraLockFlags[@]}" \
+      -- "$flake#$flakeAttr.system" \
+      | jq -r '.[0].outputs.out')
   fi
 fi
 
