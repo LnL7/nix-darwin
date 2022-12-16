@@ -363,6 +363,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleICUForce24HourTime = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to use 24-hour or 12-hour time.  The default is based on region settings.
+      '';
+    };
+
     system.defaults.NSGlobalDomain._HIHideMenuBar = mkOption {
       type = types.nullOr types.bool;
       default = null;
