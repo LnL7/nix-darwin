@@ -163,6 +163,23 @@ in {
       '';
     };
 
+    system.defaults.dock.magnification = mkOption {
+      type = types.nullOr types.bool;
+      default = false;
+      description = lib.mdDoc ''
+        Magnify icon on hover.  The default is false.
+      '';
+    };
+
+    system.defaults.dock.largesize = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = lib.mdDoc ''
+        Hover maginified icon size.  The default is null.
+      '';
+    };
+   
+
     system.defaults.dock.wvous-tl-corner = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
