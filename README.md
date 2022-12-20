@@ -48,8 +48,6 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstalle
 ./result/bin/darwin-uninstaller
 ```
 
-> NOTE: This will also uninstall Nix alongside nix-darwin.
-
 ## Example configuration
 
 Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
