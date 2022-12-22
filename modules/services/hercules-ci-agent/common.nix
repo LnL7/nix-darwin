@@ -24,32 +24,6 @@ let
 
   inherit (import ./settings.nix { inherit pkgs lib; }) format settingsModule;
 
-  # TODO (roberth, >=2022) remove
-  checkNix =
-    if !cfg.checkNix
-    then ""
-    else if lib.versionAtLeast config.nix.package.version "2.3.10"
-    then ""
-    else
-      pkgs.stdenv.mkDerivation {
-        name = "hercules-ci-check-system-nix-src";
-        inherit (config.nix.package) src patches;
-        dontConfigure = true;
-        buildPhase = ''
-          echo "Checking in-memory pathInfoCache expiry"
-          if ! grep 'PathInfoCacheValue' src/libstore/store-api.hh >/dev/null; then
-            cat 1>&2 <<EOF
-
-            You are deploying Hercules CI Agent on a system with an incompatible
-            nix-daemon. Please make sure nix.package is set to a Nix version of at
-            least 2.3.10 or a master version more recent than Mar 12, 2020.
-          EOF
-            exit 1
-          fi
-        '';
-        installPhase = "touch $out";
-      };
-
 in
 {
   imports = [
@@ -70,15 +44,6 @@ in
         continuous integation service that is centered around Nix.
 
         Support is available at [help@hercules-ci.com](mailto:help@hercules-ci.com).
-      '';
-    };
-    checkNix = mkOption {
-      type = types.bool;
-      default = true;
-      description = mdDoc ''
-        Whether to make sure that the system's Nix (nix-daemon) is compatible.
-
-        If you set this to false, please keep up with the change log.
       '';
     };
     package = mkOption {
@@ -117,7 +82,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    nix.extraOptions = lib.addContextFrom checkNix ''
+    nix.extraOptions = ''
       # A store path that was missing at first may well have finished building,
       # even shortly after the previous lookup. This *also* applies to the daemon.
       narinfo-cache-negative-ttl = 0
