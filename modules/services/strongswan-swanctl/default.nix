@@ -73,6 +73,8 @@ in  {
       rm -rf ${pkgs.strongswan}/etc/swanctl/bliss
       rm -rf ${pkgs.strongswan}/etc/swanctl/pkcs8
       rm -rf ${pkgs.strongswan}/etc/swanctl/pkcs12
+      ln -s /etc/strongswan.conf ${pkgs.strongswan}/etc/strongswan.conf
+      ln -s /etc/strongswan.d ${pkgs.strongswan}/etc/strongswan.d
       ln -s /etc/swanctl/swanctl.conf ${pkgs.strongswan}/etc/swanctl/swanctl.conf
       ln -s /etc/swanctl/x509 ${pkgs.strongswan}/etc/swanctl/x509
       ln -s /etc/swanctl/x509ca ${pkgs.strongswan}/etc/swanctl/x509ca
