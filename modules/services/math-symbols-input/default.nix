@@ -6,9 +6,16 @@ let
 
   cfg = config.services.math-symbols-input;
   package = pkgs.callPackage ./package { };
-  commands-to-plist = pkgs.callPackage ./commands-to-plist.nix { };
-  # module = types.submoduleWith { description = "Math Symbols Input"; };
 
+  plist-base-path = "com.mathsymbolsinput.inputmethod.MathSymbolsInput.plist ";
+  plist-full-path = "~/Library/Preferences/${plist-base-path}";
+
+  commands-to-plist = pkgs.callPackage ./commands-to-plist.nix { };
+  custom-commands-plist = "${commands-to-plist cfg.symbols}/${plist-base-path}";
+
+  command-to-run = pkgs.writeScriptBin "write_defaults" ''
+    defaults write ${plist-full-path} "$(defaults read ${custom-commands-plist} | sed 's|\\\\|\\|g')"
+  '';
 in {
 
   options.services.math-symbols-input = {
@@ -33,13 +40,20 @@ in {
     system.activationScripts.preActivation.text = ''
       echo "Setting up Math Symbols Input"
 
-      rm /Library/Input\ Methods/Math\ Symbols\ Input.app
-      rm ~/Library/Preferences/com.mathsymbolsinput.inputmethod.MathSymbolsInput.plist
+      if [ -d /Library/Input\ Methods/Math\ Symbols\ Input.app ]; then
+        rm /Library/Input\ Methods/Math\ Symbols\ Input.app
+      fi
 
       ln -s ${package}/Math\ Symbols\ Input.app /Library/Input\ Methods/
-      ln -s ${
-        commands-to-plist cfg.symbols
-      }/com.mathsymbolsinput.inputmethod.MathSymbolsInput.plist ~/Library/Preferences/
+
+      if [ ! -f ${plist-full-path} ]; then
+        defaults write ${plist-full-path} CustomCommands ""
+        chmod 600 ${plist-full-path}
+        chown $SUDO_USER:staff ${plist-full-path}
+      fi
+
+      # Force a cache reload by writing
+      su - $SUDO_USER -c "${command-to-run}/bin/write_defaults"
     '';
   };
 }
