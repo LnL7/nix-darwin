@@ -51,6 +51,9 @@ let
         '';
         type = types.either types.ints.positive (types.enum [ "auto" ]);
         default = "auto";
+        defaultText = literalMD ''
+          `"auto"`, meaning equal to the number of CPU cores.
+        '';
       };
       labels = mkOption {
         description = mdDoc ''
