@@ -11,12 +11,12 @@ in
       enable = mkOption {
         default = false;
         type = types.bool;
-        description = lib.mdDoc "Automatically run the nix store optimiser at a specific time.";
+        description = "Automatically run the nix store optimiser at a specific time.";
       };
       periodSeconds = mkOption {
         default = 60 * 60 * 8;
         type = types.int;
-        description = lib.mdDoc "Interval between runs of the optimizer in seconds.";
+        description = "Interval between runs of the optimizer in seconds.";
       };
     };
   };
