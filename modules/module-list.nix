@@ -1,6 +1,7 @@
 [
   ./alias.nix
   ./documentation
+  ./meta.nix
   ./misc/ids.nix
   ./misc/lib.nix
   ./security/pam.nix
@@ -49,6 +50,7 @@
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/gitlab-runner.nix
+  ./services/hercules-ci-agent
   ./services/karabiner-elements
   ./services/khd
   ./services/kwm

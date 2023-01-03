@@ -225,6 +225,19 @@ information on the `-I` flag look at the nix-build [manpage](https://nixos.org/m
 darwin-rebuild switch -I darwin=.
 ```
 
+If you're adding a module, please add yourself to `meta.maintainers`, for example
+
+```nix
+  meta.maintainers = [
+    lib.maintainers.alice or "alice"
+  ];
+
+  options.services.alicebot = # ...
+```
+
+The `or` operator takes care of graceful degradation when `lib` from Nixpkgs
+goes out of sync.
+
 Also feel free to contact me if you have questions,
 - Matrix - @daiderd:matrix.org, you can find me in [#macos:nixos.org](https://matrix.to/#/#macos:nixos.org)
 - @lnl7 on twitter
