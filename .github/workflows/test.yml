@@ -64,3 +64,53 @@ jobs:
     - run: |
         . /etc/static/bashrc
         darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+    - name: Test git submodules
+      run: |
+        . /etc/static/bashrc
+
+        mkdir -p /tmp/{test-nix-darwin-submodules,example-submodule}
+
+        pushd /tmp/example-submodule
+          echo '"hello"' > hello.nix
+          git init
+          git add .
+          git commit -m "add a submodule we will import"
+        popd
+
+        cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+
+        pushd /tmp/test-nix-darwin-submodules
+          /usr/bin/sed -i.bak \
+            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            ./flake.nix
+          /usr/bin/sed -i.bak \
+            's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
+            ./simple.nix
+          git init
+          git add flake.nix simple.nix
+          git \
+            -c protocol.file.allow=always \
+            submodule add /tmp/example-submodule submodule-test
+        popd
+
+        # Should fail
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules#simple \
+          --override-input darwin . \
+          && {
+            printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
+            exit 1
+          }
+        # Should also fail
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
+          --override-input darwin . \
+          && {
+            printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
+            exit 1
+          }
+
+        # Should succeed
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
+          --override-input darwin .
