@@ -5,7 +5,7 @@ with lib;
 let
   cfg  = config.programs.ssh;
 
-  knownHosts = map (h: getAttr h cfg.knownHosts) (attrNames cfg.knownHosts);
+  knownHosts = (attrValues cfg.knownHosts);
 
   host =
     { name, config, options, ... }:
