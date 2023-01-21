@@ -342,7 +342,7 @@ with lib;
 
     StartCalendarInterval = mkOption {
       default = null;
-      example = { Hour = 2; Minute = 30; };
+      example = [{ Hour = 2; Minute = 30; }];
       description = ''
         This optional key causes the job to be started every calendar interval as specified. Missing arguments
         are considered to be wildcard. The semantics are much like <literal>crontab(5)</literal>.  Unlike cron which skips job
