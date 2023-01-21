@@ -7,6 +7,12 @@ let
 
   knownHosts = (attrValues cfg.knownHosts);
 
+  knownHostsText = (flip (concatMapStringsSep "\n") knownHosts
+    (h: assert h.hostNames != [];
+      concatStringsSep "," h.hostNames + " "
+      + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
+    )) + "\n";
+
   host =
     { name, config, options, ... }:
     {
@@ -99,11 +105,7 @@ in
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
 
-    environment.etc."ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
-      (h: assert h.hostNames != [];
-        concatStringsSep "," h.hostNames + " "
-        + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
-      )) + "\n";
+    environment.etc."ssh/ssh_known_hosts".text = knownHostsText;
 
   };
 }
