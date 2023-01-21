@@ -123,13 +123,13 @@ flakeFlags=(--extra-experimental-features 'nix-command flakes')
 if [ -n "$flake" ]; then
     # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
     if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
-       scheme=${BASH_REMATCH[2]} # eg. http
-       authority=${BASH_REMATCH[4]} # eg. www.ics.uci.edu
+       scheme=${BASH_REMATCH[1]} # eg. http:
+       authority=${BASH_REMATCH[3]} # eg. //www.ics.uci.edu
        path=${BASH_REMATCH[5]} # eg. /pub/ietf/uri/
        queryWithQuestion=${BASH_REMATCH[6]}
        fragment=${BASH_REMATCH[9]}
 
-       flake=${scheme}://${authority}${path}${queryWithQuestion}
+       flake=${scheme}${authority}${path}${queryWithQuestion}
        flakeAttr=${fragment}
     fi
     if [ -z "$flakeAttr" ]; then
