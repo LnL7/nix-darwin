@@ -1,25 +1,12 @@
 { config
 , lib
 , pkgs
-, includeNameDefault
 , ...
 }:
 
 with lib;
 
 {
-  enable = mkOption {
-    default = false;
-    example = true;
-    description = lib.mdDoc ''
-      Whether to enable GitHub Actions runner.
-
-      Note: GitHub recommends using self-hosted runners with private repositories only. Learn more here:
-      [About self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners).
-    '';
-    type = lib.types.bool;
-  };
-
   url = mkOption {
     type = types.str;
     description = lib.mdDoc ''
@@ -55,24 +42,6 @@ with lib;
     '';
     example = "/run/secrets/github-runner/nixos.token";
   };
-
-  name = let
-    # Same pattern as for `networking.hostName`
-    baseType = types.strMatching "^$|^[[:alnum:]]([[:alnum:]_-]{0,61}[[:alnum:]])?$";
-  in mkOption {
-    type = if includeNameDefault then baseType else types.nullOr baseType;
-    description = lib.mdDoc ''
-      Name of the runner to configure. Defaults to the hostname.
-
-      Changing this option triggers a new runner registration.
-    '';
-    example = "nixos";
-  } // (if includeNameDefault then {
-    default = config.networking.hostName;
-    defaultText = literalExpression "config.networking.hostName";
-  } else {
-    default = null;
-  });
 
   runnerGroup = mkOption {
     type = types.nullOr types.str;
@@ -163,23 +132,12 @@ with lib;
     default = false;
   };
 
-  user = mkOption {
-    type = types.nullOr types.str;
-    description = lib.mdDoc ''
-      User under which to run the service. If null, will use a systemd dynamic user.
-    '';
-    default = null;
-    defaultText = literalExpression "username";
-  };
-
-  workDir = mkOption {
+  baseDir = mkOption {
     type = with types; nullOr str;
     description = lib.mdDoc ''
       Working directory, available as `$GITHUB_WORKSPACE` during workflow runs
       and used as a default for [repository checkouts](https://github.com/actions/checkout).
       The service cleans this directory on every service start.
-
-      A value of `null` will default to the systemd `RuntimeDirectory`.
     '';
     default = null;
   };
