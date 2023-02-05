@@ -25,7 +25,7 @@ let
       # Enable sudo Touch ID authentication, if not already enabled
       if ! grep 'pam_tid.so' ${file} > /dev/null; then
         ${sed} -i '2i\
-      auth       optional       ${pkgs.pam-reattach}/lib/pam_reattach.so # nix-darwin: ${option}
+      auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so # nix-darwin: ${option}
       auth       sufficient     pam_tid.so # nix-darwin: ${option}
         ' ${file}
       fi
