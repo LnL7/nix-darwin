@@ -36,7 +36,7 @@ let
         auth       sufficient     pam_tid.so # nix-darwin: ${optionSudo}
           ' ${file}
         fi
-        ${if cfg.enableTmuxTouchIdAuth then ''
+        ${if cfg.enableTmuxTouchIdSupport then ''
         # Enable tmux Touch ID authentication, if not already enabled
         if ! grep 'pam_reattach.so' ${file} > /dev/null; then
           ${sed} -i '2i\
@@ -69,7 +69,7 @@ in
         authentication with Touch ID won't work after a system update until the nix-darwin
         configuration is reapplied.)
       '';
-      enableTmuxTouchIdAuth = mkEnableOption ''
+      enableTmuxTouchIdSupport = mkEnableOption ''
         TODO: Depends on enableSudoTouchIdAuth
       '';
     };
