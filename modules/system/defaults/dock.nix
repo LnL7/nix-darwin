@@ -258,7 +258,7 @@ in {
     system.defaults.dock.springboard-columns = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      example = 5;
+      example = 7;
       description = ''
         Sets the column count for Launchpad. The default is given in the example.
       '';
@@ -267,7 +267,7 @@ in {
     system.defaults.dock.springboard-rows = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      example = 7;
+      example = 5;
       description = ''
         Sets the row count for Launchpad. The default is given in the example.
       '';
