@@ -21,7 +21,7 @@ in
 
     environment.etc = mkOption {
       type = types.attrsOf (types.submodule text);
-      default = {};
+      default = { };
       description = ''
         Set of files that have to be linked in <filename>/etc</filename>.
       '';
@@ -31,7 +31,7 @@ in
 
   config = {
 
-    system.build.etc = pkgs.runCommandNoCC "etc"
+    system.build.etc = pkgs.runCommand "etc"
       { preferLocalBuild = true; }
       ''
         mkdir -p $out/etc

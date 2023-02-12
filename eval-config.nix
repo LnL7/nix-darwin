@@ -1,7 +1,11 @@
 { lib }:
+let
+  nixpkgs-lib = lib;
+in
 
 { system ? builtins.currentSystem or "x86_64-darwin"
 , pkgs ? null
+, lib ? nixpkgs-lib
 , modules
 , inputs
 , baseModules ? import ./modules/module-list.nix
@@ -44,7 +48,7 @@ let
     literalDocBook = super.literalDocBook or super.literalExample;
   });
 
-  eval = libExtended.evalModules (builtins.removeAttrs args [ "inputs" "pkgs" "system" ] // {
+  eval = libExtended.evalModules (builtins.removeAttrs args [ "lib" "inputs" "pkgs" "system" ] // {
     modules = modules ++ [ argsModule pkgsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });

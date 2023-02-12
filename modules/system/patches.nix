@@ -11,7 +11,7 @@ in
 
     system.patches = mkOption {
       type = types.listOf types.path;
-      default = [];
+      default = [ ];
       example = literalExpression ''
         [
           (pkgs.writeText "bashrc.patch" ''''
@@ -42,7 +42,7 @@ in
 
   config = {
 
-    system.build.patches = pkgs.runCommandNoCC "patches"
+    system.build.patches = pkgs.runCommand "patches"
       { preferLocalBuild = true; }
       ''
         mkdir -p $out/patches

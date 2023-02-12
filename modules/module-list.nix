@@ -1,8 +1,10 @@
 [
   ./alias.nix
   ./documentation
+  ./meta.nix
   ./misc/ids.nix
   ./misc/lib.nix
+  ./security/pam.nix
   ./security/pki
   ./security/sandbox
   ./system
@@ -13,6 +15,7 @@
   ./system/defaults/LaunchServices.nix
   ./system/defaults/NSGlobalDomain.nix
   ./system/defaults/GlobalPreferences.nix
+  ./system/defaults/CustomPreferences.nix
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
@@ -47,6 +50,8 @@
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/gitlab-runner.nix
+  ./services/hercules-ci-agent
+  ./services/karabiner-elements
   ./services/khd
   ./services/kwm
   ./services/lorri.nix
@@ -65,6 +70,8 @@
   ./services/spotifyd.nix
   ./services/synapse-bt.nix
   ./services/synergy
+  ./services/tailscale.nix
+  ./services/wg-quick.nix
   ./services/yabai
   ./services/nextdns
   ./programs/bash

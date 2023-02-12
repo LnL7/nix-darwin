@@ -19,6 +19,7 @@ showSyntax() {
 
 # Parse the command line.
 origArgs=("$@")
+extraMetadataFlags=()
 extraBuildFlags=()
 extraLockFlags=()
 extraProfileFlags=()
@@ -35,7 +36,11 @@ while [ $# -gt 0 ]; do
     edit|switch|activate|build|check|changelog)
       action=$i
       ;;
-    --show-trace|--no-build-hook|--dry-run|--keep-going|-k|--keep-failed|-K|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|-Q)
+    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback)
+      extraMetadataFlags+=("$i")
+      extraBuildFlags+=("$i")
+      ;;
+    --no-build-hook|--dry-run|-k|-K|-Q)
       extraBuildFlags+=("$i")
       ;;
     -j[0-9]*)
@@ -57,6 +62,7 @@ while [ $# -gt 0 ]; do
       j=$1
       k=$2
       shift 2
+      extraMetadataFlags+=("$i" "$j" "$k")
       extraBuildFlags+=("$i" "$j" "$k")
       ;;
     --flake)
@@ -115,9 +121,16 @@ if [ -z "$action" ]; then showSyntax; fi
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
 if [ -n "$flake" ]; then
-    if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then
-       flake="${BASH_REMATCH[1]}"
-       flakeAttr="${BASH_REMATCH[2]}"
+    # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
+    if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
+       scheme=${BASH_REMATCH[2]}
+       authority=${BASH_REMATCH[4]}
+       path=${BASH_REMATCH[5]}
+       queryWithQuestion=${BASH_REMATCH[6]}
+       fragment=${BASH_REMATCH[9]}
+
+       flake=${scheme}${authority}${path}${queryWithQuestion}
+       flakeAttr=${fragment}
     fi
     if [ -z "$flakeAttr" ]; then
       flakeAttr=$(hostname -s)
@@ -132,11 +145,24 @@ if [ -n "$flake" ]; then
         cmd=info
     fi
 
-    flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraBuildFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
+    metadata=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake")
+    flake=$(jq -r .url <<<"${metadata}")
+
+    if [ "$(jq -r .resolved.submodules <<<"${metadata}")" = "true" ]; then
+      if [[ "$flake" == *'?'* ]]; then
+        flake="${flake}&submodules=1"
+      else
+        flake="${flake}?submodules=1"
+      fi
+    fi
 fi
 
-if [ "$action" != build ] && [ -z "$flake" ]; then
-  extraBuildFlags+=("--no-out-link")
+if [ "$action" != build ]; then
+  if [ -n "$flake" ]; then
+    extraBuildFlags+=("--no-link")
+  else
+    extraBuildFlags+=("--no-out-link")
+  fi
 fi
 
 if [ "$action" = edit ]; then
@@ -153,8 +179,10 @@ if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ]; the
   if [ -z "$flake" ]; then
     systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
   else
-    nix "${flakeFlags[@]}" build "$flake#$flakeAttr.system" "${extraBuildFlags[@]}" "${extraLockFlags[@]}"
-    systemConfig=$(readlink -f result)
+    systemConfig=$(nix "${flakeFlags[@]}" build --json \
+      "${extraBuildFlags[@]}" "${extraLockFlags[@]}" \
+      -- "$flake#$flakeAttr.system" \
+      | jq -r '.[0].outputs.out')
   fi
 fi
 
