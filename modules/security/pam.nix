@@ -70,13 +70,21 @@ in
         configuration is reapplied.)
       '';
       enableTmuxTouchIdSupport = mkEnableOption ''
-        TODO: Depends on enableSudoTouchIdAuth
+        Enable sudo authentication with Touch ID inside tmux
+
+        When enabled, this option adds the following line to /etc/pam.d/sudo:
+
+            auth       optional     pam_reattach.so
+
+        (Note that macOS resets this file when doing a system update. As such,
+        sudo authentication with Touch ID inside tmux won't work after a system
+        update until the nix-darwin configuration is reapplied.)
       '';
       sudoFile = mkOption {
         type = types.path;
         default = "/etc/pam.d/sudo";
         description = ''
-          TODO
+          Defines the path to the sudo file inside pam.d directory.
         '';
       };
     };
