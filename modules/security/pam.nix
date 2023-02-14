@@ -23,7 +23,7 @@ let
           ${sed} -i '/${optionTmux}/d' ${file}
         fi
       '';
-      file = "/etc/pam.d/sudo";
+      file = cfg.sudoFile;
       optionSudo = "security.pam.enableSudoTouchIdAuth";
       optionTmux = "security.pam.enableTmuxTouchIdAuth";
       sed = "${pkgs.gnused}/bin/sed";
@@ -72,6 +72,13 @@ in
       enableTmuxTouchIdSupport = mkEnableOption ''
         TODO: Depends on enableSudoTouchIdAuth
       '';
+      sudoFile = mkOption {
+        type = types.path;
+        default = "/etc/pam.d/sudo";
+        description = ''
+          TODO
+        '';
+      };
     };
   };
 
