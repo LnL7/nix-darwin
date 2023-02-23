@@ -46,6 +46,7 @@
   ./services/buildkite-agent.nix
   ./services/chunkwm.nix
   ./services/cachix-agent.nix
+  ./services/davmail.nix
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/gitlab-runner.nix
