@@ -34,7 +34,8 @@
   system.keyboard.remapCapsLockToControl = true;
 
   environment.systemPackages =
-    [ config.programs.vim.package
+    [
+      config.programs.vim.package
 
       pkgs.awscli
       pkgs.brotli
@@ -144,13 +145,18 @@
   # programs.vim.enable = true;
   # programs.vim.enableSensible = true;
   programs.vim.package = pkgs.neovim.override {
-      configure = {
-        packages.darwin.start = with pkgs.vimPlugins; [
-          vim-sensible vim-surround ReplaceWithRegister
-          polyglot fzfWrapper ale deoplete-nvim
-        ];
+    configure = {
+      packages.darwin.start = with pkgs.vimPlugins; [
+        vim-sensible
+        vim-surround
+        ReplaceWithRegister
+        polyglot
+        fzfWrapper
+        ale
+        deoplete-nvim
+      ];
 
-        customRC = ''
+      customRC = ''
         set completeopt=menuone
         set encoding=utf-8
         set hlsearch
@@ -302,7 +308,7 @@
 
   nixpkgs.overlays = [
     (self: super: {
-      darwin-zsh-completions = super.runCommandNoCC "darwin-zsh-completions-0.0.0"
+      darwin-zsh-completions = super.runCommand "darwin-zsh-completions-0.0.0"
         { preferLocalBuild = true; }
         ''
           mkdir -p $out/share/zsh/site-functions

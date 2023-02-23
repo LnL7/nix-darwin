@@ -5,6 +5,7 @@
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleFontSmoothing = 1;
+  system.defaults.NSGlobalDomain.AppleICUForce24HourTime = true;
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = true;
   system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
@@ -50,7 +51,13 @@
   system.defaults.ActivityMonitor.SortColumn = "CPUUsage";
   system.defaults.ActivityMonitor.SortDirection = 0;
   system.defaults.ActivityMonitor.OpenMainWindow = true;
-
+  system.defaults.CustomUserPreferences = {
+      "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
+      "com.apple.Safari" = {
+        "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
+          true;
+      };
+    };
   test = ''
     echo >&2 "checking defaults write in /activate"
     grep "defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server 'NetBIOSName' -string 'IMAC-000000'" ${config.out}/activate
@@ -61,6 +68,7 @@
     grep "defaults write -g 'AppleEnableMouseSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleEnableSwipeNavigateWithScrolls' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'AppleFontSmoothing' -int 1" ${config.out}/activate-user
+    grep "defaults write -g 'AppleICUForce24HourTime' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleKeyboardUIMode' -int 3" ${config.out}/activate-user
     grep "defaults write -g 'ApplePressAndHoldEnabled' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleShowAllExtensions' -bool YES" ${config.out}/activate-user
@@ -104,5 +112,6 @@
     grep "defaults write com.apple.ActivityMonitor 'SortColumn' -string 'CPUUsage'" ${config.out}/activate-user
     grep "defaults write com.apple.ActivityMonitor 'SortDirection' -int 0" ${config.out}/activate-user
     grep "defaults write com.apple.ActivityMonitor 'OpenMainWindow' -bool YES" ${config.out}/activate-user
+    grep "defaults write NSGlobalDomain 'TISRomanSwitchState' -int 1" ${config.out}/activate-user
   '';
 }

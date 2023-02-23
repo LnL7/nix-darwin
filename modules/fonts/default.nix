@@ -24,7 +24,7 @@ in
 
     fonts.fonts = mkOption {
       type = types.listOf types.path;
-      default = [];
+      default = [ ];
       example = literalExpression "[ pkgs.dejavu_fonts ]";
       description = "List of fonts to install.";
     };
@@ -32,7 +32,7 @@ in
 
   config = {
 
-    system.build.fonts = pkgs.runCommandNoCC "fonts"
+    system.build.fonts = pkgs.runCommand "fonts"
       { paths = cfg.fonts; preferLocalBuild = true; }
       ''
         mkdir -p $out/Library/Fonts
@@ -58,20 +58,22 @@ in
           fi
       done
 
-      fontrestore default -n 2>&1 | while read -r f; do
-          case $f in
-              /Library/Fonts/*)
-                  font=''${f##*/}
-                  if [ ! -e "$systemConfig/Library/Fonts/$font" ]; then
-                      echo "removing font $font..." >&2
-                      rm "/Library/Fonts/$font"
-                  fi
-                  ;;
-              /*)
-                  # ignoring unexpected fonts
-                  ;;
-          esac
-      done
+      if [[ "`sw_vers -productVersion`" < "13.0" ]]; then
+        fontrestore default -n 2>&1 | while read -r f; do
+            case $f in
+                /Library/Fonts/*)
+                    font=''${f##*/}
+                    if [ ! -e "$systemConfig/Library/Fonts/$font" ]; then
+                        echo "removing font $font..." >&2
+                        rm "/Library/Fonts/$font"
+                    fi
+                    ;;
+                /*)
+                    # ignoring unexpected fonts
+                    ;;
+            esac
+        done
+      fi
     '';
 
   };

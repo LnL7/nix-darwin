@@ -159,7 +159,11 @@ in
       [ "/run/current-system/sw" "/nix/var/nix/profiles/default" ]
     ];
 
-    environment.pathsToLink = [ "/bin" "/share/locale" ];
+    environment.pathsToLink = [
+      "/bin"
+      "/share/locale"
+      "/share/terminfo"
+    ];
 
     environment.extraInit = ''
        # reset TERM with new TERMINFO available (if any)
@@ -173,6 +177,7 @@ in
       {
         XDG_CONFIG_DIRS = map (path: path + "/etc/xdg") cfg.profiles;
         XDG_DATA_DIRS = map (path: path + "/share") cfg.profiles;
+        TERMINFO_DIRS = map (path: path + "/share/terminfo") cfg.profiles ++ [ "/usr/share/terminfo" ];
         EDITOR = mkDefault "nano";
         PAGER = mkDefault "less -R";
       };
