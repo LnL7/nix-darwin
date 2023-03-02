@@ -40,6 +40,11 @@ in
         description = "The time interval at which the garbage collector will run.";
       };
 
+      intervals = mkOption {
+        type = types.listOf types.attrs;
+        description = "Multiple intervals at which the garbage collector will run.";
+      };
+
       options = mkOption {
         default = "";
         example = "--max-freed $((64 * 1024**3))";
@@ -63,7 +68,7 @@ in
       command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
       environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       serviceConfig.RunAtLoad = false;
-      serviceConfig.StartCalendarInterval = [ cfg.interval ];
+      serviceConfig.StartCalendarInterval = cfg.intervals or [ cfg.interval ];
       serviceConfig.UserName = cfg.user;
     };
 
