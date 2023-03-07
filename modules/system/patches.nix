@@ -62,7 +62,7 @@ in
 
       ${concatMapStringsSep "\n" (f: ''
         f="$(basename ${f})"
-        if ! patch --reverse --dry-run -d / -p1 < '${f}' &> /dev/null; then
+        if ! patch --force --reverse --dry-run -d / -p1 < '${f}' &> /dev/null; then
             patch --forward --backup -d / -p1 < '${f}' || true
         fi
       '') cfg.patches}
