@@ -50,7 +50,7 @@ in
         ''
           --- a${cfg.sudoFile}
           +++ b${cfg.sudoFile}
-          @@ -1,4 +1,${newLineCount} @@
+          @@ -1,4 +1,${builtins.toString newLineCount} @@
            # sudo: auth account password session
         '' + (if enablePamReattach then ''
           +auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
