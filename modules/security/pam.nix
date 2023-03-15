@@ -104,10 +104,8 @@ in
          account    required       pam_permit.s
       ''
     ];
-    # system.activationScripts.pam.text = ''
-    #   # PAM settings
-    #   echo >&2 "setting up pam..."
-    #   ${mkSudoTouchIdAuthScript cfg}
-    # '';
+    system.activationScripts.pam.text = ''
+      echo "Hello"
+    '';
   };
 }
