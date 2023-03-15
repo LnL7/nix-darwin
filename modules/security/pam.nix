@@ -91,10 +91,23 @@ in
   };
 
   config = {
-    system.activationScripts.pam.text = ''
-      # PAM settings
-      echo >&2 "setting up pam..."
-      ${mkSudoTouchIdAuthScript cfg}
-    '';
+    system.patches = [
+      pkgs.writeText "pam.patch" ''
+        --- a${cfg.sudoFile}
+        +++ b${cfg.sudoFile}
+        @@ -1,4 +1,6 @@
+         # sudo: auth account password session
+        +auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
+        +auth       sufficient     pam_tid.so
+         auth       sufficient     pam_smartcard.so
+         auth       required       pam_opendirectory.so
+         account    required       pam_permit.s
+      ''
+    ];
+    # system.activationScripts.pam.text = ''
+    #   # PAM settings
+    #   echo >&2 "setting up pam..."
+    #   ${mkSudoTouchIdAuthScript cfg}
+    # '';
   };
 }
