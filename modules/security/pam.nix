@@ -92,7 +92,7 @@ in
 
   config = {
     system.patches = [
-      pkgs.writeText "pam.patch" ''
+      (pkgs.writeText "pam.patch" ''
         --- a${cfg.sudoFile}
         +++ b${cfg.sudoFile}
         @@ -1,4 +1,6 @@
@@ -102,7 +102,7 @@ in
          auth       sufficient     pam_smartcard.so
          auth       required       pam_opendirectory.so
          account    required       pam_permit.s
-      ''
+      '')
     ];
     system.activationScripts.pam.text = ''
       echo "Hello"
