@@ -20,17 +20,9 @@ in
         configuration is reapplied.)
       '';
       enablePamReattach = mkEnableOption ''
-        Enable sudo authentication with Touch ID inside tmux
-
-        When enabled, this option adds the following line to /etc/pam.d/sudo:
-
-            auth       optional     pam_reattach.so
-
-        (Note that macOS resets this file when doing a system update. As such,
-        sudo authentication with Touch ID inside tmux won't work after a system
-        update until the nix-darwin configuration is reapplied.)
+        TODO
       '';
-      sudoFile = mkOption {
+      sudoPamFile = mkOption {
         type = types.path;
         default = "/etc/pam.d/sudo";
         description = ''
@@ -42,29 +34,37 @@ in
 
   config = {
     system.patches = [
-      (pkgs.writeText "pam.patch" (
-        let
-          enablePamReattach = cfg.enableSudoTouchIdAuth && cfg.enablePamReattach;
-          newLineCount = 5 + (if enablePamReattach then 1 else 0);
-        in
-        ''
-          --- a${cfg.sudoFile}
-          +++ b${cfg.sudoFile}
-          @@ -1,4 +1,${builtins.toString newLineCount} @@
-           # sudo: auth account password session
-        '' + (if enablePamReattach then ''
-          +auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
-          +auth       sufficient     pam_tid.so
-           auth       sufficient     pam_smartcard.so
-           auth       required       pam_opendirectory.so
-           account    required       pam_permit.s
-        '' else ''
-          +auth       sufficient     pam_tid.so
-           auth       sufficient     pam_smartcard.so
-           auth       required       pam_opendirectory.so
-           account    required       pam_permit.s
-        '')
-      ))
+      (pkgs.writeText "pam.patch" (if cfg.enableSudoTouchIdAuth && cfg.enablePamReattach then ''
+        --- a${cfg.sudoPamFile}
+        +++ b${cfg.sudoPamFile}
+        @@ -1,4 +1,6 @@
+         # sudo: auth account password session
+        +auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
+        +auth       sufficient     pam_tid.so
+         auth       sufficient     pam_smartcard.so
+         auth       required       pam_opendirectory.so
+         account    required       pam_permit.so
+      '' else if cfg.enableSudoTouchIdAuth then ''
+        --- a${cfg.sudoPamFile}
+        +++ b${cfg.sudoPamFile}
+        @@ -1,4 +1,5 @@
+         # sudo: auth account password session
+        +auth       sufficient     pam_tid.so
+         auth       sufficient     pam_smartcard.so
+         auth       required       pam_opendirectory.so
+         account    required       pam_permit.so
+      '' else ''
+        --- a${cfg.sudoPamFile}
+        +++ b${cfg.sudoPamFile}
+        @@ -1,6 +1,4 @@
+         # sudo: auth account password session
+        -auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
+        -auth       sufficient     pam_tid.so
+         auth       sufficient     pam_smartcard.so
+         auth       required       pam_opendirectory.so
+         account    required       pam_permit.so
+      '')
+      )
     ];
   };
 }
