@@ -42,17 +42,41 @@ in
     ];
 
     system.patches = [
-      (pkgs.writeText "pam.patch" ''
-        --- a${cfg.sudoPamFile}
-        +++ b${cfg.sudoPamFile}
-        @@ -1,4 +1,6 @@
-         # sudo: auth account password session
-        +auth       optional       /run/current-system/sw/lib/pam/pam_reattach.so
-        +auth       sufficient     pam_tid.so
-         auth       sufficient     pam_smartcard.so
-         auth       required       pam_opendirectory.so
-         account    required       pam_permit.so
-      '')
+      (pkgs.writeText "pam.patch" (
+        let
+          enablePamReattach = cfg.enableSudoTouchIdAuth && cfg.enablePamReattach;
+        in
+        if enablePamReattach then ''
+          --- a${cfg.sudoPamFile}
+          +++ b${cfg.sudoPamFile}
+          @@ -1,4 +1,6 @@
+           # sudo: auth account password session
+          +auth       optional       /run/current-system/sw/lib/pam/pam_reattach.so
+          +auth       sufficient     pam_tid.so
+           auth       sufficient     pam_smartcard.so
+           auth       required       pam_opendirectory.so
+           account    required       pam_permit.so
+        '' else if cfg.enableSudoTouchIdAuth then ''
+          --- a${cfg.sudoPamFile}
+          +++ b${cfg.sudoPamFile}
+          @@ -1,4 +1,5 @@
+           # sudo: auth account password session
+          +auth       sufficient     pam_tid.so
+           auth       sufficient     pam_smartcard.so
+           auth       required       pam_opendirectory.so
+           account    required       pam_permit.so
+        '' else ''
+          --- a${cfg.sudoPamFile}
+          +++ b${cfg.sudoPamFile}
+          @@ -1,6 +1,4 @@
+           # sudo: auth account password session
+          -auth       optional       /run/current-system/sw/lib/pam/pam_reattach.so
+          -auth       sufficient     pam_tid.so
+           auth       sufficient     pam_smartcard.so
+           auth       required       pam_opendirectory.so
+           account    required       pam_permit.so
+        ''
+      ))
     ];
   };
 }
