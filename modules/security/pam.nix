@@ -33,38 +33,26 @@ in
   };
 
   config = {
+    environment.systemPackages = [
+      pkgs.pam-reattach
+    ];
+
+    environment.pathsToLink = [
+      "/lib/pam"
+    ];
+
     system.patches = [
-      (pkgs.writeText "pam.patch" (if cfg.enableSudoTouchIdAuth && cfg.enablePamReattach then ''
+      (pkgs.writeText "pam.patch" ''
         --- a${cfg.sudoPamFile}
         +++ b${cfg.sudoPamFile}
         @@ -1,4 +1,6 @@
          # sudo: auth account password session
-        +auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
+        +auth       optional       /run/current-system/sw/lib/pam/pam_reattach.so
         +auth       sufficient     pam_tid.so
-         auth       sufficient     pam_smartcard.so
-         auth       required       pam_opendirectory.so
-         account    required       pam_permit.so
-      '' else if cfg.enableSudoTouchIdAuth then ''
-        --- a${cfg.sudoPamFile}
-        +++ b${cfg.sudoPamFile}
-        @@ -1,4 +1,5 @@
-         # sudo: auth account password session
-        +auth       sufficient     pam_tid.so
-         auth       sufficient     pam_smartcard.so
-         auth       required       pam_opendirectory.so
-         account    required       pam_permit.so
-      '' else ''
-        --- a${cfg.sudoPamFile}
-        +++ b${cfg.sudoPamFile}
-        @@ -1,6 +1,4 @@
-         # sudo: auth account password session
-        -auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so
-        -auth       sufficient     pam_tid.so
          auth       sufficient     pam_smartcard.so
          auth       required       pam_opendirectory.so
          account    required       pam_permit.so
       '')
-      )
     ];
   };
 }
