@@ -142,7 +142,7 @@ let
     '' + optionalString (interfaceOpt.address != [ ]) (''
       Address = ${concatStringsSep "," interfaceOpt.address}
     '') + optionalString (interfaceOpt.dns != [ ]) ''
-      DNS = ${concatStringsep "," interfaceOpt.dns}
+      DNS = ${concatStringsSep "," interfaceOpt.dns}
     '' + optionalString (interfaceOpt.listenPort != null) ''
       ListenPort = ${toString interfaceOpt.listenPort}
     '' + optionalString (interfaceOpt.mtu != null) ''
