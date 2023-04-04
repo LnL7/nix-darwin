@@ -123,7 +123,7 @@ flakeFlags=(--extra-experimental-features 'nix-command flakes')
 if [ -n "$flake" ]; then
     # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
     if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
-       scheme=${BASH_REMATCH[2]}
+       scheme=${BASH_REMATCH[1]}
        authority=${BASH_REMATCH[4]}
        path=${BASH_REMATCH[5]}
        queryWithQuestion=${BASH_REMATCH[6]}
