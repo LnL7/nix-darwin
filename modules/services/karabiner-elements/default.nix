@@ -16,11 +16,17 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = [ pkgs.karabiner-elements ];
 
-    system.activationScripts.extraActivation.text = ''
+    system.activationScripts.preActivation.text = ''
       rm -rf ${parentAppDir}
       mkdir -p ${parentAppDir}
       # Kernel extensions must reside inside of /Applications, they cannot be symlinks
       cp -r ${pkgs.karabiner-elements.driver}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
+    '';
+
+    system.activationScripts.postActivation.text = ''
+      echo "attempt to activate karabiner system extension and start daemons" >&2
+      launchctl unload /Library/LaunchDaemons/org.nixos.start_karabiner_daemons.plist
+      launchctl load -w /Library/LaunchDaemons/org.nixos.start_karabiner_daemons.plist
     '';
 
     # We need the karabiner_grabber and karabiner_observer daemons to run after the
@@ -28,19 +34,19 @@ in
     # executed directly for the Input Monitoring permission. We also want these
     # daemons to auto restart but if they start up without the Nix Store they will
     # refuse to run again until they've been unloaded and loaded back in so we can
-    # use a helper daemon to start them.
+    # use a helper daemon to start them. We also only want to run the daemons after
+    # the system extension is activated, so we can call activate from the manager
+    # which will block until the system extension is activated.
     launchd.daemons.start_karabiner_daemons = {
       serviceConfig.ProgramArguments = [
         "/bin/sh" "-c"
         "/bin/wait4path /nix/store &amp;&amp; ${pkgs.writeScript "start_karabiner_daemons" ''
+          ${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager activate
           launchctl kickstart system/org.pqrs.karabiner.karabiner_grabber
           launchctl kickstart system/org.pqrs.karabiner.karabiner_observer
         ''}"
       ];
-      # Due to the daemons being loaded in alphabetical order during darwin-rebuild switch
-      # we need to set the label so that this daemon will be loaded after karabiner_grabber
-      # and karabiner_observer so that no reboot is required to start these daemons.
-      serviceConfig.Label = "org.xyz.start_karabiner_daemons";
+      serviceConfig.Label = "org.nixos.start_karabiner_daemons";
       serviceConfig.RunAtLoad = true;
     };
 
@@ -86,9 +92,8 @@ in
       serviceConfig.RunAtLoad = true;
     };
 
-    # We can't put this inside the extraActivation script as /run gets nuked
-    # every reboot and the extraActivation script only gets run on darwin-rebuild
-    # switch.
+    # We need this to run every reboot as /run gets nuked so we can't put this
+    # inside the preActivation script as it only gets run on darwin-rebuild switch.
     launchd.daemons.setsuid_karabiner_session_monitor = {
       serviceConfig.ProgramArguments = [
         "/bin/sh" "-c"
