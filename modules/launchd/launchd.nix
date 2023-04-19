@@ -686,7 +686,7 @@ with lib;
 
     MachServices = mkOption {
       default = null;
-      example = { ResetAtClose = true; };
+      example = { "org.nixos.service" = { ResetAtClose = true; }; };
       description = ''
         This optional key is used to specify Mach services to be registered with the Mach bootstrap sub-system.
         Each key in this dictionary should be the name of service to be advertised. The value of the key must
@@ -695,7 +695,7 @@ with lib;
         Finally, for the job itself, the values will be replaced with Mach ports at the time of check-in with
         launchd.
       '';
-      type = types.nullOr (types.submodule {
+      type = types.nullOr (types.attrsOf (types.either types.bool (types.submodule {
         options = {
           ResetAtClose = mkOption {
             type = types.nullOr types.bool;
@@ -719,7 +719,7 @@ with lib;
             '';
           };
         };
-      });
+      })));
     };
 
     LaunchEvents = mkOption {
@@ -745,6 +745,26 @@ with lib;
           };
         };
       };
+    };
+
+    ServiceIPC = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        This optional key specifies whether the job participates in advanced
+        communication with launchd. The default is false. This flag is
+        incompatible with the inetdCompatibility key.
+      '';
+    };
+
+    SessionCreate = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        This key specifies that the job should be spawned into a new security
+        audit session rather than the default session for the context is belongs
+        to. See auditon(2) for details.
+      '';
     };
 
     Sockets = mkOption {
