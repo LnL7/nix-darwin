@@ -33,13 +33,12 @@ in
   config = {
 
     system.build.fonts = pkgs.runCommand "fonts"
-      { paths = cfg.fonts; preferLocalBuild = true; }
+      { preferLocalBuild = true; }
       ''
         mkdir -p $out/Library/Fonts
-        for path in $paths; do
-            find -L $path/share/fonts -type f -print0 | while IFS= read -rd "" f; do
-                ln -sf "$f" $out/Library/Fonts
-            done
+        font_regexp='.*\.\(ttf\|ttc\|otf\)'
+        find -L ${toString cfg.fonts} -regex "$font_regexp" -type f -print0 | while IFS= read -rd "" f; do
+            ln -sf "$f" $out/Library/Fonts
         done
       '';
 
