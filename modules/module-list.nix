@@ -19,6 +19,7 @@
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
+  ./system/defaults/screensaver.nix
   ./system/defaults/alf.nix
   ./system/defaults/loginwindow.nix
   ./system/defaults/magicmouse.nix

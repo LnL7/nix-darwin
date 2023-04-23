@@ -34,6 +34,7 @@ let
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
   magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
+  screensaver = defaultsToList "com.apple.screensaver" cfg.screensaver;
   spaces = defaultsToList "com.apple.spaces" cfg.spaces;
   trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
@@ -84,6 +85,7 @@ in
         magicmouse
         magicmouseBluetooth
         screencapture
+        screensaver
         spaces
         trackpad
         trackpadBluetooth
@@ -104,6 +106,7 @@ in
         ${concatStringsSep "\n" magicmouse}
         ${concatStringsSep "\n" magicmouseBluetooth}
         ${concatStringsSep "\n" screencapture}
+        ${concatStringsSep "\n" screensaver}
         ${concatStringsSep "\n" spaces}
         ${concatStringsSep "\n" trackpad}
         ${concatStringsSep "\n" trackpadBluetooth}
