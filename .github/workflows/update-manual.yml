@@ -24,7 +24,7 @@ jobs:
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A manualHTML
+        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.11-darwin -I darwin=. -A manualHTML
 
     - name: Push update to manual
       run: |
