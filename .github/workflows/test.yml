@@ -114,3 +114,7 @@ jobs:
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
           --override-input darwin .
+        # Should also succeed
+        darwin-rebuild build \
+          --flake git+file:///tmp/test-nix-darwin-submodules?submodules=1#simple \
+          --override-input darwin .
