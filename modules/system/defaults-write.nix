@@ -29,6 +29,7 @@ let
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
+  clock = defaultsToList "com.apple.menuextra.clock" cfg.clock;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
@@ -80,6 +81,7 @@ in
         GlobalPreferences
         LaunchServices
         NSGlobalDomain
+        clock
         dock
         finder
         magicmouse
@@ -101,6 +103,7 @@ in
 
         ${concatStringsSep "\n" GlobalPreferences}
         ${concatStringsSep "\n" LaunchServices}
+        ${concatStringsSep "\n" clock}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
         ${concatStringsSep "\n" magicmouse}
