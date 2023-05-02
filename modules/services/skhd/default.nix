@@ -34,6 +34,7 @@ in
 
     launchd.user.agents.skhd = {
       path = [ config.environment.systemPath ];
+      environment."SHELL" = "${pkgs.dash}/bin/dash";
 
       serviceConfig.ProgramArguments = [ "${cfg.package}/bin/skhd" ]
         ++ optionals (cfg.skhdConfig != "") [ "-c" "/etc/skhdrc" ];
