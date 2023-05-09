@@ -45,6 +45,14 @@ in
       '';
     };
 
+    copy = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether this file should be copied instead of symlinking.
+      '';
+    };
+
     knownSha256Hashes = mkOption {
       internal = true;
       type = types.listOf types.str;

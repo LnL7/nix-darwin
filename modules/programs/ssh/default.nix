@@ -47,10 +47,56 @@ let
         hostNames = mkDefault [ name ];
       };
     };
+  userOptions = {
+
+    options.openssh.authorizedKeys = {
+      keys = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        description = ''
+          A list of verbatim OpenSSH public keys that should be added to the
+          user's authorized keys. The keys are added to a file that the SSH
+          daemon reads in addition to the the user's authorized_keys file.
+          You can combine the <literal>keys</literal> and
+          <literal>keyFiles</literal> options.
+          Warning: If you are using <literal>NixOps</literal> then don't use this
+          option since it will replace the key required for deployment via ssh.
+        '';
+      };
+
+      keyFiles = mkOption {
+        type = types.listOf types.path;
+        default = [];
+        description = ''
+          A list of files each containing one OpenSSH public key that should be
+          added to the user's authorized keys. The contents of the files are
+          read at build time and added to a file that the SSH daemon reads in
+          addition to the the user's authorized_keys file. You can combine the
+          <literal>keyFiles</literal> and <literal>keys</literal> options.
+        '';
+      };
+    };
+
+  };
+  authKeysFiles = let
+    mkAuthKeyFile = u: nameValuePair "ssh/authorized_keys.d/${u.name}" {
+      text = ''
+        ${concatStringsSep "\n" u.openssh.authorizedKeys.keys}
+        ${concatMapStrings (f: readFile f + "\n") u.openssh.authorizedKeys.keyFiles}
+      '';
+    };
+    usersWithKeys = attrValues (flip filterAttrs config.users.users (n: u:
+      length u.openssh.authorizedKeys.keys != 0 || length u.openssh.authorizedKeys.keyFiles != 0
+    ));
+  in listToAttrs (map mkAuthKeyFile usersWithKeys);
 in
 
 {
   options = {
+    
+    users.users = mkOption {
+      type = with types; attrsOf (submodule userOptions);
+    };
 
     programs.ssh.knownHosts = mkOption {
       default = {};
@@ -80,12 +126,13 @@ in
                   (data.publicKey != null && data.publicKeyFile == null);
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
-
-    environment.etc."ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
-      (h: assert h.hostNames != [];
-        concatStringsSep "," h.hostNames + " "
-        + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
-      )) + "\n";
-
+    
+    environment.etc = authKeysFiles //
+      { "ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
+        (h: assert h.hostNames != [];
+          concatStringsSep "," h.hostNames + " "
+          + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
+        )) + "\n";
+      };
   };
 }

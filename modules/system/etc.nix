@@ -12,6 +12,7 @@ let
   hasDir = path: length (splitString "/" path) > 1;
 
   etc = filter (f: f.enable) (attrValues config.environment.etc);
+  etcCopy = filter (f: f.copy) (attrValues config.environment.etc);
   etcDirs = filter (attr: hasDir attr.target) (attrValues config.environment.etc);
 
 in
@@ -38,6 +39,7 @@ in
         cd $out/etc
         ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
         ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
+        ${concatMapStringsSep "\n" (attr: "touch '${attr.target}'.copy") etcCopy}
       '';
 
     system.activationScripts.etc.text = ''
@@ -63,7 +65,11 @@ in
               for h in ''${etcSha256Hashes["$l"]}; do
                 if [ "$o" = "$h" ]; then
                   mv "$l" "$l.orig"
-                  ln -s "$f" "$l"
+                  if [ -e "$f".copy ]; then
+                    cp "$f" "$l"
+                  else
+                    ln -s "$f" "$l"
+                  fi
                   break
                 else
                   h=
@@ -77,7 +83,11 @@ in
             fi
           fi
         else
-          ln -s "$f" "$l"
+          if [ -e "$f".copy ]; then
+            cp "$f" "$l"
+          else
+            ln -s "$f" "$l"
+          fi
         fi
       done
 
