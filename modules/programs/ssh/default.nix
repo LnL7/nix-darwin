@@ -90,6 +90,13 @@ let
       length u.openssh.authorizedKeys.keys != 0 || length u.openssh.authorizedKeys.keyFiles != 0
     ));
   in listToAttrs (map mkAuthKeyFile usersWithKeys);
+  authKeysConfiguration = 
+  {
+    "ssh/sshd_config.d/101-authorized-keys.conf" = {
+      copy = true;
+      text = "AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u";
+    };
+  };
 in
 
 {
@@ -128,7 +135,7 @@ in
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
     
-    environment.etc = authKeysFiles //
+    environment.etc = authKeysFiles // authKeysConfiguration //
       { "ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
         (h: assert h.hostNames != [];
           concatStringsSep "," h.hostNames + " "
