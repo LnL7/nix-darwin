@@ -44,7 +44,7 @@
   ./launchd
   ./services/activate-system
   ./services/autossh.nix
-  ./services/buildkite-agent.nix
+  ./services/buildkite-agents.nix
   ./services/chunkwm.nix
   ./services/cachix-agent.nix
   ./services/dnsmasq.nix
