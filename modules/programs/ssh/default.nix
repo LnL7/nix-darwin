@@ -80,6 +80,7 @@ let
   };
   authKeysFiles = let
     mkAuthKeyFile = u: nameValuePair "ssh/authorized_keys.d/${u.name}" {
+      copy = true;
       text = ''
         ${concatStringsSep "\n" u.openssh.authorizedKeys.keys}
         ${concatMapStrings (f: readFile f + "\n") u.openssh.authorizedKeys.keyFiles}
