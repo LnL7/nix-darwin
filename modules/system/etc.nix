@@ -57,6 +57,10 @@ in
         if [ ! -e "$d" ]; then
           mkdir -p "$d"
         fi
+        if [ -e "$f".copy ]; then
+          cp "$f" "$l"
+          continue
+        fi
         if [ -e "$l" ]; then
           if [ "$(readlink "$l")" != "$f" ]; then
             if ! grep -q /etc/static "$l"; then
@@ -65,11 +69,7 @@ in
               for h in ''${etcSha256Hashes["$l"]}; do
                 if [ "$o" = "$h" ]; then
                   mv "$l" "$l.orig"
-                  if [ -e "$f".copy ]; then
-                    cp "$f" "$l"
-                  else
-                    ln -s "$f" "$l"
-                  fi
+                  ln -s "$f" "$l"
                   break
                 else
                   h=
@@ -83,11 +83,7 @@ in
             fi
           fi
         else
-          if [ -e "$f".copy ]; then
-            cp "$f" "$l"
-          else
-            ln -s "$f" "$l"
-          fi
+          ln -s "$f" "$l"
         fi
       done
 
