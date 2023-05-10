@@ -47,6 +47,7 @@ let
         hostNames = mkDefault [ name ];
       };
     };
+  # Taken from: https://github.com/NixOS/nixpkgs/blob/f4aa6afa5f934ece2d1eb3157e392d056be01617/nixos/modules/services/networking/ssh/sshd.nix#L46-L93
   userOptions = {
 
     options.openssh.authorizedKeys = {
