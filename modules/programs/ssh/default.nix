@@ -94,7 +94,7 @@ let
   {
     "ssh/sshd_config.d/101-authorized-keys.conf" = {
       copy = true;
-      text = "AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u";
+      text = "AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u\n";
     };
   };
 in
