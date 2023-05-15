@@ -5,7 +5,7 @@ with lib;
 {
   options = {
 
-    system.defaults.clock.IsAnalog = mkOption {
+    system.defaults.menuExtraClock.IsAnalog = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
@@ -13,7 +13,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.Show24Hour = mkOption {
+    system.defaults.menuExtraClock.Show24Hour = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
@@ -21,7 +21,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.ShowAMPM = mkOption {
+    system.defaults.menuExtraClock.ShowAMPM = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
@@ -29,7 +29,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.ShowDayOfMonth = mkOption {
+    system.defaults.menuExtraClock.ShowDayOfMonth = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
@@ -37,7 +37,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.ShowDayOfWeek = mkOption {
+    system.defaults.menuExtraClock.ShowDayOfWeek = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
@@ -45,7 +45,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.ShowDate = mkOption {
+    system.defaults.menuExtraClock.ShowDate = mkOption {
       type = types.nullOr (types.enum [ 0 1 2 ]);
       default = null;
       description = ''
@@ -59,7 +59,7 @@ with lib;
       '';
     };
 
-    system.defaults.clock.ShowSeconds = mkOption {
+    system.defaults.menuExtraClock.ShowSeconds = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''

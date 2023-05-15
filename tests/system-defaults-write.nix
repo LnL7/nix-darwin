@@ -37,9 +37,9 @@
   system.defaults.NSGlobalDomain."com.apple.springing.delay" = 0.0;
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.".GlobalPreferences"."com.apple.sound.beep.sound" = "/System/Library/Sounds/Funk.aiff";
-  system.defaults.clock.Show24Hour = false;
-  system.defaults.clock.ShowDayOfWeek = true;
-  system.defaults.clock.ShowDate = 2;
+  system.defaults.menuExtraClock.Show24Hour = false;
+  system.defaults.menuExtraClock.ShowDayOfWeek = true;
+  system.defaults.menuExtraClock.ShowDate = 2;
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
