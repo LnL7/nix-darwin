@@ -12,6 +12,7 @@ let
   hasDir = path: length (splitString "/" path) > 1;
 
   etc = filter (f: f.enable) (attrValues config.environment.etc);
+  etcCopy = filter (f: f.copy) (attrValues config.environment.etc);
   etcDirs = filter (attr: hasDir attr.target) (attrValues config.environment.etc);
 
 in
@@ -38,6 +39,7 @@ in
         cd $out/etc
         ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
         ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
+        ${concatMapStringsSep "\n" (attr: "touch '${attr.target}'.copy") etcCopy}
       '';
 
     system.activationScripts.etc.text = ''
@@ -54,6 +56,10 @@ in
         d=''${l%/*}
         if [ ! -e "$d" ]; then
           mkdir -p "$d"
+        fi
+        if [ -e "$f".copy ]; then
+          cp "$f" "$l"
+          continue
         fi
         if [ -e "$l" ]; then
           if [ "$(readlink "$l")" != "$f" ]; then
