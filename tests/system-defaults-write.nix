@@ -37,6 +37,9 @@
   system.defaults.NSGlobalDomain."com.apple.springing.delay" = 0.0;
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.".GlobalPreferences"."com.apple.sound.beep.sound" = "/System/Library/Sounds/Funk.aiff";
+  system.defaults.menuExtraClock.Show24Hour = false;
+  system.defaults.menuExtraClock.ShowDayOfWeek = true;
+  system.defaults.menuExtraClock.ShowDate = 2;
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
@@ -102,6 +105,9 @@
     grep "defaults write -g 'com.apple.springing.delay' -float 0.0" ${config.out}/activate-user
     grep "defaults write -g 'com.apple.swipescrolldirection' -bool YES" ${config.out}/activate-user
     grep "defaults write .GlobalPreferences 'com.apple.sound.beep.sound' -string '/System/Library/Sounds/Funk.aiff'" ${config.out}/activate-user
+    grep "defaults write com.apple.menuextra.clock 'Show24Hour' -bool NO" ${config.out}/activate-user
+    grep "defaults write com.apple.menuextra.clock 'ShowDayOfWeek' -bool YES" ${config.out}/activate-user
+    grep "defaults write com.apple.menuextra.clock 'ShowDate' -int 2" ${config.out}/activate-user
     grep "defaults write com.apple.dock 'autohide-delay' -float 0.24" ${config.out}/activate-user
     grep "defaults write com.apple.dock 'appswitcher-all-displays' -bool NO" ${config.out}/activate-user
     grep "defaults write com.apple.dock 'orientation' -string 'left'" ${config.out}/activate-user

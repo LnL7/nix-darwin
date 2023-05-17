@@ -16,6 +16,7 @@
   ./system/defaults/NSGlobalDomain.nix
   ./system/defaults/GlobalPreferences.nix
   ./system/defaults/CustomPreferences.nix
+  ./system/defaults/clock.nix
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
   ./system/defaults/screencapture.nix
