@@ -56,7 +56,7 @@ let
         default = [ pkgs.bash pkgs.gnutar pkgs.gzip pkgs.git pkgs.nix ];
         defaultText = literalExpression "[ pkgs.bash pkgs.gnutar pkgs.gzip pkgs.git pkgs.nix ]";
         description = mdDoc "Add programs to the buildkite-agent environment";
-        type = types.listOf types.package;
+        type = types.listOf (types.either types.package types.path);
       };
 
       tokenPath = mkOption {
