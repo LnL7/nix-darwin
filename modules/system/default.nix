@@ -74,8 +74,8 @@ in
       name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
 
-      activationScript = cfg.activationScripts.script.text;
-      activationUserScript = cfg.activationScripts.userScript.text;
+      activationScript = cfg.activationScripts.script;
+      activationUserScript = cfg.userActivationScripts.script;
       inherit (cfg) darwinLabel;
 
       buildCommand = ''

@@ -789,6 +789,9 @@ in
           launchctl kickstart system/org.nixos.nix-daemon
       done
     '';
+    system.activationScripts.nix-daemon.onlyOnRebuild = true;
+    # Make sure the new config file and launchd service have been installed first.
+    system.activationScripts.nix-daemon.deps = [ "etc" "launchd" ];
 
     # Legacy configuration conversion.
     nix.settings = mkMerge [

@@ -768,7 +768,7 @@ in
 
     environment.variables = mkIf cfg.enable cfg.global.homebrewEnvironmentVariables;
 
-    system.activationScripts.homebrew.text = mkIf cfg.enable ''
+    system.userActivationScripts.homebrew.text = mkIf cfg.enable ''
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
       if [ -f "${cfg.brewPrefix}/brew" ]; then

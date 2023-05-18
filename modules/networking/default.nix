@@ -118,6 +118,7 @@ in
 
       ${setNetworkServices}
     '';
+    system.activationScripts.networking.onlyOnRebuild = true;
 
   };
 }

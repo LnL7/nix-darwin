@@ -41,6 +41,7 @@ in
 
       ${timeZone}
     '';
+    system.activationScripts.time.onlyOnRebuild = true;
 
   };
 }
