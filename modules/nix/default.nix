@@ -782,7 +782,11 @@ in
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
           echo "reloading nix-daemon..." >&2
+          pid=$(launchctl kickstart -p system/org.nixos.nix-daemon)
           launchctl kill HUP system/org.nixos.nix-daemon
+          while [ "$(launchctl kickstart -p system/org.nixos.nix-daemon)" = "$pid" ]; do
+            sleep 0.1
+          done
       fi
       while ! nix-store --store daemon -q --hash ${pkgs.stdenv.shell} &>/dev/null; do
           echo "waiting for nix-daemon" >&2
