@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v17
     - run: |
-        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-        nix-channel --update
+        sudo -i nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        sudo -i nix-channel --update
     - run: |
         nix-shell -A installer
         nix-shell -A installer.check

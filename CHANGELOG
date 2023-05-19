@@ -1,3 +1,6 @@
+2022-09-09
+- Installer now adds nix-darwin as a root-channel by default.
+
 2022-08-24
 - Major changes to `homebrew` module
   `homebrew.cleanup` was renamed to `homebrew.onActivation.cleanup`.

@@ -86,8 +86,8 @@ stdenv.mkDerivation {
         fi
         case "$i" in
             y|Y)
-                nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-                nix-channel --update
+                sudo -i nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+                sudo -i nix-channel --update
                 ;;
         esac
     fi
@@ -118,8 +118,8 @@ stdenv.mkDerivation {
         test -f ~/.nixpkgs/darwin-configuration.nix
         test -w ~/.nixpkgs/darwin-configuration.nix
         echo >&2 "checking darwin channel"
-        readlink ~/.nix-defexpr/channels/darwin
-        test -e ~/.nix-defexpr/channels/darwin
+        readlink /nix/var/nix/profiles/per-user/root/channels/darwin
+        test -e /nix/var/nix/profiles/per-user/root/channels/darwin
         echo >&2 "checking /etc"
         readlink /etc/static
         test -e /etc/static
