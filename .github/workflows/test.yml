@@ -3,39 +3,11 @@ on:
   pull_request:
   push:
 
-jobs:
-  tests:
-    strategy:
-      fail-fast: true
-      matrix:
-        channel: [nixpkgs-22.11-darwin, nixpkgs-unstable]
-    runs-on: macos-12
-    timeout-minutes: 30
-    steps:
-    - uses: actions/checkout@v3
-    - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
-      with:
-        install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-22.11-darwin' }}
-    - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
-      with:
-        nix_path: nixpkgs=channel:${{ matrix.channel }}
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-unstable' }}
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ matrix.channel }} -I darwin=. -A tests
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ matrix.channel }} -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ matrix.channel }} -I darwin=. -A examples.simple
+env:
+  CURRENT_STABLE_CHANNEL: nixpkgs-22.11-darwin
 
-  install:
-    strategy:
-      fail-fast: true
-      matrix:
-        channel: [nixpkgs-22.11-darwin, nixpkgs-unstable]
+jobs:
+  test-stable:
     runs-on: macos-12
     timeout-minutes: 30
     steps:
@@ -44,20 +16,42 @@ jobs:
       uses: cachix/install-nix-action@v20
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
-        nix_path: nixpkgs=channel:${{ matrix.channel }}
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-22.11-darwin' }}
+    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A tests
+    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A examples.simple
+
+  test-unstable:
+    runs-on: macos-12
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v20
       with:
-        nix_path: nixpkgs=channel:${{ matrix.channel }}
+        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-unstable' }}
-    - name: Install ${{ matrix.channel }} channel
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A tests
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A manpages
+    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A examples.simple
+
+  install-against-stable:
+    runs-on: macos-12
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install nix corresponding to latest stable channel
+      uses: cachix/install-nix-action@v20
+      with:
+        install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
+        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
       run: |
-        nix-channel --add https://nixos.org/channels/${{ matrix.channel }} nixpkgs
+        nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin and test
       run: |
@@ -80,11 +74,43 @@ jobs:
       with:
         limit-access-to-actor: true
 
-  install-flake:
-    strategy:
-      fail-fast: true
-      matrix:
-        channel: [nixpkgs-22.11-darwin, nixpkgs-unstable]
+  install-against-unstable:
+    runs-on: macos-12
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install nix from current unstable channel
+      uses: cachix/install-nix-action@v20
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - name: Install nixpkgs-unstable channel
+      run: |
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+        nix-channel --update
+    - name: Install nix-darwin and test
+      run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
+        nix-shell -A installer
+        nix-shell -A installer.check
+    - name: Build and activate default derivation
+      run: |
+        . /etc/static/bashrc
+        darwin-rebuild switch -I darwin=.
+    - name: Test uninstallation of nix-darwin
+      run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
+        nix-shell -A uninstaller
+        nix-shell -A uninstaller.check
+    - name: Debugging tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 15
+      with:
+        limit-access-to-actor: true
+
+  install-flake-against-stable:
     runs-on: macos-12
     timeout-minutes: 30
     steps:
@@ -93,20 +119,93 @@ jobs:
       uses: cachix/install-nix-action@v20
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
-        nix_path: nixpkgs=channel:${{ matrix.channel }}
+        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-22.11-darwin' }}
+    - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
+      run: |
+        nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
+        nix-channel --update
+    - name: Install nix-darwin and test result
+      run: |
+        export NIX_PATH=$HOME/.nix-defexpr/channels
+        nix-shell -A installer
+        nix-shell -A installer.check
+    - name: Build simple flake configuration
+      run: |
+        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
+    - name: Activate derivation of simple flake build
+      run: |
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
+    - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
+      run: |
+        . /etc/static/bashrc
+        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+    - name: Test git submodules
+      run: |
+        . /etc/static/bashrc
+
+        mkdir -p /tmp/{test-nix-darwin-submodules,example-submodule}
+
+        pushd /tmp/example-submodule
+          echo '"hello"' > hello.nix
+          git init
+          git add .
+          git commit -m "add a submodule we will import"
+        popd
+
+        cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+
+        pushd /tmp/test-nix-darwin-submodules
+          /usr/bin/sed -i.bak \
+            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            ./flake.nix
+          /usr/bin/sed -i.bak \
+            's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
+            ./simple.nix
+          git init
+          git add flake.nix simple.nix
+          git \
+            -c protocol.file.allow=always \
+            submodule add /tmp/example-submodule submodule-test
+        popd
+
+        # Should fail
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules#simple \
+          --override-input darwin . \
+          && {
+            printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
+            exit 1
+          }
+        # Should also fail
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
+          --override-input darwin . \
+          && {
+            printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
+            exit 1
+          }
+
+        # Should succeed
+        darwin-rebuild build \
+          --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
+          --override-input darwin .
+
+  install-flake-against-unstable:
+    runs-on: macos-12
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v20
       with:
-        nix_path: nixpkgs=channel:${{ matrix.channel }}
+        nix_path: nixpkgs=channel:nixpkgs-unstable
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      if: ${{ matrix.channel == 'nixpkgs-unstable' }}
-    - name: Install ${{ matrix.channel }} channel
+    - name: Install nixpkgs-unstable channel
       run: |
-        nix-channel --add https://nixos.org/channels/${{ matrix.channel }} nixpkgs
+        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
     - name: Install nix-darwin and test result
       run: |
