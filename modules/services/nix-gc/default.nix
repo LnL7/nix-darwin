@@ -42,6 +42,7 @@ in
 
       intervals = mkOption {
         type = types.listOf types.attrs;
+        default = [cfg.interval];
         description = "Multiple intervals at which the garbage collector will run.";
       };
 
@@ -68,7 +69,7 @@ in
       command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
       environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       serviceConfig.RunAtLoad = false;
-      serviceConfig.StartCalendarInterval = cfg.intervals or [ cfg.interval ];
+      serviceConfig.StartCalendarInterval = cfg.intervals;
       serviceConfig.UserName = cfg.user;
     };
 
