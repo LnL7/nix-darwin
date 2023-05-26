@@ -10,6 +10,7 @@
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = true;
   system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
   system.defaults.NSGlobalDomain.AppleShowScrollBars = "Always";
+  system.defaults.NSGlobalDomain.AppleScrollerPagingBehavior = true;
   system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
@@ -78,6 +79,7 @@
     grep "defaults write -g 'ApplePressAndHoldEnabled' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleShowAllExtensions' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'AppleShowScrollBars' -string 'Always'" ${config.out}/activate-user
+    grep "defaults write -g 'AppleScrollerPagingBehavior' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSAutomaticCapitalizationEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSAutomaticDashSubstitutionEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSAutomaticPeriodSubstitutionEnabled' -bool NO" ${config.out}/activate-user
