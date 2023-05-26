@@ -153,7 +153,7 @@ in {
     };
 
     system.defaults.NSGlobalDomain.AppleWindowTabbingMode = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr (types.enum [ "manual" "always" "fullscreen" ]);
       default = null;
       description = ''
         Sets the window tabbing when opening a new document: 'manual', 'always', or 'fullscreen'.  The default is 'fullscreen'.
