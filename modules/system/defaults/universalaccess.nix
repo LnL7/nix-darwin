@@ -5,6 +5,16 @@ with lib;
 {
   options = {
 
+    system.defaults.universalaccess.mouseDriverCursorSize = mkOption {
+      type = types.nullOr float;
+      default = null;
+      example = 1.5;
+      description = ''
+        Set the size of cursor. 1 for normal, 4 for maximum.
+        The default is 1.
+      '';
+    };
+
     system.defaults.universalaccess.reduceTransparency = mkOption {
       type = types.nullOr types.bool;
       default = null;
