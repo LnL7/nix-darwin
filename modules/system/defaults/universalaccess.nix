@@ -6,7 +6,7 @@ with lib;
   options = {
 
     system.defaults.universalaccess.mouseDriverCursorSize = mkOption {
-      type = types.nullOr float;
+      type = types.nullOr types.float;
       default = null;
       example = 1.5;
       description = ''
