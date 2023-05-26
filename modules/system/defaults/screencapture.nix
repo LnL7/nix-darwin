@@ -4,6 +4,13 @@ with lib;
 
 {
   options = {
+    system.defaults.screencapture.name = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+          The filename which screencaptures should be written. The default is "Screenshot"
+        '';
+    };
 
     system.defaults.screencapture.location = mkOption {
       type = types.nullOr types.str;
@@ -26,6 +33,14 @@ with lib;
       default = null;
       description = ''
           Disable drop shadow border around screencaptures. The default is false.
+        '';
+    };
+
+    system.defaults.screencapture.include-date = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+          Include date and time in screenshot filenames. The default is true.
         '';
     };
   };
