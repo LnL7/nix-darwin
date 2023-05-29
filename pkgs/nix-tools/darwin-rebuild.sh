@@ -132,7 +132,7 @@ if [ -n "$flake" ]; then
        flakeAttr=${fragment}
     fi
     if [ -z "$flakeAttr" ]; then
-      flakeAttr=$(hostname -s)
+      flakeAttr=$(scutil --get LocalHostName)
     fi
     flakeAttr=darwinConfigurations.${flakeAttr}
 fi
