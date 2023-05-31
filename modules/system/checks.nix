@@ -205,6 +205,12 @@ in
       description = "Whether to run the NIX_PATH validation checks.";
     };
 
+    system.checks.verifyNixChannels = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to run the nix-channels validation checks.";
+    };
+
     system.checks.text = mkOption {
       internal = true;
       type = types.lines;
@@ -222,7 +228,7 @@ in
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
-      nixChannels
+      (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
     ];
