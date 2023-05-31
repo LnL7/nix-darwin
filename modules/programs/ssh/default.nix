@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 
@@ -79,6 +79,7 @@ let
     };
 
   };
+
   authKeysFiles = let
     mkAuthKeyFile = u: nameValuePair "ssh/authorized_keys.d/${u.name}" {
       copy = true;
@@ -91,20 +92,31 @@ let
       length u.openssh.authorizedKeys.keys != 0 || length u.openssh.authorizedKeys.keyFiles != 0
     ));
   in listToAttrs (map mkAuthKeyFile usersWithKeys);
-  authKeysConfiguration = 
-  {
-    "ssh/sshd_config.d/101-authorized-keys.conf" = {
-      copy = true;
-      text = "AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u\n";
-    };
-  };
+
+  oldAuthorizedKeysHash = "5a5dc1e20e8abc162ad1cc0259bfd1dbb77981013d87625f97d9bd215175fc0a";
 in
 
 {
   options = {
-    
+
     users.users = mkOption {
       type = with types; attrsOf (submodule userOptions);
+    };
+
+    services.openssh.authorizedKeysFiles = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = lib.mdDoc ''
+        Specify the rules for which files to read on the host.
+
+        This is an advanced option. If you're looking to configure user
+        keys, you can generally use [](#opt-users.users._name_.openssh.authorizedKeys.keys)
+        or [](#opt-users.users._name_.openssh.authorizedKeys.keyFiles).
+
+        These are paths relative to the host root file system or home
+        directories and they are subject to certain token expansion rules.
+        See AuthorizedKeysFile in man sshd_config for details.
+      '';
     };
 
     programs.ssh.knownHosts = mkOption {
@@ -135,13 +147,30 @@ in
                   (data.publicKey != null && data.publicKeyFile == null);
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
-    
-    environment.etc = authKeysFiles // authKeysConfiguration //
+
+    services.openssh.authorizedKeysFiles = [ "%h/.ssh/authorized_keys" "/etc/ssh/authorized_keys.d/%u" ];
+
+    environment.etc = authKeysFiles //
       { "ssh/ssh_known_hosts".text = (flip (concatMapStringsSep "\n") knownHosts
         (h: assert h.hostNames != [];
           concatStringsSep "," h.hostNames + " "
           + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
         )) + "\n";
+
+        "ssh/sshd_config.d/101-authorized-keys.conf" = {
+          text = "AuthorizedKeysFile ${toString config.services.openssh.authorizedKeysFiles}\n";
+          # Allows us to automatically migrate from using a file to a symlink
+          knownSha256Hashes = [ oldAuthorizedKeysHash ];
+        };
       };
+
+    # Clean up .orig file left over from using knownSha256Hashes
+    system.activationScripts.etc.text = ''
+      auth_keys_orig=/etc/ssh/sshd_config.d/101-authorized-keys.conf.orig
+
+      if [ -e "$auth_keys_orig" ] && [ "$(shasum -a 256 $auth_keys_orig | cut -d ' ' -f 1)" = "${oldAuthorizedKeysHash}" ]; then
+        rm "$auth_keys_orig"
+      fi
+    '';
   };
 }
