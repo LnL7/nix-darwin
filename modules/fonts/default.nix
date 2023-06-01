@@ -26,7 +26,12 @@ in
       type = types.listOf types.path;
       default = [ ];
       example = literalExpression "[ pkgs.dejavu_fonts ]";
-      description = "List of fonts to install.";
+      description = ''
+        List of fonts to install.
+
+        Fonts present in later entries override those with the same filenames
+        in previous ones.
+      '';
     };
   };
 
