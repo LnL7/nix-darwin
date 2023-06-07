@@ -39,6 +39,7 @@
   ./time
   ./networking
   ./nix
+  ./nix/linux-builder.nix
   ./nix/nix-darwin.nix
   ./nix/nixpkgs.nix
   ./environment

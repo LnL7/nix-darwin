@@ -175,7 +175,7 @@ in
         default = false;
         description = lib.mdDoc ''
           If set, Nix will use the daemon to perform operations.
-          Use this instead of services.nix-daemon.enable if you don't wan't the
+          Use this instead of services.nix-daemon.enable if you don't want the
           daemon service to be managed for you.
         '';
       };
@@ -790,9 +790,9 @@ in
       ]);
     users.knownGroups = mkIf cfg.configureBuildUsers [ "nixbld" ];
 
-    # Unreladed to use in NixOS module
+    # Unrelated to use in NixOS module
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
-      if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null; then
+      if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
       fi
