@@ -211,6 +211,12 @@ in
       description = "Whether to run the nix-channels validation checks.";
     };
 
+    system.checks.verifyBuildUsers = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to run the Nix build users validation checks.";
+    };
+
     system.checks.text = mkOption {
       internal = true;
       type = types.lines;
@@ -224,7 +230,7 @@ in
       darwinChanges
       runLink
       oldBuildUsers
-      (mkIf config.nix.useDaemon buildUsers)
+      (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
