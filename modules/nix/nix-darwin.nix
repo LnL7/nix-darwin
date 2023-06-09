@@ -1,7 +1,5 @@
 { config, pkgs, lib, ... }:
 
-with lib;
-
 let
   inherit (pkgs) stdenv;
 
@@ -38,6 +36,10 @@ in
         darwin-option
         darwin-rebuild
       ];
+
+    system.build = {
+      inherit darwin-option darwin-rebuild;
+    };
 
   };
 }

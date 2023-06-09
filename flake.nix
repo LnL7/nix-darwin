@@ -64,7 +64,18 @@
 
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
+
+      darwin = self.lib.darwinSystem {
+        inherit system;
+        modules = [ ];
+      };
+
+      nix-tools = pkgs.callPackage ./pkgs/nix-tools { inherit darwin; };
     in {
+      default = self.packages.${system}.darwin-rebuild;
+
+      inherit (nix-tools) darwin-rebuild darwin-option;
+
       darwin-uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
     });
   };
