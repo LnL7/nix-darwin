@@ -2,7 +2,9 @@
   # WARNING this is very much still experimental.
   description = "A collection of darwin modules";
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs }: let
+    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
+  in {
     lib = {
       evalConfig = import ./eval-config.nix;
 
@@ -44,7 +46,7 @@
       description = "nix flake init -t nix-darwin";
     };
 
-    checks = nixpkgs.lib.genAttrs ["aarch64-darwin" "x86_64-darwin"] (system: let
+    checks = forAllSystems (system: let
       simple = self.lib.darwinSystem {
         modules = [
           self.darwinModules.simple
@@ -58,6 +60,12 @@
         optionsJSON
         manualHTML
         manpages;
+    });
+
+    packages = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      darwin-uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
     });
   };
 }
