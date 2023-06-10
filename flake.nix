@@ -10,12 +10,14 @@
       darwinSystem =
         { modules, inputs ? { }
         , system ? throw "darwin.lib.darwinSystem now requires 'system' to be passed explicitly"
+        , extraModules ? let e = builtins.getEnv "NIXOS_EXTRA_MODULE_PATH";
+                         in if e == "" then [] else [(import e)]
         , ...
         }@args:
         self.lib.evalConfig (args // {
           inherit system;
           inputs = { inherit nixpkgs; darwin = self; } // inputs;
-          modules = modules ++ [ self.darwinModules.flakeOverrides ];
+          modules = modules ++ extraModules ++ [ self.darwinModules.flakeOverrides ];
         });
     };
 
