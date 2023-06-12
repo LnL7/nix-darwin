@@ -159,7 +159,7 @@ jobs:
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \
-            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            '\#modules = \[#s#configuration#configuration ./simple.nix#' \
             ./flake.nix
           /usr/bin/sed -i.bak \
             's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
@@ -241,7 +241,7 @@ jobs:
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \
-            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            '\#modules = \[#s#configuration#configuration ./simple.nix#' \
             ./flake.nix
           /usr/bin/sed -i.bak \
             's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
