@@ -133,14 +133,14 @@ jobs:
         nix-shell -A installer.check
     - name: Build simple flake configuration
       run: |
-        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
+        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
     - name: Activate derivation of simple flake build
       run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -155,6 +155,7 @@ jobs:
         popd
 
         cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+        cp -a ./modules/examples/flake/flake.nix /tmp/test-nix-darwin-submodules
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \
@@ -214,14 +215,14 @@ jobs:
         nix-shell -A installer.check
     - name: Build simple flake configuration
       run: |
-        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
+        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
     - name: Activate derivation of simple flake build
       run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -236,6 +237,7 @@ jobs:
         popd
 
         cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+        cp -a ./modules/examples/flake/flake.nix /tmp/test-nix-darwin-submodules
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \

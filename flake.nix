@@ -25,6 +25,11 @@
     darwinModules.ofborg = ./modules/examples/ofborg.nix;
     darwinModules.simple = ./modules/examples/simple.nix;
 
+    templates.default = {
+      path = ./modules/examples/flake;
+      description = "nix flake init -t nix-darwin";
+    };
+
     checks.x86_64-darwin.simple = (self.lib.darwinSystem {
       system = "x86_64-darwin";
       modules = [ self.darwinModules.simple ];
