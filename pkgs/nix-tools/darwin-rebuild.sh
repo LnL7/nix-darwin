@@ -12,7 +12,7 @@ showSyntax() {
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]"
-  echo "               [--no-update-lock-file] ..." >&2
+  echo "               [--no-update-lock-file] [--update] ..." >&2
   exec man darwin-rebuild
   exit 1
 }
@@ -23,6 +23,7 @@ extraMetadataFlags=()
 extraBuildFlags=()
 extraLockFlags=()
 extraProfileFlags=()
+updateChannels=false
 profile=@profile@
 action=
 flake=
@@ -109,6 +110,9 @@ while [ $# -gt 0 ]; do
       fi
       shift 1
       ;;
+    --update)
+      updateChannels=true
+      ;;
     *)
       echo "$0: unknown option '$i'"
       exit 1
@@ -117,6 +121,10 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$action" ]; then showSyntax; fi
+
+if [ "$updateChannels" = true ] ; then
+  nix-channel --update darwin
+fi
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
