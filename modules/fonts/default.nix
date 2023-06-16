@@ -46,13 +46,14 @@ in
     system.activationScripts.fonts.text = optionalString cfg.fontDir.enable ''
       # Set up fonts.
       echo "configuring fonts..." >&2
+      warning_str="Could not create hard link. Nix is probably on another filesystem. Copying the font instead..."
       find -L "$systemConfig/Library/Fonts" -type f -print0 | while IFS= read -rd "" l; do
           font=''${l##*/}
           f=$(readlink -f "$l")
           if [ ! -e "/Library/Fonts/$font" ]; then
               echo "updating font $font..." >&2
               ln -fn -- "$f" /Library/Fonts 2>/dev/null || {
-                echo "Could not create hard link. Nix is probably on another filesystem. Copying the font instead..." >&2
+	      	[[ "$warning_str" != "" ]] && echo "$warning_str" >&2 && unset warning_str
                 rsync -az --inplace "$f" /Library/Fonts
               }
           fi
