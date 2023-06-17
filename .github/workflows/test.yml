@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         extra_nix_config: |
@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
         extra_nix_config: |
@@ -43,7 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
@@ -80,7 +80,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
         extra_nix_config: |
@@ -116,7 +116,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix version corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
@@ -199,7 +199,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
         extra_nix_config: |
