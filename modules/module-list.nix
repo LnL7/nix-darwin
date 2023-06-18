@@ -53,6 +53,7 @@
   ./services/emacs.nix
   ./services/gitlab-runner.nix
   ./services/hercules-ci-agent
+  ./services/ipfs.nix
   ./services/karabiner-elements
   ./services/khd
   ./services/kwm
