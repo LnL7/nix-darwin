@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         extra_nix_config: |
@@ -28,7 +28,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
         extra_nix_config: |
@@ -43,7 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
@@ -80,7 +80,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
         extra_nix_config: |
@@ -116,7 +116,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix version corresponding to latest stable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
@@ -133,14 +133,14 @@ jobs:
         nix-shell -A installer.check
     - name: Build simple flake configuration
       run: |
-        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
+        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
     - name: Activate derivation of simple flake build
       run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -155,10 +155,11 @@ jobs:
         popd
 
         cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+        cp -a ./modules/examples/flake/flake.nix /tmp/test-nix-darwin-submodules
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \
-            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            '\#modules = \[#s#configuration#configuration ./simple.nix#' \
             ./flake.nix
           /usr/bin/sed -i.bak \
             's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
@@ -198,7 +199,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v20
+      uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
         extra_nix_config: |
@@ -214,14 +215,14 @@ jobs:
         nix-shell -A installer.check
     - name: Build simple flake configuration
       run: |
-        nix build ./modules/examples#darwinConfigurations.simple.system --override-input darwin .
+        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
     - name: Activate derivation of simple flake build
       run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples#simple --override-input darwin .
+        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -236,10 +237,11 @@ jobs:
         popd
 
         cp -a ./modules/examples/. /tmp/test-nix-darwin-submodules
+        cp -a ./modules/examples/flake/flake.nix /tmp/test-nix-darwin-submodules
 
         pushd /tmp/test-nix-darwin-submodules
           /usr/bin/sed -i.bak \
-            '\#modules = \[#s#darwin.darwinModules.simple#./simple.nix#' \
+            '\#modules = \[#s#configuration#configuration ./simple.nix#' \
             ./flake.nix
           /usr/bin/sed -i.bak \
             's#pkgs.vim#pkgs."${import ./submodule-test/hello.nix}"#' \
