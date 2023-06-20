@@ -88,6 +88,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleScrollerPagingBehavior = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Jump to the spot that's clicked on the scroll bar. The default is false.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = mkOption {
       type = types.nullOr types.bool;
       default = null;
