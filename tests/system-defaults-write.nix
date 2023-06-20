@@ -50,6 +50,7 @@
   system.defaults.screensaver.askForPasswordDelay = 5;
   system.defaults.smb.NetBIOSName = "IMAC-000000";
   system.defaults.smb.ServerDescription = ''Darwin\\\\U2019s iMac'';
+  system.defaults.universalaccess.mouseDriverCursorSize = 1.5;
   system.defaults.universalaccess.reduceTransparency = true;
   system.defaults.universalaccess.closeViewScrollWheelToggle = true;
   system.defaults.universalaccess.closeViewZoomFollowsFocus = true;
@@ -118,6 +119,7 @@
     grep "defaults write com.apple.screencapture 'location' -string '/tmp'" ${config.out}/activate-user
     grep "defaults write com.apple.screensaver 'askForPassword' -bool YES" ${config.out}/activate-user
     grep "defaults write com.apple.screensaver 'askForPasswordDelay' -int 5" ${config.out}/activate-user
+    grep "defaults write com.apple.universalaccess 'mouseDriverCursorSize' -float 1.5" ${config.out}/activate-user
     grep "defaults write com.apple.universalaccess 'reduceTransparency' -bool YES" ${config.out}/activate-user
     grep "defaults write com.apple.universalaccess 'closeViewScrollWheelToggle' -bool YES" ${config.out}/activate-user
     grep "defaults write com.apple.universalaccess 'closeViewZoomFollowsFocus' -bool YES" ${config.out}/activate-user
