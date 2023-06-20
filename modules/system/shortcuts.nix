@@ -203,13 +203,46 @@ let
       '';
     };
 
-  encodeShortcut = config: {
+  encodeShortcut = config: let
+    reverseLookup = val: let 
+      keys = builtins.attrNames keyCodes;
+      matchingKeys = builtins.filter (k: keyCodes.${k} == val) keys;
+    in
+      if matchingKeys == [] then null else builtins.head matchingKeys;
+
+    # TODO: this is brittle, probably incorrect and based on this comment https://stackoverflow.com/a/23318003 
+    # > It is the ascii code of the letter on the key, or -1 (65535) if there is no ascii code. Note that letters are lowercase, so D is 100 (lowercase d).
+    # > Sometimes a key that would normally have an ascii code uses 65535 instead. This appears to happen when the control key modifier is used, for example with hot keys for specific spaces.
+    keyCodeToAscii = config : 
+      let 
+        code = config.key;
+        mods = config.mods;
+        isAsciish = code : (code >=  0 && code < 36)
+              || (code >= 37 && code < 48)
+              || (code == 50 );
+      in
+        # Apart from the control modifier, it seems that for instance command option d is 65535
+        # deal with ascii-ish keycodes and convert them to an ascii code.
+        if (!mods.control && !(mods.command && mods.option) && isAsciish code) then
+          (lib.strings.charToInt (lib.strings.toLower (reverseLookup code)))
+        # "return"
+        else if (!mods.control && code == 36) then 10
+        # "tab"
+        else if (!mods.control && code == 48) then 9
+        # "space"
+        else if (!mods.control && code == 49) then 32
+        # "delete"
+        else if (!mods.control && code == 51) then 127
+        # assume (probably incorrectly) that the rest map to the magic code 65535
+        else 65535;
+
+  in {
     name = toString config.id;
     value = {
       enabled = config.enable;
       value = {
         parameters = [
-          65535  # This one doesn’t seem to be used
+          (keyCodeToAscii config)
           config.key
           (lib.pipe modMasks [
             (attrsets.filterAttrs (mod: _: attrsets.getAttr mod config.mods))
@@ -230,6 +263,9 @@ in
   options.system.keyboard.shortcuts = with modNames; {
     enable = options.mkEnableOption "keyboard shorcuts";
 
+    # the otherwise undocumented complete list of magic numbers for system hotkeys
+    # is here https://gist.github.com/mkhl/455002#file-ctrl-f1-c-L12 
+
     launchpadDock = {
       dockHiding = mkShortcut 52 "Turn Dock hiding on/off" true [option command] "D";
       showLaunchpad = mkShortcut 160 "Show Launchpad" false [] null;
@@ -249,7 +285,9 @@ in
     # TODO: services
 
     spotlight = {
-      search = mkShortcut 64 "Show Spotlight search" true [command] "space";
+      # search = mkShortcut 64 "Show Spotlight search" true [command] "space";
+      # until I learn how to override this correctly
+      search = mkShortcut 64 "Show Spotlight search" false [command] "space";
       finderSearch = mkShortcut 65 "Show Finder search" true [option command] "space";
     };
 
@@ -293,6 +331,12 @@ in
       system.activationScripts.shortcuts.text = lib.optionalString cfg.enable ''
         # Configuring system shortcuts
         "${updateShortcuts}" "${shortcutsSpec}"
+
+        # https://zameermanji.com/blog/2021/6/8/applying-com-apple-symbolichotkeys-changes-instantaneously/
+        # write to a (hopefully also in the future) unused magic number, so that some hidden state gets updated
+        # and activateSettings will reload the plist
+        defaults write com.apple.symbolichotkeys.plist AppleSymbolicHotKeys -dict-add 999 "<dict><key>enabled</key><false/></dict>"
+        /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
       '';
     };
 }
