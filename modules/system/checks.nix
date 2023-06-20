@@ -48,11 +48,7 @@ let
     if dscl . -list /Users | grep -q '^nixbld'; then
         echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
         echo "These can cause migration problems when upgrading to certain macOS versions" >&2
-        echo "Running the installer again will remove and recreate the users in a way that avoids these problems" >&2
-        echo >&2
-        echo "$ darwin-install" >&2
-        echo >&2
-        echo "or enable to automatically manage the users" >&2
+        echo "You can enable the following option to migrate to new style nixbld users" >&2
         echo >&2
         echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
