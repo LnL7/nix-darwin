@@ -13,6 +13,6 @@ jobs:
     runs-on: macos-12
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v20
+    - uses: cachix/install-nix-action@v22
     - run: |
         nix build ${{ github.event.client_payload.args }} -vL
