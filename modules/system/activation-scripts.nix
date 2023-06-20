@@ -69,11 +69,6 @@ in
 
       ${cfg.activationScripts.postActivation.text}
 
-      # Ensure /run exists.
-      if [ ! -e /run ]; then
-        ln -sfn private/var/run /run
-      fi
-
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system
       # (which is a symlink to the store), /run/current-system is still
@@ -102,6 +97,7 @@ in
 
       ${cfg.activationScripts.preUserActivation.text}
 
+      ${cfg.activationScripts.createRun.text}
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}

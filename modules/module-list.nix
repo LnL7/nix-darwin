@@ -8,6 +8,7 @@
   ./security/pki
   ./security/sandbox
   ./system
+  ./system/base.nix
   ./system/checks.nix
   ./system/activation-scripts.nix
   ./system/applications.nix

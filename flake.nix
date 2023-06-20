@@ -36,6 +36,12 @@
           });
     };
 
+    overlays.default = final: prev: {
+      inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option;
+
+      darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
+    };
+
     darwinModules.hydra = ./modules/examples/hydra.nix;
     darwinModules.lnl = ./modules/examples/lnl.nix;
     darwinModules.ofborg = ./modules/examples/ofborg.nix;
@@ -63,20 +69,14 @@
     });
 
     packages = forAllSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-
-      darwin = self.lib.darwinSystem {
+      pkgs = import nixpkgs {
         inherit system;
-        modules = [ ];
+        overlays = [ self.overlays.default ];
       };
-
-      nix-tools = pkgs.callPackage ./pkgs/nix-tools { inherit darwin; };
     in {
       default = self.packages.${system}.darwin-rebuild;
 
-      inherit (nix-tools) darwin-rebuild darwin-option;
-
-      darwin-uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
+      inherit (pkgs) darwin-option darwin-rebuild darwin-uninstaller;
     });
   };
 }
