@@ -191,7 +191,7 @@ let
       inherit description;
       type = types.submodule { options = shortcutOptions id enable mods key; };
       default = {};
-      example = options.literalExample ''
+      example = options.literalExpression ''
         {
           enable = true;
           mods = {
