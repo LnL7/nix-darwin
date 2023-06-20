@@ -18,6 +18,7 @@
   system.defaults.NSGlobalDomain.NSAutomaticWindowAnimationsEnabled = false;
   system.defaults.NSGlobalDomain.NSDisableAutomaticTermination = true;
   system.defaults.NSGlobalDomain.NSDocumentSaveNewDocumentsToCloud = false;
+  system.defaults.NSGlobalDomain.AppleWindowTabbingMode = "always";
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
   system.defaults.NSGlobalDomain.NSNavPanelExpandedStateForSaveMode2 = true;
   system.defaults.NSGlobalDomain.NSTableViewDefaultSizeMode = 2;
@@ -86,6 +87,7 @@
     grep "defaults write -g 'NSAutomaticWindowAnimationsEnabled' -bool NO" ${config.out}/activate-user
     grep "defaults write -g 'NSDisableAutomaticTermination' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSDocumentSaveNewDocumentsToCloud' -bool NO" ${config.out}/activate-user
+    grep "defaults write -g 'AppleWindowTabbingMode' -string 'always'" ${config.out}/activate-user
     grep "defaults write -g 'NSNavPanelExpandedStateForSaveMode' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSNavPanelExpandedStateForSaveMode2' -bool YES" ${config.out}/activate-user
     grep "defaults write -g 'NSTableViewDefaultSizeMode' -int 2" ${config.out}/activate-user
