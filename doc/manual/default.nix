@@ -1,99 +1,44 @@
-{ pkgs, options, config, version, revision, extraSources ? [] }:
+{ pkgs
+, options
+, config
+, version
+, revision
+, nixpkgsRevision
+, extraSources ? []
+, prefix ? ../..
+}:
 
 with pkgs;
 
 let
   lib = pkgs.lib;
 
-  # Remove invisible and internal options.
-  optionsListVisible = lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList options);
-
-  # Replace functions by the string <function>
-  substFunction = x:
-    if builtins.isAttrs x then lib.mapAttrs (name: substFunction) x
-    else if builtins.isList x then map substFunction x
-    else if lib.isFunction x then "<function>"
-    else x;
-
-  # Generate DocBook documentation for a list of packages. This is
-  # what `relatedPackages` option of `mkOption` from
-  # ../../../lib/options.nix influences.
-  #
-  # Each element of `relatedPackages` can be either
-  # - a string:  that will be interpreted as an attribute name from `pkgs`,
-  # - a list:    that will be interpreted as an attribute path from `pkgs`,
-  # - an attrset: that can specify `name`, `path`, `package`, `comment`
-  #   (either of `name`, `path` is required, the rest are optional).
-  genRelatedPackages = packages:
-    let
-      unpack = p: if lib.isString p then { name = p; }
-                  else if lib.isList p then { path = p; }
-                  else p;
-      describe = args:
-        let
-          title = args.title or null;
-          name = args.name or (lib.concatStringsSep "." args.path);
-          path = args.path or [ args.name ];
-          package = args.package or (lib.attrByPath path (throw "Invalid package attribute path `${toString path}'") pkgs);
-        in "<listitem>"
-        + "<para><literal>${lib.optionalString (title != null) "${title} aka "}pkgs.${name} (${package.meta.name})</literal>"
-        + lib.optionalString (!package.meta.available) " <emphasis>[UNAVAILABLE]</emphasis>"
-        + ": ${package.meta.description or "???"}.</para>"
-        + lib.optionalString (args ? comment) "\n<para>${args.comment}</para>"
-        # Lots of `longDescription's break DocBook, so we just wrap them into <programlisting>
-        + lib.optionalString (package.meta ? longDescription) "\n<programlisting>${package.meta.longDescription}</programlisting>"
-        + "</listitem>";
-    in "<itemizedlist>${lib.concatStringsSep "\n" (map (p: describe (unpack p)) packages)}</itemizedlist>";
-
-  optionsListDesc = lib.flip map optionsListVisible (opt: opt // {
-    # Clean up declaration sites to not refer to the NixOS source tree.
-    declarations = map stripAnyPrefixes opt.declarations;
-  }
-  // lib.optionalAttrs (opt ? example) { example = substFunction opt.example; }
-  // lib.optionalAttrs (opt ? default) { default = substFunction opt.default; }
-  // lib.optionalAttrs (opt ? type) { type = substFunction opt.type; }
-  // lib.optionalAttrs (opt ? relatedPackages && opt.relatedPackages != []) { relatedPackages = genRelatedPackages opt.relatedPackages; });
-
-  # We need to strip references to /nix/store/* from options,
-  # including any `extraSources` if some modules came from elsewhere,
-  # or else the build will fail.
-  #
-  # E.g. if some `options` came from modules in ${pkgs.customModules}/nix,
-  # you'd need to include `extraSources = [ pkgs.customModules ]`
-  prefixesToStrip = map (p: "${toString p}/") ([ ../../.. ] ++ extraSources);
-  stripAnyPrefixes = lib.flip (lib.fold lib.removePrefix) prefixesToStrip;
-
-  # Custom "less" that pushes up all the things ending in ".enable*"
-  # and ".package*"
-  optionLess = a: b:
-    let
-      ise = lib.hasPrefix "enable";
-      isp = lib.hasPrefix "package";
-      cmp = lib.splitByAndCompare ise lib.compare
-                                 (lib.splitByAndCompare isp lib.compare lib.compare);
-    in lib.compareLists cmp a.loc b.loc < 0;
-
-  # Customly sort option list for the man page.
-  optionsList = lib.sort optionLess optionsListDesc;
-
-  # Convert the list of options into an XML file.
-  optionsXML = builtins.toFile "options.xml" (builtins.toXML optionsList);
-
-  optionsDocBook = runCommand "options-db.xml" {} ''
-    optionsXML=${optionsXML}
-    if grep /darwin/modules $optionsXML; then
-      echo "The manual appears to depend on the location of Darwin, which is bad"
-      echo "since this prevents sharing via a channel.  This is typically"
-      echo "caused by an option default that refers to a relative path (see above"
-      echo "for hints about the offending path)."
-      exit 1
-    fi
-    ${buildPackages.libxslt.bin}/bin/xsltproc \
-      --stringparam revision '${revision}' \
-      -o intermediate.xml ${./options-to-docbook.xsl} $optionsXML
-    ${buildPackages.libxslt.bin}/bin/xsltproc \
-      -o "$out" ${./postprocess-option-descriptions.xsl} intermediate.xml
-  '';
+  optionsDoc = buildPackages.nixosOptionsDoc {
+    inherit options revision;
+    transformOptions = opt: opt // {
+      # Clean up declaration sites to not refer to the nix-darwin source tree.
+      # TODO: handle `extraSources`? (it's not set anywhere)
+      declarations = map
+        (decl:
+          if lib.hasPrefix (toString prefix) (toString decl) then
+            let
+              subpath = lib.removePrefix "/"
+                (lib.removePrefix (toString prefix) (toString decl));
+            in {
+              url = "https://github.com/LnL7/nix-darwin/blob/${revision}/${subpath}";
+              name = "<nix-darwin/${subpath}>";
+            }
+          # TODO: handle this in a better way (may require upstream
+          # changes to nixpkgs)
+          else if decl == "lib/modules.nix" then
+            {
+              url = "https://github.com/NixOS/nixpkgs/blob/${nixpkgsRevision}/${decl}";
+              name = "<nixpkgs/${decl}>";
+            }
+          else decl)
+        opt.declarations;
+    };
+  };
 
   sources = lib.sourceFilesBySuffices ./. [".xml"];
 
@@ -108,7 +53,7 @@ let
   generatedSources = runCommand "generated-docbook" {} ''
     mkdir $out
     ln -s ${modulesDoc} $out/modules.xml
-    ln -s ${optionsDocBook} $out/options-db.xml
+    ln -s ${optionsDoc.optionsDocBook} $out/options-db.xml
     printf "%s" "${version}" > $out/version
   '';
 
@@ -234,22 +179,23 @@ let
 in rec {
   inherit generatedSources;
 
-  # The NixOS options in JSON format.
-  optionsJSON = runCommand "options-json"
-    { meta.description = "List of NixOS options in JSON format";
-    }
+  # TODO: Use `optionsDoc.optionsJSON` directly once upstream
+  # `nixosOptionsDoc` is more customizable.
+  optionsJSON = runCommand "options.json"
+    { meta.description = "List of nix-darwin options in JSON format"; }
     ''
-      # Export list of options in different format.
-      dst=$out/share/doc/darwin
-      mkdir -p $dst
+      mkdir -p $out/{share/doc,nix-support}
+      cp -a ${optionsDoc.optionsJSON}/share/doc/nixos $out/share/doc/darwin
+      substitute \
+        ${optionsDoc.optionsJSON}/nix-support/hydra-build-products \
+        $out/nix-support/hydra-build-products \
+        --replace \
+          '${optionsDoc.optionsJSON}/share/doc/nixos' \
+          "$out/share/doc/darwin"
+    '';
 
-      cp ${builtins.toFile "options.json" (builtins.unsafeDiscardStringContext (builtins.toJSON
-        (builtins.listToAttrs (map (o: { name = o.name; value = removeAttrs o ["name" "visible" "internal"]; }) optionsList))))
-      } $dst/options.json
-
-      mkdir -p $out/nix-support
-      echo "file json $dst/options.json" >> $out/nix-support/hydra-build-products
-    ''; # */
+  # Temporary export for Markdown conversion.
+  inherit (optionsDoc) optionsDocBook;
 
   # Generate the NixOS manual.
   manualHTML = runCommand "darwin-manual-html"
@@ -341,4 +287,3 @@ in rec {
     '';
 
 }
-
