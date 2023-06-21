@@ -56,7 +56,6 @@ in
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
       ${cfg.activationScripts.applications.text}
-      ${cfg.activationScripts.pam.text}
       ${cfg.activationScripts.patches.text}
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.defaults.text}
