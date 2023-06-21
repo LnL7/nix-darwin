@@ -2,6 +2,9 @@
   # WARNING this is very much still experimental.
   description = "A collection of darwin modules";
 
+  # Temporary pin for Markdown documentation transition.
+  inputs.nixpkgs.url = "nixpkgs/c1bca7fe84c646cfd4ebf3482c0e6317a0b13f22";
+
   outputs = { self, nixpkgs }: {
     lib = {
       # TODO handle multiple architectures.
