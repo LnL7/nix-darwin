@@ -194,9 +194,6 @@ in rec {
           "$out/share/doc/darwin"
     '';
 
-  # Temporary export for Markdown conversion.
-  inherit (optionsDoc) optionsDocBook;
-
   # Generate the NixOS manual.
   manualHTML = runCommand "darwin-manual-html"
     { inherit sources;
