@@ -8,7 +8,8 @@ with lib;
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Security and Privacy > Firewall
+        Apple menu > System Preferences > Security and Privacy > Firewall
+
         Enable the internal firewall to prevent unauthorised applications, programs
         and services from accepting incoming connections.
 
@@ -22,7 +23,8 @@ with lib;
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Security and Privacy > Firewall
+        Apple menu > System Preferences > Security and Privacy > Firewall
+
         Allows any signed Application to accept incoming requests. Default is true.
 
         0 = disabled
@@ -34,7 +36,8 @@ with lib;
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Security and Privacy > Firewall
+        Apple menu > System Preferences > Security and Privacy > Firewall
+
         Allows any downloaded Application that has been signed to accept incoming requests. Default is 0.
 
         0 = disabled
@@ -46,7 +49,8 @@ with lib;
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Security and Privacy > Firewall
+        Apple menu > System Preferences > Security and Privacy > Firewall
+
         Enable logging of requests made to the firewall. Default is 0.
 
         0 = disabled
@@ -58,7 +62,8 @@ with lib;
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Security and firewall
+        Apple menu > System Preferences > Security and firewall
+
         Drops incoming requests via ICMP such as ping requests. Default is 0.
 
         0 = disabled

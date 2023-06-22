@@ -29,9 +29,9 @@ in
       description = ''
         Set of patches to apply to <filename>/</filename>.
 
-        <warning>
-        <para>This can modify everything so use with caution.</para>
-        </warning>
+        <warning><para>
+        This can modify everything so use with caution.
+        </para></warning>
 
         Useful for safely changing system files.  Unlike the etc module this
         won't remove or modify files with unexpected content.

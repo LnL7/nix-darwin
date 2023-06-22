@@ -23,9 +23,9 @@ in
         enable = mkOption {
           default = false;
           type = types.bool;
-          description = "
+          description = ''
             Whether to enable the Synergy client (receive keyboard and mouse events from a Synergy server).
-          ";
+          '';
         };
         screenName = mkOption {
           default = "";

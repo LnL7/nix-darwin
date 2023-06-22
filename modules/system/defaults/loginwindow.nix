@@ -8,7 +8,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Displays login window as a name and password field instead of a list of users.
         Default is false.
       '';
@@ -18,7 +19,8 @@ with lib;
       type = types.nullOr types.str;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Auto login the supplied user on boot. Default is Off.
       '';
     };
@@ -27,7 +29,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Allow users to login to the machine as guests using the Guest account. Default is true.
       '';
     };
@@ -44,7 +47,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Hides the Shut Down button on the login screen. Default is false.
       '';
     };
@@ -53,7 +57,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Hides the Sleep button on the login screen. Default is false.
       '';
     };
@@ -62,7 +67,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Hides the Restart button on the login screen. Default is false.
       '';
     };
@@ -71,7 +77,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Disables the "Shutdown" option when users are logged in. Default is false.
       '';
     };
@@ -80,7 +87,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         If set to true, the Power Off menu item will be disabled when the user is logged in. Default is false.
       '';
     };
@@ -89,7 +97,8 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Users and Groups > Login Options
+        Apple menu > System Preferences > Users and Groups > Login Options
+
         Disables the “Restart” option when users are logged in. Default is false.
       '';
     };

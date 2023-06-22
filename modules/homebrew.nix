@@ -31,9 +31,6 @@ let
 
   # Option and submodule helper functions ----------------------------------------------------------
 
-  mkDocOptionLink = optionName:
-    ''<link xlink:href="#opt-${optionName}"><option>${optionName}</option></link>'';
-
   mkNullOrBoolOption = args: mkOption (args // {
     type = types.nullOr types.bool;
     default = null;
@@ -104,7 +101,7 @@ let
 
           Although auto-updating is disabled by default during system activation, note that Homebrew
           will auto-update when you manually invoke certain Homebrew commands. To modify this
-          behavior see ${mkDocOptionLink "homebrew.global.autoUpdate"}.
+          behavior see <xref linkend="opt-homebrew.global.autoUpdate"/>.
         '';
       };
       upgrade = mkOption {
@@ -141,7 +138,7 @@ let
           the Nix store, when you manually invoke <command>brew bundle</command>.
 
           Enabling this option will change the default value of
-          ${mkDocOptionLink "homebrew.global.lockfiles"} to <literal>false</literal> since, with
+          <xref linkend="opt-homebrew.global.lockfiles"/> to <literal>false</literal> since, with
           this option enabled, <command>brew bundle [install]</command> will default to using the
           Brewfile that this module generates in the Nix store, unless you explicitly point it at
           another Brewfile using the <literal>--file</literal> flag. As a result, it will try to
@@ -151,7 +148,7 @@ let
           Implementation note: when enabled, this option sets the
           <literal>HOMEBREW_BUNDLE_FILE</literal> environment variable to the path of the Brewfile
           that this module generates in the Nix store, by adding it to
-          ${mkDocOptionLink "environment.variables"}.
+          <xref linkend="opt-environment.variables"/>.
         '';
       };
       autoUpdate = mkOption {
@@ -166,14 +163,14 @@ let
           above if it's been more then 5 minutes since it last updated.
 
           You may want to consider disabling this option if you have
-          ${mkDocOptionLink "homebrew.onActivation.upgrade"} enabled, and
-          ${mkDocOptionLink "homebrew.onActivation.autoUpdate"} disabled, if you want to ensure that
+          <xref linkend="opt-homebrew.onActivation.upgrade"/> enabled, and
+          <xref linkend="opt-homebrew.onActivation.autoUpdate"/> disabled, if you want to ensure that
           your installed formulae will only be upgraded during <command>nix-darwin</command> system
           activation, after you've explicitly run <command>brew update</command>.
 
           Implementation note: when disabled, this option sets the
           <literal>HOMEBREW_NO_AUTO_UPDATE</literal> environment variable, by adding it to
-          ${mkDocOptionLink "environment.variables"}.
+          <xref linkend="opt-environment.variables"/>.
         '';
       };
       lockfiles = mkOption {
@@ -185,7 +182,7 @@ let
           <command>brew bundle [install]</command>.
 
           This option will default to <literal>false</literal> if
-          ${mkDocOptionLink "homebrew.global.brewfile"} is enabled since, with that option enabled,
+          <xref linkend="opt-homebrew.global.brewfile"/> is enabled since, with that option enabled,
           <command>brew bundle [install]</command> will default to using the Brewfile that this
           module generates in the Nix store, unless you explicitly point it at another Brewfile
           using the <literal>--file</literal> flag. As a result, it will try to write the
@@ -194,7 +191,7 @@ let
 
           Implementation note: when disabled, this option sets the
           <literal>HOMEBREW_BUNDLE_NO_LOCK</literal> environment variable, by adding it to
-          ${mkDocOptionLink "environment.variables"}.
+          <xref linkend="opt-environment.variables"/>.
         '';
       };
 
@@ -265,70 +262,70 @@ let
         description = ''
           Target location for Applications.
 
-          Homebrew's default is <filename class='directory'>/Applications</filename>.
+          Homebrew's default is <filename>/Applications</filename>.
         '';
       };
       colorpickerdir = mkNullOrStrOption {
         description = ''
           Target location for Color Pickers.
 
-          Homebrew's default is <filename class='directory'>~/Library/ColorPickers</filename>.
+          Homebrew's default is <filename>~/Library/ColorPickers</filename>.
         '';
       };
       prefpanedir = mkNullOrStrOption {
         description = ''
           Target location for Preference Panes.
 
-          Homebrew's default is <filename class='directory'>~/Library/PreferencePanes</filename>.
+          Homebrew's default is <filename>~/Library/PreferencePanes</filename>.
         '';
       };
       qlplugindir = mkNullOrStrOption {
         description = ''
           Target location for QuickLook Plugins.
 
-          Homebrew's default is <filename class='directory'>~/Library/QuickLook</filename>.
+          Homebrew's default is <filename>~/Library/QuickLook</filename>.
         '';
       };
       mdimporterdir = mkNullOrStrOption {
         description = ''
           Target location for Spotlight Plugins.
 
-          Homebrew's default is <filename class='directory'>~/Library/Spotlight</filename>.
+          Homebrew's default is <filename>~/Library/Spotlight</filename>.
         '';
       };
       dictionarydir = mkNullOrStrOption {
         description = ''
           Target location for Dictionaries.
 
-          Homebrew's default is <filename class='directory'>~/Library/Dictionaries</filename>.
+          Homebrew's default is <filename>~/Library/Dictionaries</filename>.
         '';
       };
       fontdir = mkNullOrStrOption {
         description = ''
           Target location for Fonts.
 
-          Homebrew's default is <filename class='directory'>~/Library/Fonts</filename>.
+          Homebrew's default is <filename>~/Library/Fonts</filename>.
         '';
       };
       servicedir = mkNullOrStrOption {
         description = ''
           Target location for Services.
 
-          Homebrew's default is <filename class='directory'>~/Library/Services</filename>.
+          Homebrew's default is <filename>~/Library/Services</filename>.
         '';
       };
       input_methoddir = mkNullOrStrOption {
         description = ''
           Target location for Input Methods.
 
-          Homebrew's default is <filename class='directory'>~/Library/Input Methods</filename>.
+          Homebrew's default is <filename>~/Library/Input Methods</filename>.
         '';
       };
       internet_plugindir = mkNullOrStrOption {
         description = ''
           Target location for Internet Plugins.
 
-          Homebrew's default is <filename class='directory'>~/Library/Internet Plug-Ins</filename>.
+          Homebrew's default is <filename>~/Library/Internet Plug-Ins</filename>.
         '';
       };
       audio_unit_plugindir = mkNullOrStrOption {
@@ -336,28 +333,28 @@ let
           Target location for Audio Unit Plugins.
 
           Homebrew's default is
-          <filename class='directory'>~/Library/Audio/Plug-Ins/Components</filename>.
+          <filename>~/Library/Audio/Plug-Ins/Components</filename>.
         '';
       };
       vst_plugindir = mkNullOrStrOption {
         description = ''
           Target location for VST Plugins.
 
-          Homebrew's default is <filename class='directory'>~/Library/Audio/Plug-Ins/VST</filename>.
+          Homebrew's default is <filename>~/Library/Audio/Plug-Ins/VST</filename>.
         '';
       };
       vst3_plugindir = mkNullOrStrOption {
         description = ''
           Target location for VST3 Plugins.
 
-          Homebrew's default is <filename class='directory'>~/Library/Audio/Plug-Ins/VST3</filename>.
+          Homebrew's default is <filename>~/Library/Audio/Plug-Ins/VST3</filename>.
         '';
       };
       screen_saverdir = mkNullOrStrOption {
         description = ''
           Target location for Screen Savers.
 
-          Homebrew's default is <filename class='directory'>~/Library/Screen Savers</filename>.
+          Homebrew's default is <filename>~/Library/Screen Savers</filename>.
         '';
       };
       language = mkNullOrStrOption {
@@ -481,7 +478,7 @@ let
         visible = "shallow"; # so that options from `homebrew.caskArgs` aren't repeated.
         description = ''
           Arguments passed to <command>brew install --cask</command> when installing this cask. See
-          ${mkDocOptionLink "homebrew.caskArgs"} for the available options.
+          <xref linkend="opt-homebrew.caskArgs"/> for the available options.
         '';
       };
       greedy = mkNullOrBoolOption {
@@ -523,12 +520,12 @@ in
       Note that enabling this option does not install Homebrew, see the Homebrew
       <link xlink:href="https://brew.sh">website</link> for installation instructions.
 
-      Use the ${mkDocOptionLink "homebrew.brews"}, ${mkDocOptionLink "homebrew.casks"},
-      ${mkDocOptionLink "homebrew.masApps"}, and ${mkDocOptionLink "homebrew.whalebrews"} options
+      Use the <xref linkend="opt-homebrew.brews"/>, <xref linkend="opt-homebrew.casks"/>,
+      <xref linkend="opt-homebrew.masApps"/>, and <xref linkend="opt-homebrew.whalebrews"/> options
       to list the Homebrew formulae, casks, Mac App Store apps, and Docker containers you'd like to
-      install. Use the ${mkDocOptionLink "homebrew.taps"} option, to make additional formula
+      install. Use the <xref linkend="opt-homebrew.taps"/> option, to make additional formula
       repositories available to Homebrew. This module uses those options (along with the
-      ${mkDocOptionLink "homebrew.caskArgs"} options) to generate a Brewfile that
+      <xref linkend="opt-homebrew.caskArgs"/> options) to generate a Brewfile that
       <command>nix-darwin</command> passes to the <command>brew bundle</command> command during
       system activation.
 
@@ -536,10 +533,10 @@ in
       and all formulae, as well as upgrading anything that's already installed, so that repeated
       invocations of <command>darwin-rebuild switch</command> (without any change to the
       configuration) are idempotent. You can modify this behavior using the options under
-      ${mkDocOptionLink "homebrew.onActivation"}.
+      <xref linkend="opt-homebrew.onActivation"/>.
 
       This module also provides a few options for modifying how Homebrew commands behave when
-      you manually invoke them, under ${mkDocOptionLink "homebrew.global"}
+      you manually invoke them, under <xref linkend="opt-homebrew.global"/>
     '';
 
     brewPrefix = mkOption {
@@ -595,7 +592,7 @@ in
 
         Taps defined as strings, e.g., <literal>"user/repo"</literal>, are a shorthand for:
 
-        <code>{ name = "user/repo"; }</code>
+        <literal>{ name = "user/repo"; }</literal>
       '';
     };
 
@@ -610,7 +607,7 @@ in
       '';
       description = ''
         Arguments passed to <command>brew install --cask</command> for all casks listed in
-        ${mkDocOptionLink "homebrew.casks"}.
+        <xref linkend="opt-homebrew.casks"/>.
       '';
     };
 
@@ -644,7 +641,7 @@ in
 
         Formulae defined as strings, e.g., <literal>"imagemagick"</literal>, are a shorthand for:
 
-        <code>{ name = "imagemagick"; }</code>
+        <literal>{ name = "imagemagick"; }</literal>
       '';
     };
 
@@ -675,7 +672,7 @@ in
 
         Casks defined as strings, e.g., <literal>"google-chrome"</literal>, are a shorthand for:
 
-        <code>{ name = "google-chrome"; }</code>
+        <literal>{ name = "google-chrome"; }</literal>
       '';
     };
 
@@ -692,12 +689,12 @@ in
         Applications to install from Mac App Store using <command>mas</command>.
 
         When this option is used, <literal>"mas"</literal> is automatically added to
-        ${mkDocOptionLink "homebrew.brews"}.
+        <xref linkend="opt-homebrew.brews"/>.
 
         Note that you need to be signed into the Mac App Store for <command>mas</command> to
         successfully install and upgrade applications, and that unfortunately apps removed from this
         option will not be uninstalled automatically even if
-        ${mkDocOptionLink "homebrew.onActivation.cleanup"} is set to <literal>"uninstall"</literal>
+        <xref linkend="opt-homebrew.onActivation.cleanup"/> is set to <literal>"uninstall"</literal>
         or <literal>"zap"</literal> (this is currently a limitation of Homebrew Bundle).
 
         For more information on <command>mas</command> see:
@@ -713,7 +710,7 @@ in
         List of Docker images to install using <command>whalebrew</command>.
 
         When this option is used, <literal>"whalebrew"</literal> is automatically added to
-        ${mkDocOptionLink "homebrew.brews"}.
+        <xref linkend="opt-homebrew.brews"/>.
 
         For more information on <command>whalebrew</command> see:
         <link xlink:href="https://github.com/whalebrew/whalebrew">github.com/whalebrew/whalebrew</link>.

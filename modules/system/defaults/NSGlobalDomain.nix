@@ -229,7 +229,8 @@ in {
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Keyboard
+        Apple menu > System Preferences > Keyboard
+
         If you press and hold certain keyboard keys when in a text area, the key’s character begins to repeat.
         For example, the Delete key continues to remove text for as long as you hold it down.
 
@@ -241,7 +242,8 @@ in {
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Keyboard
+        Apple menu > System Preferences > Keyboard
+
         If you press and hold certain keyboard keys when in a text area, the key’s character begins to repeat.
         For example, the Delete key continues to remove text for as long as you hold it down.
 
@@ -285,7 +287,8 @@ in {
       type = types.nullOr floatWithDeprecationError;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Sound
+        Apple menu > System Preferences > Sound
+
         Sets the beep/alert volume level from 0.000 (muted) to 1.000 (100% volume).
 
         75% = 0.7788008
@@ -300,7 +303,8 @@ in {
       type = types.nullOr types.int;
       default = null;
       description = ''
-        # Apple menu > System Preferences > Sound
+        Apple menu > System Preferences > Sound
+
         Make a feedback sound when the system volume changed. This setting accepts
         the integers 0 or 1. Defaults to 1.
       '';

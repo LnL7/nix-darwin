@@ -88,7 +88,7 @@ in
           via the Unix socket, and md5 password authentication will be
           used for users connecting via TCP. Any added rules will be
           inserted above the default rules. If you'd like to replace the
-          default rules entirely, you can use <function>lib.mkForce</function> in your
+          default rules entirely, you can use <literal>lib.mkForce</literal> in your
           module.
         '';
       };
@@ -159,7 +159,7 @@ in
                 For more information on how to specify the target
                 and on which privileges exist, see the
                 <link xlink:href="https://www.postgresql.org/docs/current/sql-grant.html">GRANT syntax</link>.
-                The attributes are used as <code>GRANT ''${attrValue} ON ''${attrName}</code>.
+                The attributes are used as <literal>GRANT ''${attrValue} ON ''${attrName}</literal>.
               '';
               example = literalExpression ''
                 {
@@ -237,8 +237,8 @@ in
           for an overview of <literal>postgresql.conf</literal>.
 
           <note><para>
-            String values will automatically be enclosed in single quotes. Single quotes will be
-            escaped with two single quotes as described by the upstream documentation linked above.
+          String values will automatically be enclosed in single quotes. Single quotes will be
+          escaped with two single quotes as described by the upstream documentation linked above.
           </para></note>
         '';
         example = literalExpression ''

@@ -173,11 +173,11 @@ in
       useDaemon = mkOption {
         type = types.bool;
         default = false;
-        description = "
+        description = ''
           If set, Nix will use the daemon to perform operations.
           Use this instead of services.nix-daemon.enable if you don't wan't the
           daemon service to be managed for you.
-        ";
+        '';
       };
 
       distributedBuilds = mkOption {
@@ -594,7 +594,7 @@ in
                 then Nix will use a binary from a binary cache if and only
                 if it is signed by <emphasis>any</emphasis> of the keys
                 listed here. By default, only the key for
-                <uri>cache.nixos.org</uri> is included.
+                <literal>cache.nixos.org</literal> is included.
               '';
             };
 
@@ -650,8 +650,7 @@ in
           <link xlink:href="https://nixos.org/manual/nix/stable/#sec-conf-file"/>
           for avalaible options.
           The value declared here will be translated directly to the key-value pairs Nix expects.
-          </para>
-          <para>
+
           Nix configurations defined under <option>nix.*</option> will be translated and applied to this
           option. In addition, configuration specified in <option>nix.extraOptions</option> which will be appended
           verbatim to the resulting config file.
