@@ -24,7 +24,12 @@ in
     };
 
     magicDNS = {
-      enable = mkEnableOption "Whether to configure networking to work with Tailscale's MagicDNS.";
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        example = true;
+        description = "Whether to configure networking to work with Tailscale's MagicDNS.";
+      };
     };
   };
 
