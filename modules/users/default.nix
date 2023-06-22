@@ -134,6 +134,7 @@ in
       '') deletedGroups}
     '';
 
+    system.activationScripts.users.deps = [ "groups" ];
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
 

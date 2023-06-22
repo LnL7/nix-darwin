@@ -76,8 +76,9 @@ in
         ${concatStringsSep "\n" SoftwareUpdate}
         ${concatStringsSep "\n" CustomSystemPreferences}
       '';
+    system.activationScripts.defaults.onlyOnRebuild = true;
 
-    system.activationScripts.userDefaults.text = mkIfAttrs
+    system.userActivationScripts.defaults.text = mkIfAttrs
       [
         GlobalPreferences
         LaunchServices

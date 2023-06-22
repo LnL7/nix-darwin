@@ -67,6 +67,7 @@ in
         fi
       '') cfg.patches}
     '';
+    system.activationScripts.patches.onlyOnRebuild = true;
 
   };
 }

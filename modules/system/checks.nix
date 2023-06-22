@@ -239,7 +239,7 @@ in
       (mkIf cfg.verifyNixPath nixPath)
     ];
 
-    system.activationScripts.checks.text = ''
+    system.userActivationScripts.checks.text = ''
       ${cfg.text}
 
       if test ''${checkActivation:-0} -eq 1; then

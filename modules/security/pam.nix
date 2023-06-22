@@ -58,5 +58,6 @@ in
       echo >&2 "setting up pam..."
       ${mkSudoTouchIdAuthScript cfg.enableSudoTouchIdAuth}
     '';
+    system.activationScripts.pam.onlyOnRebuild = true;
   };
 }

@@ -44,6 +44,7 @@ in
         echo "warning: /Applications/Nix Apps is not owned by nix-darwin, skipping App linking..." >&2
       fi
     '';
+    system.activationScripts.applications.onlyOnRebuild = true;
 
   };
 }

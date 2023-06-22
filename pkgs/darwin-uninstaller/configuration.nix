@@ -5,7 +5,7 @@ with lib;
 {
   # We are uninstalling, disable sanity checks.
   assertions = mkForce [];
-  system.activationScripts.checks.text = mkForce "";
+  system.userActivationScripts.checks.text = mkForce "";
 
   # Disable etc, launchd, ...
   environment.etc = mkForce {};

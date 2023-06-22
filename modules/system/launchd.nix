@@ -121,8 +121,17 @@ in
         fi
       done
     '';
+    system.activationScripts.launchd.onlyOnRebuild = true;
+    # Make sure anything the launchd daemons might rely on is already configured.
+    system.activationScripts.launchd.deps = [
+      "groups"
+      "users"
+      "etc"
+      "patches"
+      "defaults"
+    ];
 
-    system.activationScripts.userLaunchd.text = ''
+    system.userActivationScripts.launchd.text = ''
       # Set up user launchd services in ~/Library/LaunchAgents
       echo "setting up user launchd services..."
 

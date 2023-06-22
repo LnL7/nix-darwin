@@ -80,6 +80,6 @@ in
         done
       fi
     '';
-
+    system.activationScripts.fonts.onlyOnRebuild = true;
   };
 }
