@@ -46,11 +46,6 @@ let
     # Added in nixpkgs #136909, adds forward compatibility until 22.03 is deprecated.
     literalExpression = super.literalExpression or super.literalExample;
     literalDocBook = super.literalDocBook or super.literalExample;
-
-    # Removed in nixpkgs #237557, readded to faciliate Markdown transition.
-    mdDoc = text:
-      if ! self.isString text then throw "mdDoc expects a string."
-      else { _type = "mdDoc"; inherit text; };
   });
 
   eval = libExtended.evalModules (builtins.removeAttrs args [ "lib" "inputs" "pkgs" "system" ] // {
