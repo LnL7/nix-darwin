@@ -35,7 +35,7 @@ in
     system.stateVersion = mkOption {
       type = types.int;
       default = 4;
-      description = ''
+      description = lib.mdDoc ''
         Every once in a while, a new NixOS release may change
         configuration defaults in a way incompatible with stateful
         data. For instance, if the default version of PostgreSQL
@@ -50,50 +50,50 @@ in
 
     system.darwinLabel = mkOption {
       type = types.str;
-      description = "Label to be used in the names of generated outputs.";
+      description = lib.mdDoc "Label to be used in the names of generated outputs.";
     };
 
     system.darwinVersion = mkOption {
       internal = true;
       type = types.str;
-      description = "The full darwin version (e.g. <literal>darwin4.master</literal>).";
+      description = lib.mdDoc "The full darwin version (e.g. `darwin4.master`).";
     };
 
     system.darwinVersionSuffix = mkOption {
       internal = true;
       type = types.str;
-      description = "The short darwin version suffix (e.g. <literal>.2abdb5a</literal>).";
+      description = lib.mdDoc "The short darwin version suffix (e.g. `.2abdb5a`).";
     };
 
     system.darwinRevision = mkOption {
       internal = true;
       type = types.str;
       default = "master";
-      description = "The darwin git revision from which this configuration was built.";
+      description = lib.mdDoc "The darwin git revision from which this configuration was built.";
     };
 
     system.nixpkgsRelease = mkOption {
       readOnly = true;
       type = types.str;
-      description = "The nixpkgs release (e.g. <literal>16.03</literal>).";
+      description = lib.mdDoc "The nixpkgs release (e.g. `16.03`).";
     };
 
     system.nixpkgsVersion = mkOption {
       internal = true;
       type = types.str;
-      description = "The full nixpkgs version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
+      description = lib.mdDoc "The full nixpkgs version (e.g. `16.03.1160.f2d4ee1`).";
     };
 
     system.nixpkgsVersionSuffix = mkOption {
       internal = true;
       type = types.str;
-      description = "The short nixpkgs version suffix (e.g. <literal>.1160.f2d4ee1</literal>).";
+      description = lib.mdDoc "The short nixpkgs version suffix (e.g. `.1160.f2d4ee1`).";
     };
 
     system.nixpkgsRevision = mkOption {
       internal = true;
       type = types.str;
-      description = "The nixpkgs git revision from which this configuration was built.";
+      description = lib.mdDoc "The nixpkgs git revision from which this configuration was built.";
     };
   };
 

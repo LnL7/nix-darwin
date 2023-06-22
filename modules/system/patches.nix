@@ -26,12 +26,14 @@ in
           '''')
         ]
       '';
-      description = ''
-        Set of patches to apply to <filename>/</filename>.
+      description = lib.mdDoc ''
+        Set of patches to apply to {file}`/`.
 
-        <warning><para>
+        ::: {.warning}
+        
         This can modify everything so use with caution.
-        </para></warning>
+        
+        :::
 
         Useful for safely changing system files.  Unlike the etc module this
         won't remove or modify files with unexpected content.

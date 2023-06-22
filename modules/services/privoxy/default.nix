@@ -10,40 +10,40 @@ in
     services.privoxy.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable the privoxy proxy service.";
+      description = lib.mdDoc "Whether to enable the privoxy proxy service.";
     };
 
     services.privoxy.listenAddress = mkOption {
       type = types.str;
       default = "127.0.0.1:8118";
-      description = "The address and TCP port on which privoxy will listen.";
+      description = lib.mdDoc "The address and TCP port on which privoxy will listen.";
     };
 
     services.privoxy.package = mkOption {
       type = types.package;
       default = pkgs.privoxy;
       example = literalExpression "pkgs.privoxy";
-      description = "This option specifies the privoxy package to use.";
+      description = lib.mdDoc "This option specifies the privoxy package to use.";
     };
 
     services.privoxy.config = mkOption {
       type = types.lines;
       default = "";
       example = "forward / upstream.proxy:8080";
-      description = "Config to use for privoxy";
+      description = lib.mdDoc "Config to use for privoxy";
     };
 
     services.privoxy.templdir = mkOption {
       type = types.path;
       default = "${pkgs.privoxy}/etc/templates";
       defaultText = "\${pkgs.privoxy}/etc/templates";
-      description = "Directory for privoxy template files.";
+      description = lib.mdDoc "Directory for privoxy template files.";
     };
 
     services.privoxy.confdir = mkOption {
       type = types.nullOr types.path;
       default = null;
-      description = "Directory for privoxy files such as .action and .filter.";
+      description = lib.mdDoc "Directory for privoxy files such as .action and .filter.";
     };
   };
 

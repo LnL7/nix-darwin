@@ -12,19 +12,19 @@ in
     programs.bash.enable = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to configure bash as an interactive shell.";
+      description = lib.mdDoc "Whether to configure bash as an interactive shell.";
     };
 
     programs.bash.interactiveShellInit = mkOption {
       default = "";
-      description = "Shell script code called during interactive bash shell initialisation.";
+      description = lib.mdDoc "Shell script code called during interactive bash shell initialisation.";
       type = types.lines;
     };
 
     programs.bash.enableCompletion = mkOption {
       type = types.bool;
       default = false;
-      description = ''
+      description = lib.mdDoc ''
         Enable bash completion for all interactive bash shells.
 
         NOTE. This doesn't work with bash 3.2, which is the default on macOS.

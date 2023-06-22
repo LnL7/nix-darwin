@@ -98,7 +98,7 @@ let
       preCommands = mkOption {
         type = types.lines;
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Extra commands to run before starting buildkite.
         '';
       };

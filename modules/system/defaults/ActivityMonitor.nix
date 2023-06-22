@@ -39,7 +39,7 @@ with lib;
     system.defaults.ActivityMonitor.SortColumn = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = ''
+      description = lib.mdDoc ''
           Which column to sort the main activity page (such as "CPUUsage"). Default is null.
         '';
     };
@@ -47,7 +47,7 @@ with lib;
     system.defaults.ActivityMonitor.SortDirection = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = ''
+      description = lib.mdDoc ''
           The sort direction of the sort column (0 is decending). Default is null.
         '';
     };
@@ -55,7 +55,7 @@ with lib;
     system.defaults.ActivityMonitor.OpenMainWindow = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = ''
+      description = lib.mdDoc ''
           Open the main window when opening Activity Monitor. Default is true.
         '';
     };

@@ -51,7 +51,7 @@ in
 
       enable = mkOption {
         default = false;
-        description = ''
+        description = lib.mdDoc ''
           Whether to configure fish as an interactive shell.
         '';
         type = types.bool;
@@ -60,15 +60,15 @@ in
       useBabelfish = mkOption {
         type = types.bool;
         default = false;
-        description = ''
-          If enabled, the configured environment will be translated to native fish using <link xlink:href="https://github.com/bouk/babelfish">babelfish</link>.
-          Otherwise, <link xlink:href="https://github.com/oh-my-fish/plugin-foreign-env">foreign-env</link> will be used.
+        description = lib.mdDoc ''
+          If enabled, the configured environment will be translated to native fish using [babelfish](https://github.com/bouk/babelfish).
+          Otherwise, [foreign-env](https://github.com/oh-my-fish/plugin-foreign-env) will be used.
         '';
       };
 
       babelfishPackage = mkOption {
         type = types.package;
-        description = ''
+        description = lib.mdDoc ''
           The babelfish package to use when useBabelfish is
           set to true.
         '';
@@ -77,7 +77,7 @@ in
       vendor.config.enable = mkOption {
         type = types.bool;
         default = true;
-        description = ''
+        description = lib.mdDoc ''
           Whether fish should source configuration snippets provided by other packages.
         '';
       };
@@ -85,7 +85,7 @@ in
       vendor.completions.enable = mkOption {
         type = types.bool;
         default = true;
-        description = ''
+        description = lib.mdDoc ''
           Whether fish should use completion files provided by other packages.
         '';
       };
@@ -93,15 +93,15 @@ in
       vendor.functions.enable = mkOption {
         type = types.bool;
         default = true;
-        description = ''
+        description = lib.mdDoc ''
           Whether fish should autoload fish functions provided by other packages.
         '';
       };
 
       shellAliases = mkOption {
         default = config.environment.shellAliases;
-        description = ''
-          Set of aliases for fish shell. See <option>environment.shellAliases</option>
+        description = lib.mdDoc ''
+          Set of aliases for fish shell. See {option}`environment.shellAliases`
           for an option format description.
         '';
         type = types.attrs;
@@ -109,7 +109,7 @@ in
 
       shellInit = mkOption {
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Shell script code called during fish shell initialisation.
         '';
         type = types.lines;
@@ -117,7 +117,7 @@ in
 
       loginShellInit = mkOption {
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Shell script code called during fish login shell initialisation.
         '';
         type = types.lines;
@@ -125,7 +125,7 @@ in
 
       interactiveShellInit = mkOption {
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Shell script code called during interactive fish shell initialisation.
         '';
         type = types.lines;
@@ -133,7 +133,7 @@ in
 
       promptInit = mkOption {
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Shell script code used to initialise fish prompt.
         '';
         type = types.lines;

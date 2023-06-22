@@ -74,11 +74,11 @@ in
       type = types.listOf types.str;
       default = [];
       example = [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
-      description = ''
+      description = lib.mdDoc ''
         List of networkservices that should be configured.
 
         To display a list of all the network services on the server's
-        hardware ports, use <command>networksetup -listallnetworkservices</command>.
+        hardware ports, use {command}`networksetup -listallnetworkservices`.
       '';
     };
 
@@ -86,13 +86,13 @@ in
       type = types.listOf types.str;
       default = [];
       example = [ "8.8.8.8" "8.8.4.4" "2001:4860:4860::8888" "2001:4860:4860::8844" ];
-      description = "The list of dns servers used when resolving domain names.";
+      description = lib.mdDoc "The list of dns servers used when resolving domain names.";
     };
 
     networking.search = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = "The list of search paths used when resolving domain names.";
+      description = lib.mdDoc "The list of search paths used when resolving domain names.";
     };
   };
 

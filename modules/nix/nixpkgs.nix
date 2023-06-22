@@ -61,13 +61,13 @@ in
           }
         '';
       type = configType;
-      description = ''
+      description = lib.mdDoc ''
         The configuration of the Nix Packages collection.  (For
         details, see the Nixpkgs documentation.)  It allows you to set
         package configuration options, and to override packages
-        globally through the <varname>packageOverrides</varname>
+        globally through the {var}`packageOverrides`
         option.  The latter is a function that takes as an argument
-        the <emphasis>original</emphasis> Nixpkgs, and must evaluate
+        the *original* Nixpkgs, and must evaluate
         to a set of new or overridden packages.
       '';
     };
@@ -85,11 +85,11 @@ in
           };
         ) ]
       '';
-      description = ''
+      description = lib.mdDoc ''
         List of overlays to use with the Nix Packages collection.
         (For details, see the Nixpkgs documentation.)  It allows
         you to override packages globally. This is a function that
-        takes as an argument the <emphasis>original</emphasis> Nixpkgs.
+        takes as an argument the *original* Nixpkgs.
         The first argument should be used for finding dependencies, and
         the second should be used for overriding recipes.
       '';
@@ -98,7 +98,7 @@ in
     nixpkgs.system = mkOption {
       type = types.str;
       example = "x86_64-darwin";
-      description = ''
+      description = lib.mdDoc ''
         Specifies the Nix platform type for which NixOS should be built.
         If unset, it defaults to the platform type of your host system.
         Specifying this option is useful when doing distributed

@@ -17,7 +17,7 @@ in
     logFile = mkOption {
       type = types.path;
       default = "/var/log/hercules-ci-agent.log";
-      description = "Stdout and sterr of hercules-ci-agent process.";
+      description = lib.mdDoc "Stdout and sterr of hercules-ci-agent process.";
     };
   };
 

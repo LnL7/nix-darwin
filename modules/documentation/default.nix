@@ -89,9 +89,9 @@ in
     documentation.enable = mkOption {
       type = types.bool;
       default = true;
-      description = ''
+      description = lib.mdDoc ''
         Whether to install documentation of packages from
-        <option>environment.systemPackages</option> into the generated system path.
+        {option}`environment.systemPackages` into the generated system path.
 
         See "Multiple-output packages" chapter in the nixpkgs manual for more info.
       '';
@@ -101,8 +101,8 @@ in
     documentation.man.enable = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Whether to install manual pages and the <command>man</command> command.
+      description = lib.mdDoc ''
+        Whether to install manual pages and the {command}`man` command.
         This also includes "man" outputs.
       '';
     };
@@ -110,8 +110,8 @@ in
     documentation.info.enable = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Whether to install info pages and the <command>info</command> command.
+      description = lib.mdDoc ''
+        Whether to install info pages and the {command}`info` command.
         This also includes "info" outputs.
       '';
     };
@@ -119,8 +119,8 @@ in
     documentation.doc.enable = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Whether to install documentation distributed in packages' <literal>/share/doc</literal>.
+      description = lib.mdDoc ''
+        Whether to install documentation distributed in packages' `/share/doc`.
         Usually plain text and/or HTML.
         This also includes "doc" outputs.
       '';

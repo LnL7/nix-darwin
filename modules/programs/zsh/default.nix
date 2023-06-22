@@ -18,13 +18,13 @@ in
     programs.zsh.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to configure zsh as an interactive shell.";
+      description = lib.mdDoc "Whether to configure zsh as an interactive shell.";
     };
 
     programs.zsh.variables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         A set of environment variables used in the global environment.
         These variables will be set on shell initialisation.
         The value of each variable can be either a string or a list of
@@ -37,61 +37,61 @@ in
     programs.zsh.shellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during zsh shell initialisation.";
+      description = lib.mdDoc "Shell script code called during zsh shell initialisation.";
     };
 
     programs.zsh.loginShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during zsh login shell initialisation.";
+      description = lib.mdDoc "Shell script code called during zsh login shell initialisation.";
     };
 
     programs.zsh.interactiveShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during interactive zsh shell initialisation.";
+      description = lib.mdDoc "Shell script code called during interactive zsh shell initialisation.";
     };
 
     programs.zsh.promptInit = mkOption {
       type = types.lines;
       default = "autoload -U promptinit && promptinit && prompt walters";
-      description = "Shell script code used to initialise the zsh prompt.";
+      description = lib.mdDoc "Shell script code used to initialise the zsh prompt.";
     };
 
     programs.zsh.enableCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable zsh completion for all interactive zsh shells.";
+      description = lib.mdDoc "Enable zsh completion for all interactive zsh shells.";
     };
 
     programs.zsh.enableBashCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable bash completion for all interactive zsh shells.";
+      description = lib.mdDoc "Enable bash completion for all interactive zsh shells.";
     };
 
     programs.zsh.enableFzfCompletion = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf completion.";
+      description = lib.mdDoc "Enable fzf completion.";
     };
 
     programs.zsh.enableFzfGit = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf keybindings for C-g git browsing.";
+      description = lib.mdDoc "Enable fzf keybindings for C-g git browsing.";
     };
 
     programs.zsh.enableFzfHistory = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf keybinding for Ctrl-r history search.";
+      description = lib.mdDoc "Enable fzf keybinding for Ctrl-r history search.";
     };
 
     programs.zsh.enableSyntaxHighlighting = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable zsh-syntax-highlighting.";
+      description = lib.mdDoc "Enable zsh-syntax-highlighting.";
     };
   };
 

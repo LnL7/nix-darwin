@@ -14,9 +14,9 @@ in
   options = {
     fonts.fontDir.enable = mkOption {
       default = false;
-      description = ''
+      description = lib.mdDoc ''
         Whether to enable font management and install configured fonts to
-        <filename>/Library/Fonts</filename>.
+        {file}`/Library/Fonts`.
 
         NOTE: removes any manually-added fonts.
       '';
@@ -26,7 +26,7 @@ in
       type = types.listOf types.path;
       default = [ ];
       example = literalExpression "[ pkgs.dejavu_fonts ]";
-      description = ''
+      description = lib.mdDoc ''
         List of fonts to install.
 
         Fonts present in later entries override those with the same filenames
