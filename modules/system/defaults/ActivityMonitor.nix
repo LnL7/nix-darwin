@@ -7,7 +7,7 @@ with lib;
 
     system.defaults.ActivityMonitor.ShowCategory = mkOption {
       type = types.nullOr (types.enum [100 101 102 103 104 105 106 107]);
-      default = 100;
+      default = null;
       description = ''
           Change which processes to show.
             100: All Processes
@@ -54,7 +54,7 @@ with lib;
 
     system.defaults.ActivityMonitor.OpenMainWindow = mkOption {
       type = types.nullOr types.bool;
-      default = true;
+      default = null;
       description = ''
           Open the main window when opening Activity Monitor. Default is true.
         '';
