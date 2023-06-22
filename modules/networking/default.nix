@@ -29,7 +29,7 @@ in
       type = types.nullOr types.str;
       default = null;
       example = "John’s MacBook Pro";
-      description = ''
+      description = lib.mdDoc ''
         The user-friendly name for the system, set in System Preferences > Sharing > Computer Name.
 
         Setting this option is equivalent to running `scutil --set ComputerName`.
@@ -42,7 +42,7 @@ in
       type = types.nullOr (types.strMatching hostnameRegEx);
       default = null;
       example = "Johns-MacBook-Pro";
-      description = ''
+      description = lib.mdDoc ''
         The hostname of your system, as visible from the command line and used by local and remote
         networks when connecting through SSH and Remote Login.
 
@@ -56,7 +56,7 @@ in
       type = types.nullOr (types.strMatching hostnameRegEx);
       default = cfg.hostName;
       example = "Johns-MacBook-Pro";
-      description = ''
+      description = lib.mdDoc ''
         The local hostname, or local network name, is displayed beneath the computer's name at the
         top of the Sharing preferences pane. It identifies your Mac to Bonjour-compatible services.
 

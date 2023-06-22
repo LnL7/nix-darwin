@@ -37,7 +37,7 @@ with lib;
     system.defaults.universalaccess.closeViewZoomFollowsFocus = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = ''
+      description = lib.mdDoc ''
         Follow the keyboard focus while zoomed in.
         Without setting `closeViewScrollWheelToggle` this has no effect.
         The default is false.

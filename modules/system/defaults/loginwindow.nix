@@ -38,8 +38,8 @@ with lib;
     system.defaults.loginwindow.LoginwindowText = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = ''
-        Text to be shown on the login window. Default is "\\U03bb".
+      description = lib.mdDoc ''
+        Text to be shown on the login window. Default is "\\\\U03bb".
       '';
     };
 

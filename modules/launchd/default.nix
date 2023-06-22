@@ -137,7 +137,7 @@ in
     launchd.agents = mkOption {
       default = {};
       type = types.attrsOf (types.submodule serviceOptions);
-      description = ''
+      description = lib.mdDoc ''
         Definition of per-user launchd agents.
 
         When a user logs in, a per-user launchd is started.
@@ -153,7 +153,7 @@ in
     launchd.daemons = mkOption {
       default = {};
       type = types.attrsOf (types.submodule serviceOptions);
-      description = ''
+      description = lib.mdDoc ''
         Definition of launchd daemons.
 
         After the system is booted and the kernel is running, launchd is run to finish the system initialization.
@@ -169,7 +169,7 @@ in
     launchd.user.agents = mkOption {
       default = {};
       type = types.attrsOf (types.submodule serviceOptions);
-      description = ''
+      description = lib.mdDoc ''
         Definition of per-user launchd agents.
 
         When a user logs in, a per-user launchd is started.

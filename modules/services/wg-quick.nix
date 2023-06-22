@@ -113,8 +113,12 @@ let
       table = mkOption {
         type = types.nullOr types.str;
         default = null;
-        description =
-          "Controls the routing table to which routes are added. There are two special values:  `off' disables  the  creation  of routes altogether, and `auto' (the default) adds routes to the default table and enables special handling of default routes.";
+        description = lib.mdDoc ''
+          Controls the routing table to which routes are added. There are two
+          special values: `off` disables the creation of routes altogether,
+          and `auto` (the default) adds routes to the default table and
+          enables special handling of default routes.
+        '';
       };
     };
   };
