@@ -35,6 +35,7 @@ let
       publicKey = mkOption {
         default = null;
         type = types.str;
+        description = "The public key for this peer.";
       };
     };
   };
