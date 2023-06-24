@@ -73,7 +73,6 @@ let
           The nix-darwin documentation now requires nixpkgs 23.05 to build.
         '';
       };
-      manual = manualHTML;
       manualHTMLIndex = "${manualHTML}/share/doc/darwin/index.html";
     };
 
