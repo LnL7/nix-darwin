@@ -22,12 +22,12 @@ in
       internal = true;
       type = types.attrsOf (types.submodule script);
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         A set of shell script fragments that are executed when a NixOS
         system configuration is activated.  Examples are updating
         /etc, creating accounts, and so on.  Since these are executed
         every time you boot the system or run
-        <command>nixos-rebuild</command>, it's important that they are
+        {command}`nixos-rebuild`, it's important that they are
         idempotent and fast.
       '';
     };

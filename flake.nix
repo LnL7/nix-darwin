@@ -30,9 +30,18 @@
       description = "nix flake init -t nix-darwin";
     };
 
-    checks.x86_64-darwin.simple = (self.lib.darwinSystem {
-      system = "x86_64-darwin";
-      modules = [ self.darwinModules.simple ];
-    }).system;
+    checks = nixpkgs.lib.genAttrs ["aarch64-darwin" "x86_64-darwin"] (system: let
+      simple = self.lib.darwinSystem {
+        inherit system;
+        modules = [ self.darwinModules.simple ];
+      };
+    in {
+      simple = simple.system;
+
+      inherit (simple.config.system.build.manual)
+        optionsJSON
+        manualHTML
+        manpages;
+    });
   };
 }

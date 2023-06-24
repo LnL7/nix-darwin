@@ -11,18 +11,18 @@ in
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = "Whether to enable the lorri service.";
+        description = lib.mdDoc "Whether to enable the lorri service.";
       };
       
       logFile = mkOption {
         type = types.nullOr types.path;
         default = null;
         example =  "/var/tmp/lorri.log";
-        description = ''
+        description = lib.mdDoc ''
           The logfile to use for the lorri service. Alternatively
-          <command>sudo launchctl debug system/org.nixos.lorri --stderr</command>
+          {command}`sudo launchctl debug system/org.nixos.lorri --stderr`
           can be used to stream the logs to a shell after restarting the service with
-          <command>sudo launchctl kickstart -k system/org.nixos.lorri</command>.
+          {command}`sudo launchctl kickstart -k system/org.nixos.lorri`.
         '';
       };
     };

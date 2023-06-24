@@ -6,7 +6,7 @@ with lib;
   options = {
     name = mkOption {
       type = types.str;
-      description = ''
+      description = lib.mdDoc ''
         The name of the user account. If undefined, the name of the
         attribute set will be used.
       '';
@@ -16,7 +16,7 @@ with lib;
       type = types.str;
       default = "";
       example = "Alice Q. User";
-      description = ''
+      description = lib.mdDoc ''
         A short description of the user account, typically the
         user's full name.
       '';
@@ -24,19 +24,19 @@ with lib;
 
     uid = mkOption {
       type = types.int;
-      description = "The user's UID.";
+      description = lib.mdDoc "The user's UID.";
     };
 
     gid = mkOption {
       type = types.int;
       default = 20;
-      description = "The user's primary group.";
+      description = lib.mdDoc "The user's primary group.";
     };
 
     isHidden = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to make the user account hidden.";
+      description = lib.mdDoc "Whether to make the user account hidden.";
     };
 
     # extraGroups = mkOption {
@@ -48,29 +48,29 @@ with lib;
     home = mkOption {
       type = types.path;
       default = "/var/empty";
-      description = "The user's home directory.";
+      description = lib.mdDoc "The user's home directory.";
     };
 
     createHome = mkOption {
       type = types.bool;
       default = false;
-      description = "Create the home directory when creating the user.";
+      description = lib.mdDoc "Create the home directory when creating the user.";
     };
 
     shell = mkOption {
       type = types.either types.shellPackage types.path;
       default = "/sbin/nologin";
       example = literalExpression "pkgs.bashInteractive";
-      description = "The user's shell.";
+      description = lib.mdDoc "The user's shell.";
     };
 
     packages = mkOption {
       type = types.listOf types.package;
       default = [];
       example = literalExpression "[ pkgs.firefox pkgs.thunderbird ]";
-      description = ''
+      description = lib.mdDoc ''
         The set of packages that should be made availabe to the user.
-        This is in contrast to <option>environment.systemPackages</option>,
+        This is in contrast to {option}`environment.systemPackages`,
         which adds packages to all users.
       '';
     };

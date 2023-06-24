@@ -18,14 +18,14 @@ in
     programs.vim.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to configure vim.";
+      description = lib.mdDoc "Whether to configure vim.";
     };
 
     programs.vim.enableSensible = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = "Enable sensible configuration options for vim.";
+      description = lib.mdDoc "Enable sensible configuration options for vim.";
     };
 
     programs.vim.extraKnownPlugins = mkOption {
@@ -46,14 +46,14 @@ in
           };
         }
         '';
-      description = "Custom plugin declarations to add to VAM's knownPlugins.";
+      description = lib.mdDoc "Custom plugin declarations to add to VAM's knownPlugins.";
     };
 
     programs.vim.plugins = mkOption {
       type = types.listOf types.attrs;
       default = [];
       example = [ { names = [ "surround" "vim-nix" ]; } ];
-      description = "VAM plugin dictionaries to use for vim_configurable.";
+      description = lib.mdDoc "VAM plugin dictionaries to use for vim_configurable.";
     };
 
     programs.vim.package = mkOption {
@@ -70,7 +70,7 @@ in
     programs.vim.vimConfig = mkOption {
       type = types.lines;
       default = "";
-      description = "Extra vimrcConfig to use for vim_configurable.";
+      description = lib.mdDoc "Extra vimrcConfig to use for vim_configurable.";
     };
   };
 

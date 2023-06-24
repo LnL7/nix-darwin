@@ -13,27 +13,27 @@ in
     services.khd.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable the khd hotkey daemon.";
+      description = lib.mdDoc "Whether to enable the khd hotkey daemon.";
     };
 
     services.khd.package = mkOption {
       type = types.package;
       default = pkgs.khd;
       defaultText = "pkgs.khd";
-      description = "This option specifies the khd package to use.";
+      description = lib.mdDoc "This option specifies the khd package to use.";
     };
 
     services.khd.khdConfig = mkOption {
       type = types.lines;
       default = "";
       example = "alt + shift - r   :   kwmc quit";
-      description = "Config to use for <filename>khdrc</filename>.";
+      description = lib.mdDoc "Config to use for {file}`khdrc`.";
     };
 
     services.khd.i3Keybindings = mkOption {
       type = types.bool;
       default = false;
-      description = "Wether to configure i3 style keybindings for kwm.";
+      description = lib.mdDoc "Wether to configure i3 style keybindings for kwm.";
     };
   };
 

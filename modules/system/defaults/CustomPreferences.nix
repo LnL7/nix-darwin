@@ -14,7 +14,7 @@ with lib;
             true;
         };
       };
-      description = ''
+      description = lib.mdDoc ''
         Sets custom user preferences
       '';
     };
@@ -29,7 +29,7 @@ with lib;
             true;
         };
       };
-      description = ''
+      description = lib.mdDoc ''
         Sets custom system preferences
       '';
     };

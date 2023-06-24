@@ -13,7 +13,7 @@ in
     services.activate-system.enable = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to activate system at boot time.";
+      description = lib.mdDoc "Whether to activate system at boot time.";
     };
   };
 

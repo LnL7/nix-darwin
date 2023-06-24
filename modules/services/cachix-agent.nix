@@ -9,23 +9,23 @@ in {
     enable = mkOption {
       type = types.bool;
       default = false;
-      description = ''
+      description = lib.mdDoc ''
         Enable to run Cachix Agent as a system service.
         
-        Read <link xlink:href="https://docs.cachix.org/deploy/">Cachix Deploy</link> documentation for more information.
+        Read [Cachix Deploy](https://docs.cachix.org/deploy/) documentation for more information.
       '';
     };
 
     name = mkOption {
       type = types.str;
       default = config.networking.hostName;
-      description = ''
+      description = lib.mdDoc ''
         Agent name, usually the same as the hostname.
       '';
     };
 
     package = mkOption {
-      description = ''
+      description = lib.mdDoc ''
         Package containing cachix executable.
       '';
       type = types.package;
@@ -36,7 +36,7 @@ in {
     credentialsFile = mkOption {
       type = types.path;
       default = "/etc/cachix-agent.token";
-      description = ''
+      description = lib.mdDoc ''
         Required file that needs to contain CACHIX_AGENT_TOKEN=...
       '';
     };
@@ -44,7 +44,7 @@ in {
     logFile = mkOption {
       type = types.nullOr types.path;
       default = "/var/log/cachix-agent.log";
-      description = "Absolute path to log all stderr and stdout";
+      description = lib.mdDoc "Absolute path to log all stderr and stdout";
     };
   };
 

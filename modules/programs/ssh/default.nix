@@ -14,7 +14,7 @@ let
         hostNames = mkOption {
           type = types.listOf types.str;
           default = [];
-          description = ''
+          description = lib.mdDoc ''
             A list of host names and/or IP numbers used for accessing
             the host's ssh service.
           '';
@@ -23,9 +23,9 @@ let
           default = null;
           type = types.nullOr types.str;
           example = "ecdsa-sha2-nistp521 AAAAE2VjZHN...UEPg==";
-          description = ''
+          description = lib.mdDoc ''
             The public key data for the host. You can fetch a public key
-            from a running SSH server with the <command>ssh-keyscan</command>
+            from a running SSH server with the {command}`ssh-keyscan`
             command. The public key should not include any host names, only
             the key type and the key itself.
           '';
@@ -33,13 +33,13 @@ let
         publicKeyFile = mkOption {
           default = null;
           type = types.nullOr types.path;
-          description = ''
+          description = lib.mdDoc ''
             The path to the public key file for the host. The public
             key file is read at build time and saved in the Nix store.
             You can fetch a public key file from a running SSH server
-            with the <command>ssh-keyscan</command> command. The content
+            with the {command}`ssh-keyscan` command. The content
             of the file should follow the same format as described for
-            the <literal>publicKey</literal> option.
+            the `publicKey` option.
           '';
         };
       };
@@ -54,13 +54,13 @@ let
       keys = mkOption {
         type = types.listOf types.str;
         default = [];
-        description = ''
+        description = lib.mdDoc ''
           A list of verbatim OpenSSH public keys that should be added to the
           user's authorized keys. The keys are added to a file that the SSH
           daemon reads in addition to the the user's authorized_keys file.
-          You can combine the <literal>keys</literal> and
-          <literal>keyFiles</literal> options.
-          Warning: If you are using <literal>NixOps</literal> then don't use this
+          You can combine the `keys` and
+          `keyFiles` options.
+          Warning: If you are using `NixOps` then don't use this
           option since it will replace the key required for deployment via ssh.
         '';
       };
@@ -68,12 +68,12 @@ let
       keyFiles = mkOption {
         type = types.listOf types.path;
         default = [];
-        description = ''
+        description = lib.mdDoc ''
           A list of files each containing one OpenSSH public key that should be
           added to the user's authorized keys. The contents of the files are
           read at build time and added to a file that the SSH daemon reads in
           addition to the the user's authorized_keys file. You can combine the
-          <literal>keyFiles</literal> and <literal>keys</literal> options.
+          `keyFiles` and `keys` options.
         '';
       };
     };
@@ -122,7 +122,7 @@ in
     programs.ssh.knownHosts = mkOption {
       default = {};
       type = types.attrsOf (types.submodule host);
-      description = ''
+      description = lib.mdDoc ''
         The set of system-wide known SSH hosts.
       '';
       example = literalExpression ''

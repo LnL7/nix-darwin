@@ -12,9 +12,9 @@ in
       type = types.listOf (types.either types.shellPackage types.path);
       default = [];
       example = literalExpression "[ pkgs.bashInteractive pkgs.zsh ]";
-      description = ''
+      description = lib.mdDoc ''
         A list of permissible login shells for user accounts.
-        No need to mention <literal>/bin/sh</literal>
+        No need to mention `/bin/sh`
         and other shells that are available by default on
         macOS.
       '';
