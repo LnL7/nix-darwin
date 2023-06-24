@@ -51,6 +51,7 @@ in
 
       ln -sfn "$(readlink -f $systemConfig/etc)" /etc/static
 
+      errorOccurred=false
       for f in $(find /etc/static/* -type l); do
         l=/etc/''${f#/etc/static/}
         d=''${l%/*}
@@ -79,6 +80,7 @@ in
               if [ -z "$h" ]; then
                 echo "[1;31merror: not linking environment.etc.\"''${l#/etc/}\" because $l already exists, skipping...[0m" >&2
                 echo "[1;31mexisting file has unknown content $o, move and activate again to apply[0m" >&2
+                errorOccurred=true
               fi
             fi
           fi
@@ -86,6 +88,10 @@ in
           ln -s "$f" "$l"
         fi
       done
+
+      if [ "$errorOccurred" != "false" ]; then
+        exit 1
+      fi
 
       for l in $(find /etc/* -type l 2> /dev/null); do
         f="$(echo $l | sed 's,/etc/,/etc/static/,')"
