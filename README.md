@@ -1,4 +1,4 @@
-[<img src="https://lnl7.github.io/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
+[<img src="https://daiderd.com/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
 
 # nix-darwin
 
@@ -189,7 +189,7 @@ $
 
 ## Documentation
 
-Reference documentation of all the options is available [here](https://lnl7.github.io/nix-darwin/manual/index.html#sec-options).  
+Reference documentation of all the options is available [here](https://daiderd.com/nix-darwin/manual/index.html).
 This can also be accessed locally using `man 5 configuration.nix`.
 
 `darwin-help` will open a HTML version of the manpage in the default browser.
