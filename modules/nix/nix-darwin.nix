@@ -16,8 +16,8 @@ let
 
   darwin-option = writeProgram "darwin-option"
     {
-      inherit (config.system) profile;
       inherit (stdenv) shell;
+      path = "${extraPath}:${config.environment.systemPath}";
     }
     ../../pkgs/nix-tools/darwin-option.sh;
 
