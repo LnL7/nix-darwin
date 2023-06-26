@@ -140,7 +140,7 @@ in
     in
     [
       # Only ever in NixOS
-      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivilant to this NixOS option.")
+      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivalent to this NixOS option.")
       (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
