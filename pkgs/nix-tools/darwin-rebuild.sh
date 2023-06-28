@@ -12,7 +12,7 @@ showSyntax() {
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]"
-  echo "               [--no-update-lock-file] ..." >&2
+  echo "               [--no-update-lock-file] [--refresh] ..." >&2
   exec man darwin-rebuild
   exit 1
 }
@@ -69,7 +69,7 @@ while [ $# -gt 0 ]; do
       flake=$1
       shift 1
       ;;
-    -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file)
+    -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file|--refresh)
       extraLockFlags+=("$i")
       ;;
     --update-input)
