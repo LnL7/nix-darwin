@@ -2,6 +2,10 @@
 
 with lib;
 
+let
+  launchdTypes = import ./types.nix { inherit config lib; };
+in
+
 {
   options = {
     Label = mkOption {
@@ -344,55 +348,21 @@ with lib;
       default = null;
       example = [{ Hour = 2; Minute = 30; }];
       description = ''
-        This optional key causes the job to be started every calendar interval as specified. Missing arguments
-        are considered to be wildcard. The semantics are much like `crontab(5)`.  Unlike cron which skips job
-        invocations when the computer is asleep, launchd will start the job the next time the computer wakes
+        This optional key causes the job to be started every calendar interval as specified. The semantics are
+        much like {manpage}`crontab(5)`: Missing attributes are considered to be wildcard. Unlike cron which skips
+        job invocations when the computer is asleep, launchd will start the job the next time the computer wakes
         up.  If multiple intervals transpire before the computer is woken, those events will be coalesced into
-        one event upon wake from sleep.
+        one event upon waking from sleep.
+
+        ::: {.important}
+        The list must not be empty and must not contain duplicate entries (attrsets which compare equally).
+        :::
+
+        ::: {.caution}
+        Since missing attrs become wildcards, an empty attrset effectively means "every minute".
+        :::
       '';
-      type = types.nullOr (types.listOf (types.submodule {
-        options = {
-          Minute = mkOption {
-            type = types.nullOr types.int;
-            default = null;
-            description = ''
-              The minute on which this job will be run.
-            '';
-          };
-
-          Hour = mkOption {
-            type = types.nullOr types.int;
-            default = null;
-            description = ''
-              The hour on which this job will be run.
-            '';
-          };
-
-          Day = mkOption {
-            type = types.nullOr types.int;
-            default = null;
-            description = ''
-              The day on which this job will be run.
-            '';
-          };
-
-          Weekday = mkOption {
-            type = types.nullOr types.int;
-            default = null;
-            description = ''
-              The weekday on which this job will be run (0 and 7 are Sunday).
-            '';
-          };
-
-          Month = mkOption {
-            type = types.nullOr types.int;
-            default = null;
-            description = ''
-              The month on which this job will be run.
-            '';
-          };
-        };
-      }));
+      type = types.nullOr launchdTypes.StartCalendarInterval;
     };
 
     StandardInPath = mkOption {
@@ -886,6 +856,5 @@ with lib;
     };
   };
 
-  config = {
-  };
+  config = {};
 }
