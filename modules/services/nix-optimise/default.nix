@@ -14,6 +14,7 @@ let
     ;
 
   cfg = config.nix.optimise;
+  launchdTypes = import ../../launchd/types.nix { inherit config lib; };
 in
 
 {
@@ -41,9 +42,13 @@ in
       };
 
       interval = mkOption {
-        type = types.attrs;
-        default = { Hour = 3; Minute = 15; };
-        description = "The time interval at which the optimiser will run.";
+        type = launchdTypes.StartCalendarInterval;
+        default = [{ Weekday = 7; Hour = 4; Minute = 15; }];
+        description = ''
+          The calendar interval at which the optimiser will run.
+          See the {option}`serviceConfig.StartCalendarInterval` option of
+          the {option}`launchd` module for more info.
+        '';
       };
 
     };
@@ -63,7 +68,7 @@ in
           "/bin/wait4path ${config.nix.package} &amp;&amp; exec ${config.nix.package}/bin/nix-store --optimise"
         ];
         RunAtLoad = false;
-        StartCalendarInterval = [ cfg.interval ];
+        StartCalendarInterval = cfg.interval;
         UserName = cfg.user;
       };
     };
