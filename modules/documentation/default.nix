@@ -1,4 +1,4 @@
-{ config, lib, pkgs, baseModules, modules, ... }:
+toplevel@{ config, lib, pkgs, baseModules, modules, ... }:
 
 with lib;
 
@@ -25,7 +25,15 @@ let
     inherit pkgs config;
     version = config.system.darwinVersion;
     revision = config.system.darwinRevision;
-    nixpkgsRevision = config.system.nixpkgsRevision;
+    nixpkgsRevision =
+      if toplevel.options.system.nixpkgsRevision.isDefined
+        then config.system.nixpkgsRevision
+
+        # If user does not use flakes and does not add rev to nixpkgs, we don't
+        # know which revision or even branch they're on. In this case we still want
+        # to link somewhere, so we hope that master hasn't changed too much.
+        else "master";
+
     options =
       let
         scrubbedEval = evalModules {

@@ -10,9 +10,14 @@ let
 
   eval = evalConfig {
     inherit system;
-    modules = [ configuration ];
+    modules = [ configuration nixpkgsRevisionModule ];
     inputs = { inherit nixpkgs; };
   };
+
+  nixpkgsRevisionModule =
+    if nixpkgs?rev && lib.isString nixpkgs.rev
+    then { system.nixpkgsRevision = nixpkgs.rev; }
+    else { };
 
   # The source code of this repo needed by the [un]installers.
   nix-darwin = lib.cleanSource (
