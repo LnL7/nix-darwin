@@ -1,19 +1,22 @@
-[<img src="https://lnl7.github.io/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
+[<img src="https://daiderd.com/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/LnL7/nix-darwin)
 
 # nix-darwin
 
-[![Build Status](https://travis-ci.org/LnL7/nix-darwin.svg?branch=master)](https://travis-ci.org/LnL7/nix-darwin)
+![Test](https://github.com/LnL7/nix-darwin/workflows/Test/badge.svg)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
+This project aims to bring the convenience of a declarative system approach to macOS.
+Nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOS](https://nixos.org/).
+
 ## Install
+
+To install nix-darwin, a working installation of [Nix](https://github.com/NixOS/nix#installation) is required.
 
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
-
-or if you run into problems with that, try the older bootstrap.sh script
 
 > NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
 > updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
@@ -32,6 +35,9 @@ nix-channel --update darwin
 darwin-rebuild changelog
 ```
 
+> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
+> Use `sudo -i nix-channel --update darwin` instead.
+
 ## Uninstalling
 
 There's also an uninstaller if you don't like the project and want to
@@ -44,7 +50,8 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstalle
 
 ## Example configuration
 
-Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
+[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
 
 ```nix
 { pkgs, ... }:
@@ -61,15 +68,82 @@ Check out [modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modu
 }
 ```
 
+## Flakes (experimental)
+
+There is also preliminary support for building your configuration using a [flake](https://nixos.wiki/wiki/Flakes).  This
+is mostly based on the flake support that was added to NixOS.
+
+A minimal example of using an existing configuration.nix:
+
+```nix
+{
+  description = "John's darwin system";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-23.05-darwin";
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, darwin, nixpkgs }: {
+    darwinConfigurations."Johns-MacBook" = darwin.lib.darwinSystem {
+      system = "x86_64-darwin";
+      modules = [ ./configuration.nix ];
+    };
+  };
+}
+```
+
+Inputs from the flake can also be passed to `darwinSystem`. These inputs are then
+accessible as an argument `inputs`, similar to `pkgs` and `lib`, inside the configuration.
+
+```nix
+darwin.lib.darwinSystem {
+  system = "x86_64-darwin";
+  modules = [ ./configuration.nix ];
+  inputs = { inherit darwin dotfiles nixpkgs; };
+}
+# in configuration.nix:
+{ pkgs, lib, inputs }:
+# inputs.darwin, inputs.dotfiles, and inputs.nixpkgs can be accessed here
+```
+
+Alternatively, `specialArgs` could be used:
+
+```nix
+darwin.lib.darwinSystem {
+  system = "x86_64-darwin";
+  modules = [ ./configuration.nix ];
+  specialArgs = { inherit darwin dotfiles nixpkgs; };
+}
+# in configuration.nix:
+{ pkgs, lib, darwin, dotfiles, nixpkgs }:
+```
+
+Since the installer doesn't work with flakes out of the box yet, nix-darwin will need to
+be bootstrapped using the installer or manually.  Afterwards the flake based
+configuration can be built.  The `hostname(1)` of your system will be used to decide
+which darwin configuration is applied if it's not specified explicitly in the flake ref.
+
+```sh
+nix build ~/.config/darwin\#darwinConfigurations.Johns-MacBook.system
+./result/sw/bin/darwin-rebuild switch --flake ~/.config/darwin
+```
+
 ## Manual Install
 
 ```bash
+# Before 10.15 Catalina
 sudo ln -s private/var/run /run
+# After 10.15 Catalina
+echo -e "run\tprivate/var/run" | sudo tee -a /etc/synthetic.conf
+/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B
+/System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t
 
 # Configure the channel
 nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
 nix-channel --update
-export NIX_PATH=darwin=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
+export NIX_PATH=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
 
 # Or use a local git repository
 git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
@@ -113,8 +187,18 @@ writing defaults...
 $
 ```
 
+## Documentation
+
+Reference documentation of all the options is available [here](https://daiderd.com/nix-darwin/manual/index.html).
+This can also be accessed locally using `man 5 configuration.nix`.
+
+`darwin-help` will open a HTML version of the manpage in the default browser.
+
+Furthermore there's `darwin-option` to introspect the settings of a system and its available options.
+> NOTE: `darwin-option` is only available to non-flake installations.
+
 ```
-$ darwin-option services.activate-system.enable                                                                                                                                            ~/src/nix-darwin
+$ darwin-option services.activate-system.enable
 Value:
 true
 
@@ -128,12 +212,6 @@ Description:
 Whether to activate system at boot time.
 ```
 
-## Documentation
-
-Reference documentation of all the options is available here
-https://lnl7.github.io/nix-darwin/manual/index.html#sec-options.
-This can also be accessed locally using `man 5 configuration.nix`.
-
 There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
 specific topics, like macOS upgrades.
 
@@ -143,6 +221,9 @@ There are basic tests that run sanity checks for some of the modules,
 you can run them like this:
 
 ```bash
+# run all tests
+nix-build release.nix -A tests
+# or just a subset
 nix-build release.nix -A tests.environment-path
 ```
 
@@ -153,12 +234,25 @@ Don't hesitate to contribute modules or open an issue.
 
 To build your configuration with local changes you can run this. This
 flag can also be used to override darwin-config or nixpkgs, for more
-information on the `-I` flag look at the nix-build manpage.
+information on the `-I` flag look at the nix-build [manpage](https://nixos.org/manual/nix/stable/command-ref/nix-build.html).
 
 ```bash
 darwin-rebuild switch -I darwin=.
 ```
 
+If you're adding a module, please add yourself to `meta.maintainers`, for example
+
+```nix
+  meta.maintainers = [
+    lib.maintainers.alice or "alice"
+  ];
+
+  options.services.alicebot = # ...
+```
+
+The `or` operator takes care of graceful degradation when `lib` from Nixpkgs
+goes out of sync.
+
 Also feel free to contact me if you have questions,
-- IRC - LnL, you can find me in #nixos or #nix-darwin on freenode.net
+- Matrix - @daiderd:matrix.org, you can find me in [#macos:nixos.org](https://matrix.to/#/#macos:nixos.org)
 - @lnl7 on twitter
