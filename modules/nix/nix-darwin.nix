@@ -7,7 +7,7 @@ let
     nixPackage = config.nix.package;
   };
 
-  inherit (nix-tools) darwin-option darwin-rebuild;
+  inherit (nix-tools) darwin-option darwin-rebuild darwin-version;
 in
 
 {
@@ -17,10 +17,11 @@ in
       [ # Include nix-tools by default
         darwin-option
         darwin-rebuild
+        darwin-version
       ];
 
     system.build = {
-      inherit darwin-option darwin-rebuild;
+      inherit darwin-option darwin-rebuild darwin-version;
     };
 
   };

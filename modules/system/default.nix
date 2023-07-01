@@ -96,6 +96,12 @@ in
       activationUserScript = cfg.activationScripts.userScript.text;
       inherit (cfg) darwinLabel;
 
+      darwinVersionJson = (pkgs.formats.json {}).generate "darwin-version.json" (
+        filterAttrs (k: v: v != null) {
+          inherit (config.system) darwinRevision nixpkgsRevision configurationRevision darwinLabel;
+        }
+      );
+
       buildCommand = ''
         mkdir $out
 
@@ -129,7 +135,7 @@ in
 
         echo -n "$systemConfig" > $out/systemConfig
 
-        echo -n "$darwinLabel" > $out/darwin-version
+        ln -s $darwinVersionJson $out/darwin-version.json
         echo -n "$system" > $out/system
 
         ${cfg.systemBuilderCommands}
