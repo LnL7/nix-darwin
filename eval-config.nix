@@ -26,15 +26,9 @@ let
   pkgsModule = { config, inputs, ... }: {
     _file = ./eval-config.nix;
     config = {
-      assertions = [ {
-        # Ensure that nixpkgs.* options are not set when pkgs is set
-        assertion = pkgs == null || (config.nixpkgs.config == { } && config.nixpkgs.overlays == [ ]);
-        message = ''
-          `nixpkgs` options are disabled when `pkgs` is supplied through `darwinSystem`.
-        '';
-      } ];
+      _module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
 
-      _module.args.pkgs = if pkgs != null then pkgs else import inputs.nixpkgs config.nixpkgs;
+      nixpkgs.source = lib.mkDefault inputs.nixpkgs;
 
       # This permits the configuration to override the passed-in
       # system.
