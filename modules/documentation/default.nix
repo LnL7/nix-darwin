@@ -54,7 +54,7 @@ let
 
   # TODO: Remove this when dropping 22.11 support.
   manual = realManual //
-    lib.optionalAttrs (lib.versionOlder lib.version "23.05-pre") rec {
+    lib.optionalAttrs (!pkgs.buildPackages ? nixos-render-docs) rec {
       optionsJSON = pkgs.writeTextFile {
         name = "options.json-stub";
         destination = "/share/doc/darwin/options.json";
