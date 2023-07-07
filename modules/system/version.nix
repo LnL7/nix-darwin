@@ -67,8 +67,8 @@ in
 
     system.darwinRevision = mkOption {
       internal = true;
-      type = types.str;
-      default = "master";
+      type = types.nullOr types.str;
+      default = null;
       description = lib.mdDoc "The darwin git revision from which this configuration was built.";
     };
 
@@ -92,7 +92,8 @@ in
 
     system.nixpkgsRevision = mkOption {
       internal = true;
-      type = types.str;
+      type = types.nullOr types.str;
+      default = null;
       description = lib.mdDoc "The nixpkgs git revision from which this configuration was built.";
     };
   };

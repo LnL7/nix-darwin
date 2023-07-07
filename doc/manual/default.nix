@@ -13,28 +13,30 @@ with pkgs;
 let
   lib = pkgs.lib;
 
+  gitHubDeclaration = user: repo: ref: subpath:
+    # Default to `master` if we don't know what revision the system
+    # configuration is using (custom nixpkgs, etc.).
+    let urlRef = if ref != null then ref else "master";
+    in {
+      url = "https://github.com/${user}/${repo}/blob/${urlRef}/${subpath}";
+      name = "<${repo}/${subpath}>";
+    };
+
   optionsDoc = buildPackages.nixosOptionsDoc {
-    inherit options revision;
+    inherit options;
     transformOptions = opt: opt // {
       # Clean up declaration sites to not refer to the nix-darwin source tree.
       # TODO: handle `extraSources`? (it's not set anywhere)
       declarations = map
         (decl:
           if lib.hasPrefix (toString prefix) (toString decl) then
-            let
-              subpath = lib.removePrefix "/"
-                (lib.removePrefix (toString prefix) (toString decl));
-            in {
-              url = "https://github.com/LnL7/nix-darwin/blob/${revision}/${subpath}";
-              name = "<nix-darwin/${subpath}>";
-            }
+            gitHubDeclaration "LnL7" "nix-darwin" revision
+              (lib.removePrefix "/"
+                (lib.removePrefix (toString prefix) (toString decl)))
           # TODO: handle this in a better way (may require upstream
           # changes to nixpkgs)
           else if decl == "lib/modules.nix" then
-            {
-              url = "https://github.com/NixOS/nixpkgs/blob/${nixpkgsRevision}/${decl}";
-              name = "<nixpkgs/${decl}>";
-            }
+            gitHubDeclaration "NixOS" "nixpkgs" nixpkgsRevision decl
           else decl)
         opt.declarations;
     };
@@ -73,7 +75,7 @@ in rec {
       cp -r ${pkgs.documentation-highlighter} $dst/highlightjs
 
       substitute ${./manual.md} manual.md \
-        --replace '@DARWIN_VERSION@' "${version}"\
+        --replace '@DARWIN_VERSION@' "${version}" \
         --replace \
           '@DARWIN_OPTIONS_JSON@' \
           ${optionsJSON}/share/doc/darwin/options.json
@@ -82,7 +84,7 @@ in rec {
       nixos-render-docs -j $NIX_BUILD_CORES manual html \
         --manpage-urls ${pkgs.writeText "manpage-urls.json" "{}"} \
         --revision ${lib.escapeShellArg revision} \
-        --generator "nixos-render-docs ${pkgs.lib.version}" \
+        --generator "nixos-render-docs ${lib.version}" \
         --stylesheet style.css \
         --stylesheet overrides.css \
         --stylesheet highlightjs/mono-blue.css \
