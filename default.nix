@@ -6,18 +6,15 @@
 }:
 
 let
-  evalConfig = import ./eval-config.nix { inherit lib; };
-
-  eval = evalConfig {
-    inherit system;
-    modules = [ configuration nixpkgsRevisionModule ];
-    inputs = { inherit nixpkgs; };
+  eval = import ./eval-config.nix {
+    inherit lib;
+    modules = [
+      configuration
+      { nixpkgs.source = lib.mkDefault nixpkgs; }
+    ] ++ lib.optional (system != null) {
+      nixpkgs.system = lib.mkDefault system;
+    };
   };
-
-  nixpkgsRevisionModule =
-    if nixpkgs?rev && lib.isString nixpkgs.rev
-    then { system.nixpkgsRevision = nixpkgs.rev; }
-    else { };
 
   # The source code of this repo needed by the [un]installers.
   nix-darwin = lib.cleanSource (

@@ -85,39 +85,29 @@ A minimal example of using an existing configuration.nix:
     darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs }: {
+  outputs = inputs@{ self, darwin, nixpkgs }: {
     darwinConfigurations."Johns-MacBook" = darwin.lib.darwinSystem {
-      system = "x86_64-darwin";
       modules = [ ./configuration.nix ];
     };
   };
 }
 ```
 
-Inputs from the flake can also be passed to `darwinSystem`. These inputs are then
+Inputs from the flake can also be passed into `darwinSystem`. These inputs are then
 accessible as an argument `inputs`, similar to `pkgs` and `lib`, inside the configuration.
 
 ```nix
+# in flake.nix
 darwin.lib.darwinSystem {
-  system = "x86_64-darwin";
   modules = [ ./configuration.nix ];
-  inputs = { inherit darwin dotfiles nixpkgs; };
+  specialArgs = { inherit inputs; };
 }
-# in configuration.nix:
-{ pkgs, lib, inputs }:
-# inputs.darwin, inputs.dotfiles, and inputs.nixpkgs can be accessed here
 ```
 
-Alternatively, `specialArgs` could be used:
-
 ```nix
-darwin.lib.darwinSystem {
-  system = "x86_64-darwin";
-  modules = [ ./configuration.nix ];
-  specialArgs = { inherit darwin dotfiles nixpkgs; };
-}
-# in configuration.nix:
-{ pkgs, lib, darwin, dotfiles, nixpkgs }:
+# in configuration.nix
+{ pkgs, lib, inputs }:
+# inputs.self, inputs.darwin, and inputs.nixpkgs can be accessed here
 ```
 
 Since the installer doesn't work with flakes out of the box yet, nix-darwin will need to

@@ -4,22 +4,36 @@
 
   outputs = { self, nixpkgs }: {
     lib = {
-      # TODO handle multiple architectures.
-      evalConfig = import ./eval-config.nix { inherit (nixpkgs) lib; };
+      evalConfig = import ./eval-config.nix;
 
-      darwinSystem =
-        { modules, inputs ? { }
-        , system ? throw "darwin.lib.darwinSystem now requires 'system' to be passed explicitly"
-        , ...
-        }@args:
-        self.lib.evalConfig (args // {
-          inherit system;
-          inputs = { inherit nixpkgs; darwin = self; } // inputs;
-          modules = modules ++ [ self.darwinModules.flakeOverrides ];
-        });
+      darwinSystem = args@{ modules, ... }: self.lib.evalConfig (
+        { inherit (nixpkgs) lib; }
+        // nixpkgs.lib.optionalAttrs (args ? pkgs) { inherit (args.pkgs) lib; }
+        // builtins.removeAttrs args [ "system" "pkgs" "inputs" ]
+        // {
+          modules = modules
+            ++ nixpkgs.lib.optional (args ? pkgs) ({ lib, ... }: {
+              _module.args.pkgs = lib.mkForce args.pkgs;
+            })
+            # Backwards compatibility shim; TODO: warn?
+            ++ nixpkgs.lib.optional (args ? system) ({ lib, ... }: {
+              nixpkgs.system = lib.mkDefault args.system;
+            })
+            # Backwards compatibility shim; TODO: warn?
+            ++ nixpkgs.lib.optional (args ? inputs) {
+              _module.args.inputs = args.inputs;
+            }
+            ++ [ ({ lib, ... }: {
+              nixpkgs.source = lib.mkDefault nixpkgs;
+
+              system.checks.verifyNixPath = lib.mkDefault false;
+
+              system.darwinVersionSuffix = ".${self.shortRev or "dirty"}";
+              system.darwinRevision = lib.mkIf (self ? rev) self.rev;
+            }) ];
+          });
     };
 
-    darwinModules.flakeOverrides = ./modules/system/flake-overrides.nix;
     darwinModules.hydra = ./modules/examples/hydra.nix;
     darwinModules.lnl = ./modules/examples/lnl.nix;
     darwinModules.ofborg = ./modules/examples/ofborg.nix;
@@ -32,8 +46,10 @@
 
     checks = nixpkgs.lib.genAttrs ["aarch64-darwin" "x86_64-darwin"] (system: let
       simple = self.lib.darwinSystem {
-        inherit system;
-        modules = [ self.darwinModules.simple ];
+        modules = [
+          self.darwinModules.simple
+          { nixpkgs.hostPlatform = system; }
+        ];
       };
     in {
       simple = simple.system;

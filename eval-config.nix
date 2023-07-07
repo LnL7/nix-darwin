@@ -1,13 +1,5 @@
-{ lib }:
-let
-  nixpkgs-lib = lib;
-in
-
-{ system ? builtins.currentSystem or "x86_64-darwin"
-, pkgs ? null
-, lib ? nixpkgs-lib
+{ lib
 , modules
-, inputs
 , baseModules ? import ./modules/module-list.nix
 , specialArgs ? { }
 , check ? true
@@ -18,26 +10,13 @@ let
     _file = ./eval-config.nix;
     config = {
       _module.args = {
-        inherit baseModules inputs modules;
+        inherit baseModules modules;
       };
     };
   };
 
-  pkgsModule = { config, inputs, ... }: {
-    _file = ./eval-config.nix;
-    config = {
-      _module.args.pkgs = lib.mkIf (pkgs != null) (lib.mkForce pkgs);
-
-      nixpkgs.source = lib.mkDefault inputs.nixpkgs;
-
-      # This permits the configuration to override the passed-in
-      # system.
-      nixpkgs.system = lib.mkDefault system;
-    };
-  };
-
-  eval = lib.evalModules (builtins.removeAttrs args [ "lib" "inputs" "pkgs" "system" ] // {
-    modules = modules ++ [ argsModule pkgsModule ] ++ baseModules;
+  eval = lib.evalModules (builtins.removeAttrs args [ "lib" ] // {
+    modules = modules ++ [ argsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });
 in
