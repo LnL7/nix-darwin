@@ -1,9 +1,9 @@
 {
-  description = "Example darwin system flake";
+  description = "Example Darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
-    darwin.url = "github:lnl7/nix-darwin";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    darwin.url = "github:LnL7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -30,6 +30,9 @@
       # Used for backwards compatibility, please read the changelog before changing.
       # $ darwin-rebuild changelog
       system.stateVersion = 4;
+
+      # The platform the configuration will be used on.
+      nixpkgs.hostPlatform = "x86_64-darwin";
     };
   in
   {
@@ -37,7 +40,6 @@
     # $ darwin-rebuild build --flake .#simple
     darwinConfigurations."simple" = darwin.lib.darwinSystem {
       modules = [ configuration ];
-      system = "x86_64-darwin";
     };
 
     # Expose the package set, including overlays, for convenience.

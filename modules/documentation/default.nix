@@ -1,4 +1,4 @@
-toplevel@{ config, lib, pkgs, baseModules, modules, ... }:
+{ config, lib, pkgs, baseModules, modules, ... }:
 
 with lib;
 
@@ -25,15 +25,7 @@ let
     inherit pkgs config;
     version = config.system.darwinVersion;
     revision = config.system.darwinRevision;
-    nixpkgsRevision =
-      if toplevel.options.system.nixpkgsRevision.isDefined
-        then config.system.nixpkgsRevision
-
-        # If user does not use flakes and does not add rev to nixpkgs, we don't
-        # know which revision or even branch they're on. In this case we still want
-        # to link somewhere, so we hope that master hasn't changed too much.
-        else "master";
-
+    inherit (config.system) nixpkgsRevision;
     options =
       let
         scrubbedEval = evalModules {
@@ -54,7 +46,7 @@ let
 
   # TODO: Remove this when dropping 22.11 support.
   manual = realManual //
-    lib.optionalAttrs (lib.versionOlder lib.version "23.05-pre") rec {
+    lib.optionalAttrs (!pkgs.buildPackages ? nixos-render-docs) rec {
       optionsJSON = pkgs.writeTextFile {
         name = "options.json-stub";
         destination = "/share/doc/darwin/options.json";
