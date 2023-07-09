@@ -8,7 +8,7 @@ let
   cfg = config.nix.linux-builder;
 
   builderWithOverrides = cfg.package.override {
-    modules = [ cfg.modules ];
+    inherit (cfg) modules;
   };
 in
 
@@ -46,7 +46,7 @@ in
 
   config = mkIf cfg.enable {
     assertions = [ {
-      assertion = config.nix.settings.trusted-users != [ "root" ] || config.nix.settings.extra-trusted-users != [ ];
+      assertion = config.nix.settings.trusted-users != [ "root" ] || (config.nix.settings.extra-trusted-users or [ ]) != [ ];
       message = ''
         Your user or group (@admin) needs to be added to `nix.settings.trusted-users` or `nix.settings.extra-trusted-users`
         to use the Linux builder.
