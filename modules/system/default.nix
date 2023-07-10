@@ -43,6 +43,24 @@ in
       '';
     };
 
+    system.systemBuilderCommands = mkOption {
+      internal = true;
+      type = types.lines;
+      default = "";
+      description = ''
+        This code will be added to the builder creating the system store path.
+      '';
+    };
+
+    system.systemBuilderArgs = mkOption {
+      internal = true;
+      type = types.attrsOf types.unspecified;
+      default = {};
+      description = lib.mdDoc ''
+        `lib.mkDerivation` attributes that will be passed to the top level system builder.
+      '';
+    };
+
     assertions = mkOption {
       type = types.listOf types.unspecified;
       internal = true;
@@ -70,7 +88,7 @@ in
 
   config = {
 
-    system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation {
+    system.build.toplevel = throwAssertions (showWarnings (stdenvNoCC.mkDerivation ({
       name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
 
@@ -113,8 +131,10 @@ in
 
         echo -n "$darwinLabel" > $out/darwin-version
         echo -n "$system" > $out/system
+
+        ${cfg.systemBuilderCommands}
       '';
-    }));
+    } // cfg.systemBuilderArgs)));
 
   };
 }
