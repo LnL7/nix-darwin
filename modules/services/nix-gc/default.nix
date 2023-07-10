@@ -11,8 +11,8 @@ in
 {
   imports = [
     (mkRemovedOptionModule [ "nix" "gc" "dates" ] "Use `nix.gc.interval` instead.")
-    (mkRemovedOptionModule [ "nix" "gc" "randomizedDelaySec" ] "No `nix-darwin` equivilant to this NixOS option.")
-    (mkRemovedOptionModule [ "nix" "gc" "persistent" ] "No `nix-darwin` equivilant to this NixOS option.")
+    (mkRemovedOptionModule [ "nix" "gc" "randomizedDelaySec" ] "No `nix-darwin` equivalent to this NixOS option.")
+    (mkRemovedOptionModule [ "nix" "gc" "persistent" ] "No `nix-darwin` equivalent to this NixOS option.")
   ];
 
   ###### interface
