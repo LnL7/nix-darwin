@@ -2,7 +2,9 @@
   # WARNING this is very much still experimental.
   description = "A collection of darwin modules";
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs }: let
+    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
+  in {
     lib = {
       evalConfig = import ./eval-config.nix;
 
@@ -34,6 +36,12 @@
           });
     };
 
+    overlays.default = final: prev: {
+      inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option;
+
+      darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
+    };
+
     darwinModules.hydra = ./modules/examples/hydra.nix;
     darwinModules.lnl = ./modules/examples/lnl.nix;
     darwinModules.ofborg = ./modules/examples/ofborg.nix;
@@ -44,7 +52,7 @@
       description = "nix flake init -t nix-darwin";
     };
 
-    checks = nixpkgs.lib.genAttrs ["aarch64-darwin" "x86_64-darwin"] (system: let
+    checks = forAllSystems (system: let
       simple = self.lib.darwinSystem {
         modules = [
           self.darwinModules.simple
@@ -58,6 +66,17 @@
         optionsJSON
         manualHTML
         manpages;
+    });
+
+    packages = forAllSystems (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ self.overlays.default ];
+      };
+    in {
+      default = self.packages.${system}.darwin-rebuild;
+
+      inherit (pkgs) darwin-option darwin-rebuild darwin-uninstaller;
     });
   };
 }

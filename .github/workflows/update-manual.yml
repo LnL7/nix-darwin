@@ -18,9 +18,6 @@ jobs:
 
     - name: Install Nix
       uses: cachix/install-nix-action@v22
-      with:
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
     - name: Build manual
       run: |

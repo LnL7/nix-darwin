@@ -1,33 +1,13 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
+{ config, pkgs, ... }:
 
 let
-  inherit (pkgs) stdenv;
+  nix-tools = pkgs.callPackage ../../pkgs/nix-tools {
+    inherit (config.system) profile;
+    inherit (config.environment) systemPath;
+    nixPackage = config.nix.package;
+  };
 
-  extraPath = lib.makeBinPath [ config.nix.package pkgs.coreutils pkgs.jq pkgs.git ];
-
-  writeProgram = name: env: src:
-    pkgs.substituteAll ({
-      inherit name src;
-      dir = "bin";
-      isExecutable = true;
-    } // env);
-
-  darwin-option = writeProgram "darwin-option"
-    {
-      inherit (stdenv) shell;
-      path = "${extraPath}:${config.environment.systemPath}";
-    }
-    ../../pkgs/nix-tools/darwin-option.sh;
-
-  darwin-rebuild = writeProgram "darwin-rebuild"
-    {
-      inherit (config.system) profile;
-      inherit (stdenv) shell;
-      path = "${extraPath}:${config.environment.systemPath}";
-    }
-    ../../pkgs/nix-tools/darwin-rebuild.sh;
+  inherit (nix-tools) darwin-option darwin-rebuild;
 in
 
 {
@@ -38,6 +18,10 @@ in
         darwin-option
         darwin-rebuild
       ];
+
+    system.build = {
+      inherit darwin-option darwin-rebuild;
+    };
 
   };
 }

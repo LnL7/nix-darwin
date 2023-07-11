@@ -16,8 +16,6 @@ jobs:
       uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A tests
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A examples.simple
@@ -29,10 +27,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v22
-      with:
-        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A tests
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A examples.simple
@@ -47,8 +41,6 @@ jobs:
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
       run: |
         nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
@@ -56,6 +48,16 @@ jobs:
     - name: Install nix-darwin and test
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
+
+        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
+        # but we expect it to fail setting up /etc/nix/nix.conf
+        nix-shell -A installer || true
+
+        nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+        /usr/bin/sed -i.bak \
+          "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+          ~/.nixpkgs/darwin-configuration.nix
+
         nix-shell -A installer
         nix-shell -A installer.check
     - name: Build and activate default derivation
@@ -83,8 +85,6 @@ jobs:
       uses: cachix/install-nix-action@v22
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
     - name: Install nixpkgs-unstable channel
       run: |
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
@@ -92,6 +92,16 @@ jobs:
     - name: Install nix-darwin and test
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
+
+        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
+        # but we expect it to fail setting up /etc/nix/nix.conf
+        nix-shell -A installer || true
+
+        nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+        /usr/bin/sed -i.bak \
+          "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+          ~/.nixpkgs/darwin-configuration.nix
+
         nix-shell -A installer
         nix-shell -A installer.check
     - name: Build and activate default derivation
@@ -119,28 +129,25 @@ jobs:
       uses: cachix/install-nix-action@v22
       with:
         install_url: https://github.com/nix-community/nix-unstable-installer/releases/download/nix-2.10.0pre20220822_7c3ab57/install
-        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
+    - name: Install nix-darwin
       run: |
-        nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
-        nix-channel --update
-    - name: Install nix-darwin and test result
-      run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
-        nix-shell -A installer
-        nix-shell -A installer.check
-    - name: Build simple flake configuration
-      run: |
-        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
-    - name: Activate derivation of simple flake build
-      run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
-    - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
+        mkdir -p ~/.config/nix-darwin
+        darwin=$(pwd)
+        pushd ~/.config/nix-darwin
+          nix flake init -t $darwin
+          nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+          /usr/bin/sed -i.bak \
+            "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            flake.nix
+        popd
+        nix run .#darwin-rebuild -- \
+          switch --flake ~/.config/nix-darwin#simple \
+          --override-input darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -175,6 +182,7 @@ jobs:
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules#simple \
           --override-input darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
             exit 1
@@ -183,6 +191,7 @@ jobs:
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
           --override-input darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
             exit 1
@@ -191,7 +200,8 @@ jobs:
         # Should succeed
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin .
+          --override-input darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
 
   install-flake-against-unstable:
     runs-on: macos-12
@@ -200,29 +210,25 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v22
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - name: Install nixpkgs-unstable channel
+    - name: Install nix-darwin
       run: |
-        nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
-        nix-channel --update
-    - name: Install nix-darwin and test result
-      run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
-        nix-shell -A installer
-        nix-shell -A installer.check
-    - name: Build simple flake configuration
-      run: |
-        nix build ./modules/examples/flake#darwinConfigurations.simple.system --override-input darwin .
-    - name: Activate derivation of simple flake build
-      run: |
-        ./result/sw/bin/darwin-rebuild switch --flake ./modules/examples/flake#simple --override-input darwin .
-    - name: Rebuild and activate simple flake, but this time using nix-darwins flake interface
+        mkdir -p ~/.config/nix-darwin
+        darwin=$(pwd)
+        pushd ~/.config/nix-darwin
+          nix flake init -t $darwin
+          nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+          /usr/bin/sed -i.bak \
+            "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            flake.nix
+        popd
+        nix run .#darwin-rebuild -- \
+          switch --flake ~/.config/nix-darwin#simple \
+          --override-input darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable
+    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin .
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin . --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -257,14 +263,17 @@ jobs:
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules#simple \
           --override-input darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
             exit 1
           }
+
         # Should also fail
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
           --override-input darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
             exit 1
@@ -273,8 +282,11 @@ jobs:
         # Should succeed
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin .
+          --override-input darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable
+
         # Should also succeed
         darwin-rebuild build \
           --flake git+file:///tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin .
+          --override-input darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable

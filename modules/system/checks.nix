@@ -28,8 +28,8 @@ let
         if test -e /etc/synthetic.conf; then
             echo >&2
             echo "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf" >&2
-            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
-            echo "$ /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
+            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
+            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
             echo >&2
             echo "The current contents of /etc/synthetic.conf is:" >&2
             echo >&2
@@ -48,11 +48,7 @@ let
     if dscl . -list /Users | grep -q '^nixbld'; then
         echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
         echo "These can cause migration problems when upgrading to certain macOS versions" >&2
-        echo "Running the installer again will remove and recreate the users in a way that avoids these problems" >&2
-        echo >&2
-        echo "$ darwin-install" >&2
-        echo >&2
-        echo "or enable to automatically manage the users" >&2
+        echo "You can enable the following option to migrate to new style nixbld users" >&2
         echo >&2
         echo "    nix.configureBuildUsers = true;" >&2
         echo >&2

@@ -664,9 +664,13 @@ in
 
     # Not in NixOS module
     environment.etc."nix/nix.conf".knownSha256Hashes = [
-      "7c2d80499b39256b03ee9abd3d6258343718306aca8d472c26ac32c9b0949093"  # nix installer
+      "7c2d80499b39256b03ee9abd3d6258343718306aca8d472c26ac32c9b0949093"  # official Nix installer
       "19299897fa312d9d32b3c968c2872dd143085aa727140cec51f57c59083e93b9"
       "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"
+      "ef78f401a9b5a42fd15e967c50da384f99ec62f9dbc66ea38f1390b46b63e1ff"  # official Nix installer 2.0
+      "c06b0c6080dd1d62e61a30cfad100c0cfed2d3bcd378e296632dc3b28b31dc69"  # official Nix installer as of 2.0.1
+      "ff08c12813680da98c4240328f828647b67a65ba7aa89c022bd8072cba862cf1"  # official Nix installer as of 2.4
+      "f3e03d851c240c1aa7daccd144ee929f0f5971982424c868c434eb6030e961d4"  # DeterminateSystems Nix installer 0.10.0
     ];
 
     environment.etc."nix/registry.json".text = builtins.toJSON {
