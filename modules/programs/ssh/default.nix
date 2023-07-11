@@ -164,9 +164,9 @@ in
         };
       };
 
-    # Clean up .orig file left over from using knownSha256Hashes
+    # Clean up .before-nix-darwin file left over from using knownSha256Hashes
     system.activationScripts.etc.text = ''
-      auth_keys_orig=/etc/ssh/sshd_config.d/101-authorized-keys.conf.orig
+      auth_keys_orig=/etc/ssh/sshd_config.d/101-authorized-keys.conf.before-nix-darwin
 
       if [ -e "$auth_keys_orig" ] && [ "$(shasum -a 256 $auth_keys_orig | cut -d ' ' -f 1)" = "${oldAuthorizedKeysHash}" ]; then
         rm "$auth_keys_orig"

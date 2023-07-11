@@ -24,9 +24,8 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 > updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
 > Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
 
-- `mv /etc/bashrc /etc/bashrc.orig`
+- `mv /etc/bashrc /etc/bashrc.before-nix-darwin`
 - `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
-- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | tee -a ~/.bashrc`
 
 ## Updating
 

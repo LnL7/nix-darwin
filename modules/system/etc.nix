@@ -69,7 +69,7 @@ in
               o=''${o%% *}
               for h in ''${etcSha256Hashes["$l"]}; do
                 if [ "$o" = "$h" ]; then
-                  mv "$l" "$l.orig"
+                  mv "$l" "$l.before-nix-darwin"
                   ln -s "$f" "$l"
                   break
                 else

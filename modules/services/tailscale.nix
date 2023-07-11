@@ -74,10 +74,10 @@ in
       "2c28f4fe3b4a958cd86b120e7eb799eee6976daa35b228c885f0630c55ef626c"
     ];
 
-    # Cleaning up the .orig file is necessary as any files in /etc/resolver will be used.
+    # Cleaning up the .before-nix-darwin file is necessary as any files in /etc/resolver will be used.
     system.activationScripts.etc.text = mkAfter ''
-      if [ -e /etc/resolver/ts.net.orig ]; then
-        rm /etc/resolver/ts.net.orig
+      if [ -e /etc/resolver/ts.net.before-nix-darwin ]; then
+        rm /etc/resolver/ts.net.before-nix-darwin
       fi
     '';
   };
