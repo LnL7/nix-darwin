@@ -14,10 +14,8 @@ with lib;
   launchd.user.agents = mkForce {};
 
   system.activationScripts.postUserActivation.text = mkAfter ''
-    if test -L ~/Applications; then
-        rm ~/Applications
-    elif test -L ~/Applications/Nix\ Apps; then
-        rm ~/Applications/Nix\ Apps
+    if test -L /Applications/Nix\ Apps; then
+        rm /Applications/Nix\ Apps
     fi
 
     if test -L ~/.nix-defexpr/channels/darwin; then
