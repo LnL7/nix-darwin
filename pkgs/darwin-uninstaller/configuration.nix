@@ -14,16 +14,16 @@ with lib;
   launchd.user.agents = mkForce {};
 
   system.activationScripts.postUserActivation.text = mkAfter ''
-    if test -L /Applications/Nix\ Apps; then
-        rm /Applications/Nix\ Apps
-    fi
-
     if test -L ~/.nix-defexpr/channels/darwin; then
         nix-channel --remove darwin || true
     fi
   '';
 
   system.activationScripts.postActivation.text = mkAfter ''
+    if test -L /Applications/Nix\ Apps; then
+        rm /Applications/Nix\ Apps
+    fi
+
     if test -L /etc/static; then
         rm /etc/static
     fi
