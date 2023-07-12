@@ -37,7 +37,9 @@ in {
       type = types.path;
       default = "/etc/cachix-agent.token";
       description = lib.mdDoc ''
-        Required file that needs to contain CACHIX_AGENT_TOKEN=...
+        Required file that needs to contains:
+       
+          export CACHIX_AGENT_TOKEN=...
       '';
     };
 
