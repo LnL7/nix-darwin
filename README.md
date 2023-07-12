@@ -106,8 +106,8 @@ Add the following to `flake.nix` in the same folder as `configuration.nix`:
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-23.05-darwin";
-    darwin.url = "github:LnL7/nix-darwin/master";
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin.url = "github:LnL7/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ self, darwin, nixpkgs }: {
@@ -147,7 +147,7 @@ accessible as an argument `inputs`, similar to `pkgs` and `lib`, inside the conf
 
 ```nix
 # in flake.nix
-darwin.lib.darwinSystem {
+nix-darwin.lib.darwinSystem {
   modules = [ ./configuration.nix ];
   specialArgs = { inherit inputs; };
 }
@@ -156,7 +156,7 @@ darwin.lib.darwinSystem {
 ```nix
 # in configuration.nix
 { pkgs, lib, inputs }:
-# inputs.self, inputs.darwin, and inputs.nixpkgs can be accessed here
+# inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
 ```
 
 ## Manual Install
