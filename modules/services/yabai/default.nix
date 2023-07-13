@@ -62,7 +62,7 @@ in
     };
 
     services.yabai.extraConfig = mkOption {
-      type = str;
+      type = lines;
       default = "";
       example = literalExpression ''
         yabai -m rule --add app='System Preferences' manage=off
