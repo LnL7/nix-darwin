@@ -142,12 +142,12 @@ jobs:
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -181,7 +181,7 @@ jobs:
         # Should fail
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
@@ -190,7 +190,7 @@ jobs:
         # Should also fail
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
@@ -200,7 +200,7 @@ jobs:
         # Should succeed
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
 
   install-flake-against-unstable:
@@ -223,12 +223,12 @@ jobs:
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input darwin . --override-input nixpkgs nixpkgs/nixpkgs-unstable
+        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Test git submodules
       run: |
         . /etc/static/bashrc
@@ -262,7 +262,7 @@ jobs:
         # Should fail
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
@@ -272,7 +272,7 @@ jobs:
         # Should also fail
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=0#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable \
           && {
             printf 'succeeded while expecting failure due to submodule\n' >/dev/stderr
@@ -282,11 +282,11 @@ jobs:
         # Should succeed
         darwin-rebuild build \
           --flake /tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
 
         # Should also succeed
         darwin-rebuild build \
           --flake git+file:///tmp/test-nix-darwin-submodules?submodules=1#simple \
-          --override-input darwin . \
+          --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
