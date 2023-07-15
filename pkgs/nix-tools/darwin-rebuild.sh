@@ -8,12 +8,11 @@ showSyntax() {
   echo "darwin-rebuild [--help] {edit | switch | activate | build | check | changelog}" >&2
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
-  echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&1
+  echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&2
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
-  echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]"
-  echo "               [--no-update-lock-file] [--refresh] ..." >&2
-  exec man darwin-rebuild
+  echo "               [--flake flake | --no-flake] [--update-input input flake] [--impure]" >&2
+  echo "               [--recreate-lock-file] [--no-update-lock-file] [--refresh] ..." >&2
   exit 1
 }
 
@@ -26,6 +25,7 @@ extraProfileFlags=()
 profile=@profile@
 action=
 flake=
+noFlake=
 
 while [ $# -gt 0 ]; do
   i=$1; shift 1
@@ -68,6 +68,9 @@ while [ $# -gt 0 ]; do
     --flake)
       flake=$1
       shift 1
+      ;;
+    --no-flake)
+      noFlake=1
       ;;
     -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file|--refresh)
       extraLockFlags+=("$i")
@@ -120,6 +123,14 @@ if [ -z "$action" ]; then showSyntax; fi
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
+# Use /etc/nixos/flake.nix if it exists. It can be a symlink to the
+# actual flake.
+if [[ -z $flake && -e /etc/nix-darwin/flake.nix && -z $noFlake ]]; then
+    flake="$(dirname "$(readlink -f /etc/nix-darwin/flake.nix)")"
+fi
+
+# For convenience, use the hostname as the default configuration to
+# build from the flake.
 if [ -n "$flake" ]; then
     # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
     if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
