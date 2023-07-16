@@ -52,6 +52,9 @@ in
 
       ${cfg.activationScripts.preActivation.text}
 
+      # We run `etcChecks` again just in case someone runs `activate`
+      # directly without `activate-user`.
+      ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraActivation.text}
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
@@ -99,6 +102,7 @@ in
 
       ${cfg.activationScripts.createRun.text}
       ${cfg.activationScripts.checks.text}
+      ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
