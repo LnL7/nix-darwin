@@ -12,13 +12,13 @@ in
     services.ofborg.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable the ofborg builder service.";
+      description = lib.mdDoc "Whether to enable the ofborg builder service.";
     };
 
     services.ofborg.package = mkOption {
       type = types.package;
       example = literalExpression "pkgs.ofborg";
-      description = ''
+      description = lib.mdDoc ''
         This option specifies the ofborg package to use. eg.
 
         (import &lt;ofborg&gt; {}).ofborg.rs
@@ -30,7 +30,7 @@ in
 
     services.ofborg.configFile = mkOption {
       type = types.path;
-      description = ''
+      description = lib.mdDoc ''
         Configuration file to use for ofborg.
 
         WARNING Don't use a path literal or derivation for this,
@@ -41,7 +41,7 @@ in
     services.ofborg.logFile = mkOption {
       type = types.path;
       default = "/var/log/ofborg.log";
-      description = "Whether to enable the khd window manager.";
+      description = lib.mdDoc "Whether to enable the khd window manager.";
     };
   };
 

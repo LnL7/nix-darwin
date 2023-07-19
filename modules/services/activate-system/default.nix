@@ -3,8 +3,6 @@
 with lib;
 
 let
-  inherit (pkgs) stdenv;
-
   cfg = config.services.activate-system;
 in
 
@@ -13,7 +11,7 @@ in
     services.activate-system.enable = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to activate system at boot time.";
+      description = lib.mdDoc "Whether to activate system at boot time.";
     };
   };
 
@@ -36,6 +34,7 @@ in
         # Prevent the current configuration from being garbage-collected.
         ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
 
+        ${config.system.activationScripts.etcChecks.text}
         ${config.system.activationScripts.etc.text}
         ${config.system.activationScripts.keyboard.text}
       '';

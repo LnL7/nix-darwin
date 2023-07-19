@@ -4,26 +4,24 @@ set -o pipefail
 export PATH=@path@:$PATH
 
 evalNix() {
-  nix-instantiate --eval --strict "${extraEvalFlags[@]}" -E "with import <darwin> {}; $*"
-}
-
-evalAttrs() {
-  evalNix "builtins.concatStringsSep \"\\n\" (builtins.attrNames $*)"
+  nix-instantiate --eval --strict "${extraEvalFlags[@]}" -E "with import <darwin> {}; $*" 2>/dev/null
 }
 
 evalOpt() {
-  evalNix "options.$option.$*" 2>/dev/null
+  evalNix "options.$option.$*"
+}
+
+evalOptAttrs() {
+  evalNix "builtins.concatStringsSep \"\\n\" (builtins.attrNames $*)" | jq -r .
 }
 
 evalOptText() {
-  eval printf "$(evalNix "options.$option.$*" 2>/dev/null)" 2>/dev/null
-  echo
+  evalNix "options.$option.$*" | jq -r .
 }
 
 showSyntax() {
   echo "$0: [-I path] <option>" >&2
-  eval printf "$(evalAttrs "options")"
-  echo
+  evalOptAttrs "options"
   exit 1
 }
 
@@ -69,9 +67,8 @@ if [ "$(evalOpt "_type")" = '"option"' ]; then
   fi
   echo
   echo "Description:"
-  evalOptText "description" || echo "no description"
+  evalOptText "description.text" || echo "no description"
   echo
 else
-  eval printf "$(evalAttrs "options.$option")" 2>/dev/null
-  echo
+  evalOptAttrs "options.$option"
 fi

@@ -11,20 +11,20 @@ in
     services.skhd.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable the skhd hotkey daemon.";
+      description = lib.mdDoc "Whether to enable the skhd hotkey daemon.";
     };
 
     services.skhd.package = mkOption {
       type = types.package;
       default = pkgs.skhd;
-      description = "This option specifies the skhd package to use.";
+      description = lib.mdDoc "This option specifies the skhd package to use.";
     };
 
     services.skhd.skhdConfig = mkOption {
       type = types.lines;
       default = "";
       example = "alt + shift - r   :   chunkc quit";
-      description = "Config to use for <filename>skhdrc</filename>.";
+      description = lib.mdDoc "Config to use for {file}`skhdrc`.";
     };
   };
 

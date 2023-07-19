@@ -59,24 +59,24 @@ in
     environment.launchAgents = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = ''
-        Set of files that have to be linked in <filename>/Library/LaunchAgents</filename>.
+      description = lib.mdDoc ''
+        Set of files that have to be linked in {file}`/Library/LaunchAgents`.
       '';
     };
 
     environment.launchDaemons = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = ''
-        Set of files that have to be linked in <filename>/Library/LaunchDaemons</filename>.
+      description = lib.mdDoc ''
+        Set of files that have to be linked in {file}`/Library/LaunchDaemons`.
       '';
     };
 
     environment.userLaunchAgents = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = ''
-        Set of files that have to be linked in <filename>~/Library/LaunchAgents</filename>.
+      description = lib.mdDoc ''
+        Set of files that have to be linked in {file}`~/Library/LaunchAgents`.
       '';
     };
 

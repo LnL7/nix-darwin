@@ -7,8 +7,9 @@ with lib;
     system.defaults.spaces.spans-displays = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = ''
-        # Apple menu > System Preferences > Mission Control
+      description = lib.mdDoc ''
+        Apple menu > System Preferences > Mission Control
+
         Displays have separate Spaces (note a logout is required before
         this setting will take effect).
 

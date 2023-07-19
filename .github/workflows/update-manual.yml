@@ -17,14 +17,11 @@ jobs:
         fetch-depth: 0
 
     - name: Install Nix
-      uses: cachix/install-nix-action@v17
-      with:
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      uses: cachix/install-nix-action@v22
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-22.05-darwin -I darwin=. -A manualHTML
+        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-23.05-darwin -I darwin=. -A manualHTML
 
     - name: Push update to manual
       run: |
@@ -32,6 +29,7 @@ jobs:
         rm -rf manual
         cp -R result/share/doc/darwin manual
         rm result
+        git checkout master -- README.md
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add --all

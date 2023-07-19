@@ -45,10 +45,10 @@ stdenv.mkDerivation {
     echo >&2
     echo >&2 "Uninstalling nix-darwin, this will:"
     echo >&2
-    echo >&2 "    - remove ~/Applications link."
-    echo >&2 "    - cleanup static /etc files."
-    echo >&2 "    - disable and remove all launchd services managed by nix-darwin."
-    echo >&2 "    - restore daemon service from nix installer (only when this is a multi-user install)."
+    echo >&2 "    - remove /Applications/Nix Apps symlink"
+    echo >&2 "    - cleanup static /etc files"
+    echo >&2 "    - disable and remove all launchd services managed by nix-darwin"
+    echo >&2 "    - restore daemon service from nix installer (only when this is a multi-user install)"
     echo >&2
 
     if test -t 0; then

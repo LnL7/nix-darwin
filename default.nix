@@ -6,12 +6,14 @@
 }:
 
 let
-  evalConfig = import ./eval-config.nix { inherit lib; };
-
-  eval = evalConfig {
-    inherit system;
-    modules = [ configuration ];
-    inputs = { inherit nixpkgs; };
+  eval = import ./eval-config.nix {
+    inherit lib;
+    modules = [
+      configuration
+      { nixpkgs.source = lib.mkDefault nixpkgs; }
+    ] ++ lib.optional (system != null) {
+      nixpkgs.system = lib.mkDefault system;
+    };
   };
 
   # The source code of this repo needed by the [un]installers.

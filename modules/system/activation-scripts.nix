@@ -22,12 +22,12 @@ in
       internal = true;
       type = types.attrsOf (types.submodule script);
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         A set of shell script fragments that are executed when a NixOS
         system configuration is activated.  Examples are updating
         /etc, creating accounts, and so on.  Since these are executed
         every time you boot the system or run
-        <command>nixos-rebuild</command>, it's important that they are
+        {command}`nixos-rebuild`, it's important that they are
         idempotent and fast.
       '';
     };
@@ -52,6 +52,9 @@ in
 
       ${cfg.activationScripts.preActivation.text}
 
+      # We run `etcChecks` again just in case someone runs `activate`
+      # directly without `activate-user`.
+      ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraActivation.text}
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
@@ -68,11 +71,6 @@ in
       ${cfg.activationScripts.fonts.text}
 
       ${cfg.activationScripts.postActivation.text}
-
-      # Ensure /run exists.
-      if [ ! -e /run ]; then
-        ln -sfn private/var/run /run
-      fi
 
       # Make this configuration the current configuration.
       # The readlink is there to ensure that when $systemConfig = /system
@@ -102,7 +100,9 @@ in
 
       ${cfg.activationScripts.preUserActivation.text}
 
+      ${cfg.activationScripts.createRun.text}
       ${cfg.activationScripts.checks.text}
+      ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraUserActivation.text}
       ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}

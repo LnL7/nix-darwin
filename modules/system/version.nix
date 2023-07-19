@@ -1,4 +1,4 @@
-{ options, config, lib, pkgs, ... }:
+{ options, config, lib, ... }:
 
 with lib;
 
@@ -7,27 +7,28 @@ let
 
   defaultStateVersion = options.system.stateVersion.default;
 
-  parseGit = path:
-    if pathExists "${path}/.git" then rec {
-      rev = commitIdFromGitRepo "${path}/.git";
-      shortRev = substring 0 7 rev;
-    }
-    else if pathExists "${path}/.git-revision" then rec {
-      rev = fileContents "${path}/.git-revision";
-      shortRev = substring 0 7 rev;
-    }
-    else {
-      shortRev = "0000000";
-    };
+  # Based on `lib.trivial.revisionWithDefault` from nixpkgs.
+  gitRevision = path:
+    if pathIsGitRepo "${path}/.git"
+    then commitIdFromGitRepo "${path}/.git"
+    else if pathExists "${path}/.git-revision"
+    then fileContents "${path}/.git-revision"
+    else null;
 
-  darwin = parseGit (toString ../..);
-  nixpkgs = parseGit (toString pkgs.path);
+  nixpkgsSrc = config.nixpkgs.source;
 
-  releaseFile = "${toString pkgs.path}/.version";
-  suffixFile = "${toString pkgs.path}/.version-suffix";
-
-  nixpkgsSuffix = if pathExists suffixFile then fileContents suffixFile
-                  else ".git." + nixpkgs.shortRev;
+  # If `nixpkgs.constructedByUs` is true, then Nixpkgs was imported from
+  # `nixpkgs.source` and we can use revision information (flake input,
+  # `builtins.fetchGit`, etc.) from it. Otherwise `pkgs` could be
+  # anything and we can't reliably determine exact version information,
+  # but if the configuration explicitly sets `nixpkgs.source` we
+  # trust it.
+  useSourceRevision =
+    (config.nixpkgs.constructedByUs
+      || options.nixpkgs.source.highestPrio < (lib.mkDefault {}).priority)
+    && isAttrs nixpkgsSrc
+    && (nixpkgsSrc._type or null == "flake"
+      || isString (nixpkgsSrc.rev or null));
 in
 
 {
@@ -35,7 +36,7 @@ in
     system.stateVersion = mkOption {
       type = types.int;
       default = 4;
-      description = ''
+      description = lib.mdDoc ''
         Every once in a while, a new NixOS release may change
         configuration defaults in a way incompatible with stateful
         data. For instance, if the default version of PostgreSQL
@@ -50,68 +51,73 @@ in
 
     system.darwinLabel = mkOption {
       type = types.str;
-      description = "Label to be used in the names of generated outputs.";
+      description = lib.mdDoc "Label to be used in the names of generated outputs.";
     };
 
     system.darwinVersion = mkOption {
       internal = true;
       type = types.str;
-      description = "The full darwin version (e.g. <literal>darwin4.master</literal>).";
+      default = "darwin${toString cfg.stateVersion}${cfg.darwinVersionSuffix}";
+      description = lib.mdDoc "The full darwin version (e.g. `darwin4.2abdb5a`).";
     };
 
     system.darwinVersionSuffix = mkOption {
       internal = true;
       type = types.str;
-      description = "The short darwin version suffix (e.g. <literal>.2abdb5a</literal>).";
+      default = if cfg.darwinRevision != null
+        then ".${substring 0 7 cfg.darwinRevision}"
+        else "";
+      description = lib.mdDoc "The short darwin version suffix (e.g. `.2abdb5a`).";
     };
 
     system.darwinRevision = mkOption {
       internal = true;
-      type = types.str;
-      default = "master";
-      description = "The darwin git revision from which this configuration was built.";
+      type = types.nullOr types.str;
+      default = gitRevision (toString ../..);
+      description = lib.mdDoc "The darwin git revision from which this configuration was built.";
     };
 
     system.nixpkgsRelease = mkOption {
       readOnly = true;
       type = types.str;
-      description = "The nixpkgs release (e.g. <literal>16.03</literal>).";
+      default = lib.trivial.release;
+      description = lib.mdDoc "The nixpkgs release (e.g. `16.03`).";
     };
 
     system.nixpkgsVersion = mkOption {
       internal = true;
       type = types.str;
-      description = "The full nixpkgs version (e.g. <literal>16.03.1160.f2d4ee1</literal>).";
+      default = cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix;
+      description = lib.mdDoc "The full nixpkgs version (e.g. `16.03.1160.f2d4ee1`).";
     };
 
     system.nixpkgsVersionSuffix = mkOption {
       internal = true;
       type = types.str;
-      description = "The short nixpkgs version suffix (e.g. <literal>.1160.f2d4ee1</literal>).";
+      default = if useSourceRevision
+        then ".${lib.substring 0 8 (nixpkgsSrc.lastModifiedDate or nixpkgsSrc.lastModified or "19700101")}.${nixpkgsSrc.shortRev or "dirty"}"
+        else lib.trivial.versionSuffix;
+      description = lib.mdDoc "The short nixpkgs version suffix (e.g. `.1160.f2d4ee1`).";
     };
 
     system.nixpkgsRevision = mkOption {
       internal = true;
-      type = types.str;
-      description = "The nixpkgs git revision from which this configuration was built.";
+      type = types.nullOr types.str;
+      default = if useSourceRevision && nixpkgsSrc ? rev
+        then nixpkgsSrc.rev
+        else lib.trivial.revisionWithDefault null;
+      description = lib.mdDoc "The nixpkgs git revision from which this configuration was built.";
     };
   };
 
   config = {
-
-    # These defaults are set here rather than up there so that
-    # changing them would not rebuild the manual
+    # This default is set here rather than up there so that the options
+    # documentation is not reprocessed on every commit
     system.darwinLabel = mkDefault "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
-    system.darwinVersion = mkDefault "darwin${toString cfg.stateVersion}${cfg.darwinVersionSuffix}";
-    system.darwinVersionSuffix = mkDefault ".${darwin.shortRev}";
-    system.darwinRevision = mkIf (darwin ? rev) (mkDefault darwin.rev);
 
-    system.nixpkgsVersion = mkDefault "${cfg.nixpkgsRelease}${cfg.nixpkgsVersionSuffix}";
-    system.nixpkgsRelease = mkDefault (fileContents releaseFile);
-    system.nixpkgsVersionSuffix = mkDefault nixpkgsSuffix;
-    system.nixpkgsRevision = mkIf (nixpkgs ? rev) (mkDefault nixpkgs.rev);
-
-    assertions = [ { assertion = cfg.stateVersion <= defaultStateVersion; message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value"; } ];
-
+    assertions = [ {
+      assertion = cfg.stateVersion <= defaultStateVersion;
+      message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value";
+    } ];
   };
 }

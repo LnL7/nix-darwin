@@ -7,32 +7,32 @@ let
 in {
 
   options.services.offlineimap = {
-    enable = mkEnableOption "Offlineimap, a software to dispose your mailbox(es) as a local Maildir(s).";
+    enable = mkEnableOption (lib.mdDoc "Offlineimap, a software to dispose your mailbox(es) as a local Maildir(s)");
 
     package = mkOption {
       type = types.package;
       default = pkgs.offlineimap;
       defaultText = "pkgs.offlineimap";
-      description = "Offlineimap derivation to use.";
+      description = lib.mdDoc "Offlineimap derivation to use.";
     };
 
     path = mkOption {
       type = types.listOf types.path;
       default = [];
       example = literalExpression "[ pkgs.pass pkgs.bash pkgs.notmuch ]";
-      description = "List of derivations to put in Offlineimap's path.";
+      description = lib.mdDoc "List of derivations to put in Offlineimap's path.";
     };
 
     startInterval = mkOption {
       type = types.nullOr types.int;
       default = 300;
-      description = "Optional key to start offlineimap services each N seconds";
+      description = lib.mdDoc "Optional key to start offlineimap services each N seconds";
     };
 
     runQuick = mkOption {
       type = types.bool;
       default = false;
-      description = ''
+      description = lib.mdDoc ''
         Run only quick synchronizations.
         Ignore any flag updates on IMAP servers. If a flag on the remote IMAP changes, and we have the message locally, it will be left untouched in a quick run.
       '';
@@ -41,7 +41,7 @@ in {
     extraConfig = mkOption {
       type = types.lines;
       default = "";
-      description = "Additional text to be appended to <filename>offlineimaprc</filename>.";
+      description = lib.mdDoc "Additional text to be appended to {file}`offlineimaprc`.";
     };
   };
 

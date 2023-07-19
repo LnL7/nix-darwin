@@ -11,40 +11,40 @@ in
     system.keyboard.enableKeyMapping = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to enable keyboard mappings.";
+      description = lib.mdDoc "Whether to enable keyboard mappings.";
     };
 
     system.keyboard.remapCapsLockToControl = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to remap the Caps Lock key to Control.";
+      description = lib.mdDoc "Whether to remap the Caps Lock key to Control.";
     };
 
     system.keyboard.remapCapsLockToEscape = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to remap the Caps Lock key to Escape.";
+      description = lib.mdDoc "Whether to remap the Caps Lock key to Escape.";
     };
 
     system.keyboard.nonUS.remapTilde = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to remap the Tilde key on non-us keyboards.";
+      description = lib.mdDoc "Whether to remap the Tilde key on non-us keyboards.";
     };
 
     system.keyboard.swapLeftCommandAndLeftAlt = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to swap the left Command key and left Alt key.";
+      description = lib.mdDoc "Whether to swap the left Command key and left Alt key.";
     };
 
     system.keyboard.userKeyMapping = mkOption {
       internal = true;
       type = types.listOf (types.attrsOf types.int);
       default = [];
-      description = ''
+      description = lib.mdDoc ''
         List of keyboard mappings to apply, for more information see
-        <link xlink:href="https://developer.apple.com/library/content/technotes/tn2450/_index.html"/>.
+        <https://developer.apple.com/library/content/technotes/tn2450/_index.html>.
       '';
     };
   };

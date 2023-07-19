@@ -89,7 +89,6 @@ let
     };
 
     manualHTML = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualHTML);
-    manualEpub = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualEpub);
     manpages = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manpages);
     options = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.optionsJSON);
 

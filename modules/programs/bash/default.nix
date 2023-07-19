@@ -12,19 +12,19 @@ in
     programs.bash.enable = mkOption {
       type = types.bool;
       default = true;
-      description = "Whether to configure bash as an interactive shell.";
+      description = lib.mdDoc "Whether to configure bash as an interactive shell.";
     };
 
     programs.bash.interactiveShellInit = mkOption {
       default = "";
-      description = "Shell script code called during interactive bash shell initialisation.";
+      description = lib.mdDoc "Shell script code called during interactive bash shell initialisation.";
       type = types.lines;
     };
 
     programs.bash.enableCompletion = mkOption {
       type = types.bool;
       default = false;
-      description = ''
+      description = lib.mdDoc ''
         Enable bash completion for all interactive bash shells.
 
         NOTE. This doesn't work with bash 3.2, which is the default on macOS.
@@ -96,9 +96,10 @@ in
     '';
 
     environment.etc."bashrc".knownSha256Hashes = [
-      "444c716ac2ccd9e1e3347858cb08a00d2ea38e8c12fdc5798380dc261e32e9ef"
-      "617b39e36fa69270ddbee19ddc072497dbe7ead840cbd442d9f7c22924f116f4"  # nix installer
-      "6be16cf7c24a3c6f7ae535c913347a3be39508b3426f5ecd413e636e21031e66"  # nix installer
+      "444c716ac2ccd9e1e3347858cb08a00d2ea38e8c12fdc5798380dc261e32e9ef"  # macOS
+      "617b39e36fa69270ddbee19ddc072497dbe7ead840cbd442d9f7c22924f116f4"  # official Nix installer
+      "6be16cf7c24a3c6f7ae535c913347a3be39508b3426f5ecd413e636e21031e66"  # official Nix installer
+      "08ffbf991a9e25839d38b80a0d3bce3b5a6c84b9be53a4b68949df4e7e487bb7"  # DeterminateSystems installer
     ];
 
   };

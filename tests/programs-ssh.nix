@@ -15,6 +15,6 @@
     echo >&2 "checking for authorized keys for foo in /etc/ssh/authorized_keys.d/foo"
     grep 'ssh-ed25519 AAAA...' ${config.out}/etc/ssh/authorized_keys.d/foo
     echo >&2 "checking for authorized keys' path in /etc/ssh/sshd_config.d/101-authorized-keys.conf"
-    grep 'AuthorizedKeysFile /etc/ssh/authorized_keys.d/%u' ${config.out}/etc/ssh/sshd_config.d/101-authorized-keys.conf
+    grep 'AuthorizedKeysFile %h/.ssh/authorized_keys /etc/ssh/authorized_keys.d/%u' ${config.out}/etc/ssh/sshd_config.d/101-authorized-keys.conf
   '';
 }

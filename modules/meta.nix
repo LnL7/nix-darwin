@@ -35,13 +35,13 @@ in
         internal = true;
         default = [];
         example = [ lib.maintainers.all ];
-        description = ''
+        description = lib.mdDoc ''
           List of maintainers of each module.  This option should be defined at
           most once per module.
 
-          NOTE: <literal>lib</literal> comes from Nixpkgs, which can go out of
+          NOTE: `lib` comes from Nixpkgs, which can go out of
           sync with nix-darwin. For this reason, use definitions like
-          <literal>maintainers.alice or "alice"</literal>.
+          `maintainers.alice or "alice"`.
         '';
       };
 

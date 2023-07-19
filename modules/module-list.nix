@@ -8,6 +8,7 @@
   ./security/pki
   ./security/sandbox
   ./system
+  ./system/base.nix
   ./system/checks.nix
   ./system/activation-scripts.nix
   ./system/applications.nix
@@ -39,6 +40,7 @@
   ./time
   ./networking
   ./nix
+  ./nix/linux-builder.nix
   ./nix/nix-darwin.nix
   ./nix/nixpkgs.nix
   ./environment
@@ -53,6 +55,7 @@
   ./services/emacs.nix
   ./services/gitlab-runner.nix
   ./services/hercules-ci-agent
+  ./services/ipfs.nix
   ./services/karabiner-elements
   ./services/khd
   ./services/kwm

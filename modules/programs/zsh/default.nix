@@ -18,13 +18,13 @@ in
     programs.zsh.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Whether to configure zsh as an interactive shell.";
+      description = lib.mdDoc "Whether to configure zsh as an interactive shell.";
     };
 
     programs.zsh.variables = mkOption {
       type = types.attrsOf (types.either types.str (types.listOf types.str));
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         A set of environment variables used in the global environment.
         These variables will be set on shell initialisation.
         The value of each variable can be either a string or a list of
@@ -37,61 +37,61 @@ in
     programs.zsh.shellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during zsh shell initialisation.";
+      description = lib.mdDoc "Shell script code called during zsh shell initialisation.";
     };
 
     programs.zsh.loginShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during zsh login shell initialisation.";
+      description = lib.mdDoc "Shell script code called during zsh login shell initialisation.";
     };
 
     programs.zsh.interactiveShellInit = mkOption {
       type = types.lines;
       default = "";
-      description = "Shell script code called during interactive zsh shell initialisation.";
+      description = lib.mdDoc "Shell script code called during interactive zsh shell initialisation.";
     };
 
     programs.zsh.promptInit = mkOption {
       type = types.lines;
-      default = "autoload -U promptinit && promptinit && prompt walters";
-      description = "Shell script code used to initialise the zsh prompt.";
+      default = "autoload -U promptinit && promptinit && prompt walters && setopt prompt_sp";
+      description = lib.mdDoc "Shell script code used to initialise the zsh prompt.";
     };
 
     programs.zsh.enableCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable zsh completion for all interactive zsh shells.";
+      description = lib.mdDoc "Enable zsh completion for all interactive zsh shells.";
     };
 
     programs.zsh.enableBashCompletion = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable bash completion for all interactive zsh shells.";
+      description = lib.mdDoc "Enable bash completion for all interactive zsh shells.";
     };
 
     programs.zsh.enableFzfCompletion = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf completion.";
+      description = lib.mdDoc "Enable fzf completion.";
     };
 
     programs.zsh.enableFzfGit = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf keybindings for C-g git browsing.";
+      description = lib.mdDoc "Enable fzf keybindings for C-g git browsing.";
     };
 
     programs.zsh.enableFzfHistory = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable fzf keybinding for Ctrl-r history search.";
+      description = lib.mdDoc "Enable fzf keybinding for Ctrl-r history search.";
     };
 
     programs.zsh.enableSyntaxHighlighting = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable zsh-syntax-highlighting.";
+      description = lib.mdDoc "Enable zsh-syntax-highlighting.";
     };
   };
 
@@ -194,14 +194,15 @@ in
 
     environment.etc."zprofile".knownSha256Hashes = [
       "db8422f92d8cff684e418f2dcffbb98c10fe544b5e8cd588b2009c7fa89559c5"
-      "0235d3c1b6cf21e7043fbc98e239ee4bc648048aafaf6be1a94a576300584ef2"
+      "0235d3c1b6cf21e7043fbc98e239ee4bc648048aafaf6be1a94a576300584ef2"  # macOS
     ];
 
     environment.etc."zshrc".knownSha256Hashes = [
       "19a2d673ffd47b8bed71c5218ff6617dfc5e8533b240b9ba79142a45f8823c23"
-      "fb5827cb4712b7e7932d438067ec4852c8955a9ff0f55e282473684623ebdfa1"
-      "c5a00c072c920f46216454978c44df044b2ec6d03409dc492c7bdcd92c94a110"  # nix install
-      "40b0d8751adae5b0100a4f863be5b75613a49f62706427e92604f7e04d2e2261"  # nix install
+      "fb5827cb4712b7e7932d438067ec4852c8955a9ff0f55e282473684623ebdfa1"  # macOS
+      "c5a00c072c920f46216454978c44df044b2ec6d03409dc492c7bdcd92c94a110"  # official Nix installer
+      "40b0d8751adae5b0100a4f863be5b75613a49f62706427e92604f7e04d2e2261"  # official Nix installer
+      "2af1b563e389d11b76a651b446e858116d7a20370d9120a7e9f78991f3e5f336"  # DeterminateSystems installer
     ];
 
   };
