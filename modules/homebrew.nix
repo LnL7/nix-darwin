@@ -536,8 +536,7 @@ in
       [](#opt-homebrew.onActivation).
 
       This module also provides a few options for modifying how Homebrew commands behave when
-      you manually invoke them, under [](#opt-homebrew.global)
-    '');
+      you manually invoke them, under [](#opt-homebrew.global)'');
 
     brewPrefix = mkOption {
       type = types.str;
