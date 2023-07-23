@@ -35,4 +35,11 @@ in
       inherit (stdenv) shell;
     }
     ./darwin-rebuild.sh;
+
+  darwin-version = writeProgram "darwin-version"
+    {
+      inherit (stdenv) shell;
+      path = lib.makeBinPath [ jq ];
+    }
+    ./darwin-version.sh;
 }

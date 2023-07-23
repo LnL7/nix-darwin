@@ -125,7 +125,7 @@
     set -g pane-border-style fg=black
     set -g status-bg black
     set -g status-fg white
-    set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(cat /run/current-system/darwin-version)'
+    set -g status-right '#[fg=white]#(id -un)@#(hostname)   #(jq --raw-output '.darwinLabel' /run/current-system/darwin-version.json)'
   '';
 
   environment.etc."nix/user-sandbox.sb".text = ''

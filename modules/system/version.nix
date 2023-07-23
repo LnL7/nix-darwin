@@ -108,6 +108,12 @@ in
         else lib.trivial.revisionWithDefault null;
       description = lib.mdDoc "The nixpkgs git revision from which this configuration was built.";
     };
+
+    system.configurationRevision = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = lib.mdDoc "The Git revision of the top-level flake from which this configuration was built.";
+    };
   };
 
   config = {

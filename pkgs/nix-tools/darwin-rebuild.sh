@@ -8,12 +8,11 @@ showSyntax() {
   echo "darwin-rebuild [--help] {edit | switch | activate | build | check | changelog}" >&2
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
-  echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&1
+  echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&2
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
-  echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]"
+  echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]" >&2
   echo "               [--no-update-lock-file] [--refresh] ..." >&2
-  exec man darwin-rebuild
   exit 1
 }
 

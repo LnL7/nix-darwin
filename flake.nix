@@ -30,14 +30,17 @@
 
               system.checks.verifyNixPath = lib.mkDefault false;
 
-              system.darwinVersionSuffix = ".${self.shortRev or "dirty"}";
-              system.darwinRevision = lib.mkIf (self ? rev) self.rev;
+              system.darwinVersionSuffix = ".${self.shortRev or self.dirtyShortRev or "dirty"}";
+              system.darwinRevision = let
+                rev = self.rev or self.dirtyRev or null;
+              in
+                lib.mkIf (rev != null) rev;
             }) ];
           });
     };
 
     overlays.default = final: prev: {
-      inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option;
+      inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option darwin-version;
 
       darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
     };
@@ -76,7 +79,7 @@
     in {
       default = self.packages.${system}.darwin-rebuild;
 
-      inherit (pkgs) darwin-option darwin-rebuild darwin-uninstaller;
+      inherit (pkgs) darwin-option darwin-rebuild darwin-version darwin-uninstaller;
     });
   };
 }
