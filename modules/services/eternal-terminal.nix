@@ -65,7 +65,6 @@ in {
       serviceConfig = {
         ProgramArguments = [
           "${cfg.package}/bin/etserver"
-          "--daemon"
           "--cfgfile=${
             pkgs.writeText "et.cfg" ''
               ; et.cfg : Config file for Eternal Terminal
@@ -81,7 +80,7 @@ in {
             ''
           }"
         ];
-        KeepAlive = true;
+        KeepAlive = false;
         RunAtLoad = true;
         HardResourceLimits.NumberOfFiles = 4096;
         SoftResourceLimits.NumberOfFiles = 4096;
