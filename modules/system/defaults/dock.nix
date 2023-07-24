@@ -167,7 +167,7 @@ in {
       type = types.nullOr types.bool;
       default = false;
       description = lib.mdDoc ''
-        Magnify icon on hover.  The default is false.
+        Magnify icon on hover. The default is false.
       '';
     };
 
@@ -175,7 +175,8 @@ in {
       type = types.nullOr types.int;
       default = null;
       description = lib.mdDoc ''
-        Hover maginified icon size.  The default is null.
+        Hover maginified icon size. The default is null.
+        Valid values can range from 16 up to 128.
       '';
     };
    
