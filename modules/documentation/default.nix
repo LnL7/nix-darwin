@@ -11,9 +11,9 @@ let
   regularConfig = config;
 
   argsModule = {
-    config._module.args = lib.mkForce (regularConfig._module.args // {
+    config._module.args = regularConfig._module.args // {
       modules = [ ];
-    });
+    };
   };
 
   /* For the purpose of generating docs, evaluate options with each derivation
@@ -28,9 +28,8 @@ let
     inherit (config.system) nixpkgsRevision;
     options =
       let
-        scrubbedEval = import ../../eval-config.nix {
-          inherit lib;
-          modules = [ argsModule ];
+        scrubbedEval = evalModules {
+          modules = baseModules ++ [ argsModule ];
           specialArgs = { pkgs = scrubDerivations "pkgs" pkgs; };
         };
         scrubDerivations = namePrefix: pkgSet: mapAttrs
