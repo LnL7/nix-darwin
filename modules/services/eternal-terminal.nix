@@ -80,7 +80,7 @@ in {
             ''
           }"
         ];
-        KeepAlive = false;
+        KeepAlive = true;
         RunAtLoad = true;
         HardResourceLimits.NumberOfFiles = 4096;
         SoftResourceLimits.NumberOfFiles = 4096;
