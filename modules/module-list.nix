@@ -71,6 +71,7 @@
   ./services/postgresql
   ./services/privoxy
   ./services/redis
+  ./services/sketchybar
   ./services/skhd
   ./services/spacebar
   ./services/spotifyd.nix
