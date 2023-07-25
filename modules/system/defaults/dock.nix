@@ -165,18 +165,17 @@ in {
 
     system.defaults.dock.magnification = mkOption {
       type = types.nullOr types.bool;
-      default = false;
+      default = null;
       description = lib.mdDoc ''
         Magnify icon on hover. The default is false.
       '';
     };
 
     system.defaults.dock.largesize = mkOption {
-      type = types.nullOr types.int;
+      type = types.nullOr (types.ints.between 16 128);
       default = null;
       description = lib.mdDoc ''
-        Hover maginified icon size. The default is null.
-        Valid values can range from 16 up to 128.
+        Magnified icon size on hover. The default is 16.
       '';
     };
    
