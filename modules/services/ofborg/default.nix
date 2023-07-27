@@ -41,7 +41,7 @@ in
     services.ofborg.logFile = mkOption {
       type = types.path;
       default = "/var/log/ofborg.log";
-      description = lib.mdDoc "Whether to enable the khd window manager.";
+      description = lib.mdDoc "The logfile to use for the ofborg service.";
     };
   };
 
