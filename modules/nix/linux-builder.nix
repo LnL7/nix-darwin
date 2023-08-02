@@ -42,6 +42,17 @@ in
         without changing this option otherwise you may not be able to build the Linux builder.
       '';
     };
+
+    maxJobs = mkOption {
+      type = types.ints.positive;
+      default = 1;
+      example = 4;
+      description = lib.mdDoc ''
+        This option specifies the maximum number of jobs to run on the Linux builder at once.
+
+        This sets the corresponding `nix.buildMachines.*.maxJobs` option.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -88,6 +99,7 @@ in
       system = "${stdenv.hostPlatform.uname.processor}-linux";
       supportedFeatures = [ "kvm" "benchmark" "big-parallel" ];
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
+      inherit (cfg) maxJobs;
     }];
 
     nix.settings.builders-use-substitutes = true;
