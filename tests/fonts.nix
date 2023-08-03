@@ -8,7 +8,6 @@ let
 in
 
 {
-  fonts.fontDir.enable = true;
   fonts.packages = [ font ];
 
   test = ''
