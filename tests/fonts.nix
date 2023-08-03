@@ -9,15 +9,13 @@ in
 
 {
   fonts.fontDir.enable = true;
-  fonts.fonts = [ font ];
+  fonts.packages = [ font ];
 
   test = ''
-    echo "checking fonts in /Library/Fonts" >&2
-    test -e ${config.out}/Library/Fonts/Font.ttf
+    echo "checking fonts in /Library/Fonts/Nix Fonts" >&2
+    test -e "${config.out}/Library/Fonts/Nix Fonts"/*/Font.ttf
 
     echo "checking activation of fonts in /activate" >&2
-    grep "fontrestore default -n 2>&1" ${config.out}/activate
-    grep 'ln -fn ".*" /Library/Fonts' ${config.out}/activate || grep 'rsync -az --inplace ".*" /Library/Fonts' ${config.out}/activate
-    grep 'rm "/Library/Fonts/.*"' ${config.out}/activate
+    grep '/Library/Fonts/Nix Fonts' ${config.out}/activate
   '';
 }
