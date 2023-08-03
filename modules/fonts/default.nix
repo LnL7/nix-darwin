@@ -6,7 +6,8 @@ in
 
 {
   imports = [
-    (lib.mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
+    (lib.mkRemovedOptionModule [ "fonts" "enableFontDir" ] "No nix-darwin equivalent to this NixOS option. This is not required to install fonts.")
+    (lib.mkRemovedOptionModule [ "fonts" "fontDir" "enable" ] "No nix-darwin equivalent to this NixOS option. This is not required to install fonts.")
     (lib.mkRemovedOptionModule [ "fonts" "fonts" ] ''
       This option has been renamed to `fonts.packages' for consistency with NixOS.
 
@@ -14,21 +15,12 @@ in
   ];
 
   options = {
-    fonts.fontDir.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = ''
-        Whether to enable font management and install configured fonts to
-        {file}`/Library/Fonts/Nix Fonts`.
-      '';
-    };
-
     fonts.packages = lib.mkOption {
       type = lib.types.listOf lib.types.path;
       default = [ ];
       example = lib.literalExpression "[ pkgs.dejavu_fonts ]";
       description = ''
-        List of fonts to install.
+        List of fonts to install into {file}`/Library/Fonts/Nix Fonts`.
       '';
     };
   };
@@ -52,7 +44,7 @@ in
         )
       '';
 
-    system.activationScripts.fonts.text = lib.optionalString cfg.fontDir.enable ''
+    system.activationScripts.fonts.text = ''
       printf >&2 'setting up /Library/Fonts/Nix Fonts...\n'
 
       # rsync uses the mtime + size of files to determine whether they
