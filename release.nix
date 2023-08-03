@@ -19,6 +19,10 @@ let
 
   makeTest = test:
     let
+      testName =
+        builtins.replaceStrings [ ".nix" ] [ "" ]
+          (builtins.baseNameOf test);
+
       configuration =
         { config, lib, pkgs, ... }:
         with lib;
@@ -36,7 +40,7 @@ let
           };
 
           config = {
-            system.build.run-test = pkgs.runCommand "darwin-test"
+            system.build.run-test = pkgs.runCommand "darwin-test-${testName}"
               { allowSubstitutes = false; preferLocalBuild = true; }
               ''
                 #! ${pkgs.stdenv.shell}
