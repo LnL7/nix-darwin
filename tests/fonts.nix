@@ -2,8 +2,8 @@
 
 let
   font = pkgs.runCommand "font-0.0.0" {} ''
-    mkdir -p $out/share/fonts
-    touch $out/share/fonts/Font.ttf
+    mkdir -p $out
+    touch $out/Font.ttf
   '';
 in
 
