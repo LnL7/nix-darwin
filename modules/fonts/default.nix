@@ -7,6 +7,10 @@ in
 {
   imports = [
     (lib.mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
+    (lib.mkRemovedOptionModule [ "fonts" "fonts" ] ''
+      This option has been renamed to `fonts.packages' for consistency with NixOS.
+
+      Note that the implementation now keeps fonts in `/Library/Fonts/Nix Fonts' to allow them to coexist with fonts not managed by nix-darwin; existing fonts will be left directly in `/Library/Fonts' without getting updates and should be manually removed.'')
   ];
 
   options = {
@@ -15,21 +19,16 @@ in
       default = false;
       description = ''
         Whether to enable font management and install configured fonts to
-        {file}`/Library/Fonts`.
-
-        NOTE: removes any manually-added fonts.
+        {file}`/Library/Fonts/Nix Fonts`.
       '';
     };
 
-    fonts.fonts = lib.mkOption {
+    fonts.packages = lib.mkOption {
       type = lib.types.listOf lib.types.path;
       default = [ ];
       example = lib.literalExpression "[ pkgs.dejavu_fonts ]";
       description = ''
         List of fonts to install.
-
-        Fonts present in later entries override those with the same filenames
-        in previous ones.
       '';
     };
   };
@@ -40,48 +39,36 @@ in
       { preferLocalBuild = true; }
       ''
         mkdir -p $out/Library/Fonts
-        font_regexp='.*\.\(ttf\|ttc\|otf\|dfont\)'
+        store_dir=${lib.escapeShellArg builtins.storeDir}
         while IFS= read -rd "" f; do
-          ln -sf "$f" "$out/Library/Fonts"
+          dest="$out/Library/Fonts/Nix Fonts/''${f#"$store_dir/"}"
+          mkdir -p "''${dest%/*}"
+          ln -sf "$f" "$dest"
         done < <(
-          find -L ${lib.escapeShellArgs cfg.fonts} \
+          find -L ${lib.escapeShellArgs cfg.packages} \
             -type f \
-            -regex "$font_regexp" \
+            -regex '.*\.\(ttf\|ttc\|otf\|dfont\)' \
             -print0
         )
       '';
 
     system.activationScripts.fonts.text = lib.optionalString cfg.fontDir.enable ''
-      # Set up fonts.
-      echo "configuring fonts..." >&2
-      find -L "$systemConfig/Library/Fonts" -type f -print0 | while IFS= read -rd "" l; do
-          font=''${l##*/}
-          f=$(readlink -f "$l")
-          if [ ! -e "/Library/Fonts/$font" ]; then
-              echo "updating font $font..." >&2
-              ln -fn -- "$f" /Library/Fonts 2>/dev/null || {
-                echo "Could not create hard link. Nix is probably on another filesystem. Copying the font instead..." >&2
-                rsync -az --inplace "$f" /Library/Fonts
-              }
-          fi
-      done
+      printf >&2 'setting up /Library/Fonts/Nix Fonts...\n'
 
-      if [[ "`sw_vers -productVersion`" < "13.0" ]]; then
-        fontrestore default -n 2>&1 | while read -r f; do
-            case $f in
-                /Library/Fonts/*)
-                    font=''${f##*/}
-                    if [ ! -e "$systemConfig/Library/Fonts/$font" ]; then
-                        echo "removing font $font..." >&2
-                        rm "/Library/Fonts/$font"
-                    fi
-                    ;;
-                /*)
-                    # ignoring unexpected fonts
-                    ;;
-            esac
-        done
-      fi
+      # rsync uses the mtime + size of files to determine whether they
+      # need to be copied by default. This is inadequate for Nix store
+      # paths, but we don't want to use `--checksum` as it makes
+      # activation consistently slow when you have large fonts
+      # installed. Instead, we ensure that fonts are linked according to
+      # their full store paths in `system.build.fonts`, so that any
+      # given font path should only ever have one possible content.
+      ${pkgs.rsync}/bin/rsync \
+        --archive \
+        --copy-links \
+        --delete-during \
+        --delete-missing-args \
+        "$systemConfig/Library/Fonts/Nix Fonts" \
+        '/Library/Fonts/'
     '';
 
   };
