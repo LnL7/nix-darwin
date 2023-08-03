@@ -1,19 +1,17 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
   cfg = config.fonts;
 in
 
 {
   imports = [
-    (mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
+    (lib.mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
   ];
 
   options = {
-    fonts.fontDir.enable = mkOption {
-      type = types.bool;
+    fonts.fontDir.enable = lib.mkOption {
+      type = lib.types.bool;
       default = false;
       description = ''
         Whether to enable font management and install configured fonts to
@@ -23,10 +21,10 @@ in
       '';
     };
 
-    fonts.fonts = mkOption {
-      type = types.listOf types.path;
+    fonts.fonts = lib.mkOption {
+      type = lib.types.listOf lib.types.path;
       default = [ ];
-      example = literalExpression "[ pkgs.dejavu_fonts ]";
+      example = lib.literalExpression "[ pkgs.dejavu_fonts ]";
       description = ''
         List of fonts to install.
 
@@ -48,7 +46,7 @@ in
         done
       '';
 
-    system.activationScripts.fonts.text = optionalString cfg.fontDir.enable ''
+    system.activationScripts.fonts.text = lib.optionalString cfg.fontDir.enable ''
       # Set up fonts.
       echo "configuring fonts..." >&2
       find -L "$systemConfig/Library/Fonts" -type f -print0 | while IFS= read -rd "" l; do
