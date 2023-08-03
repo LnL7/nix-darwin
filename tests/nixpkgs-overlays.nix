@@ -10,7 +10,7 @@
 
   test = ''
     echo checking /bin/hello >&2
-    ! ${pkgs.hello}/bin/hello
+    (! ${pkgs.hello}/bin/hello)
   '';
 }
 
