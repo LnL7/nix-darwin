@@ -41,9 +41,14 @@ in
       ''
         mkdir -p $out/Library/Fonts
         font_regexp='.*\.\(ttf\|ttc\|otf\|dfont\)'
-        find -L ${toString cfg.fonts} -regex "$font_regexp" -type f -print0 | while IFS= read -rd "" f; do
-            ln -sf "$f" $out/Library/Fonts
-        done
+        while IFS= read -rd "" f; do
+          ln -sf "$f" "$out/Library/Fonts"
+        done < <(
+          find -L ${lib.escapeShellArgs cfg.fonts} \
+            -type f \
+            -regex "$font_regexp" \
+            -print0
+        )
       '';
 
     system.activationScripts.fonts.text = lib.optionalString cfg.fontDir.enable ''
