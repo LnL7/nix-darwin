@@ -110,8 +110,8 @@ Add the following to `flake.nix` in the same folder as `configuration.nix`:
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, darwin, nixpkgs }: {
-    darwinConfigurations."Johns-MacBook" = darwin.lib.darwinSystem {
+  outputs = inputs@{ self, nix-darwin, nixpkgs }: {
+    darwinConfigurations."Johns-MacBook" = nix-darwin.lib.darwinSystem {
       modules = [ ./configuration.nix ];
     };
   };
