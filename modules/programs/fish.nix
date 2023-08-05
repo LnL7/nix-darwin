@@ -37,9 +37,9 @@ let
     '';
 
   babelfishTranslate = path: name:
-    pkgs.runCommand "${name}.fish" {
-      nativeBuildInputs = [ cfg.babelfishPackage ];
-    } "${cfg.babelfishPackage}/bin/babelfish < ${path} > $out;";
+    pkgs.runCommand "${name}.fish" {} ''
+      ${cfg.babelfishPackage}/bin/babelfish < ${path} > $out
+    '';
 
 in
 
