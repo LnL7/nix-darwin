@@ -19,7 +19,7 @@ in
     grep "&amp;&amp;" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist
     grep "exec ${nix}/bin/nix-daemon</string>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist
     grep "<key>KeepAlive</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist
-    ! grep "<key>Sockets</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+    (! grep "<key>Sockets</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist)
 
     echo checking NIX_SSL_CERT_FILE in nix-daemon service >&2
     grep "<key>NIX_SSL_CERT_FILE</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-daemon.plist
