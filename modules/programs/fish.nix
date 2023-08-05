@@ -68,6 +68,7 @@ in
 
       babelfishPackage = mkOption {
         type = types.package;
+        default = pkgs.babelfish;
         description = lib.mdDoc ''
           The babelfish package to use when useBabelfish is
           set to true.
