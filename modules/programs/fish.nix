@@ -37,9 +37,9 @@ let
     '';
 
   babelfishTranslate = path: name:
-    pkgs.runCommand "${name}.fish" {
-      nativeBuildInputs = [ cfg.babelfishPackage ];
-    } "${cfg.babelfishPackage}/bin/babelfish < ${path} > $out;";
+    pkgs.runCommand "${name}.fish" {} ''
+      ${cfg.babelfishPackage}/bin/babelfish < ${path} > $out
+    '';
 
 in
 
@@ -68,6 +68,7 @@ in
 
       babelfishPackage = mkOption {
         type = types.package;
+        default = pkgs.babelfish;
         description = lib.mdDoc ''
           The babelfish package to use when useBabelfish is
           set to true.
