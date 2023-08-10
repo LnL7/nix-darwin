@@ -30,7 +30,7 @@ with lib;
     };
 
     system.defaults.finder.FXDefaultSearchScope = mkOption {
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
       default = null;
       description = lib.mdDoc ''
         Change the default search scope. Use "SCcf" to default to current folder.
@@ -39,7 +39,7 @@ with lib;
     };
 
     system.defaults.finder.FXPreferredViewStyle = mkOption {
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
       default = null;
       description = lib.mdDoc ''
         Change the default finder view.
