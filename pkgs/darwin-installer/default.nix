@@ -75,7 +75,7 @@ stdenv.mkDerivation {
     darwinPath=$(NIX_PATH=$HOME/.nix-defexpr/channels nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
     if ! test -e "$darwinPath"; then
         if test -t 0; then
-            read -p "Would you like to manage <darwin> with nix-channel? [Y/n] " i
+            read -p "Would you like to manage <darwin> with nix-channel? [y/N] " i
         fi
         case "$i" in
             y|Y)
