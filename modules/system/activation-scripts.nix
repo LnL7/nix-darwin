@@ -36,6 +36,21 @@ in
 
   config = {
 
+    # Configuration of user-local settings only, intended to be run as that
+    # user themselves (throug sudo).
+    system.activationScripts.userProfileScript.source = pkgs.writeShellScript "activate-user-profile" ''
+      ${cfg.activationScripts.userDefaults.text}
+      ${cfg.activationScripts.userLaunchd.text}
+    '';
+
+    # Per-user config
+    system.activationScripts.configureUsers.text = builtins.concatStringsSep "\n" (builtins.map (user: ''
+      sudo -u "${user}" ${cfg.activationScripts.userProfileScript.source}
+    '') config.users.knownUsers);
+
+    # Configuration / activation script for the entire system, not
+    # per-user. This file is intended to be run as root, and the final wrapper
+    # script will prompt for sudo before running this, if necessary.
     system.activationScripts.script.text = ''
       #! ${stdenv.shell}
       set -e
@@ -69,6 +84,7 @@ in
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
+      ${cfg.activationScripts.configureUsers.text}
 
       ${cfg.activationScripts.postActivation.text}
 
@@ -84,6 +100,10 @@ in
       exit $_status
     '';
 
+    # Configuration of the entire system but intended to be run as the user
+    # running nix-darwin. Not all system-wide commands should be run as root,
+    # e.g. brew, which doesn’t like having root privileges at the top but wants
+    # to prompt for sudo itself.
     system.activationScripts.userScript.text = ''
       #! ${stdenv.shell}
       set -e
@@ -104,8 +124,6 @@ in
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraUserActivation.text}
-      ${cfg.activationScripts.userDefaults.text}
-      ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.homebrew.text}
 
       ${cfg.activationScripts.postUserActivation.text}
