@@ -100,4 +100,5 @@
   ./programs/zsh
   ./homebrew.nix
   ./users
+  ./virtualisation/build-vm.nix
 ]

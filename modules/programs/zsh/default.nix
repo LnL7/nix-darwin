@@ -220,6 +220,7 @@ in
     ];
 
     environment.etc."zshenv".knownSha256Hashes = [
+      "149e2e58b956511fb409732aaee5634a4a38084d7b498490fccfe442ad8c46ee"  # nix-darwin VM
       "d07015be6875f134976fce84c6c7a77b512079c1c5f9594dfa65c70b7968b65f"  # DeterminateSystems installer
     ];
 
