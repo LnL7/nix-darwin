@@ -1,6 +1,21 @@
 { config, pkgs, lib, ... }:
 
 {
+  options = with lib; {
+    virtualisation.initialUser = mkOption {
+      type = types.str;
+      default = if builtins.length (builtins.attrNames config.users.users) > 0 then builtins.elemAt (naturalSort (builtins.attrNames config.users.users)) 0 else "admin";
+      defaultText = literalExpression ''
+        if builtins.length (builtins.attrNames config.users.users) > 0 then builtins.elemAt (lib.naturalSort (builtins.attrNames config.users.users)) 0 else "admin";
+      '';
+      description = mdDoc ''
+        The user to create the VM with.
+
+        This defaults to the first user defined in `users.users`, otherwise it will default to `admin`.
+      '';
+    };
+  };
+
   config = let
     # This file is 12GB, you'll want to download it yourself and then add it to the Nix Store before running the VM script
     # $ aria2c -x4 https://updates.cdn-apple.com/2023SpringFCS/fullrestores/032-84884/F97A22EE-9B5E-4FD5-94C1-B39DCEE8D80F/UniversalMac_13.4_22F66_Restore.ipsw
@@ -33,7 +48,12 @@
     passh = "${lib.getBin pkgs.passh}/bin/passh";
     retry = "${lib.getBin pkgs.retry}/bin/retry";
     timeout = "${lib.getBin pkgs.coreutils}/bin/timeout";
+
+    username = config.virtualisation.initialUser;
+    user = config.users.users.${username};
+
     sshOptions = "-o UserKnownHostsFile=$TART_HOME/known_hosts -F /dev/null -i $TART_HOME/id_ed25519";
+    sshDestination = "${sshOptions} ${username}@$VM_IP";
 
     # NOTE: only 15GiB necessary for macOS install
     startVM = ''
@@ -56,6 +76,8 @@
       # states: null, uninstalled, macos-possibly-finished, macos-installed, installation-complete
       VM_STATE=$(cat $STATE_FILE || echo "null")
       VM_RUNNING=$(${tart} list --format json | ${jq} '.[] | select(.Name == "darwin-vm") | .Running')
+
+      VM_PASS=admin
 
       if [[ "$VM_STATE" != "installation-complete" ]]; then
         if [[ "$VM_RUNNING" == "true" ]]; then
@@ -124,7 +146,7 @@
         vncdo "I have read and agree to the macOS Software License Agreement." key tab pause 0.3 key space
 
         sleep 10
-        ${vncdo} type admin pause 0.3 key tab pause 0.3 key tab pause 0.3 type admin pause 0.3 key tab pause 0.3 type admin pause 0.3 key tab pause 0.3 key tab pause 0.3 key tab pause 0.3 key space
+        vncdo "Create a Computer Account" type "${user.name}" pause 0.3 key tab pause 0.3 type "${username}" pause 0.3 key tab pause 0.3 type "$VM_PASS" pause 0.3 key tab pause 0.3 type "$VM_PASS" pause 0.3 key tab pause 0.3 key tab pause 0.3 key tab pause 0.3 key space
 
         sleep 10
         vncdo "Enable Location Services" key shift-tab pause 0.3 key space
@@ -190,9 +212,9 @@
         ''}
 
         # Use SSH keys
-        ${passh} -p admin ssh-copy-id ${sshOptions} admin@$VM_IP
+        ${passh} -p "$VM_PASS" ssh-copy-id ${sshDestination}
 
-        if [[ $(ssh ${sshOptions} admin@$VM_IP "echo yo") == "yo" ]]; then
+        if [[ $(ssh ${sshDestination} "echo yo") == "yo" ]]; then
           echo macos-installed > $STATE_FILE
         else
           echo "error: couldn't SSH into VM"
@@ -201,33 +223,33 @@
         fi
 
         # Enable passwordless sudo
-        ${passh} -p admin ssh ${sshOptions} admin@$VM_IP "sudo -S sh -c \"mkdir -p /etc/sudoers.d/; echo 'admin ALL=(ALL) NOPASSWD: ALL' | EDITOR=tee visudo /etc/sudoers.d/admin-nopasswd\""
+        ${passh} -p "$VM_PASS" ssh ${sshDestination} "sudo -S sh -c \"mkdir -p /etc/sudoers.d/; echo '%admin ALL=(ALL) NOPASSWD: ALL' | VISUAL=tee visudo /etc/sudoers.d/admin-nopasswd\""
 
         # Install Nix
-        scp ${sshOptions} ${lib.getExe nix-installer} admin@$VM_IP:/tmp/nix-installer
+        scp ${sshOptions} ${lib.getExe nix-installer} ${username}@$VM_IP:/tmp/nix-installer
 
-        ssh ${sshOptions} admin@$VM_IP /tmp/nix-installer install --no-confirm
+        ssh ${sshDestination} /tmp/nix-installer install --no-confirm
 
         # Fixes `command not found: nix` for nix-copy-closure
-        cat ${../../doc/known-files/149e2e58b956511fb409732aaee5634a4a38084d7b498490fccfe442ad8c46ee} | ssh ${sshOptions} admin@$VM_IP "sudo tee /etc/zshenv"
+        cat ${../../doc/known-files/149e2e58b956511fb409732aaee5634a4a38084d7b498490fccfe442ad8c46ee} | ssh ${sshDestination} "sudo tee /etc/zshenv"
 
-        ssh ${sshOptions} admin@$VM_IP "sudo cp /etc/nix/nix.conf /etc/nix/nix.conf.bak"
+        ssh ${sshDestination} "sudo cp /etc/nix/nix.conf /etc/nix/nix.conf.bak"
 
         # Necessary for nix-copy-closure
-        echo "trusted-users = admin" | ssh ${sshOptions} admin@$VM_IP "sudo tee -a /etc/nix/nix.conf"
+        echo "trusted-users = ${username}" | ssh ${sshDestination} "sudo tee -a /etc/nix/nix.conf"
 
-        ssh ${sshOptions} admin@$VM_IP "sudo launchctl kickstart -k system/org.nixos.nix-daemon"
+        ssh ${sshDestination} "sudo launchctl kickstart -k system/org.nixos.nix-daemon"
 
-        VM_PUBLIC_KEY=$(ssh ${sshOptions} admin@$VM_IP "base64 -i /etc/ssh/ssh_host_ed25519_key.pub")
+        VM_PUBLIC_KEY=$(ssh ${sshDestination} "base64 -i /etc/ssh/ssh_host_ed25519_key.pub")
 
-        NIX_SSHOPTS="${sshOptions}" nix-copy-closure --to admin@$VM_IP ${config.system.build.toplevel}
+        NIX_SSHOPTS="${sshOptions}" nix-copy-closure --to ${username}@$VM_IP ${config.system.build.toplevel}
 
         # Restore the version without `trusted-users` to match known SHA256 hashes
-        ssh ${sshOptions} admin@$VM_IP "sudo mv /etc/nix/nix.conf.bak /etc/nix/nix.conf"
+        ssh ${sshDestination} "sudo mv /etc/nix/nix.conf.bak /etc/nix/nix.conf"
 
-        ssh ${sshOptions} admin@$VM_IP "${config.system.build.toplevel}/sw/bin/darwin-rebuild activate"
+        ssh ${sshDestination} "${config.system.build.toplevel}/sw/bin/darwin-rebuild activate"
 
-        if [[ $(ssh ${sshOptions} admin@$VM_IP "realpath /run/current-system") == ${config.system.build.toplevel} ]]; then
+        if [[ $(ssh ${sshDestination} "realpath /run/current-system") == ${config.system.build.toplevel} ]]; then
           echo installation-complete > $STATE_FILE
         else
           echo "error: nix-darwin installation did not complete successfully"
@@ -235,7 +257,7 @@
           exit 1
         fi
 
-        ${timeout} 30s ssh ${sshOptions} $VM_USER@$VM_IP "sudo bash -c 'rm /etc/sudoers.d/admin-nopasswd ~/.ssh/authorized_keys; shutdown -h now'" || true
+        ${timeout} 30s ssh ${sshDestination} "sudo bash -c 'rm /etc/sudoers.d/admin-nopasswd ~/.ssh/authorized_keys; shutdown -h now'" || true
 
         sleep 30
 
@@ -254,6 +276,8 @@
     '';
   in {
     environment.etc."nix/nix.conf".force = true;
+
+    users.users.admin.name = lib.mkDefault "admin";
 
     system.build.vm = pkgs.runCommand "run-darwin-vm" { } ''
       mkdir -p $out/bin
