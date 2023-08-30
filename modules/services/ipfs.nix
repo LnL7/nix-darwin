@@ -18,7 +18,7 @@ in
       };
 
       package = mkOption {
-        type = types.path;
+        type = types.package;
         default = pkgs.kubo;
         # defaultText = "pkgs.kubo";
         description = lib.mdDoc ''
@@ -29,7 +29,7 @@ in
       logFile = mkOption {
         type = types.nullOr types.path;
         default = null;
-        example =  "/var/tmp/lorri.log";
+        example =  "/var/tmp/ipfs.log";
         description = lib.mdDoc ''
           The logfile to use for the ipfs service. Alternatively
           {command}`sudo launchctl debug system/org.nixos.ipfs --stderr`
@@ -52,9 +52,8 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.kubo ];
+    environment.systemPackages = [ cfg.package ];
     launchd.user.agents.ipfs = {
-      # command = with pkgs; "${ipfs}/bin/ipfs daemon";
       serviceConfig = {
         ProgramArguments = [ "${cfg.package}/bin/ipfs" "daemon" ]
           ++ optionals (cfg.enableGarbageCollection) [ "--enable-gc" ];
