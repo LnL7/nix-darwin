@@ -41,7 +41,7 @@ in
       { preferLocalBuild = true; }
       ''
         mkdir -p $out/Library/Fonts
-        font_regexp='.*\.\(ttf\|ttc\|otf\)'
+        font_regexp='.*\.\(ttf\|ttc\|otf\|dfont\)'
         find -L ${toString cfg.fonts} -regex "$font_regexp" -type f -print0 | while IFS= read -rd "" f; do
             ln -sf "$f" $out/Library/Fonts
         done
