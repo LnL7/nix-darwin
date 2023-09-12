@@ -102,6 +102,10 @@ let
           Although auto-updating is disabled by default during system activation, note that Homebrew
           will auto-update when you manually invoke certain Homebrew commands. To modify this
           behavior see [](#opt-homebrew.global.autoUpdate).
+
+          Implementation note: when disabled, this option sets the `HOMEBREW_NO_AUTO_UPDATE`
+          environment variable when {command}`nix-darwin` invokes {command}`brew bundle [install]`
+          during system activation.
         '';
       };
       upgrade = mkOption {
@@ -111,6 +115,19 @@ let
           Whether to enable Homebrew to upgrade outdated formulae and Mac App Store apps during
           {command}`nix-darwin` system activation. The default is `false`
           so that repeated invocations of {command}`darwin-rebuild switch` are idempotent.
+
+          Implementation note: when disabled, {command}`nix-darwin` invokes
+          {command}`brew bundle [install]` with the {command}`--no-upgrade` flag during system
+          activation.
+        '';
+      };
+      extraFlags = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        example = [ "--verbose" ];
+        description = lib.mdDoc ''
+          Extra flags to pass to {command}`brew bundle [install]` during {command}`nix-darwin`
+          system activation.
         '';
       };
 
@@ -120,10 +137,11 @@ let
     config = {
       brewBundleCmd = concatStringsSep " " (
         optional (!config.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1"
-        ++ [ "brew bundle --verbose --file='${brewfileFile}' --no-lock" ]
+        ++ [ "brew bundle --file='${brewfileFile}' --no-lock" ]
         ++ optional (!config.upgrade) "--no-upgrade"
         ++ optional (config.cleanup == "uninstall") "--cleanup"
         ++ optional (config.cleanup == "zap") "--cleanup --zap"
+        ++ config.extraFlags
       );
     };
   };
