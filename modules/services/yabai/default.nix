@@ -90,14 +90,7 @@ in
     # TODO: [@cmacrae] Handle removal of yabai scripting additions
     (mkIf (cfg.enableScriptingAddition) {
       launchd.daemons.yabai-sa = {
-        script = ''
-          if [ ! $(${cfg.package}/bin/yabai --check-sa) ]; then
-            ${cfg.package}/bin/yabai --install-sa
-          fi
-
-          ${cfg.package}/bin/yabai --load-sa
-        '';
-
+        script = "${cfg.package}/bin/yabai --load-sa";
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive.SuccessfulExit = false;
       };
