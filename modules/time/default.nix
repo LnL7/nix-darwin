@@ -11,7 +11,7 @@ let
       echo "${cfg.timeZone} is not a valid timezone. The command 'listtimezones' will show a list of valid time zones." >&2
       false
     fi
-    systemsetup -settimezone "${cfg.timeZone}" > /dev/null
+    systemsetup -settimezone "${cfg.timeZone}" 2>/dev/null 1>&2
   '';
 
 in
