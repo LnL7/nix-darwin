@@ -135,6 +135,7 @@ in
 
         echo -n "$systemConfig" > $out/systemConfig
 
+        echo -n "$darwinLabel" > $out/darwin-version
         ln -s $darwinVersionJson $out/darwin-version.json
         echo -n "$system" > $out/system
 
