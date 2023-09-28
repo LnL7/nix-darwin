@@ -8,11 +8,15 @@ let
   cfg = config.nix.linux-builder;
 
   builderWithOverrides = cfg.package.override {
-    inherit (cfg) modules;
+    modules = [ cfg.config ];
   };
 in
 
 {
+  imports = [
+    (mkRemovedOptionModule [ "nix" "linux-builder" "modules" ] "This option has been replaced with `nix.linux-builder.config` which allows setting options directly like `nix.linux-builder.config.networking.hostName = \"banana\";.")
+  ];
+
   options.nix.linux-builder = {
     enable = mkEnableOption (lib.mdDoc "Linux builder");
 
@@ -25,21 +29,19 @@ in
       '';
     };
 
-    modules = mkOption {
-      type = types.listOf types.anything;
-      default = [ ];
+    config = mkOption {
+      type = types.deferredModule;
+      default = { };
       example = literalExpression ''
-        [
-          ({ config, ... }:
+        ({ pkgs, ... }:
 
-          {
-            virtualisation.darwin-builder.hostPort = 22;
-          })
-        ]
+        {
+          environment.systemPackages = [ pkgs.neovim ];
+        })
       '';
       description = lib.mdDoc ''
-        This option specifies extra NixOS modules and configuration for the builder. You should first run the Linux builder
-        without changing this option otherwise you may not be able to build the Linux builder.
+        This option specifies extra NixOS configuration for the builder. You should first use the Linux builder
+        without changing the builder configuration otherwise you may not be able to build the Linux builder.
       '';
     };
 
