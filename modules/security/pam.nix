@@ -1,69 +1,135 @@
 { config, lib, pkgs, ... }:
 
 with lib;
-
 let
   cfg = config.security.pam;
+  touchIdAuth = ''
+    sudo_file=/etc/pam.d/sudo
+    sudo_local_file=/etc/pam.d/sudo_local
+    tid_file=/etc/pam.d/nix-darwin-touchIdAuth
+    del_tid() {
+      local first=1
+      local f
+      for f; do
+        if [[ ! -e $f ]]; then
+          continue
+        fi
+        if [[ -n $first ]]; then
+          first=""
+          set --
+        fi
+        set -- "$@" "$f"
+      done
+      if [[ $# != 0 ]]; then
+        ${pkgs.gawk}/bin/awk -i inplace '
+          /^[[:space:]]*#/ || !NF {
+            print
+            next
+          }
+          !($1 == "auth" && $3 ~ /(\/|^)pam_(tid|reattach)\.so$/) {
+            print
+          }
+        ' "$@"
+      fi
+    }
+    ensure_include() {
+      local f="$1"
+      local inc="$2"
+      local found=""
+      if [[ -e $f ]]; then
+        found=$(${pkgs.gawk}/bin/awk -v inc="$inc" '!/^[[:space:]]*#/ && NF {
+          if ($1 == "auth" && $2 == "include" && $3 == inc) {
+            print 1
+            exit
+          }
+        }' "$f")
+      fi
+      if [[ -z $found ]]; then
+        add_at_top "$f" "auth       include        $inc"
+      fi
+    }
+    add_at_top() {
+      local f="$1"
+      local s="$2"
+      if [[ -s $f ]]; then
+        ${pkgs.gawk}/bin/awk -i inplace -v s="$s" '
+          BEGINFILE { print s }
+          { print }
+        ' "$f"
+      else
+        echo "$s" >"$f"
+      fi
+    }
+    ensure_content() {
+      local f="$1"
+      local content="$(cat)"
+      if [[ ! -e $f ]] || [[ "$(< "$f")" != "$content" ]]; then
+        echo "$content" >"$f"
+      fi
+    }
 
-  # Implementation Notes
-  #
-  # We don't use `environment.etc` because this would require that the user manually delete
-  # `/etc/pam.d/sudo` which seems unwise given that applying the nix-darwin configuration requires
-  # sudo. We also can't use `system.patchs` since it only runs once, and so won't patch in the
-  # changes again after OS updates (which remove modifications to this file).
-  #
-  # As such, we resort to line addition/deletion in place using `sed`. We add a comment to the
-  # added line that includes the name of the option, to make it easier to identify the line that
-  # should be deleted when the option is disabled.
-  mkSudoTouchIdAuthScript = isEnabled:
-  let
-    file   = "/etc/pam.d/sudo";
-    option = "security.pam.enableSudoTouchIdAuth";
-    sed = "${pkgs.gnused}/bin/sed";
-  in ''
-    ${if isEnabled then ''
-      # Enable sudo Touch ID authentication, if not already enabled
-      if ! grep 'pam_tid.so' ${file} > /dev/null; then
-        ${sed} -i '2i\
-      auth       sufficient     pam_tid.so # nix-darwin: ${option}
-        ' ${file}
-      fi
-    '' else ''
-      # Disable sudo Touch ID authentication, if added by nix-darwin
-      if grep '${option}' ${file} > /dev/null; then
-        ${sed} -i '/${option}/d' ${file}
-      fi
-    ''}
+    # sudo settings
+    del_tid "$sudo_file" "$sudo_local_file"
+    ensure_include "$sudo_file" $(basename "$sudo_local_file")
+    ensure_include "$sudo_local_file" $(basename "$tid_file")
+    ensure_content "$tid_file" <<'EOF'
+    ${optionalString
+      (cfg.touchIdAuth.enable && cfg.touchIdAuth.reattach.enable)
+      ("auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so"
+        + optionalString cfg.touchIdAuth.reattach.ignoreSSH " ignore_ssh"
+      )
+    }
+    ${optionalString
+      cfg.touchIdAuth.enable
+      "auth       sufficient     pam_tid.so"
+    }
+    EOF
   '';
 in
-
 {
-  options = {
-    security.pam.enableSudoTouchIdAuth = mkEnableOption "" // {
+  options.security.pam = {
+    touchIdAuth.enable = mkEnableOption (lib.mdDoc ''
+      sudo authentication with Touch ID
+
+      When enabled, this option adds the following line to /etc/pam.d/sudo_local:
+
+          auth       sufficient     pam_tid.so
+
+      (Note that macOS before Sonoma resets this file when doing a system update. As such, sudo
+        authentication with Touch ID won't work after a system update until the nix-darwin
+        configuration is reapplied.)
+    '');
+    touchIdAuth.reattach.enable = mkOption {
+      type = types.bool;
+      default = true;
       description = lib.mdDoc ''
-        Enable sudo authentication with Touch ID.
+        Enable re-attaching a program to the user's bootstrap session.
 
-        When enabled, this option adds the following line to
-        {file}`/etc/pam.d/sudo`:
+        This allows programs like tmux and screen that run in the background to
+        survive across user sessions to work with PAM services that are tied to the
+        bootstrap session.
 
-        ```
-        auth       sufficient     pam_tid.so
-        ```
+        When enabled, this option adds the following line before the pam_tid.so line:
 
-        ::: {.note}
-        macOS resets this file when doing a system update. As such, sudo
-        authentication with Touch ID won't work after a system update
-        until the nix-darwin configuration is reapplied.
-        :::
+            auth       optional       /path/in/nix/store/lib/pam/pam_reattach.so [options]..."
+      '';
+    };
+    touchIdAuth.reattach.ignoreSSH = mkOption {
+      type = types.bool;
+      default = true;
+      description = lib.mdDoc ''
+        Enable the ignore_ssh option for pam_reattach.so
       '';
     };
   };
-
   config = {
     system.activationScripts.pam.text = ''
       # PAM settings
       echo >&2 "setting up pam..."
-      ${mkSudoTouchIdAuthScript cfg.enableSudoTouchIdAuth}
+      (
+        set -euo pipefail
+        ${touchIdAuth}
+      ) || exit 1
     '';
   };
 }
