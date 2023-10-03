@@ -24,6 +24,7 @@ in
 {
   inherit (eval._module.args) pkgs;
   inherit (eval) options config;
+  inherit (eval) _module;
 
   system = eval.config.system.build.toplevel;
 }
