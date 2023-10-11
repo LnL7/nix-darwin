@@ -21,6 +21,7 @@ rec {
     if isNull x then "" else
     if isBool x then pprBool ind x else
     if isInt x then pprInt ind x else
+    if isFloat x then pprFloat ind x else
     if isString x then pprStr ind x else
     if isList x then pprList ind x else
     if isAttrs x then pprAttrs ind x else
@@ -30,6 +31,7 @@ rec {
 
   pprBool = ind: x: pprLiteral ind  (if x then "<true/>" else "<false/>");
   pprInt = ind: x: pprLiteral ind "<integer>${toString x}</integer>";
+  pprFloat = ind: x: pprLiteral ind "<real>${strings.floatToString x}</real>";
   pprStr = ind: x: pprLiteral ind "<string>${x}</string>";
   pprKey = ind: x: pprLiteral ind "<key>${x}</key>";
 

@@ -1,22 +1,13 @@
 { config, lib, ... }:
 
+with import ../launchd/lib.nix { inherit lib; };
 with lib;
 
 let
   cfg = config.system.defaults;
 
-  boolValue = x: if x then "YES" else "NO";
-
-  writeValue = value:
-    if isBool value then "-bool ${boolValue value}" else
-    if isInt value then "-int ${toString value}" else
-    if isFloat value then "-float ${strings.floatToString value}" else
-    if isString value then "-string '${value}'" else
-    if isList value then "-array ${concatStringsSep " " (map (v: writeValue v)value)}" else
-    throw "invalid value type";
-
   writeDefault = domain: key: value:
-    "defaults write ${domain} '${key}' ${writeValue value}";
+    "defaults write ${domain} '${key}' '${pprExpr "" value}'";
 
   defaultsToList = domain: attrs: mapAttrsToList (writeDefault domain) (filterAttrs (n: v: v != null) attrs);
 
