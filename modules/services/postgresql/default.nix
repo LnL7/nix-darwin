@@ -237,10 +237,10 @@ in
           for an overview of `postgresql.conf`.
 
           ::: {.note}
-          
+
           String values will automatically be enclosed in single quotes. Single quotes will be
           escaped with two single quotes as described by the upstream documentation linked above.
-          
+
           :::
         '';
         example = literalExpression ''
@@ -355,11 +355,14 @@ in
               "${cfg.dataDir}/recovery.conf"
           ''}
 
-          exec ${postgresql}/bin/postgres -D ${cfg.dataDir}
+          exec ${postgresql}/bin/postgres
         '';
 
         serviceConfig.KeepAlive = true;
         serviceConfig.RunAtLoad = true;
+        serviceConfig.EnvironmentVariables = {
+          PGDATA = cfg.dataDir;
+        };
       };
 
   };
