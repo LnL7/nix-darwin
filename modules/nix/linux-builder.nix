@@ -53,6 +53,16 @@ in
         This sets the corresponding `nix.buildMachines.*.maxJobs` option.
       '';
     };
+
+    supportedFeatures = mkOption {
+      type = types.listOf types.str;
+      default = [ "kvm" "benchmark" "big-parallel" ];
+      description = lib.mdDoc ''
+        This option specifies the list of features supported by the Linux builder.
+
+        This sets the corresponding `nix.buildMachines.*.supportedFeatures` option.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -97,9 +107,8 @@ in
       sshUser = "builder";
       sshKey = "/etc/nix/builder_ed25519";
       system = "${stdenv.hostPlatform.uname.processor}-linux";
-      supportedFeatures = [ "kvm" "benchmark" "big-parallel" ];
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) maxJobs;
+      inherit (cfg) maxJobs supportedFeatures;
     }];
 
     nix.settings.builders-use-substitutes = true;
