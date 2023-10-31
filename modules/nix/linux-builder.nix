@@ -10,6 +10,18 @@ let
   builderWithOverrides = cfg.package.override {
     inherit (cfg) modules;
   };
+
+  # create-builder uses TMPDIR to share files with the builder, notably certs.
+  # macOS will clean up files in /tmp automatically that haven't been accessed in 3+ days.
+  # If we let it use /tmp, leaving the computer asleep for 3 days makes the certs vanish.
+  # So we'll use /run/org.nixos.linux-builder instead and clean it up ourselves.
+  script = pkgs.writeShellScript "linux-builder-start" ''
+    export TMPDIR=/run/org.nixos.linux-builder USE_TMPDIR=1
+    rm -rf $TMPDIR
+    mkdir -p $TMPDIR
+    trap "rm -rf $TMPDIR" EXIT
+    ${builderWithOverrides}/bin/create-builder
+  '';
 in
 
 {
@@ -85,7 +97,7 @@ in
       serviceConfig = {
         ProgramArguments = [
           "/bin/sh" "-c"
-          "/bin/wait4path /nix/store &amp;&amp; exec ${builderWithOverrides}/bin/create-builder"
+          "/bin/wait4path /nix/store &amp;&amp; exec ${script}"
         ];
         KeepAlive = true;
         RunAtLoad = true;
