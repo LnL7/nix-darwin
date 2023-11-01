@@ -34,19 +34,23 @@ in
   ];
 
   options.services.skhd = {
-    enable = mkEnableOption "skhd hotkey daemon";
+    enable = mkOption {
+      type = types.bool;
+      default = false;
+      description = lib.mdDoc "Whether to enable the skhd hotkey daemon.";
+    };
 
     package = mkOption {
       type = types.package;
       default = pkgs.skhd;
-      description = "The skhd package to use.";
+      description = lib.mdDoc "The skhd package to use.";
       example = literalExpression "pkgs.skhd";
     };
 
     blacklist = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      description = ''
+      description = lib.mdDoc ''
         Prevent skhd from monitoring events for specific applications.
       '';
       example = literalExpression ''
@@ -62,7 +66,7 @@ in
         builtins.all (name: validateKeybinding name) (attrNames attrs)
       );
       default = { };
-      description = ''
+      description = lib.mdDoc ''
         A list of keybindings to add to shkd. See the
         <link xlink:href="https://github.com/koekeishiya/skhd/blob/master/examples/skhdrc">example configuration</link>
         for more information and examples on how to use this. The generated file
@@ -80,7 +84,7 @@ in
       type = types.lines;
       default = "";
       example = "alt + shift - r : chunkc quit";
-      description = ''
+      description = lib.mdDoc ''
         Extra configuration to append to the generated <filename>skhdrc</filename>.
       '';
     };
