@@ -119,24 +119,82 @@ in
       '';
     };
 
-    programs.ssh.knownHosts = mkOption {
-      default = {};
-      type = types.attrsOf (types.submodule host);
-      description = ''
-        The set of system-wide known SSH hosts.
-      '';
-      example = literalExpression ''
-        [
-          {
-            hostNames = [ "myhost" "myhost.mydomain.com" "10.10.1.4" ];
-            publicKeyFile = ./pubkeys/myhost_ssh_host_dsa_key.pub;
-          }
-          {
-            hostNames = [ "myhost2" ];
-            publicKeyFile = ./pubkeys/myhost2_ssh_host_dsa_key.pub;
-          }
-        ]
-      '';
+    programs.ssh = {
+      knownHosts = mkOption {
+        default = {};
+        type = types.attrsOf (types.submodule host);
+        description = lib.mdDoc ''
+          The set of system-wide known SSH hosts.
+        '';
+        example = literalExpression ''
+          [
+            {
+              hostNames = [ "myhost" "myhost.mydomain.com" "10.10.1.4" ];
+              publicKeyFile = ./pubkeys/myhost_ssh_host_dsa_key.pub;
+            }
+            {
+              hostNames = [ "myhost2" ];
+              publicKeyFile = ./pubkeys/myhost2_ssh_host_dsa_key.pub;
+            }
+          ]
+        '';
+      };
+
+      pubkeyAcceptedKeyTypes = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        example = [ "ssh-ed25519" "ssh-rsa" ];
+        description = lib.mdDoc ''
+          Specifies the key types that will be used for public key authentication.
+        '';
+      };
+
+      hostKeyAlgorithms = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        example = [ "ssh-ed25519" "ssh-rsa" ];
+        description = lib.mdDoc ''
+          Specifies the host key algorithms that the client wants to use in order of preference.
+        '';
+      };
+
+
+      extraConfig = mkOption {
+        type = types.lines;
+        default = "";
+        description = lib.mdDoc ''
+          Extra configuration text written to `/etc/ssh/ssh_config.d/10-extra-nix.conf`.
+          See {manpage}`ssh_config(5)` for help.
+        '';
+      };
+
+      kexAlgorithms = mkOption {
+        type = types.nullOr (types.listOf types.str);
+        default = null;
+        example = [ "curve25519-sha256@libssh.org" "diffie-hellman-group-exchange-sha256" ];
+        description = lib.mdDoc ''
+          Specifies the available KEX (Key Exchange) algorithms.
+        '';
+      };
+
+      ciphers = mkOption {
+        type = types.nullOr (types.listOf types.str);
+        default = null;
+        example = [ "chacha20-poly1305@openssh.com" "aes256-gcm@openssh.com" ];
+        description = lib.mdDoc ''
+          Specifies the ciphers allowed and their order of preference.
+        '';
+      };
+
+      macs = mkOption {
+        type = types.nullOr (types.listOf types.str);
+        default = null;
+        example = [ "hmac-sha2-512-etm@openssh.com" "hmac-sha1" ];
+        description = lib.mdDoc ''
+          Specifies the MAC (message authentication code) algorithms in order of preference. The MAC algorithm is used
+          for data integrity protection.
+        '';
+      };
     };
   };
 
@@ -162,6 +220,18 @@ in
           text = "AuthorizedKeysFile ${toString config.services.openssh.authorizedKeysFiles}\n";
           # Allows us to automatically migrate from using a file to a symlink
           knownSha256Hashes = [ oldAuthorizedKeysHash ];
+        };
+        "ssh/sshd_config.d/10-extra-nix.conf" = {
+          text = ''
+            ${optionalString (cfg.pubkeyAcceptedKeyTypes != []) "PubkeyAcceptedKeyTypes ${concatStringsSep "," cfg.pubkeyAcceptedKeyTypes}"}
+
+            ${config.programs.ssh.extraConfig}
+
+            ${optionalString (cfg.hostKeyAlgorithms != []) "HostKeyAlgorithms ${concatStringsSep "," cfg.hostKeyAlgorithms}"}
+            ${optionalString (cfg.kexAlgorithms != null) "KexAlgorithms ${concatStringsSep "," cfg.kexAlgorithms}"}
+            ${optionalString (cfg.ciphers != null) "Ciphers ${concatStringsSep "," cfg.ciphers}"}
+            ${optionalString (cfg.macs != null) "MACs ${concatStringsSep "," cfg.macs}"}
+          '';
         };
       };
 
