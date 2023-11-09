@@ -48,7 +48,7 @@ in
           etc}
       )
 
-      declare -a etcProblems
+      declare -a etcProblems=()
 
       while IFS= read -r -d "" configFile; do
         subPath=''${configFile#"$systemConfig"/etc/}
