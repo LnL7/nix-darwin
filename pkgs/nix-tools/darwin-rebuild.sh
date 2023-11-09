@@ -215,7 +215,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
   "$systemConfig/activate-user"
 
   if [ "$USER" != root ]; then
-    sudo -H --preserve-env=PATH env "$systemConfig/activate"
+    sudo -H --preserve-env=PATH "$systemConfig/activate"
   else
     "$systemConfig/activate"
   fi
