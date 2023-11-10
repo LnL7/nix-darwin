@@ -42,7 +42,7 @@
     overlays.default = final: prev: {
       inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option darwin-version;
 
-      darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { nix-darwin = self; };
+      darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { };
     };
 
     darwinModules.hydra = ./modules/examples/hydra.nix;

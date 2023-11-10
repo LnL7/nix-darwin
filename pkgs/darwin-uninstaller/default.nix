@@ -1,18 +1,17 @@
-{ stdenv, nix, pkgs, nix-darwin }:
+{ stdenv, lib, pkgs }:
 
 let
-  configuration = builtins.path {
-    name = "nix-darwin-uninstaller-configuration";
-    path = ./.;
-    filter = name: _type: name != toString ./default.nix;
+  uninstallSystem = import ../../eval-config.nix {
+    inherit lib;
+    modules = [
+      ./configuration.nix
+      {
+        nixpkgs.source = pkgs.path;
+        nixpkgs.hostPlatform = pkgs.system;
+        system.includeUninstaller = false;
+      }
+    ];
   };
-
-  nixPath = pkgs.lib.concatStringsSep ":" [
-    "darwin-config=${configuration}/configuration.nix"
-    "darwin=${nix-darwin}"
-    "nixpkgs=${pkgs.path}"
-    "$NIX_PATH"
-  ];
 in
 
 stdenv.mkDerivation {
@@ -62,10 +61,7 @@ stdenv.mkDerivation {
         esac
     fi
 
-    export nix=${nix}
-    export NIX_PATH=${nixPath}
-    system=$($nix/bin/nix-build '<darwin>' -A system)
-    $system/sw/bin/darwin-rebuild switch
+    ${uninstallSystem.system}/sw/bin/darwin-rebuild activate
 
     if test -L /run/current-system; then
       sudo rm /run/current-system
