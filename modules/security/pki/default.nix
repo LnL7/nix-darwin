@@ -21,6 +21,14 @@ in
 
 {
   options = {
+    security.pki.installCACerts = mkOption {
+      type = types.bool;
+      default = true;
+      description = lib.mdDoc ''
+        Whether to enable certificate management with nix-darwin.
+      '';
+    };
+
     security.pki.certificateFiles = mkOption {
       type = types.listOf types.path;
       default = [];
@@ -71,7 +79,7 @@ in
     };
   };
 
-  config = {
+  config = mkIf cfg.installCACerts {
 
     security.pki.certificateFiles = [ "${cacertPackage}/etc/ssl/certs/ca-bundle.crt" ];
 
