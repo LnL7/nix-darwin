@@ -51,11 +51,10 @@ in {
 
   config = {
     networking.hosts = let
-      hostnames =
-        optional (cfg.hostName != "") cfg.hostName; # Then the hostname (without the domain)
+      hasHostName = cfg.hostName != null && cfg.hostName != "";
     in {
-      "127.0.0.1" = hostnames;
-      "::1" = hostnames;
+      "127.0.0.1" = lib.mkIf hasHostName [cfg.hostName];
+      "::1" = lib.mkIf hasHostName [cfg.hostName];
     };
 
     networking.hostFiles = let
