@@ -24,6 +24,8 @@ let
 in
 
 {
+  imports = [./hosts.nix];
+  
   options = {
     networking.computerName = mkOption {
       type = types.nullOr types.str;
