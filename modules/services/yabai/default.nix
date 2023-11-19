@@ -7,9 +7,10 @@ let
 
   toYabaiConfig = opts:
     concatStringsSep "\n" (mapAttrsToList
-      (p: v: "yabai -m config ${p} ${toString v}") opts);
+      (p: v: "yabai -m config ${p} ${toString v}")
+      opts);
 
-  configFile = mkIf (cfg.config != {} || cfg.extraConfig != "")
+  configFile = mkIf (cfg.config != { } || cfg.extraConfig != "")
     "${pkgs.writeScript "yabairc" (
       (if (cfg.config != {})
        then "${toYabaiConfig cfg.config}"
@@ -42,7 +43,7 @@ in
 
     services.yabai.config = mkOption {
       type = attrs;
-      default = {};
+      default = { };
       example = literalExpression ''
         {
           focus_follows_mouse = "autoraise";
@@ -77,7 +78,7 @@ in
 
       launchd.user.agents.yabai = {
         serviceConfig.ProgramArguments = [ "${cfg.package}/bin/yabai" ]
-                                         ++ optionals (cfg.config != {} || cfg.extraConfig != "") [ "-c" configFile ];
+          ++ optionals (cfg.config != { } || cfg.extraConfig != "") [ "-c" configFile ];
 
         serviceConfig.KeepAlive = true;
         serviceConfig.RunAtLoad = true;
@@ -101,6 +102,12 @@ in
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive.SuccessfulExit = false;
       };
+
+      environment.etc."sudoers.d/yabai".text =
+        let
+          sha = builtins.hashFile "sha256" "${cfg.package}/bin/yabai";
+        in
+        "%admin ALL=(root) NOPASSWD: sha256:${sha} ${cfg.package}/bin/yabai --load-sa";
     })
   ];
 }
