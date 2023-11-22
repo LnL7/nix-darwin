@@ -57,6 +57,22 @@ in
       '';
     };
 
+    systems = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      example = literalExpression ''
+        [
+          "x86_64-linux"
+          "aarch64-linux"
+        ]
+      '';
+      description = ''
+        This option specifies system types the build machine can execute derivations on.
+
+        This sets the corresponding `nix.buildMachines.*.systems` option.
+      '';
+    };
+
     maxJobs = mkOption {
       type = types.ints.positive;
       default = 1;
@@ -122,7 +138,7 @@ in
       sshKey = "/etc/nix/builder_ed25519";
       system = "${stdenv.hostPlatform.uname.processor}-linux";
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) maxJobs supportedFeatures;
+      inherit (cfg) maxJobs supportedFeatures systems;
     }];
 
     nix.settings.builders-use-substitutes = true;
