@@ -24,6 +24,14 @@ let
   deletedUsers = filter (n: isDeleted cfg.users n) cfg.knownUsers;
 
   packageUsers = filterAttrs (_: u: u.packages != []) cfg.users;
+
+  # convert a valid argument to user.shell into a string that points to a shell
+  # executable. Logic copied from modules/system/shells.nix.
+  shellPath = v:
+    if types.shellPackage.check v
+    then "/run/current-system/sw${v.shellPath}"
+    else v;
+
 in
 
 {
@@ -158,12 +166,14 @@ in
           dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
           dscl . -create '/Users/${v.name}' RealName '${v.description}'
           dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
-          dscl . -create '/Users/${v.name}' UserShell '${v.shell}'
           ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
         else
           if [ "$u" -ne ${toString v.uid} ]; then
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
+
+          # Always set the shell path, in case it was updated
+          dscl . -create '/Users/${v.name}' UserShell ${lib.escapeShellArg (shellPath v.shell)}
         fi
       '') createdUsers}
 
