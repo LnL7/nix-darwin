@@ -159,19 +159,18 @@ in
 
         u=$(dscl . -read '/Users/${v.name}' UniqueID 2> /dev/null) || true
         u=''${u#UniqueID: }
-        if [ -z "$u" ]; then
-          echo "creating user ${v.name}..." >&2
-          dscl . -create '/Users/${v.name}' UniqueID ${toString v.uid}
-          dscl . -create '/Users/${v.name}' PrimaryGroupID ${toString v.gid}
-          dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
-          dscl . -create '/Users/${v.name}' RealName '${v.description}'
-          dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
-          ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
+        if [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
+          echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
         else
-          if [ "$u" -ne ${toString v.uid} ]; then
-            echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
+          if [ -z "$u" ]; then
+            echo "creating user ${v.name}..." >&2
+            dscl . -create '/Users/${v.name}' UniqueID ${toString v.uid}
+            dscl . -create '/Users/${v.name}' PrimaryGroupID ${toString v.gid}
+            dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
+            dscl . -create '/Users/${v.name}' RealName '${v.description}'
+            dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
+            ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
           fi
-
           # Always set the shell path, in case it was updated
           dscl . -create '/Users/${v.name}' UserShell ${lib.escapeShellArg (shellPath v.shell)}
         fi

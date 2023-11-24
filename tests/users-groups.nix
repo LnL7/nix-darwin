@@ -16,7 +16,7 @@
   users.users.foo.isHidden = false;
   users.users.foo.home = "/Users/foo";
   users.users.foo.createHome = true;
-  users.users.foo.shell = "/run/current-system/sw/bin/bash";
+  users.users.foo.shell = pkgs.bashInteractive;
 
   users.users."created.user".uid = 42001;
   users.users."unknown.user".uid = 42002;
@@ -48,6 +48,7 @@
     grep "dscl . -create '/Users/foo' NFSHomeDirectory '/Users/foo'" ${config.out}/activate
     grep "dscl . -create '/Users/foo' UserShell '/run/current-system/sw/bin/bash'" ${config.out}/activate
     grep "dscl . -create '/Users/created.user' UniqueID 42001" ${config.out}/activate
+    grep "dscl . -create '/Users/created.user' UserShell '/sbin/nologin'" ${config.out}/activate
     grep "createhomedir -cu 'foo'" ${config.out}/activate
     grep -qv "dscl . -delete '/Groups/created.user'" ${config.out}/activate
 
