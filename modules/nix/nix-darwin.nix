@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   nix-tools = pkgs.callPackage ../../pkgs/nix-tools {
@@ -7,22 +7,30 @@ let
     nixPackage = config.nix.package;
   };
 
+  darwin-uninstaller = pkgs.callPackage ../../pkgs/darwin-uninstaller { };
+
   inherit (nix-tools) darwin-option darwin-rebuild darwin-version;
 in
 
 {
-  config = {
+  options = {
+    system.includeUninstaller = lib.mkOption {
+      type = lib.types.bool;
+      internal = true;
+      default = true;
+    };
+  };
 
+  config = {
     environment.systemPackages =
       [ # Include nix-tools by default
         darwin-option
         darwin-rebuild
         darwin-version
-      ];
+      ] ++ lib.optional config.system.includeUninstaller darwin-uninstaller;
 
     system.build = {
       inherit darwin-option darwin-rebuild darwin-version;
     };
-
   };
 }

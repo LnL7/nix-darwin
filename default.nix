@@ -16,7 +16,7 @@ let
     };
   };
 
-  # The source code of this repo needed by the [un]installers.
+  # The source code of this repo needed by the installer.
   nix-darwin = lib.cleanSource (
     lib.cleanSourceWith {
       # We explicitly specify a name here otherwise `cleanSource` will use the
@@ -30,5 +30,5 @@ in
 
 eval // {
   installer = pkgs.callPackage ./pkgs/darwin-installer { inherit nix-darwin; };
-  uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { inherit nix-darwin; };
+  uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { };
 }
