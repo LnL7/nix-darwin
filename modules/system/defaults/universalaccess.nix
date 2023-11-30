@@ -15,6 +15,14 @@ with lib;
       '';
     };
 
+    system.defaults.universalaccess.reduceMotion = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = lib.mdDoc ''
+        Disable animation when switching screens or opening apps
+      '';
+    };
+
     system.defaults.universalaccess.reduceTransparency = mkOption {
       type = types.nullOr types.bool;
       default = null;
