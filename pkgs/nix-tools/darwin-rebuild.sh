@@ -187,7 +187,7 @@ fi
 
 if [ "$action" = list ] || [ "$action" = rollback ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo -H nix-env -p "$profile" "${extraProfileFlags[@]}"
+    sudo -H --preserve-env=PATH env nix-env -p "$profile" "${extraProfileFlags[@]}"
   else
     nix-env -p "$profile" "${extraProfileFlags[@]}"
   fi
@@ -205,7 +205,7 @@ if [ -z "$systemConfig" ]; then exit 0; fi
 
 if [ "$action" = switch ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo -H nix-env -p "$profile" --set "$systemConfig"
+    sudo -H --preserve-env=PATH env nix-env -p "$profile" --set "$systemConfig"
   else
     nix-env -p "$profile" --set "$systemConfig"
   fi
@@ -215,7 +215,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
   "$systemConfig/activate-user"
 
   if [ "$USER" != root ]; then
-    sudo -H "$systemConfig/activate"
+    sudo -H --preserve-env=PATH "$systemConfig/activate"
   else
     "$systemConfig/activate"
   fi
