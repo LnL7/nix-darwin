@@ -92,7 +92,7 @@ in
         ${optionalString cfg.forceRecreate ''
           g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
           g=''${g#PrimaryGroupID: }
-          if [ "$g" -eq ${toString v.gid} ]; then
+          if [[ "$g" -eq ${toString v.gid} ]]; then
             echo "deleting group ${v.name}..." >&2
             dscl . -delete '/Groups/${v.name}' 2> /dev/null
           else
@@ -141,7 +141,7 @@ in
         ${optionalString cfg.forceRecreate ''
           u=$(dscl . -read '/Users/${v.name}' UniqueID 2> /dev/null) || true
           u=''${u#UniqueID: }
-          if [ "$u" -eq ${toString v.uid} ]; then
+          if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
             dscl . -delete '/Users/${v.name}' 2> /dev/null
           else
