@@ -13,6 +13,7 @@ let
     if isFloat value then "-float ${strings.floatToString value}" else
     if isString value then "-string '${value}'" else
     if isList value then "-array ${concatStringsSep " " (map (v: writeValue v)value)}" else
+    if isAttrs value then "-dict " + (concatStringsSep " " (mapAttrsToList (k: v: "'${k}' ${writeValue v}")value)) else
     throw "invalid value type";
 
   writeDefault = domain: key: value:
