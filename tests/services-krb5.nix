@@ -81,6 +81,6 @@
     '';
   in ''
     echo "checking correctness of krb5.conf" >&2
-    diff /etc/krb5.conf ${snapshot}
+    diff ${config.out}/etc/krb5.conf ${snapshot}
   '';
 }
