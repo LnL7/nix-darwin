@@ -100,6 +100,7 @@ in
       "617b39e36fa69270ddbee19ddc072497dbe7ead840cbd442d9f7c22924f116f4"  # official Nix installer
       "6be16cf7c24a3c6f7ae535c913347a3be39508b3426f5ecd413e636e21031e66"  # official Nix installer
       "08ffbf991a9e25839d38b80a0d3bce3b5a6c84b9be53a4b68949df4e7e487bb7"  # DeterminateSystems installer
+      "204d2a960b3ab80e51748d3db0b63d940347ba71119ae6f14cccfec35da56cce"  # DeterminateSystems nix-installer 0.15.1+
     ];
 
   };

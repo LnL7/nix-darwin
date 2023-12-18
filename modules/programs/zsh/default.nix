@@ -197,12 +197,17 @@ in
       "0235d3c1b6cf21e7043fbc98e239ee4bc648048aafaf6be1a94a576300584ef2"  # macOS
     ];
 
+    environment.etc."zshenv".knownSha256Hashes = [
+      "383a89c1f79c3bcfd2ff39a2b73b5103d0303161b3be9eac88fce83e0789f0b7"  # DeterminateSystems nix-installer 0.15.1+
+    ];
+
     environment.etc."zshrc".knownSha256Hashes = [
       "19a2d673ffd47b8bed71c5218ff6617dfc5e8533b240b9ba79142a45f8823c23"
       "fb5827cb4712b7e7932d438067ec4852c8955a9ff0f55e282473684623ebdfa1"  # macOS
       "c5a00c072c920f46216454978c44df044b2ec6d03409dc492c7bdcd92c94a110"  # official Nix installer
       "40b0d8751adae5b0100a4f863be5b75613a49f62706427e92604f7e04d2e2261"  # official Nix installer
       "2af1b563e389d11b76a651b446e858116d7a20370d9120a7e9f78991f3e5f336"  # DeterminateSystems installer
+      "b9902f2020c636aeda956a74b5ae11882d53e206d1aa50b3abe591a8144fa710"  # DeterminateSystems nix-installer 0.15.1+
     ];
 
   };

@@ -1,0 +1,28 @@
+
+# Set up Nix only on SSH connections
+# See: https://github.com/DeterminateSystems/nix-installer/pull/714
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ] && [ -n "${SSH_CONNECTION}" ] && [ "${SHLVL}" -eq 1 ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+# End Nix
+# /etc/zshenv: DO NOT EDIT -- this file has been generated automatically.
+# This file is read for all shells.
+
+# Only execute this file once per shell.
+# But don't clobber the environment of interactive non-login children!
+if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
+export __ETC_ZSHENV_SOURCED=1
+
+# Don't execute this file when running in a pure nix-shell.
+if test -n "$IN_NIX_SHELL"; then return; fi
+
+if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
+  . /nix/store/aqx44dhrnk2kdk5mvpxix8xaqsr9f3lh-set-environment
+fi
+
+
+
+# Read system-wide modifications.
+if test -f /etc/zshenv.local; then
+  source /etc/zshenv.local
+fi

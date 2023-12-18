@@ -1,0 +1,47 @@
+
+# Nix
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+# End Nix
+
+        
+# /etc/zshrc: DO NOT EDIT -- this file has been generated automatically.
+# This file is read for interactive shells.
+
+# Only execute this file once per shell.
+if [ -n "$__ETC_ZSHRC_SOURCED" -o -n "$NOSYSZSHRC" ]; then return; fi
+__ETC_ZSHRC_SOURCED=1
+
+# history defaults
+SAVEHIST=2000
+HISTSIZE=2000
+HISTFILE=$HOME/.zsh_history
+
+setopt HIST_IGNORE_DUPS SHARE_HISTORY HIST_FCNTL_LOCK
+
+bindkey -e
+
+
+
+
+# Tell zsh how to find installed completions
+for p in ${(z)NIX_PROFILES}; do
+  fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions)
+done
+
+autoload -U promptinit && promptinit && prompt walters && setopt prompt_sp
+
+autoload -U compinit && compinit
+autoload -U bashcompinit && bashcompinit
+
+
+
+
+
+
+
+# Read system-wide modifications.
+if test -f /etc/zshrc.local; then
+  source /etc/zshrc.local
+fi
