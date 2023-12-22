@@ -16,6 +16,14 @@ showSyntax() {
   exit 1
 }
 
+sudo() {
+  if command sudo --help | grep -- --preserve-env= >/dev/null; then
+    command sudo -H --preserve-env=PATH env "$@"
+  else
+    command sudo -H "$@"
+  fi
+}
+
 # Parse the command line.
 origArgs=("$@")
 extraMetadataFlags=()
@@ -187,7 +195,7 @@ fi
 
 if [ "$action" = list ] || [ "$action" = rollback ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo -H --preserve-env=PATH env nix-env -p "$profile" "${extraProfileFlags[@]}"
+    sudo nix-env -p "$profile" "${extraProfileFlags[@]}"
   else
     nix-env -p "$profile" "${extraProfileFlags[@]}"
   fi
@@ -205,7 +213,7 @@ if [ -z "$systemConfig" ]; then exit 0; fi
 
 if [ "$action" = switch ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo -H --preserve-env=PATH env nix-env -p "$profile" --set "$systemConfig"
+    sudo nix-env -p "$profile" --set "$systemConfig"
   else
     nix-env -p "$profile" --set "$systemConfig"
   fi
@@ -215,7 +223,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
   "$systemConfig/activate-user"
 
   if [ "$USER" != root ]; then
-    sudo -H --preserve-env=PATH "$systemConfig/activate"
+    sudo "$systemConfig/activate"
   else
     "$systemConfig/activate"
   fi
