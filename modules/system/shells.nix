@@ -41,5 +41,9 @@ in
       ${concatStringsSep "\n" cfg.shells}
     '';
 
+    environment.etc."shells".knownSha256Hashes = [
+      "9d5aa72f807091b481820d12e693093293ba33c73854909ad7b0fb192c2db193"  # macOS
+    ];
+
   };
 }
