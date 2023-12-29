@@ -22,10 +22,10 @@ in {
       mkOption {
         type = types.nullOr floatWithDeprecationError;
         default = null;
-        example = -1;
+        example = -1.0;
         description = lib.mdDoc ''
           Sets the mouse tracking speed. Found in the "Mouse" section of
-          "System Preferences". Set to -1 to disable mouse acceleration.
+          "System Preferences". Set to -1.0 to disable mouse acceleration.
         '';
       };
   };
