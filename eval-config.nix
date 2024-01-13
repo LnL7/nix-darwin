@@ -20,12 +20,12 @@ let
     modules = modules ++ [ argsModule ] ++ baseModules;
     specialArgs = { modulesPath = builtins.toString ./modules; } // specialArgs;
   });
-in
-
-{
-  inherit (eval._module.args) pkgs;
-  inherit (eval) options config;
-  inherit (eval) _module;
-
-  system = eval.config.system.build.toplevel;
-}
+  
+  withExtraAttrs = module:
+    {
+      inherit (module._module.args) pkgs;
+      inherit (module) options config _module;
+      system = module.config.system.build.toplevel;
+      extendModules = args: withExtraAttrs (module.extendModules args);
+    };
+in withExtraAttrs eval
