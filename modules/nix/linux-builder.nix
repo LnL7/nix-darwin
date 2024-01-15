@@ -20,6 +20,9 @@ let
     rm -rf $TMPDIR
     mkdir -p $TMPDIR
     trap "rm -rf $TMPDIR" EXIT
+    ${lib.optionalString cfg.ephemeral ''
+      rm -f ${cfg.workingDirectory}/${builderWithOverrides.nixosConfig.networking.hostName}.qcow2
+    ''}
     ${builderWithOverrides}/bin/create-builder
   '';
 in
@@ -77,6 +80,22 @@ in
         This sets the corresponding `nix.buildMachines.*.supportedFeatures` option.
       '';
     };
+
+    workingDirectory = mkOption {
+      type = types.str;
+      default = "/var/lib/darwin-builder";
+      description = lib.mdDoc ''
+        The working directory of the Linux builder daemon process.
+      '';
+    };
+
+    ephemeral = mkEnableOption (lib.mdDoc ''
+      wipe the builder's filesystem on every restart.
+
+      This is disabled by default as maintaining the builder's Nix Store reduces
+      rebuilds. You can enable this if you don't want your builder to accumulate
+      state.
+    '');
   };
 
   config = mkIf cfg.enable {
@@ -89,7 +108,7 @@ in
     } ];
 
     system.activationScripts.preActivation.text = ''
-      mkdir -p /var/lib/darwin-builder
+      mkdir -p ${cfg.workingDirectory}
     '';
 
     launchd.daemons.linux-builder = {
@@ -103,7 +122,7 @@ in
         ];
         KeepAlive = true;
         RunAtLoad = true;
-        WorkingDirectory = "/var/lib/darwin-builder";
+        WorkingDirectory = cfg.workingDirectory;
       };
     };
 
