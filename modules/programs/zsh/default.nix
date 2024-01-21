@@ -1,9 +1,10 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, options, pkgs, ... }:
 
 with lib;
 
 let
   cfg = config.programs.zsh;
+  opt = options.programs.zsh;
 
   zshVariables =
     mapAttrsToList (n: v: ''${n}="${v}"'') cfg.variables;
@@ -68,6 +69,19 @@ in
       type = types.bool;
       default = true;
       description = lib.mdDoc "Enable bash completion for all interactive zsh shells.";
+    };
+
+    programs.zsh.enableGlobalCompInit = mkOption {
+      type = types.bool;
+      default = cfg.enableCompletion;
+      defaultText = literalExpression "config.${opt.enableCompletion}";
+      description = lib.mdDoc ''
+        Enable execution of compinit call for all interactive zsh shells.
+
+        This option can be disabled if the user wants to extend its
+        `fpath` and a custom `compinit`
+        call in the local config is required.
+      '';
     };
 
     programs.zsh.enableFzfCompletion = mkOption {
@@ -175,7 +189,7 @@ in
 
       ${cfg.promptInit}
 
-      ${optionalString cfg.enableCompletion "autoload -U compinit && compinit"}
+      ${optionalString cfg.enableGlobalCompInit "autoload -U compinit && compinit"}
       ${optionalString cfg.enableBashCompletion "autoload -U bashcompinit && bashcompinit"}
 
       ${optionalString cfg.enableSyntaxHighlighting
