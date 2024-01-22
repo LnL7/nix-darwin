@@ -91,7 +91,7 @@ with lib;
     };
 
     LimitLoadToSessionType = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr (types.oneOf [types.str (types.listOf types.str)]);
       default = null;
       description = lib.mdDoc ''
         This configuration file only applies to sessions of the type specified. This key is used in concert
