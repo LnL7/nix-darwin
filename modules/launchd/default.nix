@@ -1,6 +1,5 @@
 { config, lib, pkgs, ... }:
 
-with import ./lib.nix { inherit lib; };
 with lib;
 
 let
@@ -10,7 +9,7 @@ let
 
   toEnvironmentText = name: value: {
     name = "${value.serviceConfig.Label}.plist";
-    value.text = toPLIST value.serviceConfig;
+    value.text = generators.toPlist { } value.serviceConfig;
   };
 
   launchdConfig = import ./launchd.nix;
