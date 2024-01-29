@@ -7,7 +7,7 @@ local -a _1st_arguments
 _1st_arguments=(
   'edit:Open nix-darwin config in $EDITOR'\
   'switch:Build, activate, and update the current generation'\
-  'activate:Activate, and update the current generation'\
+  'activate:Activate an already built store path and update the current generation'\
   'build:Build without activating or updating the current generation'\
   'check:Build and run the activation sanity checks'\
   'changelog:Show most recent entries in the changelog'\
