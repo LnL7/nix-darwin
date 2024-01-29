@@ -33,6 +33,10 @@ in
     {
       inherit path profile;
       inherit (stdenv) shell;
+      postInstall = ''
+        mkdir -p $out/share/zsh/site-functions
+        cp ${./darwin-rebuild.zsh-completions} $out/share/zsh/site-functions/_darwin-rebuild
+      '';
     }
     ./darwin-rebuild.sh;
 
