@@ -91,7 +91,7 @@ with lib;
     };
 
     LimitLoadToSessionType = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr (types.oneOf [types.str (types.listOf types.str)]);
       default = null;
       description = lib.mdDoc ''
         This configuration file only applies to sessions of the type specified. This key is used in concert
@@ -342,7 +342,7 @@ with lib;
 
     StartCalendarInterval = mkOption {
       default = null;
-      example = { Hour = 2; Minute = 30; };
+      example = [{ Hour = 2; Minute = 30; }];
       description = lib.mdDoc ''
         This optional key causes the job to be started every calendar interval as specified. Missing arguments
         are considered to be wildcard. The semantics are much like `crontab(5)`.  Unlike cron which skips job

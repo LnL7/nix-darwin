@@ -1,0 +1,38 @@
+#compdef darwin-rebuild
+#autoload
+
+_nix-common-options
+
+local -a _1st_arguments
+_1st_arguments=(
+  'edit:Open nix-darwin config in $EDITOR'\
+  'switch:Build, activate, and update the current generation'\
+  'activate:Activate an already built store path and update the current generation'\
+  'build:Build without activating or updating the current generation'\
+  'check:Build and run the activation sanity checks'\
+  'changelog:Show most recent entries in the changelog'\
+)
+
+_arguments \
+  $__nix_search_path_args\
+  '(--verbose -v)*'{--verbose,-v}'[Increase verbosity of diagnostic messages]'\
+  '(--max-jobs -j)'{--max-jobs,-j}'[max number of build jobs in parallel]:jobs:'\
+  '--cores[threads per job (e.g. -j argument to make)]:cores:'\
+  '(--keep-going -k)'{--keep-going,-k}"[keep going until all builds are finished]"\
+  '(--keep-failed -K)'{--keep-failed,-K}'[keep failed builds (usually in /tmp)]'\
+  '--fallback[If binary download fails, fall back on building from source]'\
+  '--show-trace[Print stack trace of evaluation errors]'\
+  '*--option[set Nix configuration option]:options:_nix_options:value:_nix_options_value'\
+  '*--arg[argument to pass to the Nix function]:Name:_nix_complete_function_arg:Value: '\
+  '*--argstr[pass a string]:Name:_nix_complete_function_arg:String: '\
+  '--list-generations[Print a list of all generations in the active profile]'\
+  '--rollback[Roll back to the previous configuration]'\
+  {--switch-generation,-G}'[Activate specified generation]'\
+  '(--profile-name -p)'{--profile-name,-p}'[Profile to use to track current and previous system configurations]:Profile:_nix_profiles'\
+  '1:: :->subcmds' && return 0
+
+case $state in
+  subcmds)
+    _describe -t commands 'darwin-rebuild subcommands' _1st_arguments
+  ;;
+esac

@@ -13,6 +13,7 @@ in
 
   options = {
     fonts.fontDir.enable = mkOption {
+      type = types.bool;
       default = false;
       description = lib.mdDoc ''
         Whether to enable font management and install configured fonts to

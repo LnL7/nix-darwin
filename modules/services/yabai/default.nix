@@ -91,23 +91,18 @@ in
     # TODO: [@cmacrae] Handle removal of yabai scripting additions
     (mkIf (cfg.enableScriptingAddition) {
       launchd.daemons.yabai-sa = {
-        script = ''
-          if [ ! $(${cfg.package}/bin/yabai --check-sa) ]; then
-            ${cfg.package}/bin/yabai --install-sa
-          fi
-
-          ${cfg.package}/bin/yabai --load-sa
-        '';
-
+        script = "${cfg.package}/bin/yabai --load-sa";
         serviceConfig.RunAtLoad = true;
         serviceConfig.KeepAlive.SuccessfulExit = false;
       };
 
-      environment.etc."sudoers.d/yabai".text =
-        let
-          sha = builtins.hashFile "sha256" "${cfg.package}/bin/yabai";
-        in
-        "%admin ALL=(root) NOPASSWD: sha256:${sha} ${cfg.package}/bin/yabai --load-sa";
+      environment.etc."sudoers.d/yabai".source = pkgs.runCommand "sudoers-yabai" {} ''
+        YABAI_BIN="${cfg.package}/bin/yabai"
+        SHASUM=$(sha256sum "$YABAI_BIN" | cut -d' ' -f1)
+        cat <<EOF >"$out"
+        %admin ALL=(root) NOPASSWD: sha256:$SHASUM $YABAI_BIN --load-sa
+        EOF
+      '';
     })
   ];
 }
