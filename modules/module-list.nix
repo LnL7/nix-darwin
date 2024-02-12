@@ -7,6 +7,7 @@
   ./security/pam.nix
   ./security/pki
   ./security/sandbox
+  ./security/sudo.nix
   ./system
   ./system/base.nix
   ./system/checks.nix
