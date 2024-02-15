@@ -29,6 +29,7 @@ in
   };
 
   config = mkIf cfg.enable {
+    environment.systemPackages = [ cfg.package ];
 
     environment.etc."skhdrc".text = cfg.skhdConfig;
 
