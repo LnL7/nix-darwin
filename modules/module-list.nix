@@ -76,6 +76,8 @@
   ./services/skhd
   ./services/spacebar
   ./services/spotifyd.nix
+  ./services/strongswan.nix
+  ./services/strongswan-swanctl
   ./services/synapse-bt.nix
   ./services/synergy
   ./services/tailscale.nix
