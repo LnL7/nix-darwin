@@ -12,7 +12,7 @@ showSyntax() {
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]" >&2
-  echo "               [--no-update-lock-file] [--refresh] ..." >&2
+  echo "               [--no-update-lock-file] [--refresh] [--no-flake] ..." >&2
   exit 1
 }
 
@@ -33,6 +33,7 @@ extraProfileFlags=()
 profile=@profile@
 action=
 flake=
+noFlake=
 
 while [ $# -gt 0 ]; do
   i=$1; shift 1
@@ -75,6 +76,9 @@ while [ $# -gt 0 ]; do
     --flake)
       flake=$1
       shift 1
+      ;;
+    --no-flake)
+      noFlake=1
       ;;
     -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file|--refresh)
       extraLockFlags+=("$i")
@@ -126,6 +130,11 @@ done
 if [ -z "$action" ]; then showSyntax; fi
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
+
+# Use ~/.config/darwin/flake.nix if it exists. It can be a symlink to the actual flake.
+if [[ -z $flake && -e ~/.config/darwin/flake.nix && -z $noFlake ]]; then
+    flake="$(dirname "$(readlink -f ~/.config/darwin/flake.nix)")"
+fi
 
 if [ -n "$flake" ]; then
     # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
