@@ -71,6 +71,20 @@ in
       '';
     };
 
+    protocol = mkOption {
+      type = types.str;
+      default = "ssh-ng";
+      example = "ssh";
+      description = lib.mdDoc ''
+        The protocol used for communicating with the build machine.  Use
+        `ssh-ng` if your remote builder and your local Nix version support that
+        improved protocol.
+
+        Use `null` when trying to change the special localhost builder without a
+        protocol which is for example used by hydra.
+      '';
+    };
+
     supportedFeatures = mkOption {
       type = types.listOf types.str;
       default = [ "kvm" "benchmark" "big-parallel" ];
@@ -141,7 +155,7 @@ in
       sshKey = "/etc/nix/builder_ed25519";
       system = "${stdenv.hostPlatform.uname.processor}-linux";
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) maxJobs supportedFeatures;
+      inherit (cfg) maxJobs protocol supportedFeatures;
     }];
 
     nix.settings.builders-use-substitutes = true;
