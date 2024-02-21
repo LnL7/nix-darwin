@@ -60,12 +60,29 @@ in
       '';
     };
 
+    mandatoryFeatures = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      example = [ "big-parallel" ];
+      description = lib.mdDoc ''
+        A list of features mandatory for the Linux builder. The builder will
+        be ignored for derivations that don't require all features in
+        this list. All mandatory features are automatically included in
+        {var}`supportedFeatures`.
+
+        This sets the corresponding `nix.buildMachines.*.mandatoryFeatures` option.
+      '';
+    };
+
     maxJobs = mkOption {
       type = types.ints.positive;
       default = 1;
       example = 4;
       description = lib.mdDoc ''
-        This option specifies the maximum number of jobs to run on the Linux builder at once.
+        The number of concurrent jobs the Linux builder machine supports. The
+        build machine will enforce its own limits, but this allows hydra
+        to schedule better since there is no work-stealing between build
+        machines.
 
         This sets the corresponding `nix.buildMachines.*.maxJobs` option.
       '';
@@ -82,14 +99,28 @@ in
 
         Use `null` when trying to change the special localhost builder without a
         protocol which is for example used by hydra.
+    '';
+
+    speedFactor = mkOption {
+      type = types.ints.positive;
+      default = 1;
+      description = lib.mdDoc ''
+        The relative speed of the Linux builder. This is an arbitrary integer
+        that indicates the speed of this builder, relative to other
+        builders. Higher is faster.
+
+        This sets the corresponding `nix.buildMachines.*.speedFactor` option.
       '';
     };
 
     supportedFeatures = mkOption {
       type = types.listOf types.str;
       default = [ "kvm" "benchmark" "big-parallel" ];
+      example = [ "kvm" "big-parallel" ];
       description = lib.mdDoc ''
-        This option specifies the list of features supported by the Linux builder.
+        A list of features supported by the Linux builder. The builder will
+        be ignored for derivations that require features not in this
+        list.
 
         This sets the corresponding `nix.buildMachines.*.supportedFeatures` option.
       '';
@@ -155,7 +186,7 @@ in
       sshKey = "/etc/nix/builder_ed25519";
       system = "${stdenv.hostPlatform.uname.processor}-linux";
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) maxJobs protocol supportedFeatures;
+      inherit (cfg) mandatoryFeatures maxJobs protocol speedFactor supportedFeatures;
     }];
 
     nix.settings.builders-use-substitutes = true;
