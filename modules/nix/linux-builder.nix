@@ -71,8 +71,7 @@ in
         {var}`supportedFeatures`.
 
         This sets the corresponding `nix.buildMachines.*.mandatoryFeatures` option.
-      '';
-    };
+    '';
 
     maxJobs = mkOption {
       type = types.ints.positive;
@@ -99,7 +98,8 @@ in
 
         Use `null` when trying to change the special localhost builder without a
         protocol which is for example used by hydra.
-    '';
+      '';
+    };
 
     speedFactor = mkOption {
       type = types.ints.positive;
@@ -125,6 +125,23 @@ in
         This sets the corresponding `nix.buildMachines.*.supportedFeatures` option.
       '';
     };
+
+    systems = mkOption {
+      type = types.listOf types.str;
+      default = [ "${stdenv.hostPlatform.uname.processor}-linux" ];
+      example = literalExpression ''
+        [
+          "x86_64-linux"
+          "aarch64-linux"
+        ]
+      '';
+      description = lib.mdDoc ''
+        This option specifies system types the build machine can execute derivations on.
+
+        This sets the corresponding `nix.buildMachines.*.systems` option.
+      '';
+    };
+
 
     workingDirectory = mkOption {
       type = types.str;
@@ -184,9 +201,8 @@ in
       hostName = "linux-builder";
       sshUser = "builder";
       sshKey = "/etc/nix/builder_ed25519";
-      system = "${stdenv.hostPlatform.uname.processor}-linux";
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) mandatoryFeatures maxJobs protocol speedFactor supportedFeatures;
+      inherit (cfg) mandatoryFeatures maxJobs protocol speedFactor supportedFeatures systems;
     }];
 
     nix.settings.builders-use-substitutes = true;
