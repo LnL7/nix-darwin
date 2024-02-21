@@ -63,7 +63,8 @@ in
     mandatoryFeatures = mkOption {
       type = types.listOf types.str;
       default = [];
-      example = [ "big-parallel" ];
+      defaultText = literalExpression ''[]'';
+      example = literalExpression ''[ "big-parallel" ]'';
       description = lib.mdDoc ''
         A list of features mandatory for the Linux builder. The builder will
         be ignored for derivations that don't require all features in
@@ -71,7 +72,8 @@ in
         {var}`supportedFeatures`.
 
         This sets the corresponding `nix.buildMachines.*.mandatoryFeatures` option.
-    '';
+      '';
+    };
 
     maxJobs = mkOption {
       type = types.ints.positive;
@@ -90,7 +92,8 @@ in
     protocol = mkOption {
       type = types.str;
       default = "ssh-ng";
-      example = "ssh";
+      defaultText = literalExpression ''"ssh-ng"'';
+      example = literalExpression ''"ssh"'';
       description = lib.mdDoc ''
         The protocol used for communicating with the build machine.  Use
         `ssh-ng` if your remote builder and your local Nix version support that
@@ -104,6 +107,7 @@ in
     speedFactor = mkOption {
       type = types.ints.positive;
       default = 1;
+      defaultText = literalExpression ''1'';
       description = lib.mdDoc ''
         The relative speed of the Linux builder. This is an arbitrary integer
         that indicates the speed of this builder, relative to other
@@ -116,7 +120,8 @@ in
     supportedFeatures = mkOption {
       type = types.listOf types.str;
       default = [ "kvm" "benchmark" "big-parallel" ];
-      example = [ "kvm" "big-parallel" ];
+      defaultText = literalExpression ''[ "kvm" "benchmark" "big-parallel" ]'';
+      example = literalExpression ''[ "kvm" "big-parallel" ]'';
       description = lib.mdDoc ''
         A list of features supported by the Linux builder. The builder will
         be ignored for derivations that require features not in this
@@ -129,6 +134,7 @@ in
     systems = mkOption {
       type = types.listOf types.str;
       default = [ "${stdenv.hostPlatform.uname.processor}-linux" ];
+      defaultText = literalExpression ''[ "''${stdenv.hostPlatform.uname.processor}-linux" ]'';
       example = literalExpression ''
         [
           "x86_64-linux"
