@@ -219,5 +219,9 @@ in
       "2af1b563e389d11b76a651b446e858116d7a20370d9120a7e9f78991f3e5f336"  # DeterminateSystems installer
     ];
 
+    environment.etc."zshenv".knownSha256Hashes = [
+      "d07015be6875f134976fce84c6c7a77b512079c1c5f9594dfa65c70b7968b65f"  # DeterminateSystems installer
+    ];
+
   };
 }
