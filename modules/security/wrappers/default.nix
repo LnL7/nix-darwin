@@ -132,7 +132,7 @@ in
           doas =
           { setuid = true;
             owner = "root";
-            group = "root";
+            group = "wheel";
             source = "''${pkgs.doas}/bin/doas";
           };
 
@@ -146,11 +146,11 @@ in
           };
 
 
-          # a program with the CAP_NET_RAW capability
+          # a codesigned program
           ping =
           { owner = "root";
-            group = "root";
-            capabilities = "cap_net_raw+ep";
+            group = "wheel";
+            codesign = true;
             source = "''${pkgs.iputils.out}/bin/ping";
           };
         }
