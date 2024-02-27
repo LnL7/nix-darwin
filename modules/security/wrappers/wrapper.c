@@ -3,21 +3,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdnoreturn.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/xattr.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <errno.h>
-#include <sys/prctl.h>
-#include <limits.h>
-#include <stdint.h>
-#include <syscall.h>
-#include <byteswap.h>
+// #include <stdnoreturn.h>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <sys/xattr.h>
+// #include <fcntl.h>
+// #include <dirent.h>
+// #include <errno.h>
+// #include <sys/prctl.h>
+// #include <limits.h>
+// #include <stdint.h>
+// #include <syscall.h>
+// #include <byteswap.h>
 
 // imported from glibc
-#include "unsecvars.h"
+// #include "unsecvars.h"
 
 #ifndef SOURCE_PROG
 #error SOURCE_PROG should be defined via preprocessor commandline
@@ -86,12 +86,12 @@ int main(int argc, char **argv) {
     //
     // If we don't explicitly unset them, it's quite easy to just set LD_PRELOAD,
     // have it passed through to the wrapped program, and gain privileges.
-    for (char *unsec = UNSECURE_ENVVARS_TUNABLES UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
-        if (debug) {
-            fprintf(stderr, "unsetting %s\n", unsec);
-        }
-        unsetenv(unsec);
-    }
+    // for (char *unsec = UNSECURE_ENVVARS_TUNABLES UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
+    //     if (debug) {
+    //         fprintf(stderr, "unsetting %s\n", unsec);
+    //     }
+    //     unsetenv(unsec);
+    // }
 
     execve(SOURCE_PROG, argv, environ);
     
