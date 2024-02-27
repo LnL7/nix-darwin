@@ -52,9 +52,35 @@ let
       (opts: mkWrapper opts)
       (builtins.attrValues cfg.wrappers);
 
-  securityWrapper = sourceProg: pkgs.writers.writeBashBin "security-wrapper" ''
-    exec ${sourceProg} "$@"
-  '';
+  # securityWrapper = sourceProg: pkgs.writers.writeBashBin "security-wrapper" ''
+  #   exec ${sourceProg} "$@"
+  # '';
+  # securityWrapper = sourceProg: pkgs.runCommand "security-wrapper" {} ''
+  #   mkdir -p $out/bin
+  #   cp ${sourceProg} $out/bin/security-wrapper
+  #   # ln -s ${sourceProg} $out/bin/security-wrapper
+  # '';
+
+  securityWrapper = sourceProg : pkgs.pkgsStatic.callPackage ./wrapper.nix {
+    inherit sourceProg;
+
+    # glibc definitions of insecure environment variables
+    #
+    # We extract the single header file we need into its own derivation,
+    # so that we don't have to pull full glibc sources to build wrappers.
+    #
+    # They're taken from pkgs.glibc so that we don't have to keep as close
+    # an eye on glibc changes. Not every relevant variable is in this header,
+    # so we maintain a slightly stricter list in wrapper.c itself as well.
+    unsecvars = lib.overrideDerivation (pkgs.srcOnly pkgs.glibc)
+      ({ name, ... }: {
+        name = "${name}-unsecvars";
+        installPhase = ''
+          mkdir $out
+          cp sysdeps/generic/unsecvars.h $out
+        '';
+      });
+  };
 
   mkWrapper =
     { program
