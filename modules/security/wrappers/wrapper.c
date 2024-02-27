@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-// #include <stdnoreturn.h>
+#include <stdnoreturn.h>
+#include <sys/errno.h>
 // #include <sys/types.h>
 // #include <sys/stat.h>
 // #include <sys/xattr.h>
