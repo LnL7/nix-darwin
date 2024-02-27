@@ -84,6 +84,7 @@
   ./services/yabai
   ./services/nextdns
   ./programs/bash
+  ./programs/direnv.nix
   ./programs/fish.nix
   ./programs/gnupg.nix
   ./programs/man.nix
