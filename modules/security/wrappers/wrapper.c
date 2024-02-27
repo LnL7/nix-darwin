@@ -61,6 +61,31 @@ static noreturn void assert_failure(const char *assertion) {
     "MALLOC_ARENA_MAX\0" \
     "MALLOC_ARENA_TEST\0"
 
+#define UNSECURE_ENVVARS \
+  "GCONV_PATH\0"							      \
+  "GETCONF_DIR\0"							      \
+  "HOSTALIASES\0"							      \
+  "LD_AUDIT\0"								      \
+  "LD_DEBUG\0"								      \
+  "LD_DEBUG_OUTPUT\0"							      \
+  "LD_DYNAMIC_WEAK\0"							      \
+  "LD_HWCAP_MASK\0"							      \
+  "LD_LIBRARY_PATH\0"							      \
+  "LD_ORIGIN_PATH\0"							      \
+  "LD_PRELOAD\0"							      \
+  "LD_PROFILE\0"							      \
+  "LD_SHOW_AUXV\0"							      \
+  "LD_USE_LOAD_BIAS\0"							      \
+  "LOCALDOMAIN\0"							      \
+  "LOCPATH\0"								      \
+  "MALLOC_TRACE\0"							      \
+  "NIS_PATH\0"								      \
+  "NLSPATH\0"								      \
+  "RESOLV_HOST_CONF\0"							      \
+  "RES_OPTIONS\0"							      \
+  "TMPDIR\0"								      \
+  // GLIBC_TUNABLES_ENVVAR							      \
+
 int main(int argc, char **argv) {
     ASSERT(argc >= 1);
 
@@ -87,12 +112,12 @@ int main(int argc, char **argv) {
     //
     // If we don't explicitly unset them, it's quite easy to just set LD_PRELOAD,
     // have it passed through to the wrapped program, and gain privileges.
-    // for (char *unsec = UNSECURE_ENVVARS_TUNABLES UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
-    //     if (debug) {
-    //         fprintf(stderr, "unsetting %s\n", unsec);
-    //     }
-    //     unsetenv(unsec);
-    // }
+    for (char *unsec = UNSECURE_ENVVARS_TUNABLES UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
+        if (debug) {
+            fprintf(stderr, "unsetting %s\n", unsec);
+        }
+        unsetenv(unsec);
+    }
 
     execve(SOURCE_PROG, argv, environ);
     
