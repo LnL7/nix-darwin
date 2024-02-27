@@ -70,6 +70,7 @@ in
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
+      ${cfg.activationScripts.wrappers.text}
 
       ${cfg.activationScripts.postActivation.text}
 
