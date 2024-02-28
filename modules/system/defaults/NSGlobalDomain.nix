@@ -228,7 +228,7 @@ in {
     system.defaults.NSGlobalDomain.NSWindowShouldDragOnGesture = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = ''
+      description = lib.mdDoc ''
         Whether to enable moving window by holding anywhere on it like on Linux. The default is false.
       '';
     };
