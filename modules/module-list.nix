@@ -37,6 +37,7 @@
   ./system/launchd.nix
   ./system/patches.nix
   ./system/shells.nix
+  ./system/shortcuts.nix
   ./system/version.nix
   ./time
   ./networking
