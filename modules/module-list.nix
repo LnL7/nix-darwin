@@ -38,6 +38,7 @@
   ./system/nvram.nix
   ./system/patches.nix
   ./system/shells.nix
+  ./system/startup.nix
   ./system/version.nix
   ./time
   ./networking
