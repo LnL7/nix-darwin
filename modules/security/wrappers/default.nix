@@ -39,11 +39,11 @@ let
         default = false;
         description = mdDoc "Whether to add the setgid bit to the wrapper program.";
       };
-      codesign = mkOption {
-        type = types.bool;
-        default = false;
-        description = mdDoc "Whether to codesign the wrapper program.";
-      };
+      # codesign = mkOption {
+      #   type = types.bool;
+      #   default = false;
+      #   description = mdDoc "Whether to codesign the wrapper program.";
+      # };
     };
   });
 
@@ -51,15 +51,6 @@ let
     builtins.map
       (opts: mkWrapper opts)
       (builtins.attrValues cfg.wrappers);
-
-  # securityWrapper = sourceProg: pkgs.writers.writeBashBin "security-wrapper" ''
-  #   exec ${sourceProg} "$@"
-  # '';
-  # securityWrapper = sourceProg: pkgs.runCommand "security-wrapper" {} ''
-  #   mkdir -p $out/bin
-  #   cp ${sourceProg} $out/bin/security-wrapper
-  #   # ln -s ${sourceProg} $out/bin/security-wrapper
-  # '';
 
   securityWrapper = sourceProg : pkgs.pkgsStatic.callPackage ./wrapper.nix {
     inherit sourceProg;
@@ -90,7 +81,7 @@ let
     , permissions
     , setuid
     , setgid
-    , codesign
+    , codesign ? false
     , ...
     }:
     let
@@ -144,23 +135,13 @@ in
             group = "mlocate";
             source = "''${pkgs.locate}/bin/locate";
           };
-
-
-          # a codesigned program
-          ping =
-          { owner = "root";
-            group = "wheel";
-            codesign = true;
-            source = "''${pkgs.iputils.out}/bin/ping";
-          };
         }
       '';
       description = lib.mdDoc ''
-        This option effectively allows adding setuid/setgid bits, capabilities,
-        changing file ownership and permissions of a program without directly
-        modifying it. This works by creating a wrapper program under the
-        {option}`security.wrapperDir` directory, which is then added to
-        the shell `PATH`.
+        This option effectively allows adding setuid/setgid bits and/or changing
+        file ownership and permissions without directly modifying it. This works
+        by creating a wrapper program under the {option}`security.wrapperDir`
+        directory, which is then added to the shell `PATH`.
       '';
     };
     wrapperDir = lib.mkOption {
@@ -172,11 +153,11 @@ in
         should not be overridden.
       '';
     };
-    codesignIdentity = lib.mkOption {
-      type = lib.types.str;
-      default = "-";
-      description = lib.mdDoc "Identity to use for codesigning.";
-    };
+    # codesignIdentity = lib.mkOption {
+    #   type = lib.types.str;
+    #   default = "-";
+    #   description = lib.mdDoc "Identity to use for codesigning.";
+    # };
   };
 
   ###### implementation
