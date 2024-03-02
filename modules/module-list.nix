@@ -35,8 +35,10 @@
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix
+  ./system/nvram.nix
   ./system/patches.nix
   ./system/shells.nix
+  ./system/startup.nix
   ./system/version.nix
   ./time
   ./networking
