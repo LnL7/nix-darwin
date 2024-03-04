@@ -225,6 +225,36 @@ defaults write com.apple.dock 'orientation' $'<?xml version="1.0" encoding="UTF-
 <plist version="1.0">
 <string>left</string>
 </plist>'
+defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>MyApp.app</string>
+				<key>_CFURLStringType</key>
+				<integer>0</integer>
+			</dict>
+		</dict>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>Cool.app</string>
+				<key>_CFURLStringType</key>
+				<integer>0</integer>
+			</dict>
+		</dict>
+	</dict>
+</array>
+</plist>'
 
 
 
