@@ -7,7 +7,7 @@ let
       ./configuration.nix
       {
         nixpkgs.source = pkgs.path;
-        nixpkgs.hostPlatform = pkgs.system;
+        nixpkgs.hostPlatform = pkgs.stdenv.hostPlatform.system;
         system.includeUninstaller = false;
       }
     ];
