@@ -69,6 +69,7 @@ in
       ${cfg.activationScripts.networking.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
+      ${cfg.activationScripts.nvram.text}
 
       ${cfg.activationScripts.postActivation.text}
 

@@ -60,26 +60,94 @@ in
       '';
     };
 
+    mandatoryFeatures = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      defaultText = literalExpression ''[]'';
+      example = literalExpression ''[ "big-parallel" ]'';
+      description = lib.mdDoc ''
+        A list of features mandatory for the Linux builder. The builder will
+        be ignored for derivations that don't require all features in
+        this list. All mandatory features are automatically included in
+        {var}`supportedFeatures`.
+
+        This sets the corresponding `nix.buildMachines.*.mandatoryFeatures` option.
+      '';
+    };
+
     maxJobs = mkOption {
       type = types.ints.positive;
       default = 1;
       example = 4;
       description = lib.mdDoc ''
-        This option specifies the maximum number of jobs to run on the Linux builder at once.
+        The number of concurrent jobs the Linux builder machine supports. The
+        build machine will enforce its own limits, but this allows hydra
+        to schedule better since there is no work-stealing between build
+        machines.
 
         This sets the corresponding `nix.buildMachines.*.maxJobs` option.
+      '';
+    };
+
+    protocol = mkOption {
+      type = types.str;
+      default = "ssh-ng";
+      defaultText = literalExpression ''"ssh-ng"'';
+      example = literalExpression ''"ssh"'';
+      description = lib.mdDoc ''
+        The protocol used for communicating with the build machine.  Use
+        `ssh-ng` if your remote builder and your local Nix version support that
+        improved protocol.
+
+        Use `null` when trying to change the special localhost builder without a
+        protocol which is for example used by hydra.
+      '';
+    };
+
+    speedFactor = mkOption {
+      type = types.ints.positive;
+      default = 1;
+      defaultText = literalExpression ''1'';
+      description = lib.mdDoc ''
+        The relative speed of the Linux builder. This is an arbitrary integer
+        that indicates the speed of this builder, relative to other
+        builders. Higher is faster.
+
+        This sets the corresponding `nix.buildMachines.*.speedFactor` option.
       '';
     };
 
     supportedFeatures = mkOption {
       type = types.listOf types.str;
       default = [ "kvm" "benchmark" "big-parallel" ];
+      defaultText = literalExpression ''[ "kvm" "benchmark" "big-parallel" ]'';
+      example = literalExpression ''[ "kvm" "big-parallel" ]'';
       description = lib.mdDoc ''
-        This option specifies the list of features supported by the Linux builder.
+        A list of features supported by the Linux builder. The builder will
+        be ignored for derivations that require features not in this
+        list.
 
         This sets the corresponding `nix.buildMachines.*.supportedFeatures` option.
       '';
     };
+
+    systems = mkOption {
+      type = types.listOf types.str;
+      default = [ "${stdenv.hostPlatform.uname.processor}-linux" ];
+      defaultText = literalExpression ''[ "''${stdenv.hostPlatform.uname.processor}-linux" ]'';
+      example = literalExpression ''
+        [
+          "x86_64-linux"
+          "aarch64-linux"
+        ]
+      '';
+      description = lib.mdDoc ''
+        This option specifies system types the build machine can execute derivations on.
+
+        This sets the corresponding `nix.buildMachines.*.systems` option.
+      '';
+    };
+
 
     workingDirectory = mkOption {
       type = types.str;
@@ -139,9 +207,8 @@ in
       hostName = "linux-builder";
       sshUser = "builder";
       sshKey = "/etc/nix/builder_ed25519";
-      system = "${stdenv.hostPlatform.uname.processor}-linux";
       publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUpCV2N4Yi9CbGFxdDFhdU90RStGOFFVV3JVb3RpQzVxQkorVXVFV2RWQ2Igcm9vdEBuaXhvcwo=";
-      inherit (cfg) maxJobs supportedFeatures;
+      inherit (cfg) mandatoryFeatures maxJobs protocol speedFactor supportedFeatures systems;
     }];
 
     nix.settings.builders-use-substitutes = true;
