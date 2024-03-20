@@ -49,6 +49,8 @@
   ./environment
   ./fonts
   ./launchd
+  ./power
+  ./power/sleep.nix
   ./services/activate-system
   ./services/autossh.nix
   ./services/buildkite-agents.nix
