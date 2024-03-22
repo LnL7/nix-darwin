@@ -43,6 +43,12 @@ in
         and [example](https://github.com/FelixKratz/SketchyBar/blob/master/sketchybarrc).
       '';
     };
+
+    logFile = mkOption {
+      type = types.nullOr types.path;
+      default = "/var/tmp/sketchybar.log";
+      description = lib.mdDoc "Absolute path to log all stderr and stdout";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -54,6 +60,8 @@ in
         ++ optionals (cfg.config != "") [ "--config" "${configFile}" ];
       serviceConfig.KeepAlive = true;
       serviceConfig.RunAtLoad = true;
+      serviceConfig.StandardErrorPath = cfg.logFile;
+      serviceConfig.StandardOutPath = cfg.logFile;
     };
   };
 }
