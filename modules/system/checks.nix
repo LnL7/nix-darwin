@@ -229,7 +229,7 @@ in
       (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
-      (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
+      (mkIf (!config.nix.useDaemon && config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
