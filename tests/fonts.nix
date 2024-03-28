@@ -9,7 +9,7 @@ in
 
 {
   fonts.fontDir.enable = true;
-  fonts.fonts = [ font ];
+  fonts.packages = [ font ];
 
   test = ''
     echo "checking fonts in /Library/Fonts" >&2

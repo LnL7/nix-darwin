@@ -9,6 +9,7 @@ in
 {
   imports = [
     (mkRenamedOptionModule [ "fonts" "enableFontDir" ] [ "fonts" "fontDir" "enable" ])
+    (mkRenamedOptionModule [ "fonts" "fonts" ] [ "fonts" "packages" ])
   ];
 
   options = {
@@ -23,12 +24,12 @@ in
       '';
     };
 
-    fonts.fonts = mkOption {
+    fonts.packages = mkOption {
       type = types.listOf types.path;
       default = [ ];
       example = literalExpression "[ pkgs.dejavu_fonts ]";
       description = lib.mdDoc ''
-        List of fonts to install.
+        List of font packages to install.
 
         Fonts present in later entries override those with the same filenames
         in previous ones.
