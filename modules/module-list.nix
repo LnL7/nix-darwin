@@ -71,6 +71,7 @@
   ./services/netbird.nix
   ./services/nix-daemon.nix
   ./services/nix-gc
+  ./services/nix-optimise
   ./services/ofborg
   ./services/postgresql
   ./services/privoxy
