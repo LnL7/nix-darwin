@@ -138,6 +138,8 @@ After installing, you can run `darwin-rebuild` to apply changes to your system:
 darwin-rebuild switch --flake ~/.config/nix-darwin
 ```
 
+NOTE: if the 'darwin-rebuild' command is not found, you will need to add a path to your ~/.bashrc or ~/.zshrc file. In the file, add: `export PATH=/run/current-system/sw/bin:$PATH`
+
 #### Using flake inputs
 
 Inputs from the flake can also be passed into `darwinSystem`. These inputs are then
