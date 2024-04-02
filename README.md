@@ -108,7 +108,7 @@ Add the following to `flake.nix` in the same folder as `configuration.nix`:
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }: {
+outputs = inputs@{ self, nix-darwin, nixpkgs }: {
     darwinConfigurations."Johns-MacBook" = nix-darwin.lib.darwinSystem {
       modules = [ ./configuration.nix ];
     };
@@ -132,13 +132,14 @@ nix run nix-darwin -- switch --flake ~/.config/nix-darwin
 
 ### Step 3. Using `nix-darwin`
 
-After installing, you can run `darwin-rebuild` to apply changes to your system:
+After installing, restarting your computer should make `darwin-rebuild` available in your `PATH` to apply changes to your system:
 
 ```bash
 darwin-rebuild switch --flake ~/.config/nix-darwin
 ```
 
-NOTE: if the 'darwin-rebuild' command is not found, you will need to add a path to your ~/.bashrc or ~/.zshrc file. In the file, add: `export PATH=/run/current-system/sw/bin:$PATH`
+> NOTE: if the 'darwin-rebuild' command is not found after installation, you will need to add a path to your shell configuration (f.e. the ~/.bashrc or ~/.zshrc file).
+> To to so, add: `export PATH=/run/current-system/sw/bin:$PATH` in your shell configuration file.
 
 #### Using flake inputs
 
