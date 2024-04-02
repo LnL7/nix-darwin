@@ -132,7 +132,7 @@ nix run nix-darwin -- switch --flake ~/.config/nix-darwin
 
 ### Step 3. Using `nix-darwin`
 
-After installing, restarting your computer should make `darwin-rebuild` available in your `PATH` to apply changes to your system:
+After installation, restarting your computer will make `darwin-rebuild` available in your `PATH`. After restarting, you can apply changes in your configuration by running:
 
 ```bash
 darwin-rebuild switch --flake ~/.config/nix-darwin
