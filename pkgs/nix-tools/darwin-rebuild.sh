@@ -12,7 +12,8 @@ showSyntax() {
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]" >&2
-  echo "               [--no-update-lock-file] [--refresh] [--offline] ..." >&2
+  echo "               [--no-update-lock-file] [--refresh]" >&2
+  echo "               [--offline] [--substituters substituters-list] ..." >&2
   exit 1
 }
 
