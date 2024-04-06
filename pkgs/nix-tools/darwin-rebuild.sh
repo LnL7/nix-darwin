@@ -117,7 +117,17 @@ while [ $# -gt 0 ]; do
       shift 1
       ;;
     --offline)
+      extraMetadataFlags+=("$i")
       extraBuildFlags+=("$i")
+      ;;
+    --substituters)
+      if [ -z "$1" ]; then
+        echo "$0: '$i' requires an argument"
+        exit 1
+      fi
+      j=$1; shift 1
+      extraMetadataFlags+=("$i" "$j")
+      extraBuildFlags+=("$i" "$j")
       ;;
     *)
       echo "$0: unknown option '$i'"
