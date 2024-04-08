@@ -136,6 +136,19 @@ in {
         else map (app: { tile-data = { file-data = { _CFURLString = app; _CFURLStringType = 0; }; }; }) value;
     };
 
+    system.defaults.dock.persistent-others = mkOption {
+      type = types.nullOr (types.listOf (types.either types.path types.str));
+      default = null;
+      example = [ "~/Documents" "~/Downloads" ];
+      description = lib.mdDoc ''
+        Persistent folders in the dock.
+      '';
+      apply = value:
+        if !(isList value)
+        then value
+        else map (folder: { tile-data = { file-data = { _CFURLString = folder; _CFURLStringType = 15; }; }; }) value;
+    };
+
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
