@@ -32,6 +32,11 @@ in
 
     environment.etc."skhdrc".text = cfg.skhdConfig;
 
+    # Hot-reload workaround until https://github.com/koekeishiya/skhd/issues/342 is fixed
+    system.activationScripts.postActivation.text = ''
+      su - $(${pkgs.coreutils}/bin/logname) -c '${cfg.package}/bin/skhd -r'
+    '';
+
     launchd.user.agents.skhd = {
       path = [ config.environment.systemPath ];
 
