@@ -10,12 +10,12 @@ let
 in {
   options = {
     services.telegraf = {
-      enable = mkEnableOption (lib.mdDoc "telegraf agent");
+      enable = mkEnableOption "telegraf agent";
 
       package = mkOption {
         default = pkgs.telegraf;
         defaultText = lib.literalExpression "pkgs.telegraf";
-        description = lib.mdDoc "Which telegraf derivation to use";
+        description = "Which telegraf derivation to use";
         type = types.package;
       };
 
@@ -23,7 +23,7 @@ in {
         type = types.listOf types.path;
         default = [ ];
         example = [ "/run/keys/telegraf.env" ];
-        description = lib.mdDoc ''
+        description = ''
           File to load as environment file.
           This is useful to avoid putting secrets into the nix store.
         '';
@@ -31,7 +31,7 @@ in {
 
       extraConfig = mkOption {
         default = { };
-        description = lib.mdDoc "Extra configuration options for telegraf";
+        description = "Extra configuration options for telegraf";
         type = settingsFormat.type;
         example = {
           outputs.influxdb = {
@@ -47,7 +47,7 @@ in {
 
       configUrl = mkOption {
         default = null;
-        description = lib.mdDoc "Url to fetch config from";
+        description = "Url to fetch config from";
         type = types.nullOr types.str;
       };
     };

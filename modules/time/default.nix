@@ -23,7 +23,7 @@ in
       type = types.nullOr types.str;
       default = null;
       example = "America/New_York";
-      description = lib.mdDoc ''
+      description = ''
         The time zone used when displaying times and dates. See <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
         or run {command}`sudo systemsetup -listtimezones`
         for a comprehensive list of possible values for this setting.

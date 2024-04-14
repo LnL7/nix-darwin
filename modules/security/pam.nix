@@ -40,7 +40,7 @@ in
 {
   options = {
     security.pam.enableSudoTouchIdAuth = mkEnableOption "" // {
-      description = lib.mdDoc ''
+      description = ''
         Enable sudo authentication with Touch ID.
 
         When enabled, this option adds the following line to

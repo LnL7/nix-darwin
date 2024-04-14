@@ -11,7 +11,7 @@ in {
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc ''
+        description = ''
           Enable Trezor bridge daemon, for use with Trezor hardware wallets.
         '';
       };
@@ -19,7 +19,7 @@ in {
       emulator.enable = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc ''
+        description = ''
           Enable Trezor emulator support.
         '';
        };
@@ -27,7 +27,7 @@ in {
       emulator.port = mkOption {
         type = types.port;
         default = 21324;
-        description = lib.mdDoc ''
+        description = ''
           Listening port for the Trezor emulator.
         '';
       };

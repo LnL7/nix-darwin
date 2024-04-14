@@ -14,7 +14,7 @@ in
       type = with lib.types; nullOr bool;
       default = null;
       example = false;
-      description = lib.mdDoc ''
+      description = ''
         Whether to enable the startup chime.
 
         By default, this option does not affect your system configuration in any way.

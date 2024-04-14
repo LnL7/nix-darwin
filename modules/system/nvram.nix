@@ -22,7 +22,7 @@ in
       example = {
         "StartupMute" = "%01";
       };
-      description = lib.mdDoc ''
+      description = ''
         Non-volatile RAM variables to set. Removing a key-value pair from this
         list will **not** return the variable to its previous value, but will
         no longer set its value on system configuration activations.

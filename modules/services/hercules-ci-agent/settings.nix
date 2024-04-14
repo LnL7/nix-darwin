@@ -7,7 +7,6 @@ let
     mkOption
     ;
   literalMD = lib.literalMD or (x: lib.literalDocBook "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
-  mdDoc = lib.mdDoc or (x: "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
 
   format = pkgs.formats.toml { };
 
@@ -15,7 +14,7 @@ let
     freeformType = format.type;
     options = {
       apiBaseUrl = mkOption {
-        description = mdDoc ''
+        description = ''
           API base URL that the agent will connect to.
 
           When using Hercules CI Enterprise, set this to the URL where your
@@ -27,12 +26,12 @@ let
       baseDirectory = mkOption {
         type = types.path;
         default = "/var/lib/hercules-ci-agent";
-        description = mdDoc ''
+        description = ''
           State directory (secrets, work directory, etc) for agent
         '';
       };
       concurrentTasks = mkOption {
-        description = mdDoc ''
+        description = ''
           Number of tasks to perform simultaneously.
 
           A task is a single derivation build, an evaluation or an effect run.
@@ -56,7 +55,7 @@ let
         '';
       };
       labels = mkOption {
-        description = mdDoc ''
+        description = ''
           A key-value map of user data.
 
           This data will be available to organization members in the dashboard and API.
@@ -75,7 +74,7 @@ let
         '';
       };
       workDirectory = mkOption {
-        description = mdDoc ''
+        description = ''
           The directory in which temporary subdirectories are created for task state. This includes sources for Nix evaluation.
         '';
         type = types.path;
@@ -83,7 +82,7 @@ let
         defaultText = literalExpression ''baseDirectory + "/work"'';
       };
       staticSecretsDirectory = mkOption {
-        description = mdDoc ''
+        description = ''
           This is the default directory to look for statically configured secrets like `cluster-join-token.key`.
 
           See also `clusterJoinTokenPath` and `binaryCachesPath` for fine-grained configuration.
@@ -93,7 +92,7 @@ let
         defaultText = literalExpression ''baseDirectory + "/secrets"'';
       };
       clusterJoinTokenPath = mkOption {
-        description = mdDoc ''
+        description = ''
           Location of the cluster-join-token.key file.
 
           You can retrieve the contents of the file when creating a new agent via
@@ -110,7 +109,7 @@ let
         defaultText = literalExpression ''staticSecretsDirectory + "/cluster-join-token.key"'';
       };
       binaryCachesPath = mkOption {
-        description = mdDoc ''
+        description = ''
           Path to a JSON file containing binary cache secret keys.
 
           As these values are confidential, they should not be in the store, but
@@ -124,7 +123,7 @@ let
         defaultText = literalExpression ''staticSecretsDirectory + "/binary-caches.json"'';
       };
       secretsJsonPath = mkOption {
-        description = mdDoc ''
+        description = ''
           Path to a JSON file containing secrets for effects.
 
           As these values are confidential, they should not be in the store, but

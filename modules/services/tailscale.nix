@@ -13,20 +13,20 @@ in
   ];
 
   options.services.tailscale = {
-    enable = mkEnableOption (lib.mdDoc "Tailscale client daemon");
+    enable = mkEnableOption "Tailscale client daemon";
 
     package = mkOption {
       type = types.package;
       default = pkgs.tailscale;
       defaultText = literalExpression "pkgs.tailscale";
-      description = lib.mdDoc "The package to use for tailscale";
+      description = "The package to use for tailscale";
     };
 
     overrideLocalDns = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc ''
+      description = ''
         This option implements `Override local DNS` as it is not yet implemented in Tailscaled-on-macOS.
 
         To use this option, in the Tailscale control panel:

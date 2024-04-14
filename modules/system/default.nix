@@ -22,7 +22,7 @@ in
       internal = true;
       type = types.attrsOf types.unspecified;
       default = {};
-      description = lib.mdDoc ''
+      description = ''
         Attribute set of derivation used to setup the system.
       '';
     };
@@ -30,7 +30,7 @@ in
     system.path = mkOption {
       internal = true;
       type = types.package;
-      description = lib.mdDoc ''
+      description = ''
         The packages you want in the system environment.
       '';
     };
@@ -38,7 +38,7 @@ in
     system.profile = mkOption {
       type = types.path;
       default = "/nix/var/nix/profiles/system";
-      description = lib.mdDoc ''
+      description = ''
         Profile to use for the system.
       '';
     };
@@ -56,7 +56,7 @@ in
       internal = true;
       type = types.attrsOf types.unspecified;
       default = {};
-      description = lib.mdDoc ''
+      description = ''
         `lib.mkDerivation` attributes that will be passed to the top level system builder.
       '';
     };
@@ -66,7 +66,7 @@ in
       internal = true;
       default = [];
       example = [ { assertion = false; message = "you can't enable this for that reason"; } ];
-      description = lib.mdDoc ''
+      description = ''
         This option allows modules to express conditions that must
         hold for the evaluation of the system configuration to
         succeed, along with associated error messages for the user.
@@ -78,7 +78,7 @@ in
       default = [];
       type = types.listOf types.str;
       example = [ "The `foo' service is deprecated and will go away soon!" ];
-      description = lib.mdDoc ''
+      description = ''
         This option allows modules to show warnings to users during
         the evaluation of the system configuration.
       '';

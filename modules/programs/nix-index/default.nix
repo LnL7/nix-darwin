@@ -11,14 +11,14 @@ in
     programs.nix-index.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable nix-index and its command-not-found helper.";
+      description = "Whether to enable nix-index and its command-not-found helper.";
     };
 
     programs.nix-index.package = mkOption {
       type = types.package;
       default = pkgs.nix-index;
       defaultText = "pkgs.nix-index";
-      description = lib.mdDoc "This option specifies the nix-index package to use.";
+      description = "This option specifies the nix-index package to use.";
     };
   };
 

@@ -26,7 +26,7 @@ in
           '''')
         ]
       '';
-      description = lib.mdDoc ''
+      description = ''
         Set of patches to apply to {file}`/`.
 
         ::: {.warning}

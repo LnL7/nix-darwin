@@ -11,27 +11,27 @@ in
     services.mopidy.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the Mopidy Daemon.";
+      description = "Whether to enable the Mopidy Daemon.";
     };
 
     services.mopidy.package = mkOption {
       type = types.path;
       default = pkgs.mopidy;
       defaultText = "pkgs.mopidy";
-      description = lib.mdDoc "This option specifies the mopidy package to use.";
+      description = "This option specifies the mopidy package to use.";
     };
 
     services.mopidy.mediakeys.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the Mopidy OSX Media Keys support daemon.";
+      description = "Whether to enable the Mopidy OSX Media Keys support daemon.";
     };
 
     services.mopidy.mediakeys.package = mkOption {
       type = types.path;
       default = pkgs.pythonPackages.osxmpdkeys;
       defaultText = "pkgs.pythonPackages.osxmpdkeys";
-      description = lib.mdDoc "This option specifies the mediakeys package to use.";
+      description = "This option specifies the mediakeys package to use.";
     };
   };
 

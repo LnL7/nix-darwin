@@ -10,7 +10,7 @@ in
 
 {
   options = {
-    services.karabiner-elements.enable = mkEnableOption (lib.mdDoc "Karabiner-Elements");
+    services.karabiner-elements.enable = mkEnableOption "Karabiner-Elements";
   };
 
   config = mkIf cfg.enable {
