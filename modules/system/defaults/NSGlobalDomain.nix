@@ -403,7 +403,15 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = lib.mdDoc ''
-        Whether to autohide the menu bar.  The default is false.
+        Whether to autohide the menu bar on desktop.  The default is false.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.AppleMenuBarVisibleInFullscreen = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = lib.mdDoc ''
+        Whether to show the menu bar in full screen.  The default is false.
       '';
     };
 
