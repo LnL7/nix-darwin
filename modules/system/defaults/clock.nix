@@ -51,11 +51,9 @@ with lib;
       description = lib.mdDoc ''
         Show the full date. Default is null.
 
-        0 = Show the date
-        1 = Don't show
-        2 = Don't show
-
-        TODO: I don't know what the difference is between 1 and 2.
+        0 = When space allows
+        1 = Always
+        2 = Never
       '';
     };
 
