@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  CURRENT_STABLE_CHANNEL: nixpkgs-23.05-darwin
+  CURRENT_STABLE_CHANNEL: nixpkgs-23.11-darwin
 
 jobs:
   test-stable:
