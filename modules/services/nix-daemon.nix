@@ -11,20 +11,20 @@ in
     services.nix-daemon.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the nix-daemon service.";
+      description =  "Whether to enable the nix-daemon service.";
     };
 
     services.nix-daemon.enableSocketListener = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to make the nix-daemon service socket activated.";
+      description =  "Whether to make the nix-daemon service socket activated.";
     };
 
     services.nix-daemon.logFile = mkOption {
       type = types.nullOr types.path;
       default = null;
       example = "/var/log/nix-daemon.log";
-      description = lib.mdDoc ''
+      description =  ''
         The logfile to use for the nix-daemon service. Alternatively
         {command}`sudo launchctl debug system/org.nixos.nix-daemon --stderr`
         can be used to stream the logs to a shell after restarting the service with
@@ -35,7 +35,7 @@ in
     services.nix-daemon.tempDir = mkOption {
       type = types.nullOr types.path;
       default = null;
-      description = lib.mdDoc "The TMPDIR to use for nix-daemon.";
+      description =  "The TMPDIR to use for nix-daemon.";
     };
   };
 

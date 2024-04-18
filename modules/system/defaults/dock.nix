@@ -11,7 +11,7 @@ in {
     system.defaults.dock.appswitcher-all-displays = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to display the appswitcher on all displays or only the main one. The default is false.
       '';
     };
@@ -19,7 +19,7 @@ in {
     system.defaults.dock.autohide = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to automatically hide and show the dock.  The default is false.
       '';
     };
@@ -28,7 +28,7 @@ in {
       type = types.nullOr floatWithDeprecationError;
       default = null;
       example = 0.24;
-      description = lib.mdDoc ''
+      description =  ''
         Sets the speed of the autohide delay. The default is given in the example.
       '';
     };
@@ -37,7 +37,7 @@ in {
       type = types.nullOr floatWithDeprecationError;
       default = null;
       example = 1.0;
-      description = lib.mdDoc ''
+      description =  ''
         Sets the speed of the animation when hiding/showing the Dock. The default is given in the example.
       '';
     };
@@ -45,7 +45,7 @@ in {
     system.defaults.dock.dashboard-in-overlay = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to hide Dashboard as a Space. The default is false.
       '';
     };
@@ -53,7 +53,7 @@ in {
     system.defaults.dock.enable-spring-load-actions-on-all-items = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Enable spring loading for all Dock items. The default is false.
       '';
     };
@@ -62,7 +62,7 @@ in {
       type = types.nullOr floatWithDeprecationError;
       default = null;
       example = 1.0;
-      description = lib.mdDoc ''
+      description =  ''
         Sets the speed of the Mission Control animations. The default is given in the example.
       '';
     };
@@ -70,7 +70,7 @@ in {
     system.defaults.dock.expose-group-by-app = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to group windows by application in Mission Control's Exposé. The default is true.
       '';
     };
@@ -78,7 +78,7 @@ in {
     system.defaults.dock.launchanim = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Animate opening applications from the Dock. The default is true.
       '';
     };
@@ -86,7 +86,7 @@ in {
     system.defaults.dock.mineffect = mkOption {
       type = types.nullOr (types.enum [ "genie" "suck" "scale" ]);
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Set the minimize/maximize window effect. The default is genie.
       '';
     };
@@ -94,7 +94,7 @@ in {
     system.defaults.dock.minimize-to-application = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to minimize windows into their application icon.  The default is false.
       '';
     };
@@ -102,7 +102,7 @@ in {
     system.defaults.dock.mouse-over-hilite-stack = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Enable highlight hover effect for the grid view of a stack in the Dock.
       '';
     };
@@ -110,7 +110,7 @@ in {
     system.defaults.dock.mru-spaces = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to automatically rearrange spaces based on most recent use.  The default is true.
       '';
     };
@@ -118,7 +118,7 @@ in {
     system.defaults.dock.orientation = mkOption {
       type = types.nullOr (types.enum [ "bottom" "left" "right" ]);
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Position of the dock on screen.  The default is "bottom".
       '';
     };
@@ -127,7 +127,7 @@ in {
       type = types.nullOr (types.listOf (types.either types.path types.str));
       default = null;
       example = [ "/Applications/Safari.app" "/System/Applications/Utilities/Terminal.app" ];
-      description = lib.mdDoc ''
+      description =  ''
         Persistent applications in the dock.
       '';
       apply = value:
@@ -139,7 +139,7 @@ in {
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Show indicator lights for open applications in the Dock. The default is true.
       '';
     };
@@ -147,7 +147,7 @@ in {
     system.defaults.dock.showhidden = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to make icons of hidden applications tranclucent.  The default is false.
       '';
     };
@@ -155,7 +155,7 @@ in {
     system.defaults.dock.show-recents = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Show recent applications in the dock. The default is true.
       '';
     };
@@ -163,7 +163,7 @@ in {
     system.defaults.dock.static-only = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Show only open applications in the Dock. The default is false.
       '';
     };
@@ -171,7 +171,7 @@ in {
     system.defaults.dock.tilesize = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Size of the icons in the dock.  The default is 64.
       '';
     };
@@ -179,7 +179,7 @@ in {
     system.defaults.dock.magnification = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Magnify icon on hover. The default is false.
       '';
     };
@@ -187,7 +187,7 @@ in {
     system.defaults.dock.largesize = mkOption {
       type = types.nullOr (types.ints.between 16 128);
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Magnified icon size on hover. The default is 16.
       '';
     };
@@ -196,7 +196,7 @@ in {
     system.defaults.dock.wvous-tl-corner = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Hot corner action for top left corner. Valid values include:
 
         * `1`: Disabled
@@ -217,7 +217,7 @@ in {
     system.defaults.dock.wvous-bl-corner = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Hot corner action for bottom left corner. Valid values include:
 
         * `1`: Disabled
@@ -238,7 +238,7 @@ in {
     system.defaults.dock.wvous-tr-corner = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Hot corner action for top right corner. Valid values include:
 
         * `1`: Disabled
@@ -259,7 +259,7 @@ in {
     system.defaults.dock.wvous-br-corner = mkOption {
       type = types.nullOr types.ints.positive;
       default = null;
-      description = lib.mdDoc ''
+      description =  ''
         Hot corner action for bottom right corner. Valid values include:
 
         * `1`: Disabled

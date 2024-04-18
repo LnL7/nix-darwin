@@ -209,19 +209,19 @@ in
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the NIX_PATH validation checks.";
+      description =  "Whether to run the NIX_PATH validation checks.";
     };
 
     system.checks.verifyNixChannels = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the nix-channels validation checks.";
+      description =  "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the Nix build users validation checks.";
+      description =  "Whether to run the Nix build users validation checks.";
     };
 
     system.checks.text = mkOption {

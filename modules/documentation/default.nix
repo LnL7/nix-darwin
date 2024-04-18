@@ -88,7 +88,7 @@ in
     documentation.enable = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to install documentation of packages from
         {option}`environment.systemPackages` into the generated system path.
 
@@ -100,7 +100,7 @@ in
     documentation.man.enable = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to install manual pages and the {command}`man` command.
         This also includes "man" outputs.
       '';
@@ -109,7 +109,7 @@ in
     documentation.info.enable = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to install info pages and the {command}`info` command.
         This also includes "info" outputs.
       '';
@@ -118,7 +118,7 @@ in
     documentation.doc.enable = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc ''
+      description =  ''
         Whether to install documentation distributed in packages' `/share/doc`.
         Usually plain text and/or HTML.
         This also includes "doc" outputs.

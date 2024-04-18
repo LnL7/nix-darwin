@@ -7,7 +7,7 @@ let
     mkOption
     ;
   literalMD = lib.literalMD or (x: lib.literalDocBook "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
-  mdDoc = lib.mdDoc or (x: "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
+  mdDoc =  or (x: "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
 
   format = pkgs.formats.toml { };
 
