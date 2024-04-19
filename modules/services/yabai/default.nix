@@ -23,19 +23,19 @@ in
     services.yabai.enable = mkOption {
       type = bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the yabai window manager.";
+      description = "Whether to enable the yabai window manager.";
     };
 
     services.yabai.package = mkOption {
       type = path;
       default = pkgs.yabai;
-      description = lib.mdDoc "The yabai package to use.";
+      description = "The yabai package to use.";
     };
 
     services.yabai.enableScriptingAddition = mkOption {
       type = bool;
       default = false;
-      description = lib.mdDoc ''
+      description = ''
         Whether to enable yabai's scripting-addition.
         SIP must be disabled for this to work.
       '';
@@ -57,7 +57,7 @@ in
           window_gap          = 10;
         }
       '';
-      description = lib.mdDoc ''
+      description = ''
         Key/Value pairs to pass to yabai's 'config' domain, via the configuration file.
       '';
     };
@@ -68,7 +68,7 @@ in
       example = literalExpression ''
         yabai -m rule --add app='System Preferences' manage=off
       '';
-      description = lib.mdDoc "Extra arbitrary configuration to append to the configuration file";
+      description = "Extra arbitrary configuration to append to the configuration file";
     };
   };
 

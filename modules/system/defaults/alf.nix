@@ -7,7 +7,7 @@ with lib;
     system.defaults.alf.globalstate = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Apple menu > System Preferences > Security and Privacy > Firewall
 
         Enable the internal firewall to prevent unauthorised applications, programs
@@ -22,7 +22,7 @@ with lib;
     system.defaults.alf.allowsignedenabled = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Apple menu > System Preferences > Security and Privacy > Firewall
 
         Allows any signed Application to accept incoming requests. Default is true.
@@ -35,7 +35,7 @@ with lib;
     system.defaults.alf.allowdownloadsignedenabled = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Apple menu > System Preferences > Security and Privacy > Firewall
 
         Allows any downloaded Application that has been signed to accept incoming requests. Default is 0.
@@ -48,7 +48,7 @@ with lib;
     system.defaults.alf.loggingenabled = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Apple menu > System Preferences > Security and Privacy > Firewall
 
         Enable logging of requests made to the firewall. Default is 0.
@@ -61,7 +61,7 @@ with lib;
     system.defaults.alf.stealthenabled = mkOption {
       type = types.nullOr types.int;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Apple menu > System Preferences > Security and firewall
 
         Drops incoming requests via ICMP such as ping requests. Default is 0.

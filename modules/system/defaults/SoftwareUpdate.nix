@@ -7,7 +7,7 @@ with lib;
     system.defaults.SoftwareUpdate.AutomaticallyInstallMacOSUpdates = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Automatically install Mac OS software updates. Defaults to false.
       '';
     };

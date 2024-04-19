@@ -46,47 +46,47 @@ in
     programs.tmux.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to configure tmux.";
+      description = "Whether to configure tmux.";
     };
 
     programs.tmux.enableSensible = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc "Enable sensible configuration options for tmux.";
+      description = "Enable sensible configuration options for tmux.";
     };
 
     programs.tmux.enableMouse = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc "Enable mouse support for tmux.";
+      description = "Enable mouse support for tmux.";
     };
 
     programs.tmux.enableFzf = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc "Enable fzf keybindings for selecting tmux sessions and panes.";
+      description = "Enable fzf keybindings for selecting tmux sessions and panes.";
     };
 
     programs.tmux.enableVim = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc "Enable vim style keybindings for copy mode, and navigation of tmux panes.";
+      description = "Enable vim style keybindings for copy mode, and navigation of tmux panes.";
     };
 
     programs.tmux.iTerm2 = mkOption {
       type = types.bool;
       default = false;
       example = true;
-      description = lib.mdDoc "Cater to iTerm2 and its tmux integration, as appropriate.";
+      description = "Cater to iTerm2 and its tmux integration, as appropriate.";
     };
 
     programs.tmux.defaultCommand = mkOption {
       type = types.either types.str types.package;
-      description = lib.mdDoc "The default command to use for tmux panes.";
+      description = "The default command to use for tmux panes.";
     };
 
     programs.tmux.tmuxOptions = mkOption {
@@ -98,7 +98,7 @@ in
     programs.tmux.extraConfig = mkOption {
       type = types.lines;
       default = "";
-      description = lib.mdDoc "Extra configuration to add to {file}`tmux.conf`.";
+      description = "Extra configuration to add to {file}`tmux.conf`.";
     };
   };
 

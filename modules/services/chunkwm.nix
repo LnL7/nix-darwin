@@ -12,51 +12,51 @@ in
     services.chunkwm.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the chunkwm window manager.";
+      description = "Whether to enable the chunkwm window manager.";
     };
 
     services.chunkwm.package = mkOption {
       type = types.package;
       example = literalExpression "pkgs.chunkwm";
-      description = lib.mdDoc "This option specifies the chunkwm package to use.";
+      description = "This option specifies the chunkwm package to use.";
     };
 
     services.chunkwm.hotload = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to enable hotload.";
+      description = "Whether to enable hotload.";
     };
 
     services.chunkwm.extraConfig = mkOption {
       type = types.lines;
       default = "";
       example = ''chunkc tiling::rule --owner Emacs --state tile'';
-      description = lib.mdDoc "Additional commands for {file}`chunkwmrc`.";
+      description = "Additional commands for {file}`chunkwmrc`.";
     };
 
     services.chunkwm.plugins.dir = mkOption {
       type = types.path;
       default = "/run/current-system/sw/lib/chunkwm/plugins";
-      description = lib.mdDoc "Chunkwm Plugins directory.";
+      description = "Chunkwm Plugins directory.";
     };
 
     services.chunkwm.plugins.list = mkOption {
       type = types.listOf (types.enum plugins);
       default = plugins;
       example = ["tiling"];
-      description = lib.mdDoc "Chunkwm Plugins to enable.";
+      description = "Chunkwm Plugins to enable.";
     };
 
     services.chunkwm.plugins."border".config = mkOption {
       type = types.lines;
       default = ''chunkc set focused_border_color   0xffc0b18b'';
-      description = lib.mdDoc "Optional border plugin configuration.";
+      description = "Optional border plugin configuration.";
     };
 
     services.chunkwm.plugins."tiling".config = mkOption {
       type = types.lines;
       example = ''chunkc set global_desktop_mode   bsp'';
-      description = lib.mdDoc "Optional tiling plugin configuration.";
+      description = "Optional tiling plugin configuration.";
     };
   };
 

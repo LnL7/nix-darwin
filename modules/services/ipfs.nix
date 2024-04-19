@@ -14,14 +14,14 @@ in
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc "Whether to enable the ipfs daemon.";
+        description = "Whether to enable the ipfs daemon.";
       };
 
       package = mkOption {
         type = types.package;
         default = pkgs.kubo;
         # defaultText = "pkgs.kubo";
-        description = lib.mdDoc ''
+        description = ''
           The ipfs package to use.
         '';
       };
@@ -30,7 +30,7 @@ in
         type = types.nullOr types.path;
         default = null;
         example =  "/var/tmp/ipfs.log";
-        description = lib.mdDoc ''
+        description = ''
           The logfile to use for the ipfs service. Alternatively
           {command}`sudo launchctl debug system/org.nixos.ipfs --stderr`
           can be used to stream the logs to a shell after restarting the service with
@@ -41,13 +41,13 @@ in
       ipfsPath = mkOption {
         type = types.nullOr types.path;
         default = null;
-        description = lib.mdDoc "Set the IPFS_PATH environment variable.";
+        description = "Set the IPFS_PATH environment variable.";
       };
 
       enableGarbageCollection = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc "Passes --enable-gc flag to ipfs daemon.";
+        description = "Passes --enable-gc flag to ipfs daemon.";
       };
   };
 

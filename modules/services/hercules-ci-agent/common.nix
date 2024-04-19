@@ -18,7 +18,6 @@ let
     types
     ;
   literalMD = lib.literalMD or (x: lib.literalDocBook "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
-  mdDoc = lib.mdDoc or (x: "Documentation not rendered. Please upgrade to a newer NixOS with markdown support.");
 
   cfg = config.services.hercules-ci-agent;
 
@@ -37,7 +36,7 @@ in
     enable = mkOption {
       type = types.bool;
       default = false;
-      description = mdDoc ''
+      description = ''
         Enable to run Hercules CI Agent as a system service.
 
         [Hercules CI](https://hercules-ci.com) is a
@@ -47,7 +46,7 @@ in
       '';
     };
     package = mkOption {
-      description = mdDoc ''
+      description = ''
         Package containing the bin/hercules-ci-agent executable.
       '';
       type = types.package;
@@ -55,7 +54,7 @@ in
       defaultText = literalExpression "pkgs.hercules-ci-agent";
     };
     settings = mkOption {
-      description = mdDoc ''
+      description = ''
         These settings are written to the `agent.toml` file.
 
         Not all settings are listed as options, can be set nonetheless.
@@ -75,7 +74,7 @@ in
       type = types.path;
       internal = true;
       defaultText = literalMD "generated `hercules-ci-agent.toml`";
-      description = mdDoc ''
+      description = ''
         The fully assembled config file.
       '';
     };

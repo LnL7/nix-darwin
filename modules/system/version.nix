@@ -36,7 +36,7 @@ in
     system.stateVersion = mkOption {
       type = types.int;
       default = 4;
-      description = lib.mdDoc ''
+      description = ''
         Every once in a while, a new NixOS release may change
         configuration defaults in a way incompatible with stateful
         data. For instance, if the default version of PostgreSQL
@@ -51,14 +51,14 @@ in
 
     system.darwinLabel = mkOption {
       type = types.str;
-      description = lib.mdDoc "Label to be used in the names of generated outputs.";
+      description = "Label to be used in the names of generated outputs.";
     };
 
     system.darwinVersion = mkOption {
       internal = true;
       type = types.str;
       default = "darwin${toString cfg.stateVersion}${cfg.darwinVersionSuffix}";
-      description = lib.mdDoc "The full darwin version (e.g. `darwin4.2abdb5a`).";
+      description = "The full darwin version (e.g. `darwin4.2abdb5a`).";
     };
 
     system.darwinVersionSuffix = mkOption {
@@ -67,28 +67,28 @@ in
       default = if cfg.darwinRevision != null
         then ".${substring 0 7 cfg.darwinRevision}"
         else "";
-      description = lib.mdDoc "The short darwin version suffix (e.g. `.2abdb5a`).";
+      description = "The short darwin version suffix (e.g. `.2abdb5a`).";
     };
 
     system.darwinRevision = mkOption {
       internal = true;
       type = types.nullOr types.str;
       default = gitRevision (toString ../..);
-      description = lib.mdDoc "The darwin git revision from which this configuration was built.";
+      description = "The darwin git revision from which this configuration was built.";
     };
 
     system.nixpkgsRelease = mkOption {
       readOnly = true;
       type = types.str;
       default = lib.trivial.release;
-      description = lib.mdDoc "The nixpkgs release (e.g. `16.03`).";
+      description = "The nixpkgs release (e.g. `16.03`).";
     };
 
     system.nixpkgsVersion = mkOption {
       internal = true;
       type = types.str;
       default = cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix;
-      description = lib.mdDoc "The full nixpkgs version (e.g. `16.03.1160.f2d4ee1`).";
+      description = "The full nixpkgs version (e.g. `16.03.1160.f2d4ee1`).";
     };
 
     system.nixpkgsVersionSuffix = mkOption {
@@ -97,7 +97,7 @@ in
       default = if useSourceRevision
         then ".${lib.substring 0 8 (nixpkgsSrc.lastModifiedDate or nixpkgsSrc.lastModified or "19700101")}.${nixpkgsSrc.shortRev or "dirty"}"
         else lib.trivial.versionSuffix;
-      description = lib.mdDoc "The short nixpkgs version suffix (e.g. `.1160.f2d4ee1`).";
+      description = "The short nixpkgs version suffix (e.g. `.1160.f2d4ee1`).";
     };
 
     system.nixpkgsRevision = mkOption {
@@ -106,13 +106,13 @@ in
       default = if useSourceRevision && nixpkgsSrc ? rev
         then nixpkgsSrc.rev
         else lib.trivial.revisionWithDefault null;
-      description = lib.mdDoc "The nixpkgs git revision from which this configuration was built.";
+      description = "The nixpkgs git revision from which this configuration was built.";
     };
 
     system.configurationRevision = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = lib.mdDoc "The Git revision of the top-level flake from which this configuration was built.";
+      description = "The Git revision of the top-level flake from which this configuration was built.";
     };
   };
 

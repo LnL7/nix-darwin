@@ -13,7 +13,7 @@ in
     agent.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc ''
+      description = ''
         Enables GnuPG agent for every user session.
       '';
     };
@@ -21,7 +21,7 @@ in
     agent.enableSSHSupport = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc ''
+      description = ''
         Enable SSH agent support in GnuPG agent. Also sets SSH_AUTH_SOCK
         environment variable correctly.
       '';

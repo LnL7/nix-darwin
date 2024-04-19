@@ -11,7 +11,7 @@ in {
       mkOption {
         type = types.nullOr (types.path);
         default = null;
-        description = lib.mdDoc ''
+        description = ''
           Sets the system-wide alert sound. Found under "Sound Effects" in the
           "Sound" section of "System Preferences". Look in
           "/System/Library/Sounds" for possible candidates.
@@ -23,7 +23,7 @@ in {
         type = types.nullOr floatWithDeprecationError;
         default = null;
         example = -1.0;
-        description = lib.mdDoc ''
+        description = ''
           Sets the mouse tracking speed. Found in the "Mouse" section of
           "System Preferences". Set to -1.0 to disable mouse acceleration.
         '';

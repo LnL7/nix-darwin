@@ -14,7 +14,7 @@ in
     security.sudo.extraConfig = mkOption {
       type = types.nullOr types.lines;
       default = null;
-      description = mdDoc ''
+      description = ''
         Extra configuration text appended to {file}`sudoers`.
       '';
     };

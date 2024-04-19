@@ -6,7 +6,7 @@ with lib;
   options = {
     name = mkOption {
       type = types.str;
-      description = lib.mdDoc ''
+      description = ''
         The group's name. If undefined, the name of the attribute set
         will be used.
       '';
@@ -17,19 +17,19 @@ with lib;
         name = "gid";
         check = t: isInt t && t > 501;
       };
-      description = lib.mdDoc "The group's GID.";
+      description = "The group's GID.";
     };
 
     members = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = lib.mdDoc "The group's members.";
+      description = "The group's members.";
     };
 
     description = mkOption {
       type = types.str;
       default = "";
-      description = lib.mdDoc "The group's description.";
+      description = "The group's description.";
     };
   };
 

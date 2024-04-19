@@ -11,7 +11,7 @@ in
     programs.info.enable = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to enable info pages and the {command}`info` command.";
+      description = "Whether to enable info pages and the {command}`info` command.";
     };
   };
 

@@ -12,20 +12,20 @@ in {
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc "Whether to enable the Emacs Daemon.";
+        description = "Whether to enable the Emacs Daemon.";
       };
 
       package = mkOption {
         type = types.path;
         default = pkgs.emacs;
-        description = lib.mdDoc "This option specifies the emacs package to use.";
+        description = "This option specifies the emacs package to use.";
       };
 
       additionalPath = mkOption {
         type = types.listOf types.str;
         default = [ ];
         example = [ "/Users/my_user_name" ];
-        description = lib.mdDoc ''
+        description = ''
           This option specifies additional PATH that the emacs daemon would have.
           Typically if you have binaries in your home directory that is what you would add your home path here.
           One caveat is that there won't be shell variable expansion, so you can't use $HOME for example
@@ -35,7 +35,7 @@ in {
       exec = mkOption {
         type = types.str;
         default = "emacs";
-        description = lib.mdDoc "Emacs command/binary to execute.";
+        description = "Emacs command/binary to execute.";
       };
     };
   };

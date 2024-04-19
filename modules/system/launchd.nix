@@ -59,7 +59,7 @@ in
     environment.launchAgents = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         Set of files that have to be linked in {file}`/Library/LaunchAgents`.
       '';
     };
@@ -67,7 +67,7 @@ in
     environment.launchDaemons = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         Set of files that have to be linked in {file}`/Library/LaunchDaemons`.
       '';
     };
@@ -75,7 +75,7 @@ in
     environment.userLaunchAgents = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         Set of files that have to be linked in {file}`~/Library/LaunchAgents`.
       '';
     };

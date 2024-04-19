@@ -27,37 +27,37 @@ let
           type = types.listOf types.package;
           default = [ ];
           apply = paths: pkgs.closureInfo { rootPaths = paths; };
-          description = lib.mdDoc "List of store paths to make accessible.";
+          description = "List of store paths to make accessible.";
         };
 
         readablePaths = mkOption {
           type = types.listOf types.path;
           default = [ ];
-          description = lib.mdDoc "List of paths that should be read-only inside the sandbox.";
+          description = "List of paths that should be read-only inside the sandbox.";
         };
 
         writablePaths = mkOption {
           type = types.listOf types.path;
           default = [ ];
-          description = lib.mdDoc "List of paths that should be read/write inside the sandbox.";
+          description = "List of paths that should be read/write inside the sandbox.";
         };
 
         allowSystemPaths = mkOption {
           type = types.bool;
           default = false;
-          description = lib.mdDoc "Whether to allow read access to FHS paths like /etc and /var.";
+          description = "Whether to allow read access to FHS paths like /etc and /var.";
         };
 
         allowLocalNetworking = mkOption {
           type = types.bool;
           default = false;
-          description = lib.mdDoc "Whether to allow localhost network access inside the sandbox.";
+          description = "Whether to allow localhost network access inside the sandbox.";
         };
 
         allowNetworking = mkOption {
           type = types.bool;
           default = false;
-          description = lib.mdDoc "Whether to allow network access inside the sandbox.";
+          description = "Whether to allow network access inside the sandbox.";
         };
       };
 
@@ -133,7 +133,7 @@ in
     security.sandbox.profiles = mkOption {
       type = types.attrsOf (types.submodule profile);
       default = { };
-      description = lib.mdDoc "Definition of sandbox profiles.";
+      description = "Definition of sandbox profiles.";
     };
   };
 

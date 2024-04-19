@@ -10,32 +10,32 @@ let
       allowedIPs = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        description = lib.mdDoc "List of IP addresses associated with this peer.";
+        description = "List of IP addresses associated with this peer.";
       };
 
       endpoint = mkOption {
         type = types.nullOr types.str;
         default = null;
-        description = lib.mdDoc "IP and port to connect to this peer at.";
+        description = "IP and port to connect to this peer at.";
       };
 
       persistentKeepalive = mkOption {
         type = types.nullOr types.int;
         default = null;
-        description = lib.mdDoc "Interval in seconds to send keepalive packets";
+        description = "Interval in seconds to send keepalive packets";
       };
 
       presharedKeyFile = mkOption {
         type = types.nullOr types.str;
         default = null;
         description =
-          lib.mdDoc "Optional, path to file containing the pre-shared key for this peer.";
+          "Optional, path to file containing the pre-shared key for this peer.";
       };
 
       publicKey = mkOption {
         default = null;
         type = types.str;
-        description = lib.mdDoc "The public key for this peer.";
+        description = "The public key for this peer.";
       };
     };
   };
@@ -45,75 +45,75 @@ let
       address = mkOption {
         type = types.nullOr (types.listOf types.str);
         default = [ ];
-        description = lib.mdDoc "List of IP addresses for this interface.";
+        description = "List of IP addresses for this interface.";
       };
 
       autostart = mkOption {
         type = types.bool;
         default = true;
         description =
-          lib.mdDoc "Whether to bring up this interface automatically during boot.";
+          "Whether to bring up this interface automatically during boot.";
       };
 
       dns = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        description = lib.mdDoc "List of DNS servers for this interface.";
+        description = "List of DNS servers for this interface.";
       };
 
       listenPort = mkOption {
         type = types.nullOr types.int;
         default = null;
-        description = lib.mdDoc "Port to listen on, randomly selected if not specified.";
+        description = "Port to listen on, randomly selected if not specified.";
       };
 
       mtu = mkOption {
         type = types.nullOr types.int;
         default = null;
         description =
-          lib.mdDoc "MTU to set for this interface, automatically set if not specified";
+          "MTU to set for this interface, automatically set if not specified";
       };
 
       peers = mkOption {
         type = types.listOf (types.submodule peerOpts);
         default = [ ];
-        description = lib.mdDoc "List of peers associated with this interface.";
+        description = "List of peers associated with this interface.";
       };
 
       preDown = mkOption {
         type = with types; coercedTo (listOf str) (concatStringsSep "\n") lines;
         default = "";
-        description = lib.mdDoc "List of commadns to run before interface shutdown.";
+        description = "List of commadns to run before interface shutdown.";
       };
 
       preUp = mkOption {
         type = with types; coercedTo (listOf str) (concatStringsSep "\n") lines;
         default = "";
-        description = lib.mdDoc "List of commands to run before interface setup.";
+        description = "List of commands to run before interface setup.";
       };
 
       postDown = mkOption {
         type = with types; coercedTo (listOf str) (concatStringsSep "\n") lines;
         default = "";
-        description = lib.mdDoc "List of commands to run after interface shutdown";
+        description = "List of commands to run after interface shutdown";
       };
 
       postUp = mkOption {
         type = with types; coercedTo (listOf str) (concatStringsSep "\n") lines;
         default = "";
-        description = lib.mdDoc "List of commands to run after interface setup.";
+        description = "List of commands to run after interface setup.";
       };
 
       privateKeyFile = mkOption {
         type = types.str;
         default = null;
-        description = lib.mdDoc "Path to file containing this interface's private key.";
+        description = "Path to file containing this interface's private key.";
       };
 
       table = mkOption {
         type = types.nullOr types.str;
         default = null;
-        description = lib.mdDoc ''
+        description = ''
           Controls the routing table to which routes are added. There are two
           special values: `off` disables the creation of routes altogether,
           and `auto` (the default) adds routes to the default table and
@@ -208,13 +208,13 @@ in {
       interfaces = mkOption {
         type = types.attrsOf (types.submodule interfaceOpts);
         default = { };
-        description = lib.mdDoc "Set of wg-quick interfaces.";
+        description = "Set of wg-quick interfaces.";
       };
 
       logDir = mkOption {
         type = types.str;
         default = "/var/log";
-        description = lib.mdDoc "Directory to save wg-quick logs to.";
+        description = "Directory to save wg-quick logs to.";
       };
     };
   };
