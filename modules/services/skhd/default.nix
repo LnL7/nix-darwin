@@ -49,7 +49,7 @@ in
     blacklist = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      description = lib.mdDoc ''
+      description = ''
         Prevent skhd from monitoring events for specific applications.
       '';
       example = literalExpression ''
