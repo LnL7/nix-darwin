@@ -29,7 +29,7 @@ in
       type = types.nullOr types.str;
       default = null;
       example = "John’s MacBook Pro";
-      description = lib.mdDoc ''
+      description = ''
         The user-friendly name for the system, set in System Preferences > Sharing > Computer Name.
 
         Setting this option is equivalent to running `scutil --set ComputerName`.
@@ -42,7 +42,7 @@ in
       type = types.nullOr (types.strMatching hostnameRegEx);
       default = null;
       example = "Johns-MacBook-Pro";
-      description = lib.mdDoc ''
+      description = ''
         The hostname of your system, as visible from the command line and used by local and remote
         networks when connecting through SSH and Remote Login.
 
@@ -56,7 +56,7 @@ in
       type = types.nullOr (types.strMatching hostnameRegEx);
       default = cfg.hostName;
       example = "Johns-MacBook-Pro";
-      description = lib.mdDoc ''
+      description = ''
         The local hostname, or local network name, is displayed beneath the computer's name at the
         top of the Sharing preferences pane. It identifies your Mac to Bonjour-compatible services.
 
@@ -74,7 +74,7 @@ in
       type = types.listOf types.str;
       default = [];
       example = [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
-      description = lib.mdDoc ''
+      description = ''
         List of networkservices that should be configured.
 
         To display a list of all the network services on the server's
@@ -86,13 +86,13 @@ in
       type = types.listOf types.str;
       default = [];
       example = [ "8.8.8.8" "8.8.4.4" "2001:4860:4860::8888" "2001:4860:4860::8844" ];
-      description = lib.mdDoc "The list of dns servers used when resolving domain names.";
+      description = "The list of dns servers used when resolving domain names.";
     };
 
     networking.search = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = lib.mdDoc "The list of search paths used when resolving domain names.";
+      description = "The list of search paths used when resolving domain names.";
     };
   };
 

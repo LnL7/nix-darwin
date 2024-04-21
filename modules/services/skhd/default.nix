@@ -37,14 +37,13 @@ in
     enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the skhd hotkey daemon.";
+      description = "Whether to enable the skhd hotkey daemon.";
     };
 
     package = mkOption {
       type = types.package;
       default = pkgs.skhd;
-      description = lib.mdDoc "The skhd package to use.";
-      example = literalExpression "pkgs.skhd";
+      description = "This option specifies the skhd package to use.";
     };
 
     blacklist = mkOption {
@@ -83,10 +82,15 @@ in
     extraConfig = mkOption {
       type = types.lines;
       default = "";
+<<<<<<< HEAD
       example = "alt + shift - r : chunkc quit";
       description = lib.mdDoc ''
         Extra configuration to append to the generated <filename>skhdrc</filename>.
       '';
+=======
+      example = "alt + shift - r   :   chunkc quit";
+      description = "Config to use for {file}`skhdrc`.";
+>>>>>>> fix
     };
   };
 

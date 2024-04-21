@@ -11,21 +11,21 @@ in
     services.kwm.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable the khd window manager.";
+      description = "Whether to enable the khd window manager.";
     };
 
     services.kwm.package = mkOption {
       type = types.path;
       default = pkgs.kwm;
       defaultText = "pkgs.kwm";
-      description = lib.mdDoc "This option specifies the kwm package to use.";
+      description = "This option specifies the kwm package to use.";
     };
 
     services.kwm.kwmConfig = mkOption {
       type = types.lines;
       default = "";
       example = ''kwmc rule owner="iTerm2" properties={role="AXDialog"}'';
-      description = lib.mdDoc "Config to use for {file}`kwmrc`.";
+      description = "Config to use for {file}`kwmrc`.";
     };
   };
 

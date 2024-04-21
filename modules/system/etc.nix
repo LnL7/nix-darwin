@@ -20,7 +20,7 @@ in
     environment.etc = mkOption {
       type = types.attrsOf (types.submodule text);
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         Set of files that have to be linked in {file}`/etc`.
       '';
     };

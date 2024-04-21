@@ -19,7 +19,7 @@ in
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = lib.mdDoc ''
+        description = ''
           Whether to enable the spotifyd service.
         '';
       };
@@ -28,7 +28,7 @@ in
         type = types.path;
         default = pkgs.spotifyd;
         defaultText = "pkgs.spotifyd";
-        description = lib.mdDoc ''
+        description = ''
           The spotifyd package to use.
         '';
       };
@@ -40,7 +40,7 @@ in
           bitrate = 160;
           volume_normalisation = true;
         };
-        description = lib.mdDoc ''
+        description = ''
           Configuration for spotifyd, see <https://spotifyd.github.io/spotifyd/config/File.html>
           for supported values.
         '';

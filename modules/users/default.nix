@@ -39,7 +39,7 @@ in
     users.knownGroups = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = lib.mdDoc ''
+      description = ''
         List of groups owned and managed by nix-darwin. Used to indicate
         what users are safe to create/delete based on the configuration.
         Don't add system groups to this.
@@ -49,7 +49,7 @@ in
     users.knownUsers = mkOption {
       type = types.listOf types.str;
       default = [];
-      description = lib.mdDoc ''
+      description = ''
         List of users owned and managed by nix-darwin. Used to indicate
         what users are safe to create/delete based on the configuration.
         Don't add the admin user or other system users to this.
@@ -59,13 +59,13 @@ in
     users.groups = mkOption {
       type = types.attrsOf (types.submodule group);
       default = {};
-      description = lib.mdDoc "Configuration for groups.";
+      description = "Configuration for groups.";
     };
 
     users.users = mkOption {
       type = types.attrsOf (types.submodule user);
       default = {};
-      description = lib.mdDoc "Configuration for users.";
+      description = "Configuration for users.";
     };
 
     users.gids = mkOption {
@@ -84,7 +84,7 @@ in
       internal = true;
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Remove and recreate existing groups/users.";
+      description = "Remove and recreate existing groups/users.";
     };
   };
 

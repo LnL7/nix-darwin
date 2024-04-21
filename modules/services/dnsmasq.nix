@@ -12,32 +12,32 @@ in
     services.dnsmasq.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Whether to enable DNSmasq.";
+      description = "Whether to enable DNSmasq.";
     };
 
     services.dnsmasq.package = mkOption {
       type = types.path;
       default = pkgs.dnsmasq;
       defaultText = "pkgs.dnsmasq";
-      description = lib.mdDoc "This option specifies the dnsmasq package to use.";
+      description = "This option specifies the dnsmasq package to use.";
     };
 
     services.dnsmasq.bind = mkOption {
       type = types.str;
       default = "127.0.0.1";
-      description = lib.mdDoc "This option specifies the interface on which DNSmasq will listen.";
+      description = "This option specifies the interface on which DNSmasq will listen.";
     };
 
     services.dnsmasq.port = mkOption {
       type = types.int;
       default = 53;
-      description = lib.mdDoc "This option specifies port on which DNSmasq will listen.";
+      description = "This option specifies port on which DNSmasq will listen.";
     };
 
     services.dnsmasq.addresses = mkOption {
       type = types.attrs;
       default = {};
-      description = lib.mdDoc "List of domains that will be redirected by the DNSmasq.";
+      description = "List of domains that will be redirected by the DNSmasq.";
       example = literalExpression ''
         { localhost = "127.0.0.1"; }
         '';

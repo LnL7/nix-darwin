@@ -11,7 +11,7 @@ with lib;
         "TwoButton"
       ]);
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         "OneButton": any tap is a left click.  "TwoButton": allow left-
         and right-clicking.
       '';

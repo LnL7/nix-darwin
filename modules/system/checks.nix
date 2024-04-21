@@ -191,6 +191,17 @@ let
         exit 2
     fi
   '';
+
+  nixStoreOptimiser = ''
+    if test -O /nix/store; then
+        echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
+        echo "Configure the optimiser to run as the current user:" >&2
+        echo >&2
+        echo "    nix.optimiser.user = \"$USER\";" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -198,19 +209,19 @@ in
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the NIX_PATH validation checks.";
+      description = "Whether to run the NIX_PATH validation checks.";
     };
 
     system.checks.verifyNixChannels = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the nix-channels validation checks.";
+      description = "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc "Whether to run the Nix build users validation checks.";
+      description = "Whether to run the Nix build users validation checks.";
     };
 
     system.checks.text = mkOption {
@@ -230,6 +241,7 @@ in
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
+      (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
       (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)

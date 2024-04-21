@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) literalExpression maintainers mdDoc mkEnableOption mkIf mkPackageOptionMD mkOption optionals types;
+  inherit (lib) literalExpression maintainers mkEnableOption mkIf mkPackageOptionMD mkOption optionals types;
 
   cfg = config.services.sketchybar;
 
@@ -15,7 +15,7 @@ in
   ];
 
   options.services.sketchybar = {
-    enable = mkEnableOption (mdDoc "sketchybar");
+    enable = mkEnableOption "sketchybar";
 
     package = mkPackageOptionMD pkgs "sketchybar" { };
 
@@ -23,7 +23,7 @@ in
       type = types.listOf types.package;
       default = [ ];
       example = literalExpression "[ pkgs.jq ]";
-      description = mdDoc ''
+      description = ''
         Extra packages to add to PATH.
       '';
     };
@@ -36,7 +36,7 @@ in
         sketchybar --update
         echo "sketchybar configuration loaded.."
       '';
-      description = mdDoc ''
+      description = ''
         Contents of sketchybar's configuration file. If empty (the default), the configuration file won't be managed.
 
         See [documentation](https://felixkratz.github.io/SketchyBar/)

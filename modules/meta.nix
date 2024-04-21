@@ -34,8 +34,8 @@ in
         type = listOfMaintainers;
         internal = true;
         default = [];
-        example = [ lib.maintainers.all ];
-        description = lib.mdDoc ''
+        example = [ lib.maintainers.lnl7 ];
+        description = ''
           List of maintainers of each module.  This option should be defined at
           most once per module.
 
