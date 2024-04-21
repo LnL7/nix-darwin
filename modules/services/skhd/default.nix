@@ -82,15 +82,8 @@ in
     extraConfig = mkOption {
       type = types.lines;
       default = "";
-<<<<<<< HEAD
-      example = "alt + shift - r : chunkc quit";
-      description = lib.mdDoc ''
-        Extra configuration to append to the generated <filename>skhdrc</filename>.
-      '';
-=======
       example = "alt + shift - r   :   chunkc quit";
       description = "Config to use for {file}`skhdrc`.";
->>>>>>> fix
     };
   };
 
