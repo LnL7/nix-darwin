@@ -65,7 +65,7 @@ in
         builtins.all (name: validateKeybinding name) (attrNames attrs)
       );
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         A list of keybindings to add to shkd. See the
         <link xlink:href="https://github.com/koekeishiya/skhd/blob/master/examples/skhdrc">example configuration</link>
         for more information and examples on how to use this. The generated file
