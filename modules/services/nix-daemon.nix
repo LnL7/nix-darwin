@@ -51,7 +51,7 @@ in
       serviceConfig.ProcessType = config.nix.daemonProcessType;
       serviceConfig.LowPriorityIO = config.nix.daemonIOLowPriority;
       serviceConfig.Label = "org.nixos.nix-daemon"; # must match daemon installed by Nix regardless of the launchd label Prefix
-      serviceConfig.SoftResourceLimits.NumberOfFiles = mkDefault 4096;
+      serviceConfig.SoftResourceLimits.NumberOfFiles = mkDefault 1048576;
       serviceConfig.StandardErrorPath = cfg.logFile;
 
       serviceConfig.KeepAlive = mkIf (!cfg.enableSocketListener) true;
