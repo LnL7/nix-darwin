@@ -24,7 +24,7 @@ in {
           "192.168.0.2" = [ "fileserver.local" "nameserver.local" ];
         };
       '';
-      description = lib.mdDoc ''
+      description = ''
         Locally defined maps of hostnames to IP addresses.
       '';
     };
@@ -33,7 +33,7 @@ in {
       type = types.listOf types.path;
       defaultText = literalMD "Hosts from {option}`networking.hosts` and {option}`networking.extraHosts`";
       example = literalExpression ''[ "''${pkgs.my-blocklist-package}/share/my-blocklist/hosts" ]'';
-      description = lib.mdDoc ''
+      description = ''
         Files that should be concatenated together to form {file}`/etc/hosts`.
       '';
     };
@@ -42,7 +42,7 @@ in {
       type = types.lines;
       default = "";
       example = "192.168.0.1 lanlocalhost";
-      description = lib.mdDoc ''
+      description = ''
         Additional verbatim entries to be appended to {file}`/etc/hosts`.
         For adding hosts from derivation results, use {option}`networking.hostFiles` instead.
       '';
