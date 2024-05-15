@@ -265,11 +265,13 @@ defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>~/Documents</string>
+				<string>file://~/Documents</string>
 				<key>_CFURLStringType</key>
 				<integer>15</integer>
 			</dict>
 		</dict>
+		<key>tile-type</key>
+		<string>directory-tile</string>
 	</dict>
 	<dict>
 		<key>tile-data</key>
@@ -277,11 +279,13 @@ defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>~/Downloads</string>
+				<string>file://~/Downloads/file.txt</string>
 				<key>_CFURLStringType</key>
 				<integer>15</integer>
 			</dict>
 		</dict>
+		<key>tile-type</key>
+		<string>file-tile</string>
 	</dict>
 </array>
 </plist>'

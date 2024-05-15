@@ -146,7 +146,7 @@ in {
       apply = value:
         if !(isList value)
         then value
-        else map (folder: { tile-data = { file-data = { _CFURLString = folder; _CFURLStringType = 15; }; }; }) value;
+        else map (folder: { tile-data = { file-data = { _CFURLString = "file://" + folder; _CFURLStringType = 15; }; }; tile-type = if strings.hasInfix "." (last (splitString "/" folder)) then "file-tile" else "directory-tile"; }) value;
     };
 
     system.defaults.dock.show-process-indicators = mkOption {
