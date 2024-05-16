@@ -58,7 +58,7 @@ in {
         exec ${cfg.package}/bin/cachix deploy agent ${cfg.name}
       '';
 
-      path = [ config.nix.package pkgs.coreutils ];
+      path = [ config.nix.package pkgs.coreutils config.environment.systemPath ];
 
       environment = {
         NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
