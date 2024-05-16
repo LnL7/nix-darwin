@@ -55,7 +55,7 @@ in
 
     programs.zsh.promptInit = mkOption {
       type = types.lines;
-      default = "autoload -U promptinit && promptinit && prompt walters && setopt prompt_sp";
+      default = "autoload -U promptinit && promptinit && prompt suse && setopt prompt_sp";
       description = "Shell script code used to initialise the zsh prompt.";
     };
 
