@@ -140,7 +140,7 @@ in {
       type = types.nullOr (types.listOf (types.either types.path types.str));
       default = null;
       example = [ "~/Documents" "~/Downloads" ];
-      description = lib.mdDoc ''
+      description = ''
         Persistent folders in the dock.
       '';
       apply = value:
