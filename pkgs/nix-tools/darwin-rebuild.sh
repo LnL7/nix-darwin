@@ -44,7 +44,7 @@ while [ $# -gt 0 ]; do
     edit|switch|activate|build|check|changelog)
       action=$i
       ;;
-    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback)
+    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|--offline)
       extraMetadataFlags+=("$i")
       extraBuildFlags+=("$i")
       ;;
@@ -116,10 +116,6 @@ while [ $# -gt 0 ]; do
         mkdir -p -m 0755 "$(dirname "$profile")"
       fi
       shift 1
-      ;;
-    --offline)
-      extraMetadataFlags+=("$i")
-      extraBuildFlags+=("$i")
       ;;
     --substituters)
       if [ -z "$1" ]; then
