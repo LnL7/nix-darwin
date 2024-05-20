@@ -12,7 +12,8 @@ showSyntax() {
   echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]" >&2
-  echo "               [--no-update-lock-file] [--refresh] ..." >&2
+  echo "               [--no-update-lock-file] [--refresh]" >&2
+  echo "               [--offline] [--substituters substituters-list] ..." >&2
   exit 1
 }
 
@@ -43,7 +44,7 @@ while [ $# -gt 0 ]; do
     edit|switch|activate|build|check|changelog)
       action=$i
       ;;
-    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback)
+    --show-trace|--keep-going|--keep-failed|--verbose|-v|-vv|-vvv|-vvvv|-vvvvv|--fallback|--offline)
       extraMetadataFlags+=("$i")
       extraBuildFlags+=("$i")
       ;;
@@ -115,6 +116,15 @@ while [ $# -gt 0 ]; do
         mkdir -p -m 0755 "$(dirname "$profile")"
       fi
       shift 1
+      ;;
+    --substituters)
+      if [ -z "$1" ]; then
+        echo "$0: '$i' requires an argument"
+        exit 1
+      fi
+      j=$1; shift 1
+      extraMetadataFlags+=("$i" "$j")
+      extraBuildFlags+=("$i" "$j")
       ;;
     *)
       echo "$0: unknown option '$i'"
