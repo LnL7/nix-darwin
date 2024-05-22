@@ -520,6 +520,32 @@ let
           + optionalString (sCfgSubset != { }) ", ${mkBrewfileLineOptionsListString sCfgSubset}";
       };
   };
+
+  masOptions = { config, ... }: {
+    options = {
+      name = mkOption {
+        type = types.nullOr (types.str);
+        description = "The name of the Mac App Store app to install.";
+      };
+      id = mkOption {
+        type = types.ints.positive;
+        description = "The ID of the Mac App Store app to install.";
+      };
+
+      brewfileLine = mkInternalOption { type = types.nullOr types.str; };
+    };
+
+    config =
+      let
+        sCfg = mkProcessedSubmodConfig config;
+        sCfgSubset = removeAttrs sCfg [ "name" ];
+      in
+      {
+        brewfileLine =
+          "mas ${sCfg.name}"
+          + ", ${mkBrewfileLineOptionsListString sCfgSubset}";
+      };
+  };
 in
 
 {
@@ -719,6 +745,38 @@ in
       '';
     };
 
+    extraMasApps = mkOption {
+      type = with types; listOf (submodule masOptions);
+      default = [ ];
+      example = literalExpression ''
+        [
+          {
+            name = "Transporter";
+            id = 1450874784;
+          }
+          {
+            name = "AppleConfigurator";
+            id = 1037126344;
+          }
+        ]
+      '';
+      description = ''
+        Applications to install from Mac App Store using {command}`mas`.
+
+        When this option is used, `"mas"` is automatically added to
+        [](#opt-homebrew.brews).
+
+        Note that you need to be signed into the Mac App Store for {command}`mas` to
+        successfully install and upgrade applications, and that unfortunately apps removed from this
+        option will not be uninstalled automatically even if
+        [](#opt-homebrew.onActivation.cleanup) is set to `"uninstall"`
+        or `"zap"` (this is currently a limitation of Homebrew Bundle).
+
+        For more information on {command}`mas` see:
+        [github.com/mas-cli/mas](https://github.com/mas-cli/mas).
+      '';
+    };
+
     whalebrews = mkOption {
       type = with types; listOf str;
       default = [ ];
@@ -765,7 +823,7 @@ in
     ];
 
     homebrew.brews =
-      optional (cfg.masApps != { }) "mas"
+      optional (cfg.masApps != { } || cfg.extraMasApps != [ ]) "mas"
       ++ optional (cfg.whalebrews != [ ]) "whalebrew";
 
     homebrew.brewfile =
@@ -777,6 +835,7 @@ in
       + mkBrewfileSectionString "Casks" cfg.casks
       + mkBrewfileSectionString "Mac App Store apps"
         (mapAttrsToList (n: id: ''mas "${n}", id: ${toString id}'') cfg.masApps)
+      + mkBrewfileSectionString "Extra Mac App Store apps" cfg.extraMasApps
       + mkBrewfileSectionString "Docker containers" (map (v: ''whalebrew "${v}"'') cfg.whalebrews)
       + optionalString (cfg.extraConfig != "") ("# Extra config\n" + cfg.extraConfig);
 
