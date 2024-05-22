@@ -4,10 +4,18 @@ with lib;
 
 {
   test = ''
-    echo checking /run/current-system/sw/bin in environment >&2
-    grep 'export PATH=.*:/run/current-system/sw/bin' ${config.system.build.setEnvironment}
+    echo 'checking PATH' >&2
+    env_path=$(bash -c 'source ${config.system.build.setEnvironment}; echo $PATH')
 
-    echo checking /bin and /sbin in environment >&2
-    grep 'export PATH=.*:/usr/bin:/usr/sbin:/bin:/sbin' ${config.system.build.setEnvironment}
+    test "$env_path" = "${builtins.concatStringsSep ":" [
+      "/homeless-shelter/.nix-profile/bin"
+      "/run/current-system/sw/bin"
+      "/nix/var/nix/profiles/default/bin"
+      "/usr/local/bin"
+      "/usr/bin"
+      "/usr/sbin"
+      "/bin"
+      "/sbin"
+    ]}"
   '';
 }
