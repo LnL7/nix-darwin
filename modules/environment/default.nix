@@ -151,7 +151,10 @@ in
 
   config = {
 
-    environment.systemPath = [ (makeBinPath cfg.profiles) "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ];
+    environment.systemPath = mkMerge [
+      [ (makeBinPath cfg.profiles) ]
+      (mkOrder 1200 [ "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ])
+    ];
 
     # Use user, default and system profiles.
     environment.profiles = mkMerge [
