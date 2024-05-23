@@ -63,5 +63,14 @@ with lib;
       '';
     };
 
+    system.defaults.trackpad.TrackpadThreeFingerTapGesture = mkOption {
+      type = types.nullOr (types.enum [ 0 2 ]);
+      default = null;
+      description = ''
+        0 to disable three finger tap, 2 to trigger Look up & data detectors.
+        The default is 2.
+      '';
+    };
+
   };
 }
