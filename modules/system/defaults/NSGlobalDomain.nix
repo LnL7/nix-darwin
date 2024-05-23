@@ -346,7 +346,7 @@ in {
       type = types.nullOr (types.enum [ 0 1 ]);
       default = null;
       description = ''
-        Wheter to enable trackpad force click.
+        Whether to enable trackpad force click.
       '';
     };
 
