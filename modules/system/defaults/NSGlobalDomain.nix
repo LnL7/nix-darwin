@@ -342,6 +342,14 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain."com.apple.trackpad.forceClick" = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Wheter to enable trackpad force click.
+      '';
+    };
+
     system.defaults.NSGlobalDomain."com.apple.springing.enabled" = mkOption {
       type = types.nullOr types.bool;
       default = null;
