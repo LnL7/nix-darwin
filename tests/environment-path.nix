@@ -3,11 +3,37 @@
 with lib;
 
 {
-  test = ''
-    echo checking /run/current-system/sw/bin in environment >&2
-    grep 'export PATH=.*:/run/current-system/sw/bin' ${config.system.build.setEnvironment}
+  environment.systemPath = mkMerge [
+    (mkBefore [ "beforePath" ])
+    [ "myPath" ]
+    (mkAfter [ "afterPath" ])
+  ];
 
-    echo checking /bin and /sbin in environment >&2
-    grep 'export PATH=.*:/usr/bin:/usr/sbin:/bin:/sbin' ${config.system.build.setEnvironment}
+  environment.profiles = mkMerge [
+    (mkBefore [ "beforeProfile" ])
+    [ "myProfile" ]
+    (mkAfter [ "afterProfile" ])
+  ];
+
+  test = ''
+    echo 'checking PATH' >&2
+    env_path=$(bash -c 'source ${config.system.build.setEnvironment}; echo $PATH')
+
+    test "$env_path" = "${builtins.concatStringsSep ":" [
+      "beforePath"
+      "myPath"
+      "beforeProfile/bin"
+      "/homeless-shelter/.nix-profile/bin"
+      "myProfile/bin"
+      "/run/current-system/sw/bin"
+      "/nix/var/nix/profiles/default/bin"
+      "afterProfile/bin"
+      "/usr/local/bin"
+      "/usr/bin"
+      "/usr/sbin"
+      "/bin"
+      "/sbin"
+      "afterPath"
+    ]}"
   '';
 }
