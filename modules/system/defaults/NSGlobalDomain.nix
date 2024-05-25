@@ -343,7 +343,7 @@ in {
     };
 
     system.defaults.NSGlobalDomain."com.apple.trackpad.forceClick" = mkOption {
-      type = types.nullOr (types.enum [ 0 1 ]);
+      type = types.nullOr types.bool;
       default = null;
       description = ''
         Whether to enable trackpad force click.
