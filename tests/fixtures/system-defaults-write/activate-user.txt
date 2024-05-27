@@ -255,6 +255,40 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 	</dict>
 </array>
 </plist>'
+defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file://~/Documents</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>directory-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file://~/Downloads/file.txt</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>file-tile</string>
+	</dict>
+</array>
+</plist>'
 
 
 
