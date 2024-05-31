@@ -28,6 +28,7 @@ let
     fi
   '';
 
+
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
         echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
@@ -283,6 +284,19 @@ let
         exit 2
     fi
   '';
+
+  homebrewInstalled = ''
+    if [[ ! -f ${escapeShellArg config.homebrew.brewPrefix}/brew ]]; then
+        echo "[1;31merror: Using the homebrew module requires homebrew installed, aborting activation[0m" >&2
+        echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
+        echo "You can install homebrew using the following command:" >&2
+        echo >&2
+        # shellcheck disable=SC2016
+        echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -331,6 +345,7 @@ in
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
+      (mkIf config.homebrew.enable homebrewInstalled)
     ];
 
     system.activationScripts.checks.text = ''
