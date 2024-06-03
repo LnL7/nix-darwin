@@ -24,6 +24,7 @@ with lib;
       "myPath"
       "beforeProfile/bin"
       "/homeless-shelter/.nix-profile/bin"
+      "/homeless-shelter/.local/state}/nix/profile"
       "myProfile/bin"
       "/run/current-system/sw/bin"
       "/nix/var/nix/profiles/default/bin"
