@@ -87,6 +87,7 @@
   ./services/wg-quick.nix
   ./services/yabai
   ./services/nextdns
+  ./services/jankyborders
   ./programs/bash
   ./programs/direnv.nix
   ./programs/fish.nix
