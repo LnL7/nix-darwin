@@ -7,6 +7,8 @@
   inherit (lib) maintainers mkEnableOption mkIf mkPackageOptionMD mkOption types;
 
   cfg = config.services.jankyborders;
+  joinStrings = strings: builtins.concatStringsSep "," strings;
+
   optionalArg = arg: value:
     if value != null && value != ""
     then
@@ -96,29 +98,37 @@ in {
     };
 
     blacklist = mkOption {
-      type = types.str;
-      default = "";
-      example = "Safari,kitty";
+      type = types.listOf types.str;
+      default = [];
+      example = ["Safari" "kitty"];
       description = ''
-        The applications specified here are excluded from being bordered. For example, blacklist="Safari,kitty" excludes Safari and kitty from being bordered.
+        The applications specified here are excluded from being bordered.
+        For example, blacklist = [ "Safari" "kitty" ] excludes Safari and kitty from being bordered.
       '';
     };
 
     whitelist = mkOption {
-      type = types.str;
-      default = "";
-      example = "Safari,kitty";
+      type = types.listOf types.str;
+      default = [];
+      example = ["Arc" "USB Overdrive"];
       description = ''
-        Once this list is populated, only applications listed here are considered for receiving a border. If the whitelist is empty (default) it is inactive.
+        Once this list is populated, only applications listed here are considered for receiving a border.
+        If the whitelist is empty (default) it is inactive.
       '';
     };
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !(cfg.blacklist != [] && cfg.whitelist != []);
+        message = "Cannot define both a blacklist and a whitelist for jankyborders.";
+      }
+    ];
     environment.systemPackages = [cfg.package];
 
     launchd.user.agents.jankyborders = {
-      path = [config.environment.systemPath];
+      path = [cfg.package];
       serviceConfig.ProgramArguments =
         [
           "${cfg.package}/bin/borders"
@@ -139,8 +149,8 @@ in {
           then "on"
           else "off"
         ))
-        ++ (optionalArg "blacklist" cfg.blacklist)
-        ++ (optionalArg "whitelist" cfg.whitelist);
+        ++ (optionalArg "blacklist" (joinStrings cfg.blacklist))
+        ++ (optionalArg "whitelist" (joinStrings cfg.whitelist));
       serviceConfig.KeepAlive = true;
       serviceConfig.RunAtLoad = true;
     };
