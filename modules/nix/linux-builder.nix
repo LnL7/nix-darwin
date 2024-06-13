@@ -7,9 +7,11 @@ let
 
   cfg = config.nix.linux-builder;
 
-  builderWithOverrides = cfg.package.override {
-    modules = [ cfg.config ];
-  };
+  builderWithOverrides = cfg.package.override (previousArguments: {
+    # the linux-builder packages require a list `modules` argument, so it's
+    # always non-null.
+    modules = previousArguments.modules ++ [ cfg.config ];
+  });
 
   # create-builder uses TMPDIR to share files with the builder, notably certs.
   # macOS will clean up files in /tmp automatically that haven't been accessed in 3+ days.
@@ -133,8 +135,10 @@ in
 
     systems = mkOption {
       type = types.listOf types.str;
-      default = [ "${stdenv.hostPlatform.uname.processor}-linux" ];
-      defaultText = literalExpression ''[ "''${stdenv.hostPlatform.uname.processor}-linux" ]'';
+      default = [ builderWithOverrides.nixosConfig.nixpkgs.hostPlatform.system ];
+      defaultText = ''
+        The `nixpkgs.hostPlatform.system` of the build machine's final NixOS configuration.
+      '';
       example = literalExpression ''
         [
           "x86_64-linux"
