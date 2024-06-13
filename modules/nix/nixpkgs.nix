@@ -3,48 +3,6 @@
 with lib;
 
 let
-
-  # Backport from Nixpkgs 23.05
-  defaultOverridePriority =
-    lib.modules.defaultOverridePriority or lib.modules.defaultPriority;
-
-  # Backport from Nixpkgs 23.11
-  mergeAttrDefinitionsWithPrio = lib.mergeAttrDefinitionsWithPrio or (opt:
-    let
-        # Inlined to avoid warning about using internal APIs 🥴
-        pushDownProperties = cfg:
-          if cfg._type or "" == "merge" then
-            concatMap pushDownProperties cfg.contents
-          else if cfg._type or "" == "if" then
-            map (mapAttrs (n: v: mkIf cfg.condition v)) (pushDownProperties cfg.content)
-          else if cfg._type or "" == "override" then
-            map (mapAttrs (n: v: mkOverride cfg.priority v)) (pushDownProperties cfg.content)
-          else # FIXME: handle mkOrder?
-            [ cfg ];
-
-        defsByAttr =
-          lib.zipAttrs (
-            lib.concatLists (
-              lib.concatMap
-                ({ value, ... }@def:
-                  map
-                    (lib.mapAttrsToList (k: value: { ${k} = def // { inherit value; }; }))
-                    (pushDownProperties value)
-                )
-                opt.definitionsWithLocations
-            )
-          );
-    in
-      assert opt.type.name == "attrsOf" || opt.type.name == "lazyAttrsOf";
-      lib.mapAttrs
-            (k: v:
-              let merging = lib.mergeDefinitions (opt.loc ++ [k]) opt.type.nestedTypes.elemType v;
-              in {
-                value = merging.mergedValue;
-                inherit (merging.defsFinal') highestPrio;
-              })
-            defsByAttr);
-
   cfg = config.nixpkgs;
   opt = options.nixpkgs;
 
@@ -91,9 +49,7 @@ let
     merge = lib.mergeOneOption;
   };
 
-  # TODO: Remove backwards compatibility hack when dropping
-  # 22.11 support.
-  pkgsType = types.pkgs or (types.uniq types.attrs) // {
+  pkgsType = types.pkgs // {
     # This type is only used by itself, so let's elaborate the description a bit
     # for the purpose of documentation.
     description = "An evaluation of Nixpkgs; the top level attribute set of packages";
@@ -310,15 +266,15 @@ in
         # which is somewhat costly for Nixpkgs. With an explicit priority, we only
         # evaluate the wrapper to find out that the priority is lower, and then we
         # don't need to evaluate `finalPkgs`.
-        lib.mkOverride defaultOverridePriority
+        lib.mkOverride lib.modules.defaultOverridePriority
           finalPkgs.__splicedPackages;
     };
 
     nixpkgs.constructedByUs =
       # We set it with default priority and it can not be merged, so if the
       # pkgs module argument has that priority, it's from us.
-      (mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
-        == defaultOverridePriority
+      (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
+        == lib.modules.defaultOverridePriority
       # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
         && !opt.pkgs.isDefined;
 
