@@ -128,7 +128,6 @@ in {
     environment.systemPackages = [cfg.package];
 
     launchd.user.agents.jankyborders = {
-      path = [cfg.package];
       serviceConfig.ProgramArguments =
         [
           "${cfg.package}/bin/borders"
