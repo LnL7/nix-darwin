@@ -167,14 +167,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    assertions = [ {
-      assertion = config.nix.settings.trusted-users != [ "root" ] || (config.nix.settings.extra-trusted-users or [ ]) != [ ];
-      message = ''
-        Your user or group (@admin) needs to be added to `nix.settings.trusted-users` or `nix.settings.extra-trusted-users`
-        to use the Linux builder.
-      '';
-    } ];
-
     system.activationScripts.preActivation.text = ''
       mkdir -p ${cfg.workingDirectory}
     '';

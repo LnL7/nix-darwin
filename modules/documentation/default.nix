@@ -11,9 +11,9 @@ let
   regularConfig = config;
 
   argsModule = {
-    config._module.args = regularConfig._module.args // {
+    config._module.args = lib.mkForce (regularConfig._module.args // {
       modules = [ ];
-    };
+    });
   };
 
   /* For the purpose of generating docs, evaluate options with each derivation
@@ -21,15 +21,16 @@ let
     It isn't perfect, but it seems to cover a vast majority of use cases.
     Caveat: even if the package is reached by a different means,
     the path above will be shown and not e.g. `${config.services.foo.package}`. */
-  realManual = import ../../doc/manual {
+  manual = import ../../doc/manual {
     inherit pkgs config;
     version = config.system.darwinVersion;
     revision = config.system.darwinRevision;
     inherit (config.system) nixpkgsRevision;
     options =
       let
-        scrubbedEval = evalModules {
-          modules = baseModules ++ [ argsModule ];
+        scrubbedEval = import ../../eval-config.nix {
+          inherit lib;
+          modules = [ argsModule ];
           specialArgs = { pkgs = scrubDerivations "pkgs" pkgs; };
         };
         scrubDerivations = namePrefix: pkgSet: mapAttrs
@@ -43,38 +44,6 @@ let
           pkgSet;
       in scrubbedEval.options;
   };
-
-  # TODO: Remove this when dropping 22.11 support.
-  manual = realManual //
-    lib.optionalAttrs (!pkgs.buildPackages ? nixos-render-docs) rec {
-      optionsJSON = pkgs.writeTextFile {
-        name = "options.json-stub";
-        destination = "/share/doc/darwin/options.json";
-        text = "{}";
-      };
-      manpages = pkgs.writeTextFile {
-        name = "darwin-manpages-stub";
-        destination = "/share/man/man5/configuration.nix.5";
-        text = ''
-          .TH "CONFIGURATION\&.NIX" "5" "01/01/1980" "Darwin" "Darwin Reference Pages"
-          .SH "NAME"
-          \fIconfiguration\&.nix\fP \- Darwin system configuration specification
-          .SH "DESCRIPTION"
-          .PP
-          The nix\-darwin documentation now requires nixpkgs 23.05 to build.
-        '';
-      };
-      manualHTML = pkgs.writeTextFile {
-        name = "darwin-manual-html-stub";
-        destination = "/share/doc/darwin/index.html";
-        text = ''
-          <!DOCTYPE html>
-          <title>Darwin Configuration Options</title>
-          The nix-darwin documentation now requires nixpkgs 23.05 to build.
-        '';
-      };
-      manualHTMLIndex = "${manualHTML}/share/doc/darwin/index.html";
-    };
 
   helpScript = pkgs.writeScriptBin "darwin-help"
     ''

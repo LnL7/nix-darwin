@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 
 with lib;
 
@@ -27,6 +27,14 @@ with lib;
       description = ''
           Disable drop shadow border around screencaptures. The default is false.
         '';
+    };
+
+    system.defaults.screencapture.show-thumbnail = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Show thumbnail after screencapture before writing to file. The default is true.
+      '';
     };
   };
 }
