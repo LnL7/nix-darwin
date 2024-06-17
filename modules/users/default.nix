@@ -169,6 +169,7 @@ in
               -GID ${toString v.gid} \
               -fullName '${v.description}' \
               -home '${v.home}' \
+              ${optionalString v.initialPassword != null "-password '${v.initialPassword}' \\"}
               -shell ${lib.escapeShellArg (shellPath v.shell)}
             dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
             ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
