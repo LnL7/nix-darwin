@@ -151,7 +151,7 @@ in
           u=''${u#UniqueID: }
           if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
-            dscl . -delete '/Users/${v.name}' 2> /dev/null
+            sysadminctl -deleteUser '${v.name}' 2>/dev/null
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
@@ -164,11 +164,13 @@ in
         else
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
-            dscl . -create '/Users/${v.name}' UniqueID ${toString v.uid}
-            dscl . -create '/Users/${v.name}' PrimaryGroupID ${toString v.gid}
+            sysadminctl -addUser '${v.name}' \
+              -UID ${toString v.uid} \
+              -GID ${toString v.gid} \
+              -fullName '${v.description}' \
+              -home '${v.home}' \
+              -shell ${lib.escapeShellArg (shellPath v.shell)}
             dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
-            dscl . -create '/Users/${v.name}' RealName '${v.description}'
-            dscl . -create '/Users/${v.name}' NFSHomeDirectory '${v.home}'
             ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
           fi
           # Always set the shell path, in case it was updated
@@ -182,7 +184,7 @@ in
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            dscl . -delete '/Users/${name}' 2> /dev/null
+            sysadminctl -deleteUser '${name}' 2> /dev/null
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi
