@@ -22,13 +22,15 @@
   users.users."unknown.user".uid = 42002;
 
   test = ''
-    echo "checking group creation in /activate" >&2
+    set -v
+
+    # checking group creation in /activate
     grep "dscl . -create '/Groups/foo' PrimaryGroupID 42000" ${config.out}/activate
     grep "dscl . -create '/Groups/foo' RealName 'Foo group'" ${config.out}/activate
     grep "dscl . -create '/Groups/created.group' PrimaryGroupID 42001" ${config.out}/activate
     grep -qv "dscl . -delete '/Groups/created.group'" ${config.out}/activate
 
-    echo "checking group deletion in /activate" >&2
+    # checking group deletion in /activate
     grep "dscl . -delete '/Groups/deleted.group'" ${config.out}/activate
     grep -qv "dscl . -create '/Groups/deleted.group'" ${config.out}/activate
 
@@ -36,28 +38,28 @@
     grep "dscl . -create '/Groups/foo' GroupMembership 'admin' 'foo'" ${config.out}/activate
     grep "dscl . -create '/Groups/created.group' GroupMembership" ${config.out}/activate
 
-    echo "checking unknown group in /activate" >&2
+    # checking unknown group in /activate
     grep -qv "dscl . -create '/Groups/unknown.group'" ${config.out}/activate
     grep -qv "dscl . -delete '/Groups/unknown.group'" ${config.out}/activate
 
-    echo "checking user creation in /activate" >&2
-    grep "dscl . -create '/Users/foo' UniqueID 42000" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' PrimaryGroupID 42000" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' IsHidden 0" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' RealName 'Foo user'" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' NFSHomeDirectory '/Users/foo'" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
-    grep "dscl . -create '/Users/created.user' UniqueID 42001" ${config.out}/activate
-    grep "dscl . -create '/Users/created.user' UserShell ${lib.escapeShellArg "/sbin/nologin"}" ${config.out}/activate
+    # checking user creation in /activate
+    grep -zoP "sysadminctl -addUser 'foo' (.|\n)* -UID 42000 (.|\n)* -GID 42000 (.|\n)* -fullName 'Foo user' (.|\n)* -home '/Users/foo' (.|\n)* -shell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
     grep "createhomedir -cu 'foo'" ${config.out}/activate
-    grep -qv "dscl . -delete '/Groups/created.user'" ${config.out}/activate
+    grep -zoP "sysadminctl -addUser 'created.user' (.|\n)* -UID 42001 (.|\n)* -shell ${lib.escapeShellArg "/sbin/nologin"}" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser 'created.user'" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser 'created.user'" ${config.out}/activate
 
-    echo "checking user deletion in /activate" >&2
-    grep "dscl . -delete '/Users/deleted.user'" ${config.out}/activate
-    grep -qv "dscl . -create '/Users/deleted.user'" ${config.out}/activate
+    # checking user properties always get updated in /activate
+    grep "dscl . -create '/Users/foo' UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
 
-    echo "checking unknown user in /activate" >&2
-    grep -qv "dscl . -create '/Users/unknown.user'" ${config.out}/activate
-    grep -qv "dscl . -delete '/Users/unknown.user'" ${config.out}/activate
+    # checking user deletion in /activate
+    grep "sysadminctl -deleteUser 'deleted.user'" ${config.out}/activate
+    grep -qv "sysadminctl -addUser 'deleted.user'" ${config.out}/activate
+
+    # checking unknown user in /activate
+    grep -qv "sysadminctl -addUser 'unknown.user'" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser 'unknown.user'" ${config.out}/activate
+
+    set +v
   '';
 }
