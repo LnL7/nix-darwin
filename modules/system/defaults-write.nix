@@ -10,6 +10,11 @@ let
 
   defaultsToList = domain: attrs: mapAttrsToList (writeDefault domain) (filterAttrs (n: v: v != null) attrs);
 
+  configurableUsers = lib.filterAttrs (n: v: lib.hasPrefix "/Users" v.home) config.users.users;
+  userDefaultsToList = domain: attrs: builtins.concatLists (mapAttrsToList (n: v:
+    (builtins.map (cmd: "sudo -u ${n} " + cmd) (defaultsToList "${v.home}/Library/Preferences/${domain}" attrs))
+  ) configurableUsers);
+
   # defaults
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   loginwindow = defaultsToList "/Library/Preferences/com.apple.loginwindow" cfg.loginwindow;
@@ -17,23 +22,23 @@ let
   SoftwareUpdate = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
 
   # userDefaults
-  GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
-  LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
-  NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
-  menuExtraClock = defaultsToList "com.apple.menuextra.clock" cfg.menuExtraClock;
-  dock = defaultsToList "com.apple.dock" cfg.dock;
-  finder = defaultsToList "com.apple.finder" cfg.finder;
-  magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
-  magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
-  screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
-  screensaver = defaultsToList "com.apple.screensaver" cfg.screensaver;
-  spaces = defaultsToList "com.apple.spaces" cfg.spaces;
-  trackpad = defaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
-  trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
-  universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
-  ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
-  CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
-  CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
+  GlobalPreferences = userDefaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
+  LaunchServices = userDefaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
+  NSGlobalDomain = userDefaultsToList ".GlobalPreferences" cfg.NSGlobalDomain;
+  menuExtraClock = userDefaultsToList "com.apple.menuextra.clock" cfg.menuExtraClock;
+  dock = userDefaultsToList "com.apple.dock" cfg.dock;
+  finder = userDefaultsToList "com.apple.finder" cfg.finder;
+  magicmouse = userDefaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
+  magicmouseBluetooth = userDefaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
+  screencapture = userDefaultsToList "com.apple.screencapture" cfg.screencapture;
+  screensaver = userDefaultsToList "com.apple.screensaver" cfg.screensaver;
+  spaces = userDefaultsToList "com.apple.spaces" cfg.spaces;
+  trackpad = userDefaultsToList "com.apple.AppleMultitouchTrackpad" cfg.trackpad;
+  trackpadBluetooth = userDefaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
+  universalaccess = userDefaultsToList "com.apple.universalaccess" cfg.universalaccess;
+  ActivityMonitor = userDefaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
+  CustomUserPreferences = flatten (mapAttrsToList (name: value: userDefaultsToList name value) cfg.CustomUserPreferences);
+  CustomSystemPreferences = flatten (mapAttrsToList (name: value: userDefaultsToList name value) cfg.CustomSystemPreferences);
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
