@@ -170,6 +170,7 @@ in
   config.users = mkIf (any (cfg: cfg.enable && cfg.user == null && cfg.group == null) (attrValues config.services.github-runners)) {
     users."_github-runner" = {
       createHome = false;
+      isSystemUser = true;
       description = "GitHub Runner service user";
       gid = config.users.groups."_github-runner".gid;
       home = "/var/lib/github-runners";
