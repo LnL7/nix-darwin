@@ -1,7 +1,10 @@
 { name, lib, ... }:
 
 with lib;
-
+let
+  uidsAreUnique = idsAreUnique (filterAttrs (n: u: u.uid != null) cfg.users) "uid";
+  gidsAreUnique = idsAreUnique (filterAttrs (n: g: g.gid != null) cfg.groups) "gid";
+in
 {
   options = {
     name = mkOption {
@@ -23,13 +26,14 @@ with lib;
     };
 
     uid = mkOption {
-      type = types.int;
-      description = "The user's UID.";
+      type = with types; nullOr int;
+      default = null;
+      description = "The account UID. If the UID is null, a free UID is picked on activation.";
     };
 
     gid = mkOption {
-      type = types.int;
-      default = 20;
+      type = with types; nullOr int;
+      default = null;
       description = "The user's primary group.";
     };
 
@@ -57,14 +61,47 @@ with lib;
       description = "Create the home directory when creating the user.";
     };
 
+    isTokenUser = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Indicates whether this user has a secure token capable of descrypting FileVault.
+        Uses uid 501 as admin for the purpose of adding the token.
+        Will prompt for a password from this user to grant the token.
+      '';
+    };
+
+    isNormalUser = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Indicates whether this is an account for a “real” user.
+        This automatically sets group to staff, createHome to true,
+        home to /home/«username», useDefaultShell to true, and isSystemUser to false.
+        Exactly one of isNormalUser and isSystemUser must be true.
+      '';
+    };
+
+    isSystemUser = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Indicates if the user is a system user or not.
+        This option only has an effect if uid is null,
+        in which case it determines whether the user’s UID is allocated in the range for system users
+        (200-400) or in the range for normal users (starting at 501).
+        Exactly one of isNormalUser and isSystemUser must be true.
+      '';
+    };
+
     initialPassword = mkOption {
       type = with types; nullOr str;
       default = null;
       description = ''
         Specifies the initial password for the user,
         i.e. the password assigned if the user does not already exist.
-        If {option}`users.isHidden` is set to false,
-        then the password is used for configuring a secure token for disk encryption.
+        The password specified here is world-readable in the Nix store,
+        so it should only be used for guest accounts or passwords that will be changed promptly.
       '';
     };
 
@@ -88,6 +125,20 @@ with lib;
   };
 
   config = {
+
+    assetions = [
+      { assertion = !cfg.enforceIdUniqueness || (uidsAreUnique && gidsAreUnique);
+        message = "UIDs and GIDs must be unique!";
+      }
+      {
+        assertion = let
+          isEffectivelySystemUser = user.isSystemUser || (user.uid != null && (user.uid >= 200 && user.uid <= 400));
+        in xor isEffectivelySystemUser user.isNormalUser;
+        message = ''
+          Exactly one of users.users.${user.name}.isSystemUser and users.users.${user.name}.isNormalUser must be set.
+        '';
+      }
+    ];
 
     name = mkDefault name;
 

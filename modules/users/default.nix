@@ -165,16 +165,17 @@ in
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
             sysadminctl -addUser '${v.name}' \
-              -UID ${toString v.uid} \
-              -GID ${toString v.gid} \
-              -fullName '${v.description}' \
-              -home '${v.home}' \
+              ${optionalString (v.uid != null) "-UID ${toString v.uid} \\"}
+              ${optionalString (v.gid != null) "-GID ${toString v.gid} \\"}
+              ${optionalString (v.description != "") "-fullName '${v.description}' \\"}
+              ${optionalString (v.isNormalUser == false && v.createHome) "-home '${v.home}' \\"}
+              ${optionalString v.isSystemUser "-roleAccount \\"}
               ${optionalString (v.initialPassword != null) "-password '${v.initialPassword}' \\"}
               -shell ${lib.escapeShellArg (shellPath v.shell)}
             dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
+            ${optionalString (v.isNormalUser == false && v.createHome) "createhomedir -cu '${v.name}'"}
             ${
-               optionalString (v.isHidden == false && v.initialPassword != null)
+               optionalString v.isTokenUser
                  "sysadminctl -adminUser \"$(id -F 501)\" -adminPassword - -secureTokenOn '${v.name}' -password '${v.initialPassword}'"
              }
           fi
