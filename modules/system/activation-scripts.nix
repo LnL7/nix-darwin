@@ -70,6 +70,7 @@ in
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
+      ${cfg.activationScripts.userDefaults.text}
 
       ${cfg.activationScripts.postActivation.text}
 
@@ -105,7 +106,6 @@ in
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraUserActivation.text}
-      ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.homebrew.text}
 
