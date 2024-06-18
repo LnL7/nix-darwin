@@ -220,7 +220,7 @@ in
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
-      default = true;
+      default = !(config.nix.settings.auto-allocate-uids or false);
       description = "Whether to run the Nix build users validation checks.";
     };
 
