@@ -169,10 +169,14 @@ in
               -GID ${toString v.gid} \
               -fullName '${v.description}' \
               -home '${v.home}' \
-              ${optionalString v.initialPassword != null "-password '${v.initialPassword}' \\"}
+              ${optionalString (v.initialPassword != null) "-password '${v.initialPassword}' \\"}
               -shell ${lib.escapeShellArg (shellPath v.shell)}
             dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
             ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
+            ${
+               optionalString (v.isHidden == false && v.initialPassword != null)
+                 "sysadminctl -adminUser \"$(id -F 501)\" -adminPassword - -secureTokenOn '${v.name}' -password '${v.initialPassword}'"
+             }
           fi
           # Always set the shell path, in case it was updated
           dscl . -create '/Users/${v.name}' UserShell ${lib.escapeShellArg (shellPath v.shell)}
