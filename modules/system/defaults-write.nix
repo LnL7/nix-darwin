@@ -107,6 +107,10 @@ in
         ${concatStringsSep "\n" universalaccess}
         ${concatStringsSep "\n" ActivityMonitor}
         ${concatStringsSep "\n" CustomUserPreferences}
+
+        ${if builtins.length dock > 0
+            then "echo >&2 'restarting dock...'; killall Dock"
+            else ""}
       '';
 
   };
