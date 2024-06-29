@@ -93,6 +93,7 @@
   ./programs/direnv.nix
   ./programs/fish.nix
   ./programs/gnupg.nix
+  ./programs/jdks.nix
   ./programs/man.nix
   ./programs/info
   ./programs/nix-index
