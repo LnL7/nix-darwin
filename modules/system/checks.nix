@@ -192,6 +192,17 @@ let
     fi
   '';
 
+  nhCleanAll = ''
+    if test -O /nix/store; then
+        echo "[1;31merror: A single-user install can't run nh clean all as root, aborting activation[0m" >&2
+        echo "Configure nh clean all to run as the current user:" >&2
+        echo >&2
+        echo "    programs.nh.clean.user = \"$USER\";" >&2
+        echo >&2
+        exit 2
+    fi
+  '';
+
   nixStoreOptimiser = ''
     if test -O /nix/store; then
         echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
@@ -241,6 +252,7 @@ in
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
+      (mkIf (config.programs.nh.clean.enable && config.programs.nh.clean.user == null) nhCleanAll)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
       (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
