@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) literalExpression maintainers mkEnableOption mkIf mkPackageOptionMD mkOption optionals types;
+  inherit (lib) literalExpression maintainers mkEnableOption mkIf mkPackageOption mkOption optionals types;
 
   cfg = config.services.sketchybar;
 
@@ -17,7 +17,7 @@ in
   options.services.sketchybar = {
     enable = mkEnableOption "sketchybar";
 
-    package = mkPackageOptionMD pkgs "sketchybar" { };
+    package = mkPackageOption pkgs "sketchybar" { };
 
     extraPackages = mkOption {
       type = types.listOf types.package;
