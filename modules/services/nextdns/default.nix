@@ -31,10 +31,9 @@ in {
     launchd.daemons.nextdns = {
       path = [ nextdns ];
       serviceConfig.ProgramArguments =
-        [ "${pkgs.nextdns}/bin/nextdns" "run" (escapeShellArgs cfg.arguments) ];
+        [ "${pkgs.nextdns}/bin/nextdns" "run" ] ++ cfg.arguments;
       serviceConfig.KeepAlive = true;
       serviceConfig.RunAtLoad = true;
     };
-
   };
 }

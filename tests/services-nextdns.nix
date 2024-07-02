@@ -12,6 +12,7 @@ in {
     echo >&2 "checking nextdns service in ~/Library/LaunchDaemons"
     grep "org.nixos.nextdns" ${config.out}/Library/LaunchDaemons/org.nixos.nextdns.plist
     grep "/bin/nextdns" ${config.out}/Library/LaunchDaemons/org.nixos.nextdns.plist
-    grep "'-config' '10.0.3.0/24=abcdef'" ${config.out}/Library/LaunchDaemons/org.nixos.nextdns.plist
+    grep -- "-config" ${config.out}/Library/LaunchDaemons/org.nixos.nextdns.plist
+    grep "10.0.3.0/24=abcdef" ${config.out}/Library/LaunchDaemons/org.nixos.nextdns.plist
   '';
 }
