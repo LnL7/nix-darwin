@@ -44,6 +44,18 @@ let
     fi
   '';
 
+  checkHomebrewInstall = ''
+    if [ ! -f /usr/local/bin/brew ] && [ ! -f /opt/homebrew/bin/brew ]; then
+        echo "[1;31merror: Using the homebrew module requires homebrew installed, aborting activation[0m" >&2
+        echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
+        echo "You can install homebrew using the following command" >&2
+        echo >&2
+        echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
+        echo >&2
+        exit 2
+    fi
+  '';
+
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
         echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
@@ -237,6 +249,7 @@ in
       darwinChanges
       runLink
       oldBuildUsers
+      checkHomebrewInstall
       (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
