@@ -1,3 +1,18 @@
+2024-06-15
+- SECURITY NOTICE: The previous implementation of the
+  `users.users.<name>.openssh.authorizedKeys.*` options would not delete
+  authorized keys files when the setting for a given user was removed.
+
+  This means that if you previously stopped managing a user's authorized
+  SSH keys with nix-darwin, or intended to revoke their access by
+  removing the option, the previous set of keys could still be used to
+  log in as that user.
+
+  You can check the /etc/ssh/authorized_keys.d directory to see which
+  keys were permitted; afterwards, please remove the directory and
+  re-run activation. The options continue to be supported and will now
+  correctly permit only the keys in your current system configuration.
+
 2022-08-24
 - Major changes to `homebrew` module
   `homebrew.cleanup` was renamed to `homebrew.onActivation.cleanup`.
