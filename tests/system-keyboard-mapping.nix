@@ -6,6 +6,7 @@
   system.keyboard.remapCapsLockToEscape = true;
   system.keyboard.nonUS.remapTilde = true;
   system.keyboard.swapLeftCommandAndLeftAlt = true;
+  system.keyboard.swapLeftCtrlAndFn = true;
 
   test = ''
     echo checking keyboard mappings in /activate >&2
@@ -17,5 +18,7 @@
     grep "\"HIDKeyboardModifierMappingDst\":30064771296" ${config.out}/activate
     grep "\"HIDKeyboardModifierMappingDst\":30064771298" ${config.out}/activate
     grep "\"HIDKeyboardModifierMappingDst\":30064771299" ${config.out}/activate
+    grep "\"HIDKeyboardModifierMappingDst\":30064771296" ${config.out}/activate
+    grep "\"HIDKeyboardModifierMappingDst\":1095216660483" ${config.out}/activate
   '';
 }
