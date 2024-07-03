@@ -24,28 +24,21 @@ in
       '';
     };
 
-    # selected = lib.mkOption {
-    #   type = with lib.types; nullOr package; # use string instead? or version?
-    #   default = null;
-    #   example = "";
-    #   description = ''
-    #     The JDK to set as active.
-    #
-    #     Tools such as `java`, `javac`, etc. will use this JDK.
-    #
-    #     Should it also be added to the list of installed JDKs if not there?
-    #   '';
-    # };
+    selected = lib.mkOption {
+      type = with lib.types; nullOr package;
+      default = null;
+      example = "";
+      description = ''
+        The JDK to set as active.
+
+        Tools such as `java`, `javac`, etc. will use this JDK.
+
+        Should it also be added to the list of installed JDKs if not there?
+      '';
+    };
   };
 
   config = {
-    # environment.variables = lib.mkIf (cfg.selected != null) {
-    #   JAVA_HOME = "hello";
-    # };
-    # launchd.envVariables = lib.mkIf (cfg.selected != null) {
-    #   JAVA_HOME = "hello";
-    # };
-
     system.build.jdks = pkgs.runCommand "jdks"
       { preferLocalBuild = true; }
       ''
@@ -93,6 +86,24 @@ in
           fi
         fi
       done
+
+      # if a JDK is selected, `launchctl setenv` it
+      ${lib.optionalString (cfg.selected != null) ''
+        # prevent variables from propagating
+        (
+          # set locale to C for stable sorting
+          export LC_ALL=C
+          for jdk in ${cfg.selected}/*.jdk; do
+            export JAVA_HOME="''${jdk}/Contents/Home"
+            # ensure that this JDK is actually a macOS JDK bundle before using it
+            if test -e "$JAVA_HOME"; then
+              launchctl setenv JAVA_HOME "$JAVA_HOME"
+              # break out of the loop so that we only set JAVA_HOME once, even if there are multiple JDKs in this derivation
+              break
+            fi
+          done
+        )
+      ''}
     '';
   };
 }
