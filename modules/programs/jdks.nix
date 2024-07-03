@@ -44,7 +44,11 @@ in
       ''
         mkdir -p $out/Library/Java/JavaVirtualMachines
         cd $out/Library/Java/JavaVirtualMachines
-        ${lib.concatMapStringsSep "\n" (jdk: ''ln -s "${jdk}/"*.jdk .'') cfg.installed}
+        ${lib.concatMapStringsSep "\n" (jdk: ''
+          for jdk in "${jdk}/*.jdk"; do
+            ln -s "''${jdk}" "./''${jdk//\//_}"
+          done
+        '') cfg.installed}
       '';
 
     system.activationScripts.jdks.text = ''
