@@ -45,7 +45,7 @@ in
         mkdir -p $out/Library/Java/JavaVirtualMachines
         cd $out/Library/Java/JavaVirtualMachines
         ${lib.concatMapStringsSep "\n" (jdk: ''
-          for jdk in "${jdk}/*.jdk"; do
+          for jdk in ${jdk}/*.jdk; do
             ln -s "''${jdk}" "./''${jdk//\//_}"
           done
         '') cfg.installed}
@@ -58,7 +58,7 @@ in
       ${lib.optionalString (cfg.installed != []) ''
         for _jdk in ${config.system.build.jdks}/Library/Java/JavaVirtualMachines/*.jdk; do
           # $_jdk is the full nix store path (because it reads symlinks?), so shorten it (to e.g. `zulu-8.jdk`)
-          export jdk=$(basename $_jdk)
+          export jdk=$(basename "$_jdk")
           if ! diff "${config.system.build.jdks}/Library/Java/JavaVirtualMachines/''${jdk}" "/Library/Java/JavaVirtualMachines/''${jdk}" &> /dev/null; then
             # $jdk from the new system is different from the one with the same name in /Library/Java/JavaVirtualMachines
             if ! test -e "/Library/Java/JavaVirtualMachines/''${jdk}"; then
@@ -80,7 +80,7 @@ in
       # remove installed JDKs that were from the previous system but aren't in the new system
       for _jdk in $(ls /run/current-system/Library/Java/JavaVirtualMachines 2> /dev/null); do
         # this is not actually necessary, but I'm doing it for consistency
-        export jdk=$(basename $_jdk)
+        export jdk=$(basename "$_jdk")
         if test ! -e "${config.system.build.jdks}/Library/Java/JavaVirtualMachines/''${jdk}"; then
           # $jdk was in the old system config, but not the new system config
           if test -e "/Library/Java/JavaVirtualMachines/''${jdk}"; then
