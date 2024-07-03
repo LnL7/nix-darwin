@@ -1,10 +1,6 @@
-{ name, lib, ... }:
+{ name, config, lib, ... }:
 
 with lib;
-let
-  uidsAreUnique = idsAreUnique (filterAttrs (n: u: u.uid != null) cfg.users) "uid";
-  gidsAreUnique = idsAreUnique (filterAttrs (n: g: g.gid != null) cfg.groups) "gid";
-in
 {
   options = {
     name = mkOption {
@@ -66,7 +62,7 @@ in
       default = false;
       description = ''
         Indicates whether this user has a secure token capable of descrypting FileVault.
-        Uses uid 501 as admin for the purpose of adding the token.
+        Uses first alphabetical ordered admin with secure token enabled for the purpose of adding the token.
         Will prompt for a password from this user to grant the token.
       '';
     };
@@ -76,10 +72,16 @@ in
       default = false;
       description = ''
         Indicates whether this is an account for a “real” user.
-        This automatically sets group to staff, createHome to true,
-        home to /home/«username», useDefaultShell to true, and isSystemUser to false.
+        This automatically sets gid to 20, createHome to true,
+        home to /home/«username», and isSystemUser to false.
         Exactly one of isNormalUser and isSystemUser must be true.
       '';
+    };
+
+    isAdminUser = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Indicates whether this is an account for an admin user.";
     };
 
     isSystemUser = mkOption {
@@ -100,8 +102,23 @@ in
       description = ''
         Specifies the initial password for the user,
         i.e. the password assigned if the user does not already exist.
+        If users.mutableUsers is true,
+        the password can be changed subsequently using the sysadminctl command.
+        Otherwise, it’s equivalent to setting the password option.
         The password specified here is world-readable in the Nix store,
         so it should only be used for guest accounts or passwords that will be changed promptly.
+      '';
+    };
+
+    password = mkOption {
+      type = with types; nullOr str;
+      default = null;
+      description = ''
+        Specifies the (clear text) password for the user.
+        Warning: do not set confidential information here because it is world-readable in the Nix store.
+        This option should only be used for public accounts or with a Nix secrets manager.
+        If users.mutableUsers is false, you cannot change user passwords,
+        they will always be set according to the password options on next rebuild.
       '';
     };
 
@@ -124,23 +141,19 @@ in
     };
   };
 
-  config = {
+  config = mkMerge [
+    { name = mkDefault name; }
 
-    assetions = [
-      { assertion = !cfg.enforceIdUniqueness || (uidsAreUnique && gidsAreUnique);
-        message = "UIDs and GIDs must be unique!";
-      }
-      {
-        assertion = let
-          isEffectivelySystemUser = user.isSystemUser || (user.uid != null && (user.uid >= 200 && user.uid <= 400));
-        in xor isEffectivelySystemUser user.isNormalUser;
-        message = ''
-          Exactly one of users.users.${user.name}.isSystemUser and users.users.${user.name}.isNormalUser must be set.
-        '';
-      }
-    ];
+    (mkIf config.isNormalUser {
+      gid = mkDefault 20;
+      createHome = mkDefault true;
+      home = mkDefault "/Users/${config.name}";
+      isSystemUser = mkDefault false;
+    })
 
-    name = mkDefault name;
-
-  };
+    {
+      password = if config.initialPassword != null
+        then "${config.initialPassword}" else "${config.password}";
+    }
+  ];
 }
