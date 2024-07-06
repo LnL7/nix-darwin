@@ -64,16 +64,13 @@ in {
       name = "run-darwin-vm";
       runtimeInputs = [ pkgs.tart pkgs.jq pkgs.vncdo pkgs.passh pkgs.retry ];
       text = ''
-        set -euxo pipefail
+        set -x
 
         # Allows trap ERR to work with `set -e`
         set -E
 
         # For job control
         set -m
-
-        # If we fail during installation, pass control back to `tart run` so users can kill the VM with Ctrl-C
-        trap fg ERR
 
         unset SSH_AUTH_SOCK
 
@@ -108,11 +105,18 @@ in {
           # Give it time to start VM and VNC server
           sleep 5
           VNC_URL=$(grep --only 'vnc://.*\d' "$TART_HOME/tart.out")
-          VNC_URL=''${VNC_URL//@/:}
-          declare -a array=("''${VNC_URL//:/ }")
-          VNC_PASSWORD=''${array[2]}
-          VNC_ADDRESS=''${array[3]}
-          VNC_PORT=''${array[4]}
+          IFS=":" read -r -a VNC_DETAILS <<< "''${VNC_URL//@/:}"
+          VNC_PASSWORD=''${VNC_DETAILS[2]}
+          VNC_ADDRESS=''${VNC_DETAILS[3]}
+          VNC_PORT=''${VNC_DETAILS[4]}
+
+          # If we fail during installation, pass control back to `tart run` so users can kill the VM with Ctrl-C
+          trap onInstallFail ERR
+
+          onInstallFail() {
+            open "$VNC_URL"
+            fg
+          }
 
           function vncdo {
             echo Sending VNC inputs for "$1"
@@ -202,6 +206,7 @@ in {
           rm "$TART_HOME/tart.out"
 
           VM_IP=$(tart ip darwin-vm)
+          export VM_IP
 
           if [[ -f $TART_HOME/id_ed25519 ]]; then
             rm "$TART_HOME/id_ed25519" "$TART_HOME/id_ed25519.pub"
@@ -210,13 +215,18 @@ in {
           ssh-keygen -t ed25519 -f "$TART_HOME/id_ed25519" -N ""
 
           # Sometimes it takes time for this to succeed after enabling SSH
-          retry -d 5 -t 10 ${pkgs.writeShellScript "ssh-keyscan-vm" ''
-            set -eux
-            ssh-keyscan -t ed25519 $VM_IP | tee $TART_HOME/known_hosts
-            if [[ ! -s $TART_HOME/known_hosts ]]; then
-              exit 1
-            fi
-          ''}
+          retry -d 5 -t 10 ${lib.getExe (pkgs.writeShellApplication {
+            name = "ssh-keyscan-vm";
+            text = ''
+              set -x
+
+              ssh-keyscan -t ed25519 "$VM_IP" | tee "$TART_HOME/known_hosts"
+
+              if [[ ! -s $TART_HOME/known_hosts ]]; then
+                exit 1
+              fi
+            '';
+          })}
 
           # Use SSH keys
           passh -p "$VM_PASS" ssh-copy-id ${sshDestination}
@@ -273,6 +283,9 @@ in {
             exit 1
           fi
         fi
+
+        # Remove trap now that installation has finished
+        trap - ERR
 
         tart run darwin-vm
       '';
