@@ -192,9 +192,11 @@ in
 
     environment.etc."ssh/ssh_config.d/100-linux-builder.conf".text = ''
       Host linux-builder
+        User builder
         Hostname localhost
         HostKeyAlias linux-builder
         Port 31022
+        IdentityFile ${cfg.workingDirectory}/keys/builder_ed25519
     '';
 
     nix.distributedBuilds = true;
