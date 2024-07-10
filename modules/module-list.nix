@@ -86,6 +86,7 @@
   ./services/trezord.nix
   ./services/wg-quick.nix
   ./services/yabai
+  ./services/yggdrasil.nix
   ./services/nextdns
   ./programs/bash
   ./programs/direnv.nix
