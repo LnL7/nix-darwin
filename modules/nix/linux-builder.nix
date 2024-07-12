@@ -196,7 +196,7 @@ in
         Hostname localhost
         HostKeyAlias linux-builder
         Port 31022
-        IdentityFile ${cfg.workingDirectory}/keys/builder_ed25519
+        IdentityFile /etc/nix/builder_ed25519
     '';
 
     nix.distributedBuilds = true;
