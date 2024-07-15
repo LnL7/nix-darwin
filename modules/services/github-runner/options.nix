@@ -199,7 +199,7 @@ with lib;
           default = { };
         };
 
-        package = mkPackageOptionMD pkgs "github-runner" { };
+        package = mkPackageOption pkgs "github-runner" { };
 
         ephemeral = mkOption {
           type = types.bool;

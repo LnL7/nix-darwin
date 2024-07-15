@@ -10,7 +10,6 @@ let
   };
 
   etc = filter (f: f.enable) (attrValues config.environment.etc);
-  etcCopy = filter (f: f.copy) (attrValues config.environment.etc);
 
 in
 
@@ -34,9 +33,10 @@ in
       ''
         mkdir -p $out/etc
         cd $out/etc
-        ${concatMapStringsSep "\n" (attr: "mkdir -p $(dirname '${attr.target}')") etc}
-        ${concatMapStringsSep "\n" (attr: "ln -s '${attr.source}' '${attr.target}'") etc}
-        ${concatMapStringsSep "\n" (attr: "touch '${attr.target}'.copy") etcCopy}
+        ${concatMapStringsSep "\n" (attr: ''
+          mkdir -p "$(dirname ${escapeShellArg attr.target})"
+          ln -s ${escapeShellArgs [ attr.source attr.target ]}
+        '') etc}
       '';
 
     system.activationScripts.etcChecks.text = ''
@@ -54,10 +54,6 @@ in
         subPath=''${configFile#"$systemConfig"/etc/}
         etcStaticFile=/etc/static/$subPath
         etcFile=/etc/$subPath
-
-        if [[ -e $configFile.copy ]]; then
-          continue
-        fi
 
         # We need to check files that exist and aren't already links to
         # $etcStaticFile for known hashes.
@@ -109,11 +105,6 @@ in
           mkdir -p "$etcDir"
         fi
 
-        if [[ -e $etcStaticFile.copy ]]; then
-          cp "$etcStaticFile" "$etcFile"
-          continue
-        fi
-
         if [[ -e $etcFile ]]; then
           if [[ $(readlink -- "$etcFile") == "$etcStaticFile" ]]; then
             continue
@@ -130,7 +121,7 @@ in
 
         # Delete stale links into /etc/static.
         if [[
-          $(readlink "$etcFile") == "$etcStaticFile"
+          $(readlink -- "$etcFile") == "$etcStaticFile"
           && ! -e $etcStaticFile
         ]]; then
           rm "$etcFile"
