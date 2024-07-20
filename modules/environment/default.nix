@@ -159,7 +159,7 @@ in
     # Use user, default and system profiles.
     environment.profiles = mkMerge [
       (mkOrder 800 [ "$HOME/.nix-profile" ])
-      (mkOrder 800 [ "\${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile" ])
+      (mkOrder 801 [ "\${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile" ])
       [ "/run/current-system/sw" "/nix/var/nix/profiles/default" ]
     ];
 
