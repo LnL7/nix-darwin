@@ -202,6 +202,28 @@ let
         exit 2
     fi
   '';
+
+  # TODO: Remove this a couple years down the line when we can assume
+  # that anyone who cares about security has upgraded.
+  oldSshAuthorizedKeysDirectory = ''
+    if [[ -d /etc/ssh/authorized_keys.d ]]; then
+        printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
+        printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
+        printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
+        printf >&2 'authorized keys files when the setting for a given user was removed.\n'
+        printf >&2 '\n'
+        printf >&2 "This means that if you previously stopped managing a user's authorized\n"
+        printf >&2 'SSH keys with nix-darwin, or intended to revoke their access by\n'
+        printf >&2 'removing the option, the previous set of keys could still be used to\n'
+        printf >&2 'log in as that user.\n'
+        printf >&2 '\n'
+        printf >&2 'You can check the /etc/ssh/authorized_keys.d directory to see which\n'
+        printf >&2 'keys were permitted; afterwards, please remove the directory and\n'
+        printf >&2 're-run activation. The options continue to be supported and will now\n'
+        printf >&2 'correctly permit only the keys in your current system configuration.\n'
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -220,7 +242,7 @@ in
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
-      default = true;
+      default = !(config.nix.settings.auto-allocate-uids or false);
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -245,6 +267,7 @@ in
       (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
+      oldSshAuthorizedKeysDirectory
     ];
 
     system.activationScripts.checks.text = ''
