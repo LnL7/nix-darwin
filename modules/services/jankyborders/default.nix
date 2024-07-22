@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  inherit (lib) maintainers mkEnableOption mkIf mkPackageOptionMD mkOption types;
+  inherit (lib) maintainers mkEnableOption mkIf mkPackageOption mkOption types;
 
   cfg = config.services.jankyborders;
   joinStrings = strings: builtins.concatStringsSep "," strings;
@@ -24,7 +24,7 @@ in {
   options.services.jankyborders = {
     enable = mkEnableOption "Enable the jankyborders service.";
 
-    package = mkPackageOptionMD pkgs "jankyborders" {};
+    package = mkPackageOption pkgs "jankyborders" {};
 
     width = mkOption {
       type = types.float;
