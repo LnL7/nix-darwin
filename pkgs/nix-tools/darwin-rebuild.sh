@@ -13,7 +13,7 @@ showSyntax() {
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
   echo "               [--flake flake] [--no-flake] [--update-input input flake] [--impure]" >&2
   echo "               [--recreate-lock-file] [--no-update-lock-file] [--refresh]" >&2
-  echo "               [--offline] [--substituters substituters-list] ..." >&2
+  echo "               [--offline] [--substituters substituters-list] [--upgrade] [--upgrade-all] ..." >&2
   exit 1
 }
 
@@ -35,6 +35,8 @@ profile=@profile@
 action=
 flake=
 noFlake=
+upgrade=
+upgrade_all=
 
 while [ $# -gt 0 ]; do
   i=$1; shift 1
@@ -129,6 +131,13 @@ while [ $# -gt 0 ]; do
       j=$1; shift 1
       extraMetadataFlags+=("$i" "$j")
       extraBuildFlags+=("$i" "$j")
+      ;;
+    --upgrade)
+      upgrade=1
+      ;;
+    --upgrade-all)
+      upgrade=1
+      upgrade_all=1
       ;;
     *)
       echo "$0: unknown option '$i'"
@@ -262,4 +271,24 @@ fi
 if [ "$action" = check ]; then
   export checkActivation=1
   "$systemConfig/activate-user"
+fi
+
+# If ‘--upgrade’ or `--upgrade-all` is given,
+# run ‘nix-channel --update darwin’.
+if [[ -n $upgrade && -z $flake ]]; then
+    # If --upgrade-all is passed, or there are other channels that
+    # contain a file called ".update-on-nixos-rebuild", update them as
+    # well. Also upgrade the darwin channel.
+
+    for channelpath in /nix/var/nix/profiles/per-user/root/channels/*; do
+        channel_name=$(basename "$channelpath")
+
+        if [[ "$channel_name" == "darwin" ]]; then
+            runCmd nix-channel --update "$channel_name"
+        elif [ -e "$channelpath/.update-on-nixos-rebuild" ]; then
+            runCmd nix-channel --update "$channel_name"
+        elif [[ -n $upgrade_all ]] ; then
+            runCmd nix-channel --update "$channel_name"
+        fi
+    done
 fi
