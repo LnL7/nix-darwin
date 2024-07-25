@@ -152,8 +152,8 @@ with lib;
     })
 
     {
-      password = if config.initialPassword != null
-        then "${config.initialPassword}" else "${config.password}";
+      password = mkDefault (if config.initialPassword != null
+        then "${config.initialPassword}" else "${config.password}");
     }
   ];
 }
