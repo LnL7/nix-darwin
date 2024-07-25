@@ -160,7 +160,7 @@ in
             echo "[1;31mwarning: user $user is last user in admin group, skipping...[0m" >&2
           else
             echo "deleting user $user..."
-            # '-keepHome' doesn't always work so archive the home dir manually
+            # NOTE: '-keepHome' doesn't always work so archive the home dir manually
             cp -ax "/Users/$user" "/Users/$user (Deleted)" 2>/dev/null || true
             sysadminctl -deleteUser "$user" 2>/dev/null
             admins=(''${admins[@]/$user})
@@ -186,7 +186,7 @@ in
         # Always create users that don't exist
         if [ -z "$ignore" ]; then
           echo "creating user ${v.name}..." >&2
-          # Use sysadminctl to ensure all macOS user attributes are set.
+          # NOTE: use sysadminctl to ensure all macOS user attributes are set.
           # Otherwise, user management might break in System Settings with just dscl.
           ${concatStringsSep " " [
             "sysadminctl -addUser '${v.name}'"
@@ -203,7 +203,7 @@ in
           ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
           ${
              optionalString v.isTokenUser ''
-               # Only admin with token can set a token for a user
+               # NOTE: only admin with token can set a token for a user
                sysadminctl -adminUser "$(echo $tokenAdmins | head -n 1)" -adminPassword - \
                 -secureTokenOn '${v.name}' -password '${if v.password == null then "-" else "${v.password}"}'
              ''
