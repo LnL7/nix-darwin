@@ -17,15 +17,17 @@ let
   let
     file = "/etc/pam.d/sudo";
     option = "security.pam";
+    deprecatedOption = "security.pam.enableSudoTouchIdAuth";
     sed = "${pkgs.gnused}/bin/sed";
   in ''
     ${if isEnabled then ''
+      # NOTE: this can be removed at some point when support for older versions are dropped
+      # Always clear out older implementation if it exists
+      if grep '${deprecatedOption}' ${file} > /dev/null; then
+        ${sed} -i '/${option}/d' ${file}
+      fi
       # Check if include line is needed (macOS < 14)
       if ! grep 'sudo_local' ${file} > /dev/null; then
-        # Clear out older implementation
-        if grep '${option}' ${file} > /dev/null; then
-          ${sed} -i '/${option}/d' ${file}
-        fi
         ${sed} -i '2iauth       include        sudo_local # nix-darwin: ${option}' ${file}
       fi
     '' else ''
