@@ -4,6 +4,33 @@ with lib;
 
 let
   cfg = config.security.pam;
+
+  # Implementation Notes
+  #
+  # Uses `environment.etc` to create the `/etc/pam.d/sudo_local` file that will be used
+  # to manage all things pam related for nix-darwin. An activation script will run to check
+  # for the existance of the line `auth       include        sudo_local`. This is included
+  # in macOS Sonoma and later. If the line is not there already then `sed` will add it.
+  # In those cases, the line will include the name of the option root (`security.pam`),
+  # to make it easier to identify the line that should be deleted when the option is disabled.
+  mkIncludeSudoLocalScript = isEnabled:
+  let
+    file = "/etc/pam.d/sudo";
+    option = "security.pam";
+    sed = "${pkgs.gnused}/bin/sed";
+  in ''
+    ${if isEnabled then ''
+      # Check if include line is needed (macOS < 14)
+      if ! grep 'sudo_local' ${file} > /dev/null; then
+        ${sed} -i '2iauth       include        sudo_local # nix-darwin: ${option}' ${file}
+      fi
+    '' else ''
+      # Remove include line if we added it
+      if grep '${option}' ${file} > /dev/null; then
+        ${sed} -i '/${option}/d' ${file}
+      fi
+    ''}
+  '';
 in
 {
   options = {
@@ -32,7 +59,11 @@ in
     };
   };
 
-  config = {
+  config =
+  let
+    isPamEnabled = (cfg.enableSudoTouchIdAuth || cft.enablePamReattach);
+  in
+  {
     environment.etc."pam.d/sudo_local" = {
       enable = (cfg.enablePamReattach || cfg.enableSudoTouchIdAuth);
       text = lib.strings.concatStringsSep "\n" [
@@ -40,5 +71,10 @@ in
         (lib.optionalString cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
       ];
     };
+    system.activationScripts.pam.text = ''
+      # PAM settings
+      echo >&2 "setting up pam..."
+      ${mkIncludeSudoLocalScript isPamEnabled}
+    '';
   };
 }
