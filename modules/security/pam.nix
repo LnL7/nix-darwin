@@ -22,6 +22,10 @@ let
     ${if isEnabled then ''
       # Check if include line is needed (macOS < 14)
       if ! grep 'sudo_local' ${file} > /dev/null; then
+        # Clear out older implementation
+        if grep '${option}' ${file} > /dev/null; then
+          ${sed} -i '/${option}/d' ${file}
+        fi
         ${sed} -i '2iauth       include        sudo_local # nix-darwin: ${option}' ${file}
       fi
     '' else ''
