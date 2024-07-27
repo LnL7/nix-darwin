@@ -22,25 +22,23 @@ in
       enableSudoTouchIdAuth = mkEnableOption "" // {
         description = ''
           Enable sudo authentication with Touch ID.
-
-          When enabled, this option creates {file} with:
+          When enabled, this option adds the following line to {file}:
           ```
           auth       sufficient     pam_tid.so
           ```
         '';
       };
       enablePamReattach = mkEnableOption ''
-          Enable re-attaching a program to the user's bootstrap session.
-          This allows programs like tmux and screen that run in the background to
-          survive across user sessions to work with PAM services that are tied to the
-          bootstrap session.
-          When enabled, this option adds the following line to /etc/pam.d/sudo_local:
-              auth       optional       /path/in/nix/store/lib/pam/pam_reattach.so"
-          (Note that macOS resets this file when doing a system update. As such, sudo
-          authentication with Touch ID won't work after a system update until the nix-darwin
-          configuration is reapplied.)
-        '';
-      };
+        Enable re-attaching a program to the user's bootstrap session.
+        This allows programs like tmux and screen that run in the background to
+        survive across user sessions to work with PAM services that are tied to the
+        bootstrap session.
+        When enabled, this option adds the following line to /etc/pam.d/sudo_local:
+        ```
+        auth       optional       /path/in/nix/store/lib/pam/pam_reattach.so"
+        ```
+      '';
+    };
   };
 
   config = {
