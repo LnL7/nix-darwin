@@ -49,9 +49,13 @@ let
   let
     option = "security.pam.enablePamReattach";
   in
+  # NOTE: needs to check that `pkgs.pam-reattach` is in the line in case the store location updates
   ''
     ${if isEnabled then ''
-      if ! grep '${option}' ${file} > /dev/null; then
+      if ! grep '${pkgs.pam-reattach}' ${file} > /dev/null; then
+        if grep '${option}' ${file} > /dev/null; then
+          ${sed} -i '/${option}/d' ${file}
+        fi
         ${sed} -i '1iauth optional ${pkgs.pam-reattach}/lib/pam/pam_reattach.so # nix-darwin: ${option}' ${file}
       fi
     '' else ''
