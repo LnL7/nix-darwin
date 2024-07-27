@@ -65,7 +65,7 @@ in
   in
   {
     environment.etc."pam.d/sudo_local" = {
-      enable = (cfg.enablePamReattach || cfg.enableSudoTouchIdAuth);
+      enable = isPamEnabled;
       text = lib.strings.concatStringsSep "\n" [
         (lib.optionalString cfg.enablePamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
         (lib.optionalString cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
