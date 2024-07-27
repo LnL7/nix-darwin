@@ -109,8 +109,11 @@ in
         ${concatStringsSep "\n" CustomUserPreferences}
 
         ${optionalString (length dock > 0) ''
-          echo >&2 "restarting Dock..."
-          killall Dock
+          # Only restart Dock if current user is logged in
+          if pgrep -xu $UID Dock; then
+            echo >&2 "restarting Dock..."
+            killall Dock || true
+          fi
         ''}
       '';
 
