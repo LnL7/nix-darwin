@@ -61,7 +61,7 @@ in
 
   config =
   let
-    isPamEnabled = (cfg.enableSudoTouchIdAuth || cft.enablePamReattach);
+    isPamEnabled = (cfg.enableSudoTouchIdAuth || cfg.enablePamReattach);
   in
   {
     environment.etc."pam.d/sudo_local" = {
