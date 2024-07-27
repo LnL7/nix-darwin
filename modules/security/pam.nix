@@ -46,16 +46,10 @@ in
   config = {
     environment.etc."pam.d/sudo_local" = {
       enable = (cfg.enablePamReattach || cfg.enableSudoTouchIdAuth);
-      text = ''
-        ${if cfg.enablePamReattach
-          then "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so"
-          else ""
-        }
-        ${if cfg.enableSudoTouchIdAuth
-          then "auth       sufficient     pam_tid.so"
-          else ""
-        }
-      '';
+      text = lib.strings.concatStringsSep "\n" [
+        (lib.optionalString cfg.enablePamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
+        (lib.optionalString cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
+      ];
     };
   };
 }
