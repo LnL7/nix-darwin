@@ -37,11 +37,11 @@ let
   ''
     ${if isEnabled then ''
       if ! grep '${option}' ${file} > /dev/null; then
-        ${sed} -i '2iauth       sufficient     pam_tid.so # nix-darwin: ${option}' ${file}
+        ${sed} -i 's/#\(auth\s\+sufficient\s\+pam_tid.so\)/\1 # nix-darwin: ${option}/g' ${file}
       fi
     '' else ''
       if grep '${option}' ${file} > /dev/null; then
-        ${sed} -i '/${option}/d' ${file}
+        ${sed} -i 's/\(.*\)#.*${option}/#\1/g' ${file}
       fi
     ''}
   '';
