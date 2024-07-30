@@ -9,8 +9,7 @@
   ...
 }: let
   inherit (lib) types mkBefore;
-  inherit (lib.lists) optional;
-  inherit (lib.options) literalExpression literalMD;
+  inherit (lib.options) literalExpression;
   inherit (lib.attrsets) attrNames filterAttrs;
   inherit (lib.strings) concatStringsSep concatMapStrings;
   cfg = config.networking;
@@ -31,7 +30,7 @@ in {
 
     networking.hostFiles = lib.mkOption {
       type = types.listOf types.path;
-      defaultText = literalMD "Hosts from {option}`networking.hosts` and {option}`networking.extraHosts`";
+      defaultText = "Hosts from {option}`networking.hosts` and {option}`networking.extraHosts`";
       example = literalExpression ''[ "''${pkgs.my-blocklist-package}/share/my-blocklist/hosts" ]'';
       description = ''
         Files that should be concatenated together to form {file}`/etc/hosts`.
