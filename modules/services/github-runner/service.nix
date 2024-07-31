@@ -4,7 +4,7 @@ let
   mkSvcName = name: "github-runner-${name}";
   mkStateDir = cfg: "/var/lib/github-runners/${cfg.name}";
   mkLogDir = cfg: "/var/log/github-runners/${cfg.name}";
-  mkWorkDir = cfg: if (cfg.workDir != null) then cfg.workDir else "/var/run/github-runners/${cfg.name}";
+  mkWorkDir = cfg: if (cfg.workDir != null) then cfg.workDir else "/var/lib/github-runners/_work/${cfg.name}";
 in
 {
   config.assertions = flatten (
@@ -16,6 +16,10 @@ in
       {
         assertion = !cfg.noDefaultLabels || (cfg.extraLabels != [ ]);
         message = "`services.github-runners.${name}`: The `extraLabels` option is mandatory if `noDefaultLabels` is set";
+      }
+      {
+        assertion = cfg.workDir == null || !(hasPrefix "/run/" cfg.workDir || hasPrefix "/var/run/" cfg.workDir || hasPrefix "/private/var/run/");
+        message = "`services.github-runners.${name}`: `workDir` being inside /run is not supported";
       }
     ])
   );
@@ -41,7 +45,7 @@ in
     in
     {
       launchd = mkIf cfg.enable {
-        text = mkBefore ''
+        text = mkBefore (''
           echo >&2 "setting up GitHub Runner '${cfg.name}'..."
 
           ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkStateDir cfg)}
@@ -49,7 +53,10 @@ in
 
           ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkLogDir cfg)}
           ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
-        '';
+        '' + optionalString (cfg.workDir == null) ''
+          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkWorkDir cfg)}
+          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+        '');
       };
     }));
 
@@ -59,9 +66,6 @@ in
       stateDir = mkStateDir cfg;
       logDir = mkLogDir cfg;
       workDir = mkWorkDir cfg;
-      user = if (cfg.user != null) then cfg.user else "_github-runner";
-      # If both user and group are null then we manage the group, otherwise if only group is null then there's no group
-      group = if (cfg.group != null) then group else if (cfg.user == null) then "_github-runner" else "";
     in
     nameValuePair
       (mkSvcName name)
@@ -116,12 +120,6 @@ in
           ''
             echo "Configuring GitHub Actions Runner"
 
-            ${optionalString (cfg.workDir == null) ''
-              # /var/run gets cleared every reboot so we need to create it before starting the service
-              ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg workDir}
-              ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg workDir}
-            ''}
-
             # Always clean the working directory
             ${pkgs.findutils}/bin/find ${escapeShellArg workDir} -mindepth 1 -delete
 
@@ -153,7 +151,7 @@ in
             StandardErrorPath = "${logDir}/launchd-stderr.log";
             StandardOutPath = "${logDir}/launchd-stdout.log";
             ThrottleInterval = 30;
-            UserName = user;
+            UserName = if (cfg.user != null) then cfg.user else "_github-runner";
             WatchPaths = [
               "/etc/resolv.conf"
               "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
