@@ -11,6 +11,14 @@ let
     { name, ... }:
     {
       options = {
+        certAuthority = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = ''
+            This public key is an SSH certificate authority, rather than an
+            individual host's key.
+          '';
+        };
         hostNames = mkOption {
           type = types.listOf types.str;
           default = [];
@@ -139,7 +147,7 @@ in
       { "ssh/ssh_known_hosts" = mkIf (builtins.length knownHosts > 0) {
           text = (flip (concatMapStringsSep "\n") knownHosts
             (h: assert h.hostNames != [];
-              concatStringsSep "," h.hostNames + " "
+              lib.optionalString h.certAuthority "@cert-authority " + concatStringsSep "," h.hostNames + " "
               + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
             )) + "\n";
         };
