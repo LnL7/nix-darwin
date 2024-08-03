@@ -111,6 +111,8 @@ in
       ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.homebrew.text}
 
+      ${cfg.activationScripts.shortcuts.text}
+
       ${cfg.activationScripts.postUserActivation.text}
 
       exit $_status
