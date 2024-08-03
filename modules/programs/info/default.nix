@@ -22,7 +22,7 @@ in
     environment.pathsToLink = [ "/info" "/share/info" ];
     environment.extraOutputsToInstall = [ "info" ];
 
-    environment.postBuild = ''
+    environment.extraSetup = ''
       if test -w $out/share/info; then
         shopt -s nullglob
         for i in $out/share/info/*.info $out/share/info/*.info.gz; do
