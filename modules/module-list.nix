@@ -77,6 +77,7 @@
   ./services/postgresql
   ./services/privoxy
   ./services/redis
+  ./services/scrutiny-collector.nix
   ./services/sketchybar
   ./services/skhd
   ./services/spacebar
