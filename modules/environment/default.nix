@@ -46,7 +46,8 @@ in
     environment.postBuild = mkOption {
       type = types.lines;
       default = "";
-      description = "Commands to execute when building the global environment.";
+      visible = false;
+      description = "Deprecated alias of {option}`environment.extraSetup`";
     };
 
     environment.extraOutputsToInstall = mkOption {
@@ -147,6 +148,17 @@ in
       '';
       type = types.lines;
     };
+
+    environment.extraSetup = mkOption {
+      type = types.lines;
+      default = cfg.postBuild;
+      description = ''
+        Shell fragments to be run after the system environment has been created.
+        This should only be used for things that need to modify the internals
+        of the environment, e.g. generating MIME caches.
+        The environment being built can be accessed at $out.
+      '';
+    };
   };
 
   config = {
@@ -188,7 +200,8 @@ in
     system.path = pkgs.buildEnv {
       name = "system-path";
       paths = cfg.systemPackages;
-      inherit (cfg) postBuild pathsToLink extraOutputsToInstall;
+      postBuild = cfg.extraSetup;
+      inherit (cfg) pathsToLink extraOutputsToInstall;
     };
 
     system.build.setEnvironment = pkgs.writeText "set-environment" ''
@@ -206,5 +219,8 @@ in
       ${concatStringsSep "\n" aliasCommands}
     '';
 
+    warnings = lib.optional (
+      cfg.postBuild != ""
+    ) "The option `environment.postBuild` has been renamed to `environment.extraSetup`";
   };
 }

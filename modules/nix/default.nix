@@ -380,14 +380,38 @@ in
         '';
       };
 
+      channel = {
+        enable = mkOption {
+          description = ''
+            Whether the `nix-channel` command and state files are made available on the machine.
+
+            The following files are initialized when enabled:
+              - `/nix/var/nix/profiles/per-user/root/channels`
+              - `$HOME/.nix-defexpr/channels` (on login)
+
+            Disabling this option will not remove the state files from the system.
+          '';
+          type = types.bool;
+          default = true;
+        };
+      };
+
       # Definition differs substantially from NixOS module
       nixPath = mkOption {
         type = nixPathType;
-        default = [
+        default = lib.optionals cfg.channel.enable [
+          # Include default path <darwin-config>.
+          { darwin-config = "${config.environment.darwinConfig}"; }
+          "/nix/var/nix/profiles/per-user/root/channels"
+        ];
+        
+        defaultText = lib.literalExpression ''
+          lib.optionals cfg.channel.enable [
             # Include default path <darwin-config>.
-            { darwin-config = "${config.environment.darwinConfig}"; }
+            { darwin-config = "''${config.environment.darwinConfig}"; }
             "/nix/var/nix/profiles/per-user/root/channels"
-          ];
+          ]
+        '';
         description = ''
           The default Nix expression search path, used by the Nix
           evaluator to look up paths enclosed in angle brackets
@@ -744,27 +768,21 @@ in
     ];
 
     # Not in NixOS module
-    nix.nixPath = mkMerge [
-      (mkIf (config.system.stateVersion < 2) (mkDefault
-      [ "darwin=$HOME/.nix-defexpr/darwin"
-        "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ]))
-      (mkIf (config.system.stateVersion > 3) (mkOrder 1200
-      [ { darwin-config = "${config.environment.darwinConfig}"; }
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ]))
-    ];
+    nix.nixPath = mkIf (config.system.stateVersion < 2) (mkDefault [
+      "darwin=$HOME/.nix-defexpr/darwin"
+      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+      "/nix/var/nix/profiles/per-user/root/channels"
+    ]);
 
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
-    environment.extraInit =
-      ''
+    environment.extraInit = mkMerge [
+      (mkIf cfg.channel.enable ''
         if [ -e "$HOME/.nix-defexpr/channels" ]; then
           export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
         fi
-      '' +
+      '')
       # Not in NixOS module
       ''
         # Set up secure multi-user builds: non-root users build through the
@@ -772,7 +790,12 @@ in
         if [ ! -w /nix/var/nix/db ]; then
             export NIX_REMOTE=daemon
         fi
-      '';
+      ''
+    ];
+
+    environment.extraSetup = mkIf (!cfg.channel.enable) ''
+      rm --force $out/bin/nix-channel
+    '';
 
     nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
 
