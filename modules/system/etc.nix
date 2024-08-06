@@ -48,6 +48,12 @@ in
           etc}
       )
 
+      declare -A etcForced=(
+        ${concatMapStringsSep "\n  "
+          (attr: "[${escapeShellArg attr.target}]=" + (builtins.toJSON attr.force))
+          etc}
+      )
+
       declare -a etcProblems=()
 
       while IFS= read -r -d "" configFile; do
@@ -65,6 +71,11 @@ in
           # everything else (e.g. directories) we complain about
           # unconditionally.
           if [[ -f $(readlink -f "$etcFile") ]]; then
+            # Skip checking hashes for files marked force.
+            if [[ ''${etcForced[$subPath]} == "true" ]]; then
+              continue
+            fi
+
             etcFileSha256Output=$(shasum -a 256 "$etcFile")
             etcFileSha256Hash=''${etcFileSha256Output%% *}
             for knownSha256Hash in ''${etcSha256Hashes[$subPath]}; do

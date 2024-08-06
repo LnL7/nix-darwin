@@ -2,7 +2,7 @@
   description = "Example Darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/6cee3b5893090b0f5f0a06b4cf42ca4e60e5d222";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -35,7 +35,9 @@
       system.stateVersion = 4;
 
       # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "x86_64-darwin";
+      nixpkgs.hostPlatform = "aarch64-darwin"; # TODO: debug
+
+      nixpkgs.config.allowUnfree = true; # TODO: debug
     };
   in
   {

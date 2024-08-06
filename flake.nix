@@ -43,6 +43,8 @@
       inherit (prev.callPackage ./pkgs/nix-tools { }) darwin-rebuild darwin-option darwin-version;
 
       darwin-uninstaller = prev.callPackage ./pkgs/darwin-uninstaller { };
+
+      ipsw = prev.callPackage ./pkgs/ipsw { };
     };
 
     darwinModules.hydra = ./modules/examples/hydra.nix;
@@ -79,7 +81,7 @@
     in {
       default = self.packages.${system}.darwin-rebuild;
 
-      inherit (pkgs) darwin-option darwin-rebuild darwin-version darwin-uninstaller;
+      inherit (pkgs) darwin-option darwin-rebuild darwin-version darwin-uninstaller ipsw;
     });
   };
 }
