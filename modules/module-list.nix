@@ -32,6 +32,7 @@
   ./system/defaults/trackpad.nix
   ./system/defaults/universalaccess.nix
   ./system/defaults/ActivityMonitor.nix
+  ./system/defaults/WindowManager.nix
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix
@@ -87,6 +88,7 @@
   ./services/wg-quick.nix
   ./services/yabai
   ./services/nextdns
+  ./services/jankyborders
   ./programs/bash
   ./programs/direnv.nix
   ./programs/fish.nix

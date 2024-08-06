@@ -4,7 +4,7 @@ let
   mkSvcName = name: "github-runner-${name}";
   mkStateDir = cfg: "/var/lib/github-runners/${cfg.name}";
   mkLogDir = cfg: "/var/log/github-runners/${cfg.name}";
-  mkWorkDir = cfg: if (cfg.workDir != null) then cfg.workDir else "/var/run/github-runners/${cfg.name}";
+  mkWorkDir = cfg: if (cfg.workDir != null) then cfg.workDir else "/var/lib/github-runners/_work/${cfg.name}";
 in
 {
   config.assertions = flatten (
@@ -16,6 +16,10 @@ in
       {
         assertion = !cfg.noDefaultLabels || (cfg.extraLabels != [ ]);
         message = "`services.github-runners.${name}`: The `extraLabels` option is mandatory if `noDefaultLabels` is set";
+      }
+      {
+        assertion = cfg.workDir == null || !(hasPrefix "/run/" cfg.workDir || hasPrefix "/var/run/" cfg.workDir || hasPrefix "/private/var/run/");
+        message = "`services.github-runners.${name}`: `workDir` being inside /run is not supported";
       }
     ])
   );

@@ -32,6 +32,7 @@ let
   trackpadBluetooth = defaultsToList "com.apple.driver.AppleBluetoothMultitouch.trackpad" cfg.trackpad;
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
+  WindowManager = defaultsToList "com.apple.WindowManager" cfg.WindowManager;
   CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
   CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
 
@@ -85,6 +86,7 @@ in
         universalaccess
         ActivityMonitor
         CustomUserPreferences
+        WindowManager
       ]
       ''
         # Set defaults
@@ -107,10 +109,14 @@ in
         ${concatStringsSep "\n" universalaccess}
         ${concatStringsSep "\n" ActivityMonitor}
         ${concatStringsSep "\n" CustomUserPreferences}
+        ${concatStringsSep "\n" WindowManager}
 
         ${optionalString (length dock > 0) ''
-          echo >&2 "restarting Dock..."
-          killall Dock
+          # Only restart Dock if current user is logged in
+          if pgrep -xu $UID Dock; then
+            echo >&2 "restarting Dock..."
+            killall Dock || true
+          fi
         ''}
       '';
 

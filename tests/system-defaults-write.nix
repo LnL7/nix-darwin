@@ -12,6 +12,7 @@
   system.defaults.NSGlobalDomain.AppleShowScrollBars = "Always";
   system.defaults.NSGlobalDomain.AppleScrollerPagingBehavior = true;
   system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+  system.defaults.NSGlobalDomain.NSAutomaticInlinePredictionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
@@ -63,6 +64,14 @@
   system.defaults.ActivityMonitor.SortColumn = "CPUUsage";
   system.defaults.ActivityMonitor.SortDirection = 0;
   system.defaults.ActivityMonitor.OpenMainWindow = true;
+  system.defaults.WindowManager.GloballyEnabled = false;
+  system.defaults.WindowManager.EnableStandardClickToShowDesktop = false;
+  system.defaults.WindowManager.AutoHide = false;
+  system.defaults.WindowManager.AppWindowGroupingBehavior = true;
+  system.defaults.WindowManager.StandardHideDesktopIcons = false;
+  system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.StandardHideWidgets = true;
+  system.defaults.WindowManager.StageManagerHideWidgets = true;
   system.defaults.CustomUserPreferences = {
       "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
       "com.apple.Safari" = {
