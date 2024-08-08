@@ -103,6 +103,7 @@ let
     tests.activation-scripts = makeTest ./tests/activation-scripts.nix;
     tests.autossh = makeTest ./tests/autossh.nix;
     tests.checks-nix-gc = makeTest ./tests/checks-nix-gc.nix;
+    tests.checks-nh-clean = makeTest ./tests/checks-nh-clean.nix;
     tests.environment-path = makeTest ./tests/environment-path.nix;
     tests.environment-terminfo = makeTest ./tests/environment-terminfo.nix;
     tests.homebrew = makeTest ./tests/homebrew.nix;
@@ -111,6 +112,7 @@ let
     tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
     tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
     tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
+    tests.programs-nh = makeTest ./tests/programs-nh.nix;
     tests.programs-ssh = makeTest ./tests/programs-ssh.nix;
     tests.programs-tmux = makeTest ./tests/programs-tmux.nix;
     tests.programs-zsh = makeTest ./tests/programs-zsh.nix;
