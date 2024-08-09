@@ -92,19 +92,11 @@ in
       serviceConfig.RunAtLoad = true;
     };
 
-    # We need this to run every reboot as /run gets nuked so we can't put this
-    # inside the preActivation script as it only gets run on darwin-rebuild switch.
-    launchd.daemons.setsuid_karabiner_session_monitor = {
-      serviceConfig.ProgramArguments = [
-        "/bin/sh" "-c"
-        "/bin/wait4path /nix/store &amp;&amp; ${pkgs.writeScript "setsuid_karabiner_session_monitor" ''
-          rm -rf /run/wrappers
-          mkdir -p /run/wrappers/bin
-          install -m4555 "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
-        ''}"
-      ];
-      serviceConfig.RunAtLoad = true;
-      serviceConfig.KeepAlive.SuccessfulExit = false;
+    security.wrappers.karabiner_session_monitor = {
+      setuid = true;
+      owner = "root";
+      group = "wheel";
+      source = "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor";
     };
 
     launchd.user.agents.karabiner_session_monitor = {
