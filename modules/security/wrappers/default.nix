@@ -9,40 +9,40 @@ let
     options = with lib; {
       source = mkOption {
         type = types.path;
-        description = mdDoc "The absolute path to the program to be wrapped.";
+        description = "The absolute path to the program to be wrapped.";
       };
       program = mkOption {
         type = with types; nullOr str;
         default = name;
-        description = mdDoc "The name of the wrapper program. Defaults to the attribute name.";
+        description = "The name of the wrapper program. Defaults to the attribute name.";
       };
       owner = mkOption {
         type = types.str;
-        description = mdDoc "The owner of the wrapper program.";
+        description = "The owner of the wrapper program.";
       };
       group = mkOption {
         type = types.str;
-        description = mdDoc "The group of the wrapper program.";
+        description = "The group of the wrapper program.";
       };
       permissions = mkOption {
         type = types.str;
         default = "u+rx,g+x,o+x";
-        description = mdDoc "The permissions to set on the wrapper.";
+        description = "The permissions to set on the wrapper.";
       };
       setuid = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Whether to add the setuid bit to the wrapper program.";
+        description = "Whether to add the setuid bit to the wrapper program.";
       };
       setgid = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Whether to add the setgid bit to the wrapper program.";
+        description = "Whether to add the setgid bit to the wrapper program.";
       };
       # codesign = mkOption {
       #   type = types.bool;
       #   default = false;
-      #   description = mdDoc "Whether to codesign the wrapper program.";
+      #   description = "Whether to codesign the wrapper program.";
       # };
     };
   });
@@ -137,7 +137,7 @@ in
           };
         }
       '';
-      description = lib.mdDoc ''
+      description = ''
         This option effectively allows adding setuid/setgid bits and/or changing
         file ownership and permissions without directly modifying it. This works
         by creating a wrapper program under the {option}`security.wrapperDir`
@@ -148,7 +148,7 @@ in
       type = lib.types.path;
       default = "/run/wrappers/bin";
       internal = true;
-      description = lib.mdDoc ''
+      description = ''
         This option defines the path to the wrapper programs. It
         should not be overridden.
       '';
@@ -156,7 +156,7 @@ in
     # codesignIdentity = lib.mkOption {
     #   type = lib.types.str;
     #   default = "-";
-    #   description = lib.mdDoc "Identity to use for codesigning.";
+    #   description = "Identity to use for codesigning.";
     # };
   };
 
