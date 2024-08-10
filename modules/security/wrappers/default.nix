@@ -111,6 +111,10 @@ in
     (lib.mkRemovedOptionModule [ "security" "setuidPrograms" ] "Use security.wrappers instead")
   ];
 
+  meta.maintainers = [
+    lib.maintainers.samasaur or "samasaur"
+  ];
+
   ###### interface
   options.security = {
     wrappers = lib.mkOption {
@@ -162,6 +166,10 @@ in
 
   ###### implementation
   config = {
+    assertions = [
+      { assertion = cfg.wrappers != {} -> config.services.activate-system.enable; message = "security.wrappers requires services.activate-system because `/run` is wiped on boot"; }
+    ];
+
     environment.extraInit = ''
       # Wrappers override other bin directories.
       export PATH="${cfg.wrapperDir}:$PATH"
