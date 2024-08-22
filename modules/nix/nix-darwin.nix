@@ -13,8 +13,19 @@ let
 in
 
 {
-  options = {
-    system.includeUninstaller = lib.mkOption {
+  options.system = {
+    disableInstallerTools = lib.mkOption {
+      type = lib.types.bool;
+      internal = true;
+      default = false;
+      description = ''
+        Disable darwin-rebuild and darwin-option. This is useful to shrink
+        systems which are not expected to rebuild or reconfigure themselves.
+        Use at your own risk!
+    '';
+    };
+
+    includeUninstaller = lib.mkOption {
       type = lib.types.bool;
       internal = true;
       default = true;
@@ -23,10 +34,10 @@ in
 
   config = {
     environment.systemPackages =
-      [ # Include nix-tools by default
+      [ darwin-version ]
+      ++ lib.optionals (!config.system.disableInstallerTools) [
         darwin-option
         darwin-rebuild
-        darwin-version
       ] ++ lib.optional config.system.includeUninstaller darwin-uninstaller;
 
     system.build = {
