@@ -41,12 +41,16 @@ darwin-rebuild changelog
 
 ## Uninstalling
 
-There's also an uninstaller if you don't like the project and want to
-remove the configured files and services.
+To run the latest version of the uninstaller, you can run the following command:
 
-```bash
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstaller
-./result/bin/darwin-uninstaller
+```
+nix --extra-experimental-features "nix-command flakes" run nix-darwin#darwin-uninstaller
+```
+
+If that command doesn't work for you, you can try the locally installed uninstaller:
+
+```
+darwin-uninstaller
 ```
 
 ## Example configuration
@@ -155,57 +159,6 @@ nix-darwin.lib.darwinSystem {
 # in configuration.nix
 { pkgs, lib, inputs }:
 # inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
-```
-
-## Manual Install
-
-```bash
-# Configure the channel
-nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-nix-channel --update
-export NIX_PATH=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
-
-# Or use a local git repository
-git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
-export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
-
-cp ~/.nix-defexpr/darwin/modules/examples/simple.nix ~/.nixpkgs/darwin-configuration.nix
-
-# you can also use this to rebootstrap nix-darwin in case
-# darwin-rebuild is too old to activate the system.
-$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
-$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
-
-. /etc/static/bashrc
-```
-
-... or for `fish`:
-
-```fish
-(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
-(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
-```
-
-This will create and manage a system profile in `/run/current-system`, just like NixOS.
-
-
-By default, nix-darwin will look in your `NIX_PATH` for this repository at `~/.nix-defexpr/darwin` and your configuration at `~/.nixpkgs/darwin-configuration.nix`.
-If you want to change these you can set your own with `nix.nixPath = [ ];`.
-
-```
-$ darwin-rebuild switch
-building the system configuration...
-these derivations will be built:
-  /nix/store/vfad6xgjzr56jcs051cg6vzch4dby92y-etc-zprofile.drv
-  /nix/store/cbmkscxsz0k02ynaph5xaxm1aql0p3vq-etc.drv
-  /nix/store/r5fpn177jhc16f8iyzk12gcw4pivzpbw-nixdarwin-system-16.09.drv
-building path(s) ‘/nix/store/wlq89shja597ip7mrmjv7yzk2lwyh8n0-etc-zprofile’
-building path(s) ‘/nix/store/m8kcm1pa5j570h3indp71a439wsh9lzq-etc’
-building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system-16.09’
-setting up /etc...
-setting up launchd services...
-writing defaults...
-$
 ```
 
 ## Documentation
