@@ -90,7 +90,7 @@ in
           let
             configure = pkgs.writeShellApplication {
               name = "configure-github-runner-${name}";
-              text = ''
+              text = /*bash*/''
                 export RUNNER_ROOT
 
                 args=(
@@ -98,7 +98,7 @@ in
                   --disableupdate
                   --work ${escapeShellArg workDir}
                   --url ${escapeShellArg cfg.url}
-                  --labels ${escapeShellArg (concatStringsSep "," cfg.extraLabels)}
+                  --labels "${escapeShellArg (concatStringsSep "," cfg.extraLabels)}"
                   ${optionalString (cfg.name != null ) "--name ${escapeShellArg cfg.name}"}
                   ${optionalString cfg.replace "--replace"}
                   ${optionalString (cfg.runnerGroup != null) "--runnergroup ${escapeShellArg cfg.runnerGroup}"}
