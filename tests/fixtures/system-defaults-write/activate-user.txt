@@ -48,6 +48,11 @@ defaults write -g 'AppleShowScrollBars' $'<?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
 <string>Always</string>
 </plist>'
+defaults write -g 'AppleSpacesSwitchOnActivate' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write -g 'AppleWindowTabbingMode' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
