@@ -42,5 +42,10 @@ in
       serviceConfig.KeepAlive.SuccessfulExit = false;
     };
 
+    launchd.user.agents.activate-user = {
+      command = "/run/current-system/activate-user";
+      serviceConfig.RunAtLoad = true;
+      serviceConfig.KeepAlive.SuccessfulExit = false;
+    };
   };
 }
