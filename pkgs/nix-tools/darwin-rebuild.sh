@@ -233,7 +233,7 @@ fi
 
 if [ -z "$systemConfig" ]; then exit 0; fi
 
-if [ "$action" = switch ]; then
+if [ "$action" = switch ] || [ "$action" = activate ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
     sudo nix-env -p "$profile" --set "$systemConfig"
   else

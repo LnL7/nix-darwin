@@ -50,6 +50,15 @@ in
       type = types.listOf types.str;
       default = [];
     };
+
+    force = mkOption {
+      type = types.bool;
+      default = false;
+      internal = true;
+      description = ''
+        Whether this file should be placed even if an unknown version of the file already exists.
+      '';
+    };
   };
 
   config = {

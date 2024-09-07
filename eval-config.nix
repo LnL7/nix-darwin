@@ -28,4 +28,5 @@ in
   inherit (eval) _module;
 
   system = eval.config.system.build.toplevel;
+  inherit (eval.config.system.build) vm;
 }
