@@ -5,7 +5,6 @@ let
 
   mongodb = cfg.package;
 
-  # ${optionalString cfg.enableAuth "security.authorization: enabled"}
   mongoCnf = cfg:
     pkgs.writeText "mongodb.conf" ''
       net.bindIp: ${cfg.bind_ip}
@@ -15,6 +14,7 @@ let
       "replication.replSetName: ${cfg.replSetName}"}
       ${cfg.extraConfig}
     '';
+  # ${optionalString cfg.enableAuth "security.authorization: enabled"}
 in {
   meta.maintainers = [ lib.maintainers.obinmatt or "obinmatt" ];
 
@@ -26,11 +26,11 @@ in {
 
       package = mkPackageOption pkgs "mongodb" { };
 
-      # user = mkOption {
-      #   type = types.str;
-      #   default = "mongodb";
-      #   description = "User account under which MongoDB runs";
-      # };
+      user = mkOption {
+        type = types.str;
+        default = "mongodb";
+        description = "User account under which MongoDB runs";
+      };
 
       bind_ip = mkOption {
         type = types.str;
@@ -44,17 +44,18 @@ in {
         description = "quieter output";
       };
 
-      # enableAuth = mkOption {
-      #   type = types.bool;
-      #   default = false;
-      #   description = "Enable client authentication. Creates a default superuser with username root!";
-      # };
-      #
-      # initialRootPassword = mkOption {
-      #   type = types.nullOr types.str;
-      #   default = null;
-      #   description = "Password for the root user if auth is enabled.";
-      # };
+      enableAuth = mkOption {
+        type = types.bool;
+        default = false;
+        description =
+          "Enable client authentication. Creates a default superuser with username root!";
+      };
+
+      initialRootPassword = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Password for the root user if auth is enabled.";
+      };
 
       dbpath = mkOption {
         type = types.str;
@@ -86,25 +87,27 @@ in {
         description = "MongoDB extra configuration in YAML format";
       };
 
-      # initialScript = mkOption {
-      #   type = types.nullOr types.path;
-      #   default = null;
-      #   description = ''
-      #     A file containing MongoDB statements to execute on first startup.
-      #   '';
-      # };
+      initialScript = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = ''
+          A file containing MongoDB statements to execute on first startup.
+        '';
+      };
     };
   };
 
   ###### implementation
 
   config = mkIf config.services.mongodb.enable {
-    # assertions = [
-    #   {
-    #     assertion = !cfg.enableAuth || cfg.initialRootPassword != null;
-    #     message = "`enableAuth` requires `initialRootPassword` to be set.";
-    #   }
-    # ];
+    # these require a different implementation (user) or functionality that launchd does not provide
+    warnings = if cfg.user != "mongodb" || cfg.enableAuth != false
+    || cfg.initialRootPassword != null || cfg.initialScript != null then
+      [
+        "Currently nix-darwin does not support mongodb user, enableAuth, initialRootPassword or initialScript"
+      ]
+    else
+      [ ];
 
     environment.systemPackages = [ mongodb ];
 
@@ -129,7 +132,8 @@ in {
           mongoCnf cfg
         } --dbpath ${cfg.dbpath} --fork --pidfilepath ${cfg.pidFile}
 
-        #TODO: postStart
+        # postStart
+        # launchd does not have this functionality
       '';
     };
   };
