@@ -67,8 +67,9 @@
   ./services/kwm
   ./services/lorri.nix
   ./services/mail/offlineimap.nix
-  ./services/mopidy.nix
+  ./services/mongodb
   ./services/monitoring/telegraf.nix
+  ./services/mopidy.nix
   ./services/netbird.nix
   ./services/nix-daemon.nix
   ./services/nix-gc
