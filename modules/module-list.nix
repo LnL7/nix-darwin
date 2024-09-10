@@ -47,6 +47,7 @@
   ./nix/linux-builder.nix
   ./nix/nix-darwin.nix
   ./nix/nixpkgs.nix
+  ./nix/nixpkgs-flake.nix
   ./environment
   ./fonts
   ./launchd
