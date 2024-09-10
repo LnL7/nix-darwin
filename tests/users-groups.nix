@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 
 {
   users.knownGroups = [ "foo" "created.group" "deleted.group" ];
@@ -46,9 +46,9 @@
     grep "dscl . -create '/Users/foo' IsHidden 0" ${config.out}/activate
     grep "dscl . -create '/Users/foo' RealName 'Foo user'" ${config.out}/activate
     grep "dscl . -create '/Users/foo' NFSHomeDirectory '/Users/foo'" ${config.out}/activate
-    grep "dscl . -create '/Users/foo' UserShell '/run/current-system/sw/bin/bash'" ${config.out}/activate
+    grep "dscl . -create '/Users/foo' UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
     grep "dscl . -create '/Users/created.user' UniqueID 42001" ${config.out}/activate
-    grep "dscl . -create '/Users/created.user' UserShell '/sbin/nologin'" ${config.out}/activate
+    grep "dscl . -create '/Users/created.user' UserShell ${lib.escapeShellArg "/sbin/nologin"}" ${config.out}/activate
     grep "createhomedir -cu 'foo'" ${config.out}/activate
     grep -qv "dscl . -delete '/Groups/created.user'" ${config.out}/activate
 
