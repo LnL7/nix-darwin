@@ -12,10 +12,13 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
+    # We use the Determinate Systems installer for 2.18 because the
+    # Sequoia UID/GID changes have not yet been backported to the
+    # official installer for that version.
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v23
+      uses: DeterminateSystems/nix-installer-action@main
       with:
-        install_url: https://releases.nixos.org/nix/nix-2.13.6/install
+        nix-package-url: https://releases.nixos.org/nix/nix-2.18.5/nix-2.18.5-x86_64-darwin.tar.xz
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A tests
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A examples.simple
@@ -38,18 +41,20 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
+    # We use the Determinate Systems installer for 2.18 because the
+    # Sequoia UID/GID changes have not yet been backported to the
+    # official installer for that version.
     - name: Install nix corresponding to latest stable channel
-      uses: cachix/install-nix-action@v23
+      uses: DeterminateSystems/nix-installer-action@main
       with:
-        install_url: https://releases.nixos.org/nix/nix-2.13.6/install
-        nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
+        nix-package-url: https://releases.nixos.org/nix/nix-2.18.5/nix-2.18.5-x86_64-darwin.tar.xz
     - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
       run: |
         nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin and test
       run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
+        export NIX_PATH=nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
 
         # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
         # but we expect it to fail setting up /etc/nix/nix.conf
@@ -128,10 +133,13 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
-    - name: Install nix version corresponding to latest stable channel
-      uses: cachix/install-nix-action@v23
+    # We use the Determinate Systems installer for 2.18 because the
+    # Sequoia UID/GID changes have not yet been backported to the
+    # official installer for that version.
+    - name: Install nix corresponding to latest stable channel
+      uses: DeterminateSystems/nix-installer-action@main
       with:
-        install_url: https://releases.nixos.org/nix/nix-2.13.6/install
+        nix-package-url: https://releases.nixos.org/nix/nix-2.18.5/nix-2.18.5-x86_64-darwin.tar.xz
     - name: Install nix-darwin
       run: |
         mkdir -p ~/.config/nix-darwin
