@@ -35,7 +35,7 @@ in
   options = {
     system.stateVersion = mkOption {
       type = types.int;
-      default = 4;
+      default = 5;
       description = ''
         Every once in a while, a new NixOS release may change
         configuration defaults in a way incompatible with stateful
