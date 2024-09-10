@@ -43,7 +43,7 @@ in
     '' + (optionalString cfg.agent.enableSSHSupport ''
       # SSH agent protocol doesn't support changing TTYs, so bind the agent
       # to every new TTY.
-      ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
+      ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null 2>&1
 
       export SSH_AUTH_SOCK=$(${pkgs.gnupg}/bin/gpgconf --list-dirs agent-ssh-socket)
     '');

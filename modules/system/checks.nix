@@ -236,7 +236,7 @@ in
 
     system.checks.verifyNixChannels = mkOption {
       type = types.bool;
-      default = true;
+      default = config.nix.channel.enable;
       description = "Whether to run the nix-channels validation checks.";
     };
 

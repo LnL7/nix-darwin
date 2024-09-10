@@ -3,15 +3,7 @@
 with lib;
 
 let
-  inherit (pkgs) stdenv;
-
   cfg = config.nix.linux-builder;
-
-  builderWithOverrides = cfg.package.override (previousArguments: {
-    # the linux-builder packages require a list `modules` argument, so it's
-    # always non-null.
-    modules = previousArguments.modules ++ [ cfg.config ];
-  });
 
   # create-builder uses TMPDIR to share files with the builder, notably certs.
   # macOS will clean up files in /tmp automatically that haven't been accessed in 3+ days.
@@ -23,9 +15,9 @@ let
     mkdir -p $TMPDIR
     trap "rm -rf $TMPDIR" EXIT
     ${lib.optionalString cfg.ephemeral ''
-      rm -f ${cfg.workingDirectory}/${builderWithOverrides.nixosConfig.networking.hostName}.qcow2
+      rm -f ${cfg.workingDirectory}/${cfg.package.nixosConfig.networking.hostName}.qcow2
     ''}
-    ${builderWithOverrides}/bin/create-builder
+    ${cfg.package}/bin/create-builder
   '';
 in
 
@@ -41,6 +33,11 @@ in
       type = types.package;
       default = pkgs.darwin.linux-builder;
       defaultText = "pkgs.darwin.linux-builder";
+      apply = pkg: pkg.override (old: {
+        # the linux-builder package requires `modules` as an argument, so it's
+        # always non-null.
+        modules = old.modules ++ [ cfg.config ];
+      });
       description = ''
         This option specifies the Linux builder to use.
       '';
@@ -135,7 +132,7 @@ in
 
     systems = mkOption {
       type = types.listOf types.str;
-      default = [ builderWithOverrides.nixosConfig.nixpkgs.hostPlatform.system ];
+      default = [ cfg.package.nixosConfig.nixpkgs.hostPlatform.system ];
       defaultText = ''
         The `nixpkgs.hostPlatform.system` of the build machine's final NixOS configuration.
       '';
