@@ -46,12 +46,17 @@ let
 
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
-        echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
+        echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
         echo "These can cause migration problems when upgrading to certain macOS versions" >&2
         echo "You can enable the following option to migrate to new style nixbld users" >&2
         echo >&2
         echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
+        echo "or disable this check with" >&2
+        echo >&2
+        echo "    system.checks.verifyBuildUsers = false;" >&2
+        echo >&2
+        exit 2
     fi
   '';
 
@@ -260,7 +265,7 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
-      oldBuildUsers
+      (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
