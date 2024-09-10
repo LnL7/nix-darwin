@@ -242,7 +242,9 @@ in
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
-      default = !(config.nix.settings.auto-allocate-uids or false);
+      default =
+        (config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+        || config.nix.configureBuildUsers;
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -259,7 +261,7 @@ in
       darwinChanges
       runLink
       oldBuildUsers
-      (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
+      (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
