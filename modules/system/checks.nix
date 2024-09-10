@@ -197,7 +197,7 @@ let
         echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
         echo "Configure the optimiser to run as the current user:" >&2
         echo >&2
-        echo "    nix.optimiser.user = \"$USER\";" >&2
+        echo "    nix.optimise.user = \"$USER\";" >&2
         echo >&2
         exit 2
     fi
