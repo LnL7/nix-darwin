@@ -28,7 +28,7 @@ in {
 
       user = mkOption {
         type = types.str;
-        default = "";
+        default = "mongodb";
         description = "User account under which MongoDB runs";
       };
 
@@ -65,7 +65,7 @@ in {
 
       pidFile = mkOption {
         type = types.str;
-        default = "";
+        default = "~/.mongodb/mongodb.pid";
         description = "Location of MongoDB pid file";
       };
 
@@ -101,10 +101,10 @@ in {
 
   config = mkIf config.services.mongodb.enable {
     # these require a different implementation (user) or functionality that launchd does not provide
-    warnings = if cfg.user != "" || cfg.pidFile != "" || cfg.enableAuth != false
+    warnings = if cfg.user != "mongodb" || cfg.enableAuth != false
     || cfg.initialRootPassword != null || cfg.initialScript != null then
       [
-        "Currently nix-darwin does not support mongodb user, enableAuth, initialRootPassword, pidFile or initialScript"
+        "Currently nix-darwin does not support mongodb user, enableAuth, initialRootPassword or initialScript"
       ]
     else
       [ ];
@@ -123,11 +123,14 @@ in {
         if ! test -e ${cfg.dbpath}; then
           ${pkgs.coreutils}/bin/install -d -m 700 ${cfg.dbpath}
         fi
+        if ! test -e ${cfg.pidFile}; then
+          ${pkgs.coreutils}/bin/install -D /dev/null ${cfg.pidFile}
+        fi
 
         # start
         exec ${mongodb}/bin/mongod --config ${
           mongoCnf cfg
-        } --dbpath ${cfg.dbpath} --fork
+        } --dbpath ${cfg.dbpath} --fork --pidfilepath ${cfg.pidFile}
 
         # postStart
         # launchd does not have this functionality
