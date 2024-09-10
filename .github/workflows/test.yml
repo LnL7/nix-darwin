@@ -26,7 +26,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v23
+      uses: cachix/install-nix-action@v27
+      with:
+        install_url: https://releases.nixos.org/nix/nix-2.24.6/install
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A tests
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A manpages
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A examples.simple
@@ -82,8 +84,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v23
+      uses: cachix/install-nix-action@v27
       with:
+        install_url: https://releases.nixos.org/nix/nix-2.24.6/install
         nix_path: nixpkgs=channel:nixpkgs-unstable
     - name: Install nixpkgs-unstable channel
       run: |
@@ -209,7 +212,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install nix from current unstable channel
-      uses: cachix/install-nix-action@v23
+      uses: cachix/install-nix-action@v27
+      with:
+        install_url: https://releases.nixos.org/nix/nix-2.24.6/install
     - name: Install nix-darwin
       run: |
         mkdir -p ~/.config/nix-darwin
