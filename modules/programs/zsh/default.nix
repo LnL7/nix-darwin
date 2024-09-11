@@ -124,9 +124,8 @@ in
       # This file is read for all shells.
 
       # Only execute this file once per shell.
-      # But don't clobber the environment of interactive non-login children!
       if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
-      export __ETC_ZSHENV_SOURCED=1
+      __ETC_ZSHENV_SOURCED=1
 
       # Don't execute this file when running in a pure nix-shell.
       if test -n "$IN_NIX_SHELL"; then return; fi
