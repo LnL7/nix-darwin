@@ -46,13 +46,52 @@ let
 
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
-        echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
+        echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
         echo "These can cause migration problems when upgrading to certain macOS versions" >&2
         echo "You can enable the following option to migrate to new style nixbld users" >&2
         echo >&2
         echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
+        echo "or disable this check with" >&2
+        echo >&2
+        echo "    system.checks.verifyBuildUsers = false;" >&2
+        echo >&2
+        exit 2
+     fi
+   '';
+ 
+  preSequoiaBuildUsers = ''
+    ${lib.optionalString config.nix.configureBuildUsers ''
+      # Don’t complain when we’re about to migrate old‐style build users…
+      if ! dscl . -list /Users | grep -q '^nixbld'; then
+    ''}
+    firstBuildUserID=$(dscl . -read /Users/_nixbld1 UniqueID | awk '{print $2}')
+    if [[ $firstBuildUserID != ${toString (config.ids.uids.nixbld + 1)} ]]; then
+        printf >&2 '\e[1;31merror: Build users have unexpected UIDs, aborting activation\e[0m\n'
+        printf >&2 'The default Nix build user ID range has been adjusted for\n'
+        printf >&2 'compatibility with macOS Sequoia 15. Your _nixbld1 user currently has\n'
+        printf >&2 'UID %d rather than the new default of 351.\n' "$firstBuildUserID"
+        printf >&2 '\n'
+        printf >&2 'You can automatically migrate your users using the following script\n'
+        printf >&2 'from the Nix repository:\n'
+        printf >&2 '\n'
+        printf >&2 '    https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh\n'
+        printf >&2 '\n'
+        printf >&2 'This should work even if you installed Nix with the Determinate\n'
+        printf >&2 'Systems installer or are using Lix. If you are comfortable using the\n'
+        printf >&2 'script without review, you can run:\n'
+        printf >&2 '\n'
+        printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -\n"
+        printf >&2 '\n'
+        printf >&2 'If you have no intention of upgrading to macOS Sequoia 15, or already\n'
+        printf >&2 'have a custom UID range that you know is compatible with Sequoia, you\n'
+        printf >&2 'can disable this check by setting:\n'
+        printf >&2 '\n'
+        printf >&2 '    ids.uids.nixbld = %d;\n' "$((firstBuildUserID - 1))"
+        printf >&2 '\n'
+        exit 2
     fi
+    ${lib.optionalString config.nix.configureBuildUsers "fi"}
   '';
 
   buildUsers = ''
@@ -66,6 +105,32 @@ let
         echo >&2
         echo "    services.nix-daemon.enable = false;" >&2
         echo >&2
+        exit 2
+    fi
+  '';
+
+  buildGroupID = ''
+    buildGroupID=$(dscl . -read /Groups/nixbld PrimaryGroupID | awk '{print $2}')
+    expectedBuildGroupID=${toString config.ids.gids.nixbld}
+    if [[ $buildGroupID != $expectedBuildGroupID ]]; then
+        printf >&2 '\e[1;31merror: Build user group has mismatching GID, aborting activation\e[0m\n'
+        printf >&2 'The default Nix build user group ID was changed from 30000 to 350.\n'
+        printf >&2 'You are currently managing Nix build users with nix-darwin, but your\n'
+        printf >&2 'nixbld group has GID %d, whereas we expected %d.\n' \
+          "$buildGroupID" "$expectedBuildGroupID"
+        printf >&2 '\n'
+        printf >&2 'Possible causes include setting up a new Nix installation with an\n'
+        printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
+        printf >&2 'installation with an existing Nix installation, or manually increasing\n'
+        printf >&2 'your `system.stateVersion` setting.\n'
+        printf >&2 '\n'
+        printf >&2 'You can set the configured group ID to match the actual value:\n'
+        printf >&2 '\n'
+        printf >&2 '    ids.gids.nixbld = %d;\n' "$buildGroupID"
+        printf >&2 '\n'
+        printf >&2 'We do not recommend trying to change the group ID with macOS user\n'
+        printf >&2 'management tools without a complete uninstallation and reinstallation\n'
+        printf >&2 'of Nix.\n'
         exit 2
     fi
   '';
@@ -242,7 +307,9 @@ in
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
-      default = !(config.nix.settings.auto-allocate-uids or false);
+      default =
+        (config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+        || config.nix.configureBuildUsers;
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -258,8 +325,10 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
-      oldBuildUsers
-      (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
+      (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
+      (mkIf cfg.verifyBuildUsers buildUsers)
+      (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
+      (mkIf config.nix.configureBuildUsers buildGroupID)
       (mkIf (!config.nix.useDaemon) singleUser)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
