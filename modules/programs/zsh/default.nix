@@ -124,13 +124,13 @@ in
       # This file is read for all shells.
 
       # Only execute this file once per shell.
-      if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
+      if [ -n "''${__ETC_ZSHENV_SOURCED-}" ]; then return; fi
       __ETC_ZSHENV_SOURCED=1
 
       # Don't execute this file when running in a pure nix-shell.
       if test -n "$IN_NIX_SHELL"; then return; fi
 
-      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
+      if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
         . ${config.system.build.setEnvironment}
       fi
 
@@ -152,7 +152,7 @@ in
       # This file is read for login shells.
 
       # Only execute this file once per shell.
-      if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
+      if [ -n "''${__ETC_ZPROFILE_SOURCED-}" ]; then return; fi
       __ETC_ZPROFILE_SOURCED=1
 
       ${concatStringsSep "\n" zshVariables}
