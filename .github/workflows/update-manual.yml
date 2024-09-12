@@ -17,11 +17,11 @@ jobs:
         fetch-depth: 0
 
     - name: Install Nix
-      uses: cachix/install-nix-action@v22
+      uses: cachix/install-nix-action@v27
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-23.11-darwin -I darwin=. -A manualHTML
+        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-24.05-darwin -I darwin=. -A manualHTML
 
     - name: Push update to manual
       run: |
