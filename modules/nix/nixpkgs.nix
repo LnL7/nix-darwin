@@ -128,11 +128,10 @@ in
         '';
       type = configType;
       description = ''
-        The configuration of the Nix Packages collection.  (For
-        details, see the Nixpkgs documentation.)  It allows you to set
-        package configuration options.
+        Global configuration for Nixpkgs.
+        The complete list of [Nixpkgs configuration options](https://nixos.org/manual/nixpkgs/unstable/#sec-config-options-reference) is in the [Nixpkgs manual section on global configuration](https://nixos.org/manual/nixpkgs/unstable/#chap-packageconfig).
 
-        Ignored when `nixpkgs.pkgs` is set.
+        Ignored when {option}`nixpkgs.pkgs` is set.
       '';
     };
 
@@ -151,22 +150,18 @@ in
         '';
       type = types.listOf overlayType;
       description = ''
-        List of overlays to use with the Nix Packages collection.
-        (For details, see the Nixpkgs documentation.)  It allows
-        you to override packages globally. Each function in the list
-        takes as an argument the *original* Nixpkgs.
-        The first argument should be used for finding dependencies, and
-        the second should be used for overriding recipes.
+        List of overlays to apply to Nixpkgs.
+        This option allows modifying the Nixpkgs package set accessed through the `pkgs` module argument.
 
-        If `nixpkgs.pkgs` is set, overlays specified here
-        will be applied after the overlays that were already present
-        in `nixpkgs.pkgs`.
+        For details, see the [Overlays chapter in the Nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#chap-overlays).
+
+        If the {option}`nixpkgs.pkgs` option is set, overlays specified using `nixpkgs.overlays` will be applied after the overlays that were already included in `nixpkgs.pkgs`.
       '';
     };
 
     hostPlatform = mkOption {
       type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
-      example = { system = "aarch64-darwin"; config = "aarch64-apple-darwin"; };
+      example = { system = "aarch64-darwin"; };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this. TODO make `lib.systems` itself use the module system.
       apply = lib.systems.elaborate;
@@ -182,10 +177,14 @@ in
     buildPlatform = mkOption {
       type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
       default = cfg.hostPlatform;
-      example = { system = "x86_64-darwin"; config = "x86_64-apple-darwin"; };
+      example = { system = "x86_64-darwin"; };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this.
-      apply = lib.systems.elaborate;
+      apply = inputBuildPlatform:
+        let elaborated = lib.systems.elaborate inputBuildPlatform;
+        in if lib.systems.equals elaborated cfg.hostPlatform
+          then cfg.hostPlatform  # make identical, so that `==` equality works; see https://github.com/NixOS/nixpkgs/issues/278001
+          else elaborated;
       defaultText = literalExpression
         ''config.nixpkgs.hostPlatform'';
       description = ''
@@ -286,6 +285,16 @@ in
           ${concatMapStrings showOptionWithDefLocs legacyOptionsDefined}
           For a future proof system configuration, we recommend to remove
           the legacy definitions.
+        '';
+      }
+      {
+        assertion = opt.pkgs.isDefined -> cfg.config == {};
+        message = ''
+          Your system configures nixpkgs with an externally created instance.
+          `nixpkgs.config` options should be passed when creating the instance instead.
+
+          Current value:
+          ${lib.generators.toPretty { multiline = true; } opt.config}
         '';
       }
     ];
