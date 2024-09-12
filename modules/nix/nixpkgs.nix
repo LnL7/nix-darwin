@@ -238,21 +238,7 @@ in
         `<nixpkgs>` or nix-darwin's `nixpkgs` flake input
       '';
       description = ''
-        The path to import Nixpkgs from. If you're setting a custom
-        [](#opt-nixpkgs.pkgs) or `_module.args.pkgs`, setting this
-        to something with `rev` and `shortRev` attributes (such as a
-        flake input or `builtins.fetchGit` result) will also set
-        `system.nixpkgsRevision` and related options.
-        (nix-darwin only)
-      '';
-    };
-
-    constructedByUs = mkOption {
-      type = types.bool;
-      internal = true;
-      description = ''
-        Whether `pkgs` was constructed by this module. This is false when any of
-        `nixpkgs.pkgs` or `_module.args.pkgs` is set. (nix-darwin only)
+        The path to import Nixpkgs from. (nix-darwin only)
       '';
     };
   };
@@ -270,25 +256,27 @@ in
           finalPkgs.__splicedPackages;
     };
 
-    nixpkgs.constructedByUs =
-      # We set it with default priority and it can not be merged, so if the
-      # pkgs module argument has that priority, it's from us.
-      (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
-        == lib.modules.defaultOverridePriority
-      # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
-        && !opt.pkgs.isDefined;
-
-    assertions = [
+    assertions = let
+      # Whether `pkgs` was constructed by this module. This is false when any of
+      # nixpkgs.pkgs or _module.args.pkgs is set.
+      constructedByMe =
+        # We set it with default priority and it can not be merged, so if the
+        # pkgs module argument has that priority, it's from us.
+        (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
+          == lib.modules.defaultOverridePriority
+        # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
+          && !opt.pkgs.isDefined;
+    in [
       (
         let
           pkgsSystem = finalPkgs.stdenv.targetPlatform.system;
         in {
-          assertion = cfg.constructedByUs -> !hasPlatform -> cfg.system == pkgsSystem;
+          assertion = constructedByMe -> !hasPlatform -> cfg.system == pkgsSystem;
           message = "The nix-darwin nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but nix-darwin was configured for system ${darwinExpectedSystem} via nix-darwin option nixpkgs.system. The nix-darwin system settings must match the Nixpkgs target system.";
         }
       )
       {
-        assertion = cfg.constructedByUs -> hasPlatform -> legacyOptionsDefined == [];
+        assertion = constructedByMe -> hasPlatform -> legacyOptionsDefined == [];
         message = ''
           Your system configures nixpkgs with the platform parameter${optionalString hasBuildPlatform "s"}:
           ${hostPlatformLine
