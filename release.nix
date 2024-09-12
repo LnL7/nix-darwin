@@ -40,6 +40,8 @@ let
           };
 
           config = {
+            system.stateVersion = lib.mkDefault config.system.maxStateVersion;
+
             system.build.run-test = pkgs.runCommand "darwin-test-${testName}"
               { allowSubstitutes = false; preferLocalBuild = true; }
               ''
@@ -71,6 +73,10 @@ let
       nano emacs vim;
   };
 
+  manual = buildFromConfig ({ lib, config, ... }: {
+    system.stateVersion = lib.mkDefault config.system.maxStateVersion;
+  }) (config: config.system.build.manual);
+
   jobs = {
 
     unstable = pkgs.releaseTools.aggregate {
@@ -92,9 +98,9 @@ let
       meta.description = "Release-critical builds for the darwin channel";
     };
 
-    manualHTML = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualHTML);
-    manpages = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manpages);
-    options = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.optionsJSON);
+    manualHTML = manual.manualHTML;
+    manpages = manual.manpages;
+    options = manual.optionsJSON;
 
     examples.hydra = makeSystem ./modules/examples/hydra.nix;
     examples.lnl = makeSystem ./modules/examples/lnl.nix;
