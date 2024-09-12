@@ -203,7 +203,7 @@ if [ "$action" = edit ]; then
   fi
 fi
 
-if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ]; then
+if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ] || [ "$action" = changelog ]; then
   echo "building the system configuration..." >&2
   if [ -z "$flake" ]; then
     systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
@@ -252,11 +252,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
 fi
 
 if [ "$action" = changelog ]; then
-  echo >&2
-  echo "[1;1mCHANGELOG[0m" >&2
-  echo >&2
-  head -n 32 "$systemConfig/darwin-changes"
-  echo >&2
+  ${PAGER:-less} -- "$systemConfig/darwin-changes"
 fi
 
 if [ "$action" = check ]; then
