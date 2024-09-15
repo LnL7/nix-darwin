@@ -72,16 +72,24 @@ let
         printf >&2 'compatibility with macOS Sequoia 15. Your _nixbld1 user currently has\n'
         printf >&2 'UID %d rather than the new default of 351.\n' "$firstBuildUserID"
         printf >&2 '\n'
-        printf >&2 'You can automatically migrate your users using the following script\n'
-        printf >&2 'from the Nix repository:\n'
+        printf >&2 'You can automatically migrate the users with the following command:\n'
         printf >&2 '\n'
-        printf >&2 '    https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh\n'
-        printf >&2 '\n'
-        printf >&2 'This should work even if you installed Nix with the Determinate\n'
-        printf >&2 'Systems installer or are using Lix. If you are comfortable using the\n'
-        printf >&2 'script without review, you can run:\n'
-        printf >&2 '\n'
-        printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -\n"
+        if [[ -e /nix/receipt.json ]]; then
+            if
+                ${pkgs.jq}/bin/jq --exit-status \
+                'try(.planner.settings | has("enable_flakes"))' \
+                /nix/receipt.json \
+                >/dev/null
+            then
+                installerUrl="https://install.lix.systems/lix"
+            else
+                installerUrl="https://install.determinate.systems/nix"
+            fi
+            printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L %s | sh -s -- repair sequoia --move-existing-users\n" \
+                "$installerUrl"
+        else
+            printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -\n"
+        fi
         printf >&2 '\n'
         printf >&2 'If you have no intention of upgrading to macOS Sequoia 15, or already\n'
         printf >&2 'have a custom UID range that you know is compatible with Sequoia, you\n'
