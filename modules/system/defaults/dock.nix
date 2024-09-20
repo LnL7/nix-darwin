@@ -20,7 +20,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to automatically hide and show the dock.  The default is false.
+        Whether to automatically hide and show the dock. The default is false.
       '';
     };
 
