@@ -80,6 +80,14 @@ with lib;
       '';
     };
 
+    system.defaults.finder._FXSortFoldersFirst = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Keep folders on top when sorting by name. The default is false.
+      '';
+    };
+
     system.defaults.finder.FXEnableExtensionChangeWarning = mkOption {
       type = types.nullOr types.bool;
       default = null;

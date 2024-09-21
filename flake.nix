@@ -27,6 +27,7 @@
             }
             ++ [ ({ lib, ... }: {
               nixpkgs.source = lib.mkDefault nixpkgs;
+              nixpkgs.flake.source = lib.mkDefault nixpkgs;
 
               system.checks.verifyNixPath = lib.mkDefault false;
 

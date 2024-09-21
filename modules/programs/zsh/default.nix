@@ -124,16 +124,17 @@ in
       # This file is read for all shells.
 
       # Only execute this file once per shell.
-      # But don't clobber the environment of interactive non-login children!
-      if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
-      export __ETC_ZSHENV_SOURCED=1
+      if [ -n "''${__ETC_ZSHENV_SOURCED-}" ]; then return; fi
+      __ETC_ZSHENV_SOURCED=1
 
-      # Don't execute this file when running in a pure nix-shell.
-      if test -n "$IN_NIX_SHELL"; then return; fi
-
-      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
+      if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
         . ${config.system.build.setEnvironment}
       fi
+
+      # Tell zsh how to find installed completions
+      for p in ''${(z)NIX_PROFILES}; do
+        fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
+      done
 
       ${cfg.shellInit}
 
@@ -148,7 +149,7 @@ in
       # This file is read for login shells.
 
       # Only execute this file once per shell.
-      if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
+      if [ -n "''${__ETC_ZPROFILE_SOURCED-}" ]; then return; fi
       __ETC_ZPROFILE_SOURCED=1
 
       ${concatStringsSep "\n" zshVariables}
@@ -181,11 +182,6 @@ in
 
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
-
-      # Tell zsh how to find installed completions
-      for p in ''${(z)NIX_PROFILES}; do
-        fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions)
-      done
 
       ${cfg.promptInit}
 
