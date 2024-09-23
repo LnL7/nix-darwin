@@ -20,7 +20,6 @@ let
     { config, name, ... }:
     let
 
-      cmd = config.command;
       env = config.environment // optionalAttrs (config.path != "") { PATH = config.path; };
 
     in
@@ -88,7 +87,11 @@ let
         '');
 
         serviceConfig.Label = mkDefault "${cfg.labelPrefix}.${name}";
-        serviceConfig.ProgramArguments = mkIf (cmd != "") [ "/bin/sh" "-c" "exec ${cmd}" ];
+        serviceConfig.ProgramArguments = mkIf (config.command != "") [
+          "/bin/sh"
+          "-c"
+          "/bin/wait4path /nix/store &amp;&amp; exec ${config.command}"
+        ];
         serviceConfig.EnvironmentVariables = mkIf (env != {}) env;
       };
     };

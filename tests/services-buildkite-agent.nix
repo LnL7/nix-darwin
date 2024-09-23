@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  buildkite-agent = pkgs.runCommand "buildkite-agent-0.0.0" {} "mkdir $out";
+  buildkite-agent = pkgs.runCommand "buildkite-agent-0.0.0" { } "mkdir $out";
   tokenPath = pkgs.writeText "buildkite_token" "TEST_TOKEN";
 in
 
@@ -20,7 +20,7 @@ in
     grep "org.nixos.buildkite-agent-test" ${config.out}/Library/LaunchDaemons/org.nixos.buildkite-agent-test.plist
 
     echo "checking creation of buildkite-agent service config" >&2
-    script=$(cat ${config.out}/Library/LaunchDaemons/org.nixos.buildkite-agent-test.plist | awk -F'[< ]' '$3 ~ "^/nix/store/.*" {print $3}')
+    script=$(cat ${config.out}/Library/LaunchDaemons/org.nixos.buildkite-agent-test.plist | awk -F'[< ]' '$6 ~ "^/nix/store/.*" {print $6}')
     grep "yolo=1" "$script"
     grep "${tokenPath}" "$script"
 

@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  nix = pkgs.runCommand "nix-2.2" {} "mkdir -p $out";
+  nix = pkgs.runCommand "nix-2.2" { } "mkdir -p $out";
 in
 
 {
@@ -13,7 +13,7 @@ in
     echo checking nix-optimise service in /Library/LaunchDaemons >&2
     grep "<string>org.nixos.nix-optimise</string>" \
       ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
-    grep "<string>/bin/wait4path ${nix} &amp;&amp; exec ${nix}/bin/nix-store --optimise</string>" \
+    grep "<string>/bin/wait4path /nix/store &amp;&amp; exec ${nix}/bin/nix-store --optimise</string>" \
       ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
     grep "<key>UserName</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
     grep "<string>nixuser</string>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
