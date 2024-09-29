@@ -80,6 +80,15 @@ in {
       '';
     };
 
+    order = mkOption {
+      type = types.str;
+      default = "below";
+      example = "above";
+      description = ''
+        Specifies whether borders should be drawn above or below windows.
+      '';
+    };
+
     blur_radius = mkOption {
       type = types.float;
       default = 0.0;
@@ -149,7 +158,8 @@ in {
           else "off"
         ))
         ++ (optionalArg "blacklist" (joinStrings cfg.blacklist))
-        ++ (optionalArg "whitelist" (joinStrings cfg.whitelist));
+        ++ (optionalArg "whitelist" (joinStrings cfg.whitelist))
+        ++ (optionalArg "order" cfg.order);
       serviceConfig.KeepAlive = true;
       serviceConfig.RunAtLoad = true;
     };
