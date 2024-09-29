@@ -54,7 +54,7 @@ in
     launchd.daemons.tailscaled = {
       # derived from
       # https://github.com/tailscale/tailscale/blob/main/cmd/tailscaled/install_darwin.go#L30
-      command = lib.getExe' cfg.package "tailscaled";
+      command = [ (lib.getExe' cfg.package "tailscaled") ];
       serviceConfig = {
         Label = "com.tailscale.tailscaled";
         RunAtLoad = true;

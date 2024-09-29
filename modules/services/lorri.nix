@@ -13,7 +13,7 @@ in
         default = false;
         description = "Whether to enable the lorri service.";
       };
-      
+
       logFile = mkOption {
         type = types.nullOr types.path;
         default = null;
@@ -31,7 +31,7 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = [ pkgs.lorri ];
     launchd.user.agents.lorri = {
-      command = with pkgs; "${lorri}/bin/lorri daemon";
+      command = [ (lib.getExe pkgs.lorri) "daemon" ];
       path = with pkgs; [ config.nix.package git gnutar gzip ];
       serviceConfig = {
         KeepAlive = true;

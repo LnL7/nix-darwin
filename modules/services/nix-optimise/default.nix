@@ -62,7 +62,7 @@ in
 
     launchd.daemons.nix-optimise = {
       environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
-      command = "${lib.getExe' config.nix.package "nix-store"} --optimise";
+      command = [ (lib.getExe' config.nix.package "nix-store") "--optimise" ];
       serviceConfig = {
         RunAtLoad = false;
         StartCalendarInterval = cfg.interval;

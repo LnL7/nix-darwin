@@ -63,7 +63,7 @@ in
 
     launchd.user.agents.synapse-bt =
       { path = [ cfg.package ];
-        command = "${cfg.package}/bin/synapse --config ${configFile}";
+        command = [ (lib.getExe' cfg.package "synapse") "--config" configFile ];
         serviceConfig.KeepAlive = true;
         serviceConfig.RunAtLoad = true;
       };
