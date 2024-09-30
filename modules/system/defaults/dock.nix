@@ -176,7 +176,7 @@ in {
     system.defaults.dock.slow-motion-allowed = mkOption {
       type = types.nullOr types.bool;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Allow for slow-motion minimize effect while holding Shift key. The default is false.
       '';
     };
