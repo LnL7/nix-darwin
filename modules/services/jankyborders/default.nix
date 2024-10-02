@@ -81,7 +81,7 @@ in {
     };
 
     order = mkOption {
-      type = types.str;
+      type = types.enum [ "above" "below" ];
       default = "below";
       example = "above";
       description = ''
