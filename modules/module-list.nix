@@ -46,6 +46,7 @@
   ./nix
   ./nix/linux-builder.nix
   ./nix/nix-darwin.nix
+  ./nix/nix-optimise.nix
   ./nix/nixpkgs.nix
   ./nix/nixpkgs-flake.nix
   ./environment
