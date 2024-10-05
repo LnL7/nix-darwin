@@ -48,6 +48,11 @@ defaults write -g 'AppleShowScrollBars' $'<?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
 <string>Always</string>
 </plist>'
+defaults write -g 'AppleSpacesSwitchOnActivate' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write -g 'AppleWindowTabbingMode' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -69,6 +74,11 @@ defaults write -g 'NSAutomaticCapitalizationEnabled' $'<?xml version="1.0" encod
 <false/>
 </plist>'
 defaults write -g 'NSAutomaticDashSubstitutionEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write -g 'NSAutomaticInlinePredictionEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <false/>
@@ -289,7 +299,61 @@ defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding
 	</dict>
 </array>
 </plist>'
-
+defaults write com.apple.finder 'AppleShowAllExtensions' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder 'AppleShowAllFiles' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder 'CreateDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.finder 'FXDefaultSearchScope' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<string>SCcf</string>
+</plist>'
+defaults write com.apple.finder 'FXEnableExtensionChangeWarning' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.finder 'FXPreferredViewStyle' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<string>Flwv</string>
+</plist>'
+defaults write com.apple.finder 'QuitMenuItem' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder 'ShowPathbar' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder 'ShowStatusBar' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder '_FXShowPosixPathInTitle' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.finder '_FXSortFoldersFirst' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
 
 
 defaults write com.apple.screencapture 'location' $'<?xml version="1.0" encoding="UTF-8"?>
@@ -366,6 +430,46 @@ defaults write NSGlobalDomain 'TISRomanSwitchState' $'<?xml version="1.0" encodi
 <integer>1</integer>
 </plist>'
 defaults write com.apple.Safari 'com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.WindowManager 'AppWindowGroupingBehavior' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.WindowManager 'AutoHide' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.WindowManager 'EnableStandardClickToShowDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.WindowManager 'GloballyEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.WindowManager 'HideDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.WindowManager 'StageManagerHideWidgets' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.WindowManager 'StandardHideDesktopIcons' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.WindowManager 'StandardHideWidgets' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <true/>

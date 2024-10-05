@@ -3,30 +3,7 @@
 with lib;
 
 let
-  inherit (pkgs) stdenv;
-
   cfg = config.nix.linux-builder;
-
-  builderWithOverrides = cfg.package.override (previousArguments: {
-    # the linux-builder packages require a list `modules` argument, so it's
-    # always non-null.
-    modules = previousArguments.modules ++ [ cfg.config ];
-  });
-
-  # create-builder uses TMPDIR to share files with the builder, notably certs.
-  # macOS will clean up files in /tmp automatically that haven't been accessed in 3+ days.
-  # If we let it use /tmp, leaving the computer asleep for 3 days makes the certs vanish.
-  # So we'll use /run/org.nixos.linux-builder instead and clean it up ourselves.
-  script = pkgs.writeShellScript "linux-builder-start" ''
-    export TMPDIR=/run/org.nixos.linux-builder USE_TMPDIR=1
-    rm -rf $TMPDIR
-    mkdir -p $TMPDIR
-    trap "rm -rf $TMPDIR" EXIT
-    ${lib.optionalString cfg.ephemeral ''
-      rm -f ${cfg.workingDirectory}/${builderWithOverrides.nixosConfig.networking.hostName}.qcow2
-    ''}
-    ${builderWithOverrides}/bin/create-builder
-  '';
 in
 
 {
@@ -41,6 +18,11 @@ in
       type = types.package;
       default = pkgs.darwin.linux-builder;
       defaultText = "pkgs.darwin.linux-builder";
+      apply = pkg: pkg.override (old: {
+        # the linux-builder package requires `modules` as an argument, so it's
+        # always non-null.
+        modules = old.modules ++ [ cfg.config ];
+      });
       description = ''
         This option specifies the Linux builder to use.
       '';
@@ -135,7 +117,7 @@ in
 
     systems = mkOption {
       type = types.listOf types.str;
-      default = [ builderWithOverrides.nixosConfig.nixpkgs.hostPlatform.system ];
+      default = [ cfg.package.nixosConfig.nixpkgs.hostPlatform.system ];
       defaultText = ''
         The `nixpkgs.hostPlatform.system` of the build machine's final NixOS configuration.
       '';
@@ -179,11 +161,23 @@ in
       environment = {
         inherit (config.environment.variables) NIX_SSL_CERT_FILE;
       };
+
+      # create-builder uses TMPDIR to share files with the builder, notably certs.
+      # macOS will clean up files in /tmp automatically that haven't been accessed in 3+ days.
+      # If we let it use /tmp, leaving the computer asleep for 3 days makes the certs vanish.
+      # So we'll use /run/org.nixos.linux-builder instead and clean it up ourselves.
+      script = ''
+        export TMPDIR=/run/org.nixos.linux-builder USE_TMPDIR=1
+        rm -rf $TMPDIR
+        mkdir -p $TMPDIR
+        trap "rm -rf $TMPDIR" EXIT
+        ${lib.optionalString cfg.ephemeral ''
+          rm -f ${cfg.workingDirectory}/${cfg.package.nixosConfig.networking.hostName}.qcow2
+        ''}
+        ${cfg.package}/bin/create-builder
+      '';
+
       serviceConfig = {
-        ProgramArguments = [
-          "/bin/sh" "-c"
-          "/bin/wait4path /nix/store &amp;&amp; exec ${script}"
-        ];
         KeepAlive = true;
         RunAtLoad = true;
         WorkingDirectory = cfg.workingDirectory;
@@ -192,9 +186,11 @@ in
 
     environment.etc."ssh/ssh_config.d/100-linux-builder.conf".text = ''
       Host linux-builder
+        User builder
         Hostname localhost
         HostKeyAlias linux-builder
         Port 31022
+        IdentityFile /etc/nix/builder_ed25519
     '';
 
     nix.distributedBuilds = true;

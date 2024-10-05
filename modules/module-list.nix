@@ -32,6 +32,7 @@
   ./system/defaults/trackpad.nix
   ./system/defaults/universalaccess.nix
   ./system/defaults/ActivityMonitor.nix
+  ./system/defaults/WindowManager.nix
   ./system/etc.nix
   ./system/keyboard.nix
   ./system/launchd.nix
@@ -47,6 +48,7 @@
   ./nix/linux-builder.nix
   ./nix/nix-darwin.nix
   ./nix/nixpkgs.nix
+  ./nix/nixpkgs-flake.nix
   ./environment
   ./fonts
   ./launchd
@@ -69,6 +71,7 @@
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
   ./services/monitoring/telegraf.nix
+  ./services/monitoring/netdata.nix
   ./services/netbird.nix
   ./services/nix-daemon.nix
   ./services/nix-gc
@@ -88,6 +91,7 @@
   ./services/wg-quick.nix
   ./services/yabai
   ./services/nextdns
+  ./services/jankyborders
   ./programs/bash
   ./programs/direnv.nix
   ./programs/fish.nix

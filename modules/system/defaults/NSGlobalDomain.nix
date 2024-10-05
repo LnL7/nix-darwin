@@ -7,7 +7,6 @@ let
   inherit (config.lib.defaults.types) floatWithDeprecationError;
 in {
   options = {
-
     system.defaults.NSGlobalDomain.AppleShowAllFiles = mkOption {
       type = types.nullOr types.bool;
       default = null;
@@ -96,11 +95,27 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleSpacesSwitchOnActivate = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether or not to switch to a workspace that has a window of the application open, that is switched to. The default is true.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
         Whether to enable automatic capitalization.  The default is true.
+      '';
+    };
+
+    system.defaults.NSGlobalDomain.NSAutomaticInlinePredictionEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable inline predictive text.  The default is true.
       '';
     };
 

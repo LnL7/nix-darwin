@@ -5,8 +5,6 @@ with lib;
 let
   cfg = config.system;
 
-  defaultStateVersion = options.system.stateVersion.default;
-
   # Based on `lib.trivial.revisionWithDefault` from nixpkgs.
   gitRevision = path:
     if pathIsGitRepo "${path}/.git"
@@ -34,8 +32,9 @@ in
 {
   options = {
     system.stateVersion = mkOption {
-      type = types.int;
-      default = 4;
+      type = types.ints.between 1 config.system.maxStateVersion;
+      # TODO: Remove this default and the assertion below.
+      default = config.system.maxStateVersion;
       description = ''
         Every once in a while, a new NixOS release may change
         configuration defaults in a way incompatible with stateful
@@ -47,6 +46,12 @@ in
         defaults corresponding to the specified release (such as using
         an older version of PostgreSQL).
       '';
+    };
+
+    system.maxStateVersion = mkOption {
+      internal = true;
+      type = types.int;
+      default = 5;
     };
 
     system.darwinLabel = mkOption {
@@ -121,9 +126,22 @@ in
     # documentation is not reprocessed on every commit
     system.darwinLabel = mkDefault "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
 
-    assertions = [ {
-      assertion = cfg.stateVersion <= defaultStateVersion;
-      message = "system.stateVersion = ${toString cfg.stateVersion}; is not a valid value";
-    } ];
+    assertions = [
+      {
+        assertion = options.system.stateVersion.highestPrio != (lib.mkOptionDefault { }).priority;
+        message = ''
+          The `system.stateVersion` option is not defined in your
+          nix-darwin configuration. The value is used to conditionalize
+          backwards‐incompatible changes in default settings. You should
+          usually set this once when installing nix-darwin on a new system
+          and then never change it (at least without reading all the relevant
+          entries in the changelog using `darwin-rebuild changelog`).
+
+          You can use the current value for new installations as follows:
+
+              system.stateVersion = ${toString config.system.maxStateVersion};
+        '';
+      }
+    ];
   };
 }

@@ -22,12 +22,12 @@ with lib;
 
       * `/var/lib/github-runners/<name>`:
         State directory to store the runner registration credentials
+      * `/var/lib/github-runners/_work/<name>`:
+        Working directory for workflow files. The runner only uses this
+        directory if `workDir` is `null` (see the `workDir` option for details).
       * `/var/log/github-runners/<name>`:
         The launchd service writes the stdout and stderr streams to this
         directory.
-      * `/var/run/github-runners/<name>`:
-        Working directory for workflow files. The runner only uses this
-        directory if `workDir` is `null` (see the `workDir` option for details).
     '';
     example = {
       runner1 = {
@@ -199,7 +199,7 @@ with lib;
           default = { };
         };
 
-        package = mkPackageOptionMD pkgs "github-runner" { };
+        package = mkPackageOption pkgs "github-runner" { };
 
         ephemeral = mkOption {
           type = types.bool;

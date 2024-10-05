@@ -3,7 +3,7 @@
 with lib;
 
 let
-  cfg  = config.programs.ssh;
+  cfg = config.programs.ssh;
 
   knownHosts = map (h: getAttr h cfg.knownHosts) (attrNames cfg.knownHosts);
 
@@ -11,6 +11,14 @@ let
     { name, ... }:
     {
       options = {
+        certAuthority = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = ''
+            This public key is an SSH certificate authority, rather than an
+            individual host's key.
+          '';
+        };
         hostNames = mkOption {
           type = types.listOf types.str;
           default = [];
@@ -81,8 +89,7 @@ let
   };
 
   authKeysFiles = let
-    mkAuthKeyFile = u: nameValuePair "ssh/authorized_keys.d/${u.name}" {
-      copy = true;
+    mkAuthKeyFile = u: nameValuePair "ssh/nix_authorized_keys.d/${u.name}" {
       text = ''
         ${concatStringsSep "\n" u.openssh.authorizedKeys.keys}
         ${concatMapStrings (f: readFile f + "\n") u.openssh.authorizedKeys.keyFiles}
@@ -97,26 +104,14 @@ let
 in
 
 {
+  imports = [
+    (mkRemovedOptionModule [ "services" "openssh" "authorizedKeysFiles" ] "No `nix-darwin` equivalent to this NixOS option.")
+  ];
+
   options = {
 
     users.users = mkOption {
       type = with types; attrsOf (submodule userOptions);
-    };
-
-    services.openssh.authorizedKeysFiles = mkOption {
-      type = types.listOf types.str;
-      default = [];
-      description = ''
-        Specify the rules for which files to read on the host.
-
-        This is an advanced option. If you're looking to configure user
-        keys, you can generally use [](#opt-users.users._name_.openssh.authorizedKeys.keys)
-        or [](#opt-users.users._name_.openssh.authorizedKeys.keyFiles).
-
-        These are paths relative to the host root file system or home
-        directories and they are subject to certain token expansion rules.
-        See AuthorizedKeysFile in man sshd_config for details.
-      '';
     };
 
     programs.ssh.knownHosts = mkOption {
@@ -148,25 +143,29 @@ in
       message = "knownHost ${name} must contain either a publicKey or publicKeyFile";
     });
 
-    services.openssh.authorizedKeysFiles = [ "%h/.ssh/authorized_keys" "/etc/ssh/authorized_keys.d/%u" ];
-
     environment.etc = authKeysFiles //
       { "ssh/ssh_known_hosts" = mkIf (builtins.length knownHosts > 0) {
           text = (flip (concatMapStringsSep "\n") knownHosts
             (h: assert h.hostNames != [];
-              concatStringsSep "," h.hostNames + " "
+              lib.optionalString h.certAuthority "@cert-authority " + concatStringsSep "," h.hostNames + " "
               + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
             )) + "\n";
         };
         "ssh/sshd_config.d/101-authorized-keys.conf" = {
-          text = "AuthorizedKeysFile ${toString config.services.openssh.authorizedKeysFiles}\n";
+          text = ''
+            # sshd doesn't like reading from symbolic links, so we cat
+            # the file ourselves.
+            AuthorizedKeysCommand /bin/cat /etc/ssh/nix_authorized_keys.d/%u
+            # Just a simple cat, fine to use _sshd.
+            AuthorizedKeysCommandUser _sshd
+          '';
           # Allows us to automatically migrate from using a file to a symlink
           knownSha256Hashes = [ oldAuthorizedKeysHash ];
         };
       };
 
-    # Clean up .before-nix-darwin file left over from using knownSha256Hashes
     system.activationScripts.etc.text = ''
+      # Clean up .before-nix-darwin file left over from using knownSha256Hashes
       auth_keys_orig=/etc/ssh/sshd_config.d/101-authorized-keys.conf.before-nix-darwin
 
       if [ -e "$auth_keys_orig" ] && [ "$(shasum -a 256 $auth_keys_orig | cut -d ' ' -f 1)" = "${oldAuthorizedKeysHash}" ]; then

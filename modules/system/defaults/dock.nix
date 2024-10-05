@@ -20,7 +20,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to automatically hide and show the dock.  The default is false.
+        Whether to automatically hide and show the dock. The default is false.
       '';
     };
 
@@ -170,6 +170,14 @@ in {
       default = null;
       description = ''
         Show recent applications in the dock. The default is true.
+      '';
+    };
+
+    system.defaults.dock.slow-motion-allowed = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Allow for slow-motion minimize effect while holding Shift key. The default is false.
       '';
     };
 

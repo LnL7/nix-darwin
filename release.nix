@@ -40,6 +40,8 @@ let
           };
 
           config = {
+            system.stateVersion = lib.mkDefault config.system.maxStateVersion;
+
             system.build.run-test = pkgs.runCommand "darwin-test-${testName}"
               { allowSubstitutes = false; preferLocalBuild = true; }
               ''
@@ -71,6 +73,10 @@ let
       nano emacs vim;
   };
 
+  manual = buildFromConfig ({ lib, config, ... }: {
+    system.stateVersion = lib.mkDefault config.system.maxStateVersion;
+  }) (config: config.system.build.manual);
+
   jobs = {
 
     unstable = pkgs.releaseTools.aggregate {
@@ -92,9 +98,9 @@ let
       meta.description = "Release-critical builds for the darwin channel";
     };
 
-    manualHTML = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manualHTML);
-    manpages = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.manpages);
-    options = buildFromConfig ({ ... }: { }) (config: config.system.build.manual.optionsJSON);
+    manualHTML = manual.manualHTML;
+    manpages = manual.manpages;
+    options = manual.optionsJSON;
 
     examples.hydra = makeSystem ./modules/examples/hydra.nix;
     examples.lnl = makeSystem ./modules/examples/lnl.nix;
@@ -128,6 +134,7 @@ let
     tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
     tests.services-nix-optimise = makeTest ./tests/services-nix-optimise.nix;
     tests.services-nextdns = makeTest ./tests/services-nextdns.nix;
+    tests.services-netdata = makeTest ./tests/services-netdata.nix;
     tests.services-ofborg = makeTest ./tests/services-ofborg.nix;
     tests.services-offlineimap = makeTest ./tests/services-offlineimap.nix;
     tests.services-privoxy = makeTest ./tests/services-privoxy.nix;
@@ -138,6 +145,7 @@ let
     tests.services-synapse-bt = makeTest ./tests/services-synapse-bt.nix;
     tests.services-synergy = makeTest ./tests/services-synergy.nix;
     tests.services-yabai = makeTest ./tests/services-yabai.nix;
+    tests.services-jankyborders = makeTest ./tests/services-jankyborders.nix;
     tests.system-defaults-write = makeTest ./tests/system-defaults-write.nix;
     tests.system-environment = makeTest ./tests/system-environment.nix;
     tests.system-keyboard-mapping = makeTest ./tests/system-keyboard-mapping.nix;

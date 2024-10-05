@@ -13,10 +13,7 @@ with lib;
     };
 
     gid = mkOption {
-      type = mkOptionType {
-        name = "gid";
-        check = t: isInt t && t > 501;
-      };
+      type = types.int;
       description = "The group's GID.";
     };
 

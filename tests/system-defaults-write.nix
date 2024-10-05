@@ -11,7 +11,9 @@
   system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
   system.defaults.NSGlobalDomain.AppleShowScrollBars = "Always";
   system.defaults.NSGlobalDomain.AppleScrollerPagingBehavior = true;
+  system.defaults.NSGlobalDomain.AppleSpacesSwitchOnActivate = false;
   system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+  system.defaults.NSGlobalDomain.NSAutomaticInlinePredictionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
@@ -48,6 +50,17 @@
   system.defaults.dock.orientation = "left";
   system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
+  system.defaults.finder.AppleShowAllFiles = true;
+  system.defaults.finder.ShowStatusBar = true;
+  system.defaults.finder.ShowPathbar = true;
+  system.defaults.finder.FXDefaultSearchScope = "SCcf";
+  system.defaults.finder.FXPreferredViewStyle = "Flwv";
+  system.defaults.finder.AppleShowAllExtensions = true;
+  system.defaults.finder.CreateDesktop = false;
+  system.defaults.finder.QuitMenuItem = true;
+  system.defaults.finder._FXShowPosixPathInTitle = true;
+  system.defaults.finder._FXSortFoldersFirst = true;
+  system.defaults.finder.FXEnableExtensionChangeWarning = false;
   system.defaults.screencapture.location = "/tmp";
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;
@@ -63,25 +76,34 @@
   system.defaults.ActivityMonitor.SortColumn = "CPUUsage";
   system.defaults.ActivityMonitor.SortDirection = 0;
   system.defaults.ActivityMonitor.OpenMainWindow = true;
+  system.defaults.WindowManager.GloballyEnabled = false;
+  system.defaults.WindowManager.EnableStandardClickToShowDesktop = false;
+  system.defaults.WindowManager.AutoHide = false;
+  system.defaults.WindowManager.AppWindowGroupingBehavior = true;
+  system.defaults.WindowManager.StandardHideDesktopIcons = false;
+  system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.StandardHideWidgets = true;
+  system.defaults.WindowManager.StageManagerHideWidgets = true;
   system.defaults.CustomUserPreferences = {
-      "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
-      "com.apple.Safari" = {
-        "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
-          true;
-      };
+    "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
+    "com.apple.Safari" = {
+      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
+        true;
     };
-  test = lib.strings.concatMapStringsSep "\n" (x: ''
-    echo >&2 "checking defaults write in /${x}"
-    ${pkgs.python3}/bin/python3 <<EOL
-import sys
-from pathlib import Path
-fixture = '${./fixtures/system-defaults-write}/${x}.txt'
-out = '${config.out}/${x}'
-if Path(fixture).read_text() not in Path(out).read_text():
-  print("Did not find content from %s in %s" % (fixture, out), file=sys.stderr)
-  sys.exit(1)
-EOL
-  '') [
+  };
+  test = lib.strings.concatMapStringsSep "\n"
+    (x: ''
+      echo >&2 "checking defaults write in /${x}"
+      ${pkgs.python3}/bin/python3 <<EOL
+      import sys
+      from pathlib import Path
+      fixture = '${./fixtures/system-defaults-write}/${x}.txt'
+      out = '${config.out}/${x}'
+      if Path(fixture).read_text() not in Path(out).read_text():
+        print("Did not find content from %s in %s" % (fixture, out), file=sys.stderr)
+        sys.exit(1)
+      EOL
+    '') [
     "activate"
     "activate-user"
   ];
