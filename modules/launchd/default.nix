@@ -45,8 +45,9 @@ let
         };
 
         command = mkOption {
-          type = types.either types.str types.path;
-          default = "";
+          type = types.listOf (types.either types.str types.path);
+          default = [ ];
+          apply = escapeShellArgs;
           description = "Command executed as the service's main process.";
         };
 
@@ -55,15 +56,6 @@ let
           default = "";
           description = "Shell commands executed as the service's main process.";
         };
-
-        # preStart = mkOption {
-        #   type = types.lines;
-        #   default = "";
-        #   description = ''
-        #     Shell commands executed before the service's main process
-        #     is started.
-        #   '';
-        # };
 
         serviceConfig = mkOption {
           type = types.submodule launchdConfig;
@@ -80,11 +72,11 @@ let
       };
 
       config = {
-        command = mkIf (config.script != "") (pkgs.writeScript "${name}-start" ''
+        command = mkIf (config.script != "") [ (pkgs.writeScript "${name}-start" ''
           #! ${stdenv.shell}
 
           ${config.script}
-        '');
+        '') ];
 
         serviceConfig.Label = mkDefault "${cfg.labelPrefix}.${name}";
         serviceConfig.ProgramArguments = mkIf (config.command != "") [

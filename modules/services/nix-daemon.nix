@@ -44,7 +44,7 @@ in
     nix.useDaemon = true;
 
     launchd.daemons.nix-daemon = {
-      command = lib.getExe' config.nix.package "nix-daemon";
+      command = [ (lib.getExe' config.nix.package "nix-daemon") ];
       serviceConfig.ProcessType = config.nix.daemonProcessType;
       serviceConfig.LowPriorityIO = config.nix.daemonIOLowPriority;
       serviceConfig.Label = "org.nixos.nix-daemon"; # must match daemon installed by Nix regardless of the launchd label Prefix

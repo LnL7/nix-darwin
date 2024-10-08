@@ -50,7 +50,7 @@ in {
     environment.etc."offlineimaprc".text = cfg.extraConfig;
     launchd.user.agents.offlineimap = {
       path                            = [ cfg.package ];
-      command                         = "${cfg.package}/bin/offlineimap -c /etc/offlineimaprc" + optionalString (cfg.runQuick) " -q";
+      command                         = [ (lib.getExe cfg.package) "-c" "/etc/offlineimaprc" ] ++ optional cfg.runQuick "-q";
       serviceConfig.KeepAlive         = false;
       serviceConfig.RunAtLoad         = true;
       serviceConfig.StartInterval     = cfg.startInterval;
