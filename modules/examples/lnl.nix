@@ -199,7 +199,7 @@
   # Dotfiles.
   # programs.vim.package = mkForce pkgs.lnl.vim;
 
-  programs.bash.enableCompletion = true;
+  programs.bash.completion.enable = true;
 
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;

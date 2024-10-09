@@ -7,6 +7,10 @@ let
 in
 
 {
+  imports = [
+    (mkRenamedOptionModule [ "programs" "bash" "enableCompletion" ] [ "programs" "bash" "completion" "enable" ])
+  ];
+
   options = {
 
     programs.bash.enable = mkOption {
@@ -21,14 +25,18 @@ in
       type = types.lines;
     };
 
-    programs.bash.enableCompletion = mkOption {
-      type = types.bool;
-      default = false;
-      description = ''
-        Enable bash completion for all interactive bash shells.
+    programs.bash.completion = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Enable bash completion for all interactive bash shells.
 
-        NOTE. This doesn't work with bash 3.2, which is the default on macOS.
-      '';
+          NOTE: This doesn't work with bash 3.2, which is installed by default on macOS by Apple.
+        '';
+      };
+
+      package = mkPackageOption pkgs "bash-completion" { };
     };
 
   };
@@ -38,9 +46,9 @@ in
     environment.systemPackages =
       [ # Include bash package
         pkgs.bashInteractive
-      ] ++ optional cfg.enableCompletion pkgs.bash-completion;
+      ] ++ optional cfg.completion.enable cfg.completion.package;
 
-    environment.pathsToLink =
+    environment.pathsToLink = optionals cfg.completion.enable
       [ "/etc/bash_completion.d"
         "/share/bash-completion/completions"
       ];
@@ -70,9 +78,9 @@ in
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 
-      ${optionalString cfg.enableCompletion ''
+      ${optionalString cfg.completion.enable ''
         if [ "$TERM" != "dumb" ]; then
-          source "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
+          source "${cfg.completion.package}/etc/profile.d/bash_completion.sh"
 
           nullglobStatus=$(shopt -p nullglob)
           shopt -s nullglob

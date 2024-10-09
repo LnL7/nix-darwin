@@ -686,7 +686,7 @@ in
         nixPackage
         pkgs.nix-info
       ]
-      ++ optional (config.programs.bash.enableCompletion) pkgs.nix-bash-completions;
+      ++ optional (config.programs.bash.completion.enable) pkgs.nix-bash-completions;
 
     environment.etc."nix/nix.conf".source = nixConf;
 
