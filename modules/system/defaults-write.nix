@@ -113,7 +113,7 @@ in
 
         ${optionalString (length dock > 0) ''
           # Only restart Dock if current user is logged in
-          if pgrep -xu $UID Dock; then
+          if pgrep -xu $UID Dock >/dev/null; then
             echo >&2 "restarting Dock..."
             killall Dock || true
           fi
