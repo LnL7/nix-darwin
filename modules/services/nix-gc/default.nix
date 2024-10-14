@@ -46,9 +46,9 @@ in
       };
 
       options = mkOption {
-        default = "";
-        example = "--max-freed $((64 * 1024**3))";
-        type = types.str;
+        type = types.listOf types.str;
+        default = [ ];
+        example = [ "--max-freed" "$((64 * 1024**3))" ];
         description = ''
           Options given to {file}`nix-collect-garbage` when the
           garbage collector is run automatically.
@@ -65,7 +65,7 @@ in
   config = mkIf cfg.automatic {
 
     launchd.daemons.nix-gc = {
-      command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
+      command = [ (lib.getExe' config.nix.package "nix-collect-garbage") ] ++ cfg.options;
       environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       serviceConfig.RunAtLoad = false;
       serviceConfig.StartCalendarInterval = cfg.interval;

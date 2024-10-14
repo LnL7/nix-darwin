@@ -65,7 +65,7 @@ in
     environment.systemPackages = [ cfg.package ];
 
     launchd.user.agents.redis = {
-      command = "${cfg.package}/bin/redis-server /etc/redis.conf";
+      command = [ (lib.getExe' cfg.package "redis-server") "/etc/redis.conf" ];
       serviceConfig.KeepAlive = true;
     };
 

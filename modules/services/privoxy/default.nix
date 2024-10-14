@@ -57,9 +57,7 @@ in
 
     launchd.user.agents.privoxy = {
       path = [ config.environment.systemPath ];
-      command = ''
-      ${cfg.package}/bin/privoxy /etc/privoxy-config
-      '';
+      command = [ (lib.getExe cfg.package) "/etc/privoxy-config" ];
       serviceConfig.KeepAlive = true;
     };
   };
