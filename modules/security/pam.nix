@@ -7,63 +7,80 @@ let
 
   # Implementation Notes
   #
-  # We don't use `environment.etc` because this would require that the user manually delete
-  # `/etc/pam.d/sudo` which seems unwise given that applying the nix-darwin configuration requires
-  # sudo. We also can't use `system.patchs` since it only runs once, and so won't patch in the
-  # changes again after OS updates (which remove modifications to this file).
-  #
-  # As such, we resort to line addition/deletion in place using `sed`. We add a comment to the
-  # added line that includes the name of the option, to make it easier to identify the line that
-  # should be deleted when the option is disabled.
-  mkSudoTouchIdAuthScript = isEnabled:
+  # Uses `environment.etc` to create the `/etc/pam.d/sudo_local` file that will be used
+  # to manage all things pam related for nix-darwin. An activation script will run to check
+  # for the existance of the line `auth       include        sudo_local`. This is included
+  # in macOS Sonoma and later. If the line is not there already then `sed` will add it.
+  # In those cases, the line will include the name of the option root (`security.pam`),
+  # to make it easier to identify the line that should be deleted when the option is disabled.
+  mkIncludeSudoLocalScript = isEnabled:
   let
-    file   = "/etc/pam.d/sudo";
-    option = "security.pam.enableSudoTouchIdAuth";
+    file = "/etc/pam.d/sudo";
+    option = "security.pam";
+    deprecatedOption = "security.pam.enableSudoTouchIdAuth";
     sed = "${pkgs.gnused}/bin/sed";
   in ''
     ${if isEnabled then ''
-      # Enable sudo Touch ID authentication, if not already enabled
-      if ! grep 'pam_tid.so' ${file} > /dev/null; then
-        ${sed} -i '2i\
-      auth       sufficient     pam_tid.so # nix-darwin: ${option}
-        ' ${file}
+      # NOTE: this can be removed at some point when support for older versions are dropped
+      # Always clear out older implementation if it exists
+      if grep '${deprecatedOption}' ${file} > /dev/null; then
+        ${sed} -i '/${option}/d' ${file}
+      fi
+      # Check if include line is needed (macOS < 14)
+      if ! grep 'sudo_local' ${file} > /dev/null; then
+        ${sed} -i '2iauth       include        sudo_local # nix-darwin: ${option}' ${file}
       fi
     '' else ''
-      # Disable sudo Touch ID authentication, if added by nix-darwin
+      # Remove include line if we added it
       if grep '${option}' ${file} > /dev/null; then
         ${sed} -i '/${option}/d' ${file}
       fi
     ''}
   '';
 in
-
 {
   options = {
-    security.pam.enableSudoTouchIdAuth = mkEnableOption "" // {
-      description = ''
-        Enable sudo authentication with Touch ID.
-
-        When enabled, this option adds the following line to
-        {file}`/etc/pam.d/sudo`:
-
-        ```
-        auth       sufficient     pam_tid.so
-        ```
-
-        ::: {.note}
-        macOS resets this file when doing a system update. As such, sudo
-        authentication with Touch ID won't work after a system update
-        until the nix-darwin configuration is reapplied.
-        :::
-      '';
+    security.pam = {
+      enableSudoTouchIdAuth = mkEnableOption "" // {
+        description = ''
+          Enable sudo authentication with Touch ID.
+          When enabled, this option adds the following line to {file}:
+          ```
+          auth       sufficient     pam_tid.so
+          ```
+        '';
+      };
+      enablePamReattach = mkEnableOption "" // {
+        description = ''
+          Enable re-attaching a program to the user's bootstrap session.
+          This allows programs like tmux and screen that run in the background to
+          survive across user sessions to work with PAM services that are tied to the
+          bootstrap session.
+          When enabled, this option adds the following line to /etc/pam.d/sudo_local:
+          ```
+          auth       optional       /path/in/nix/store/lib/pam/pam_reattach.so"
+          ```
+        '';
+      };
     };
   };
 
-  config = {
+  config =
+  let
+    isPamEnabled = (cfg.enableSudoTouchIdAuth || cfg.enablePamReattach);
+  in
+  {
+    environment.etc."pam.d/sudo_local" = {
+      enable = isPamEnabled;
+      text = lib.strings.concatStringsSep "\n" [
+        (lib.optionalString cfg.enablePamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
+        (lib.optionalString cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
+      ];
+    };
     system.activationScripts.pam.text = ''
       # PAM settings
       echo >&2 "setting up pam..."
-      ${mkSudoTouchIdAuthScript cfg.enableSudoTouchIdAuth}
+      ${mkIncludeSudoLocalScript isPamEnabled}
     '';
   };
 }
