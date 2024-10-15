@@ -67,6 +67,8 @@ in
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
+      ${cfg.activationScripts.power.text}
+      ${cfg.activationScripts.sleep.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
