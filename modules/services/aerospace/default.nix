@@ -5,8 +5,6 @@
   ...
 }:
 
-with lib;
-
 let
   cfg = config.services.aerospace;
 
@@ -15,51 +13,47 @@ let
 in
 
 {
-  options = with types; {
-    services.aerospace = {
-      enable = mkEnableOption "AeroSpace window manager";
+  options = {
+    services.aerospace = with lib.types; {
+      enable = lib.mkEnableOption "AeroSpace window manager";
 
-      package = mkOption {
-        type = types.path;
-        default = pkgs.aerospace;
-        description = "The AeroSpace package to use.";
-      };
+      package = lib.mkPackageOption pkgs "aerospace" { };
 
-      settings = mkOption {
+      settings = lib.mkOption {
         type = submodule {
           freeformType = format.type;
           options = {
-            start-at-login = mkOption {
-              type = addCheck bool (b: !false || !cfg.enable);
+            start-at-login = lib.mkOption {
+              type = bool;
               default = false;
               description = "Do not start AeroSpace at login. (Managed by launchd instead)";
             };
-            after-login-command = mkOption {
-              type = addCheck (listOf str) (l: l == [ ] || !cfg.enable);
+            after-login-command = lib.mkOption {
+              type = listOf str;
               default = [ ];
               description = "Do not use AeroSpace to run commands after login. (Managed by launchd instead)";
             };
-            after-startup-command = mkOption {
-              type = addCheck (listOf str) (l: l == [ ] || !cfg.enable);
+            after-startup-command = lib.mkOption {
+              type = listOf str;
               default = [ ];
               description = "Do not use AeroSpace to run commands after startup. (Managed by launchd instead)";
             };
-            enable-normalization-flatten-containers = mkOption {
+            enable-normalization-flatten-containers = lib.mkOption {
               type = bool;
               default = true;
               description = "Containers that have only one child are \"flattened\".";
             };
-            enable-normalization-opposite-orientation-for-nested-containers = mkOption {
+            enable-normalization-opposite-orientation-for-nested-containers = lib.mkOption {
               type = bool;
               default = true;
               description = "Containers that nest into each other must have opposite orientations.";
             };
-            accordion-padding = mkOption {
+            accordion-padding = lib.mkOption {
               type = int;
               default = 30;
               description = "Padding between windows in an accordion container.";
             };
-            default-root-container-layout = mkOption {
+            default-root-container-layout = lib.mkOption {
               type = enum [
                 "tiles"
                 "accordion"
@@ -67,7 +61,7 @@ in
               default = "tiles";
               description = "Default layout for the root container.";
             };
-            default-root-container-orientation = mkOption {
+            default-root-container-orientation = lib.mkOption {
               type = enum [
                 "horizontal"
                 "vertical"
@@ -76,22 +70,22 @@ in
               default = "auto";
               description = "Default orientation for the root container.";
             };
-            on-window-detected = mkOption {
+            on-window-detected = lib.mkOption {
               type = listOf str;
               default = [ ];
               description = "Commands to run every time a new window is detected.";
             };
-            on-focus-changed = mkOption {
+            on-focus-changed = lib.mkOption {
               type = listOf str;
               default = [ ];
               description = "Commands to run every time focused window or workspace changes.";
             };
-            on-focused-monitor-changed = mkOption {
+            on-focused-monitor-changed = lib.mkOption {
               type = listOf str;
               default = [ "move-mouse monitor-lazy-center" ];
               description = "Commands to run every time focused monitor changes.";
             };
-            exec-on-workspace-change = mkOption {
+            exec-on-workspace-change = lib.mkOption {
               type = listOf str;
               default = [ ];
               example = [
@@ -101,7 +95,7 @@ in
               ];
               description = "Commands to run every time workspace changes.";
             };
-            key-mapping.preset = mkOption {
+            key-mapping.preset = lib.mkOption {
               type = enum [
                 "qwerty"
                 "dvorak"
@@ -112,7 +106,7 @@ in
           };
         };
         default = { };
-        example = literalExpression ''
+        example = lib.literalExpression ''
           {
             gaps = {
               outer.left = 8;
@@ -137,20 +131,33 @@ in
     };
   };
 
-  config = mkMerge [
-    (mkIf (cfg.enable) {
+  config = (
+    lib.mkIf (cfg.enable) {
+      assertions = [
+        {
+          assertion = !cfg.settings.start-at-login;
+          message = "AeroSpace started at login is managed by home-manager and launchd instead of itself via this option.";
+        }
+        {
+          assertion = cfg.settings.after-login-command == [ ];
+          message = "AeroSpace will not run these commands as it does not start itself.";
+        }
+        {
+          assertion = cfg.settings.after-startup-command == [ ];
+          message = "AeroSpace will not run these commands as it does not start itself.";
+        }
+      ];
       environment.systemPackages = [ cfg.package ];
 
-      launchd.user.agents.aerospace.serviceConfig = {
-        ProgramArguments =
-          [ "${cfg.package}/Applications/AeroSpace.app/Contents/MacOS/AeroSpace" ]
-          ++ optionals (cfg.settings != { }) [
-            "--config-path"
-            "${configFile}"
-          ];
-        KeepAlive = true;
-        RunAtLoad = true;
+      launchd.user.agents.aerospace = {
+        command =
+          "${cfg.package}/Applications/AeroSpace.app/Contents/MacOS/AeroSpace"
+          + (lib.optionalString (cfg.settings != { }) " --config-path ${configFile}");
+        serviceConfig = {
+          KeepAlive = true;
+          RunAtLoad = true;
+        };
       };
-    })
-  ];
+    }
+  );
 }
