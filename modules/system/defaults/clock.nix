@@ -5,6 +5,14 @@ with lib;
 {
   options = {
 
+    system.defaults.menuExtraClock.FlashDateSeparators = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        When enabled, the clock indicator (which by default is the colon) will flash on and off each second. Default is null.
+      '';
+    };
+
     system.defaults.menuExtraClock.IsAnalog = mkOption {
       type = types.nullOr types.bool;
       default = null;
