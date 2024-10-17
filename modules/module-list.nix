@@ -52,6 +52,7 @@
   ./fonts
   ./launchd
   ./services/activate-system
+  ./services/aerospace
   ./services/autossh.nix
   ./services/buildkite-agents.nix
   ./services/chunkwm.nix

@@ -129,6 +129,7 @@ let
     tests.services-lorri = makeTest ./tests/services-lorri.nix;
     tests.services-nix-daemon = makeTest ./tests/services-nix-daemon.nix;
     tests.sockets-nix-daemon = makeTest ./tests/sockets-nix-daemon.nix;
+    tests.services-aerospace = makeTest ./tests/services-aerospace.nix;
     tests.services-dnsmasq = makeTest ./tests/services-dnsmasq.nix;
     tests.services-eternal-terminal = makeTest ./tests/services-eternal-terminal.nix;
     tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
