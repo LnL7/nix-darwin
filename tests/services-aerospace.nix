@@ -27,7 +27,7 @@ in
     grep "org.nixos.aerospace" ${config.out}/user/Library/LaunchAgents/org.nixos.aerospace.plist
     grep "${aerospace}/Applications/AeroSpace.app/Contents/MacOS/AeroSpace" ${config.out}/user/Library/LaunchAgents/org.nixos.aerospace.plist
 
-    conf=`sed -En '/<string>--config-path<\/string>/{n; s/\s+?<\/?string>//g; p;}' \
+    conf=`sed -En 's/^[[:space:]]*<string>.*--config-path (.*)<\/string>$/\1/p' \
       ${config.out}/user/Library/LaunchAgents/org.nixos.aerospace.plist`
 
     echo >&2 "checking config in $conf"
