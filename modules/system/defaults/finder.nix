@@ -38,6 +38,15 @@ with lib;
       '';
     };
 
+    system.defaults.finder.FXRemoveOldTrashItems = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Remove items in the bin after 30 days.
+        The default is false.
+      '';
+    };
+
     system.defaults.finder.FXPreferredViewStyle = mkOption {
       type = types.nullOr types.str;
       default = null;
@@ -52,7 +61,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to always show file extensions.  The default is false.
+        Whether to always show file extensions. The default is false.
       '';
     };
 
@@ -68,7 +77,39 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to allow quitting of the Finder.  The default is false.
+        Whether to allow quitting of the Finder. The default is false.
+      '';
+    };
+
+    system.defaults.finder.ShowExternalHardDrivesOnDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to show external disks on desktop. The default is true.
+      '';
+    };
+
+    system.defaults.finder.ShowHardDrivesOnDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to show hard disks on desktop. The default is false.
+      '';
+    };
+
+    system.defaults.finder.ShowMountedServersOnDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to show connected servers on desktop. The default is false.
+      '';
+    };
+
+    system.defaults.finder.ShowRemovableMediaOnDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to show removable media (CDs, DVDs and iPods) on desktop. The default is true.
       '';
     };
 
@@ -76,7 +117,7 @@ with lib;
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to show the full POSIX filepath in the window title.  The default is false.
+        Whether to show the full POSIX filepath in the window title. The default is false.
       '';
     };
 
@@ -88,11 +129,19 @@ with lib;
       '';
     };
 
+    system.defaults.finder._FXSortFoldersFirstOnDesktop = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Keep folders on top when sorting by name on the desktop. The default is false.
+      '';
+    };
+
     system.defaults.finder.FXEnableExtensionChangeWarning = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to show warnings when change the file extension of files.  The default is true.
+        Whether to show warnings when change the file extension of files. The default is true.
       '';
     };
 
