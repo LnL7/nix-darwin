@@ -66,8 +66,8 @@ with lib;
     };
 
     system.defaults.menuExtraClock.FlashDateSeparators = mkOption {
-      type = types.bool;
-      default = false;
+      type = types.nullOr types.bool;
+      default = null;
       description = ''
         When enabled, the time separators will flash on and off each second.
       '';
