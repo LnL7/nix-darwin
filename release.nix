@@ -1,14 +1,11 @@
 { nixpkgs ? <nixpkgs>
-, supportedSystems ? [ "x86_64-darwin" ]
+, system ? builtins.currentSystem
+, supportedSystems ? [ "x86_64-darwin" "aarch64-darwin" ]
 , scrubJobs ? true
 }:
 
 let
-  inherit (release) mapTestOn packagePlatforms pkgs all linux darwin;
-
-  system = "x86_64-darwin";
-
-  mapPlatforms = systems: pkgs.lib.mapAttrs (n: v: systems);
+  inherit (release) mapTestOn packagePlatforms pkgs;
 
   buildFromConfig = configuration: sel: sel
     (import ./. { inherit nixpkgs configuration system; }).config;
