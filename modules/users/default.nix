@@ -168,7 +168,7 @@ in
         else
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
-            sysadminctl -addUser ${lib.escapeShellArgs [ v.name "-UID" v.uid "-GID" v.gid "-fullName" v.description "-home" v.home "-shell" (shellPath v.shell) ]}
+            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])}
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
             ${optionalString v.createHome "createhomedir -cu ${name}"}
           fi
