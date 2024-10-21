@@ -44,7 +44,7 @@
 
     # checking user creation in /activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "foo" "-UID" 42000 "-GID" 42000 "-fullName" "Foo user" "-home" "/Users/foo" "-shell" "/run/current-system/sw/bin/bash" ]}" ${config.out}/activate
-    grep "createhomedir -cu 'foo'" ${config.out}/activate
+    grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/sbin/nologin" ]}" ${config.out}/activate
     grep -qv "sysadminctl -deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate
     grep -qv "sysadminctl -deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate

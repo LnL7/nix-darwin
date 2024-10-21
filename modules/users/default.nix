@@ -149,19 +149,20 @@ in
       echo "setting up users..." >&2
 
       ${concatMapStringsSep "\n" (v: let
+        name = lib.escapeShellArg v.name;
         dsclUser = lib.escapeShellArg "/Users/${v.name}";
       in ''
         ${optionalString cfg.forceRecreate ''
-          u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
+          u=$(id -u ${name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
-            sysadminctl -deleteUser ${lib.escapeShellArg v.name} 2> /dev/null
+            sysadminctl -deleteUser ${name} 2> /dev/null
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
         ''}
 
-        u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
+        u=$(id -u ${name} 2> /dev/null) || true
         if [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
         else
@@ -169,7 +170,7 @@ in
             echo "creating user ${v.name}..." >&2
             sysadminctl -addUser ${lib.escapeShellArgs [ v.name "-UID" v.uid "-GID" v.gid "-fullName" v.description "-home" v.home "-shell" (shellPath v.shell) ]}
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
+            ${optionalString v.createHome "createhomedir -cu ${name}"}
           fi
           # Always set the shell path, in case it was updated
           dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
