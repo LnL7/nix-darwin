@@ -95,45 +95,49 @@ in
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
 
-      ${concatMapStringsSep "\n" (v: ''
+      ${concatMapStringsSep "\n" (v: let
+        dsclGroup = lib.escapeShellArg "/Groups/${v.name}";
+      in ''
         ${optionalString cfg.forceRecreate ''
-          g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
+          g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
           g=''${g#PrimaryGroupID: }
           if [[ "$g" -eq ${toString v.gid} ]]; then
             echo "deleting group ${v.name}..." >&2
-            dscl . -delete '/Groups/${v.name}' 2> /dev/null
+            dscl . -delete ${dsclGroup} 2> /dev/null
           else
             echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
           fi
         ''}
 
-        g=$(dscl . -read '/Groups/${v.name}' PrimaryGroupID 2> /dev/null) || true
+        g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
         if [ -z "$g" ]; then
           echo "creating group ${v.name}..." >&2
-          dscl . -create '/Groups/${v.name}' PrimaryGroupID ${toString v.gid}
-          dscl . -create '/Groups/${v.name}' RealName '${v.description}'
+          dscl . -create ${dsclGroup} PrimaryGroupID ${toString v.gid}
+          dscl . -create ${dsclGroup} RealName '${v.description}'
           g=${toString v.gid}
         fi
 
         if [ "$g" -eq ${toString v.gid} ]; then
-          g=$(dscl . -read '/Groups/${v.name}' GroupMembership 2> /dev/null) || true
+          g=$(dscl . -read ${dsclGroup} GroupMembership 2> /dev/null) || true
           if [ "$g" != 'GroupMembership: ${concatStringsSep " " v.members}' ]; then
             echo "updating group members ${v.name}..." >&2
-            dscl . -create '/Groups/${v.name}' GroupMembership ${lib.escapeShellArgs v.members}
+            dscl . -create ${dsclGroup} GroupMembership ${lib.escapeShellArgs v.members}
           fi
         else
           echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
         fi
       '') createdGroups}
 
-      ${concatMapStringsSep "\n" (name: ''
-        g=$(dscl . -read '/Groups/${name}' PrimaryGroupID 2> /dev/null) || true
+      ${concatMapStringsSep "\n" (name: let
+        dsclGroup = lib.escapeShellArg "/Groups/${name}";
+      in ''
+        g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
         if [ -n "$g" ]; then
           if [ "$g" -gt 501 ]; then
             echo "deleting group ${name}..." >&2
-            dscl . -delete '/Groups/${name}' 2> /dev/null
+            dscl . -delete ${dsclGroup} 2> /dev/null
           else
             echo "[1;31mwarning: existing group '${name}' has unexpected gid $g, skipping...[0m" >&2
           fi
@@ -144,7 +148,9 @@ in
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
 
-      ${concatMapStringsSep "\n" (v: ''
+      ${concatMapStringsSep "\n" (v: let
+        dsclUser = lib.escapeShellArg "/Users/${v.name}";
+      in ''
         ${optionalString cfg.forceRecreate ''
           u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
@@ -162,11 +168,11 @@ in
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
             sysadminctl -addUser ${lib.escapeShellArgs [ v.name "-UID" v.uid "-GID" v.gid "-fullName" v.description "-home" v.home "-shell" (shellPath v.shell) ]}
-            dscl . -create '/Users/${v.name}' IsHidden ${if v.isHidden then "1" else "0"}
+            dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
             ${optionalString v.createHome "createhomedir -cu '${v.name}'"}
           fi
           # Always set the shell path, in case it was updated
-          dscl . -create '/Users/${v.name}' UserShell ${lib.escapeShellArg (shellPath v.shell)}
+          dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
         fi
       '') createdUsers}
 
