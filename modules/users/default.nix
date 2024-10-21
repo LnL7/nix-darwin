@@ -147,7 +147,7 @@ in
 
       ${concatMapStringsSep "\n" (v: ''
         ${optionalString cfg.forceRecreate ''
-          u=$(id -u '${v.name}' 2> /dev/null) || true
+          u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
             sysadminctl -deleteUser '${v.name}' 2> /dev/null
@@ -156,7 +156,7 @@ in
           fi
         ''}
 
-        u=$(id -u '${v.name}' 2> /dev/null) || true
+        u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
         if [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
         else
@@ -177,7 +177,7 @@ in
       '') createdUsers}
 
       ${concatMapStringsSep "\n" (name: ''
-        u=$(id -u '${name}' 2> /dev/null) || true
+        u=$(id -u ${lib.escapeShellArg name} 2> /dev/null) || true
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
