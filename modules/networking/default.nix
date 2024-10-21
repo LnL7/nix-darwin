@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 
@@ -8,15 +8,14 @@ let
   hostnameRegEx = ''^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'';
 
   emptyList = lst: if lst != [] then lst else ["empty"];
-  quoteStrings = concatMapStringsSep " " (str: "'${str}'");
 
   setNetworkServices = optionalString (cfg.knownNetworkServices != []) ''
     networkservices=$(networksetup -listallnetworkservices)
     ${concatMapStringsSep "\n" (srv: ''
       case "$networkservices" in
-        *'${srv}'*)
-          networksetup -setdnsservers '${srv}' ${quoteStrings (emptyList cfg.dns)}
-          networksetup -setsearchdomains '${srv}' ${quoteStrings (emptyList cfg.search)}
+        *${lib.escapeShellArg srv}*)
+          networksetup -setdnsservers ${lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.dns))}
+          networksetup -setsearchdomains ${lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.search))}
           ;;
       esac
     '') cfg.knownNetworkServices}
