@@ -150,7 +150,7 @@ in
           u=$(id -u ${lib.escapeShellArg v.name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
-            sysadminctl -deleteUser '${v.name}' 2> /dev/null
+            sysadminctl -deleteUser ${lib.escapeShellArg v.name} 2> /dev/null
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
@@ -181,7 +181,7 @@ in
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            sysadminctl -deleteUser '${name}' 2> /dev/null
+            sysadminctl -deleteUser ${lib.escapeShellArg name} 2> /dev/null
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi

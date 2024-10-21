@@ -46,19 +46,19 @@
     grep -zoP "sysadminctl -addUser 'foo' (.|\n)* -UID 42000 (.|\n)* -GID 42000 (.|\n)* -fullName 'Foo user' (.|\n)* -home '/Users/foo' (.|\n)* -shell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
     grep "createhomedir -cu 'foo'" ${config.out}/activate
     grep -zoP "sysadminctl -addUser 'created.user' (.|\n)* -UID 42001 (.|\n)* -shell ${lib.escapeShellArg "/sbin/nologin"}" ${config.out}/activate
-    grep -qv "sysadminctl -deleteUser 'created.user'" ${config.out}/activate
-    grep -qv "sysadminctl -deleteUser 'created.user'" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate
 
     # checking user properties always get updated in /activate
     grep "dscl . -create '/Users/foo' UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
 
     # checking user deletion in /activate
-    grep "sysadminctl -deleteUser 'deleted.user'" ${config.out}/activate
+    grep "sysadminctl -deleteUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate
     grep -qv "sysadminctl -addUser 'deleted.user'" ${config.out}/activate
 
     # checking unknown user in /activate
     grep -qv "sysadminctl -addUser 'unknown.user'" ${config.out}/activate
-    grep -qv "sysadminctl -deleteUser 'unknown.user'" ${config.out}/activate
+    grep -qv "sysadminctl -deleteUser ${lib.escapeShellArg "unknown.user"}" ${config.out}/activate
 
     set +v
   '';
