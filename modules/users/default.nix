@@ -8,7 +8,6 @@ let
   group = import ./group.nix;
   user = import ./user.nix;
 
-  toArguments = concatMapStringsSep " " (v: "'${v}'");
   toGID = v: { "${toString v.gid}" = v.name; };
   toUID = v: { "${toString v.uid}" = v.name; };
 
@@ -121,7 +120,7 @@ in
           g=$(dscl . -read '/Groups/${v.name}' GroupMembership 2> /dev/null) || true
           if [ "$g" != 'GroupMembership: ${concatStringsSep " " v.members}' ]; then
             echo "updating group members ${v.name}..." >&2
-            dscl . -create '/Groups/${v.name}' GroupMembership ${toArguments v.members}
+            dscl . -create '/Groups/${v.name}' GroupMembership ${lib.escapeShellArgs v.members}
           fi
         else
           echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2

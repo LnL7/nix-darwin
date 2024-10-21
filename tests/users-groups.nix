@@ -35,7 +35,7 @@
     grep -qv "dscl . -create '/Groups/deleted.group'" ${config.out}/activate
 
     echo "checking group membership in /activate" >&2
-    grep "dscl . -create '/Groups/foo' GroupMembership 'admin' 'foo'" ${config.out}/activate
+    grep "dscl . -create '/Groups/foo' GroupMembership ${lib.escapeShellArgs [ "admin" "foo" ]}" ${config.out}/activate
     grep "dscl . -create '/Groups/created.group' GroupMembership" ${config.out}/activate
 
     # checking unknown group in /activate
