@@ -114,7 +114,7 @@ in
         if [ -z "$g" ]; then
           echo "creating group ${v.name}..." >&2
           dscl . -create ${dsclGroup} PrimaryGroupID ${toString v.gid}
-          dscl . -create ${dsclGroup} RealName '${v.description}'
+          dscl . -create ${dsclGroup} RealName ${lib.escapeShellArg v.description}
           g=${toString v.gid}
         fi
 

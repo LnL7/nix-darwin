@@ -26,7 +26,7 @@
 
     # checking group creation in /activate
     grep "dscl . -create ${lib.escapeShellArg "/Groups/foo"} PrimaryGroupID 42000" ${config.out}/activate
-    grep "dscl . -create ${lib.escapeShellArg "/Groups/foo"} RealName 'Foo group'" ${config.out}/activate
+    grep "dscl . -create ${lib.escapeShellArg "/Groups/foo"} RealName ${lib.escapeShellArg "Foo group"}" ${config.out}/activate
     grep "dscl . -create ${lib.escapeShellArg "/Groups/created.group"} PrimaryGroupID 42001" ${config.out}/activate
     grep -qv "dscl . -delete ${lib.escapeShellArg "/Groups/created.group"}" ${config.out}/activate
 
