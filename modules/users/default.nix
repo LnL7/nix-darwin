@@ -148,6 +148,42 @@ in
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
 
+      deleteUser() {
+        fullDiskAccess=false
+
+        if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
+          fullDiskAccess=true
+        fi
+
+        if [[ "$fullDiskAccess" != true ]]; then
+          printf >&2 '\e[1;31merror: users cannot be deleted without Full Disk Access, aborting activation\e[0m\n'
+          printf >&2 'The user %s could not be deleted as `darwin-rebuild` was not executed with Full Disk Access.' "$1"
+
+          printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
+          printf >&2 '\n'
+          # This command will fail if run as root and System Settings is already running
+          # even if System Settings was launched by root.
+          sudo -u $SUDO_USER open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+
+          if [[ -n "$SSH_CONNECTION" ]]; then
+            printf >&2 'Please enable Full Disk Access for programs over SSH by flipping\n'
+            printf >&2 'the switch for `sshd-keygen-wrapper`.\n'
+          else
+            printf >&2 'Please enable Full Disk Access for your terminal emulator by flipping\n'
+            printf >&2 'the switch in System Settings.\n'
+          fi
+
+          exit 1
+        fi
+
+        sysadminctl -deleteUser "$1" 2> /dev/null
+
+        if id -u "$1" > /dev/null 2>&1; then
+          printf >&2 '\e[1;31merror: failed to delete user %s, aborting activation\e[0m\n', "$1"
+          exit 1
+        fi
+      }
+
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
         dsclUser = lib.escapeShellArg "/Users/${v.name}";
@@ -156,7 +192,7 @@ in
           u=$(id -u ${name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
             echo "deleting user ${v.name}..." >&2
-            sysadminctl -deleteUser ${name} 2> /dev/null
+            deleteUser ${name}
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
@@ -182,7 +218,7 @@ in
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            sysadminctl -deleteUser ${lib.escapeShellArg name} 2> /dev/null
+            deleteUser ${lib.escapeShellArg name}
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi
