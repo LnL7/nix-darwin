@@ -17,7 +17,7 @@ jobs:
         fetch-depth: 0
 
     - name: Install Nix
-      uses: cachix/install-nix-action@v27
+      uses: cachix/install-nix-action@v30
 
     - name: Build manual
       run: |
