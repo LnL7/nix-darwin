@@ -5,7 +5,7 @@
     inherit (lib) literalExpression mkOption types;
   in {
     name = mkOption {
-      type = types.str;
+      type = types.nonEmptyStr;
       default = name;
       description = ''
         The name of the user account. If undefined, the name of the
