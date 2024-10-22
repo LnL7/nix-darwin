@@ -128,11 +128,10 @@ in
         '';
       type = configType;
       description = ''
-        The configuration of the Nix Packages collection.  (For
-        details, see the Nixpkgs documentation.)  It allows you to set
-        package configuration options.
+        Global configuration for Nixpkgs.
+        The complete list of [Nixpkgs configuration options](https://nixos.org/manual/nixpkgs/unstable/#sec-config-options-reference) is in the [Nixpkgs manual section on global configuration](https://nixos.org/manual/nixpkgs/unstable/#chap-packageconfig).
 
-        Ignored when `nixpkgs.pkgs` is set.
+        Ignored when {option}`nixpkgs.pkgs` is set.
       '';
     };
 
@@ -151,22 +150,18 @@ in
         '';
       type = types.listOf overlayType;
       description = ''
-        List of overlays to use with the Nix Packages collection.
-        (For details, see the Nixpkgs documentation.)  It allows
-        you to override packages globally. Each function in the list
-        takes as an argument the *original* Nixpkgs.
-        The first argument should be used for finding dependencies, and
-        the second should be used for overriding recipes.
+        List of overlays to apply to Nixpkgs.
+        This option allows modifying the Nixpkgs package set accessed through the `pkgs` module argument.
 
-        If `nixpkgs.pkgs` is set, overlays specified here
-        will be applied after the overlays that were already present
-        in `nixpkgs.pkgs`.
+        For details, see the [Overlays chapter in the Nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#chap-overlays).
+
+        If the {option}`nixpkgs.pkgs` option is set, overlays specified using `nixpkgs.overlays` will be applied after the overlays that were already included in `nixpkgs.pkgs`.
       '';
     };
 
     hostPlatform = mkOption {
       type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
-      example = { system = "aarch64-darwin"; config = "aarch64-apple-darwin"; };
+      example = { system = "aarch64-darwin"; };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this. TODO make `lib.systems` itself use the module system.
       apply = lib.systems.elaborate;
@@ -182,10 +177,14 @@ in
     buildPlatform = mkOption {
       type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
       default = cfg.hostPlatform;
-      example = { system = "x86_64-darwin"; config = "x86_64-apple-darwin"; };
+      example = { system = "x86_64-darwin"; };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this.
-      apply = lib.systems.elaborate;
+      apply = inputBuildPlatform:
+        let elaborated = lib.systems.elaborate inputBuildPlatform;
+        in if lib.systems.equals elaborated cfg.hostPlatform
+          then cfg.hostPlatform  # make identical, so that `==` equality works; see https://github.com/NixOS/nixpkgs/issues/278001
+          else elaborated;
       defaultText = literalExpression
         ''config.nixpkgs.hostPlatform'';
       description = ''
@@ -238,21 +237,7 @@ in
         `<nixpkgs>` or nix-darwin's `nixpkgs` flake input
       '';
       description = ''
-        The path to import Nixpkgs from. If you're setting a custom
-        [](#opt-nixpkgs.pkgs) or `_module.args.pkgs`, setting this
-        to something with `rev` and `shortRev` attributes (such as a
-        flake input or `builtins.fetchGit` result) will also set
-        `system.nixpkgsRevision` and related options.
-        (nix-darwin only)
-      '';
-    };
-
-    constructedByUs = mkOption {
-      type = types.bool;
-      internal = true;
-      description = ''
-        Whether `pkgs` was constructed by this module. This is false when any of
-        `nixpkgs.pkgs` or `_module.args.pkgs` is set. (nix-darwin only)
+        The path to import Nixpkgs from. (nix-darwin only)
       '';
     };
   };
@@ -270,25 +255,27 @@ in
           finalPkgs.__splicedPackages;
     };
 
-    nixpkgs.constructedByUs =
-      # We set it with default priority and it can not be merged, so if the
-      # pkgs module argument has that priority, it's from us.
-      (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
-        == lib.modules.defaultOverridePriority
-      # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
-        && !opt.pkgs.isDefined;
-
-    assertions = [
+    assertions = let
+      # Whether `pkgs` was constructed by this module. This is false when any of
+      # nixpkgs.pkgs or _module.args.pkgs is set.
+      constructedByMe =
+        # We set it with default priority and it can not be merged, so if the
+        # pkgs module argument has that priority, it's from us.
+        (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
+          == lib.modules.defaultOverridePriority
+        # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
+          && !opt.pkgs.isDefined;
+    in [
       (
         let
           pkgsSystem = finalPkgs.stdenv.targetPlatform.system;
         in {
-          assertion = cfg.constructedByUs -> !hasPlatform -> cfg.system == pkgsSystem;
+          assertion = constructedByMe -> !hasPlatform -> cfg.system == pkgsSystem;
           message = "The nix-darwin nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but nix-darwin was configured for system ${darwinExpectedSystem} via nix-darwin option nixpkgs.system. The nix-darwin system settings must match the Nixpkgs target system.";
         }
       )
       {
-        assertion = cfg.constructedByUs -> hasPlatform -> legacyOptionsDefined == [];
+        assertion = constructedByMe -> hasPlatform -> legacyOptionsDefined == [];
         message = ''
           Your system configures nixpkgs with the platform parameter${optionalString hasBuildPlatform "s"}:
           ${hostPlatformLine
@@ -298,6 +285,16 @@ in
           ${concatMapStrings showOptionWithDefLocs legacyOptionsDefined}
           For a future proof system configuration, we recommend to remove
           the legacy definitions.
+        '';
+      }
+      {
+        assertion = opt.pkgs.isDefined -> cfg.config == {};
+        message = ''
+          Your system configures nixpkgs with an externally created instance.
+          `nixpkgs.config` options should be passed when creating the instance instead.
+
+          Current value:
+          ${lib.generators.toPretty { multiline = true; } opt.config}
         '';
       }
     ];
