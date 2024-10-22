@@ -70,6 +70,7 @@
   ./services/mail/offlineimap.nix
   ./services/mopidy.nix
   ./services/monitoring/telegraf.nix
+  ./services/monitoring/netdata.nix
   ./services/netbird.nix
   ./services/nix-daemon.nix
   ./services/nix-gc

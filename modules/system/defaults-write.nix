@@ -14,7 +14,7 @@ let
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   loginwindow = defaultsToList "/Library/Preferences/com.apple.loginwindow" cfg.loginwindow;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
-  SoftwareUpdate = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
+  SoftwareUpdate = defaultsToList "/Library/Preferences/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
 
   # userDefaults
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
@@ -113,7 +113,7 @@ in
 
         ${optionalString (length dock > 0) ''
           # Only restart Dock if current user is logged in
-          if pgrep -xu $UID Dock; then
+          if pgrep -xu $UID Dock >/dev/null; then
             echo >&2 "restarting Dock..."
             killall Dock || true
           fi
