@@ -2,6 +2,8 @@ name: "Test"
 on:
   pull_request:
   push:
+    branches:
+      - master
 
 env:
   CURRENT_STABLE_CHANNEL: nixpkgs-24.05-darwin
