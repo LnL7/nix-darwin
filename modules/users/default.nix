@@ -149,6 +149,15 @@ in
       echo "setting up users..." >&2
 
       deleteUser() {
+        # TODO: add `darwin.primaryUser` as well
+        if [[ "$1" == "$SUDO_USER" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
+          exit 1
+        elif [[ "$1" == "root" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n', "$1"
+          exit 1
+        fi
+
         fullDiskAccess=false
 
         if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
@@ -191,8 +200,15 @@ in
         ${optionalString cfg.forceRecreate ''
           u=$(id -u ${name} 2> /dev/null) || true
           if [[ "$u" -eq ${toString v.uid} ]]; then
-            echo "deleting user ${v.name}..." >&2
-            deleteUser ${name}
+            # TODO: add `darwin.primaryUser` as well
+            if [[ ${name} == "$SUDO_USER" ]]; then
+              printf >&2 '[1;31mwarning: not going to recreate the user calling `darwin-rebuild` (%s), skipping...[0m\n' "$SUDO_USER"
+            elif [[ ${name} == "root" ]]; then
+              printf >&2 '[1;31mwarning: not going to recreate root, skipping...[0m\n'
+            else
+              printf >&2 'deleting user ${v.name}...\n'
+              deleteUser ${name}
+            fi
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
           fi
