@@ -7,10 +7,9 @@ let
 
   hostnameRegEx = ''^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'';
 
-  emptyList = lst: if lst != [] then lst else ["empty"];
-  quoteStrings = concatMapStringsSep " " (str: "'${str}'");
+  emptyList = lst: if lst != [ ] then lst else [ "empty" ];
 
-  setLocations = optionalString (cfg.knownNetworkServices != [] && cfg.location != {}) ''
+  setLocations = optionalString (cfg.knownNetworkServices != [ ] && cfg.location != { }) ''
     curr_location=$(networksetup -getcurrentlocation)
 
     readarray -t curr_locations_array < <(networksetup -listlocations)
@@ -32,9 +31,7 @@ let
     done
 
     # switch to a location that surely does not need to be deleted
-    networksetup -switchtolocation ${strings.escapeShellArg (
-      builtins.head (builtins.attrNames cfg.location)
-    )} > /dev/null
+    networksetup -switchtolocation ${strings.escapeShellArg (builtins.head (builtins.attrNames cfg.location))} > /dev/null
 
     for location in "''${!curr_locations[@]}"; do
       if [[ ! -v goal_locations[$location] ]]; then
@@ -48,9 +45,13 @@ let
       networkservices=$(networksetup -listallnetworkservices)
       ${concatMapStringsSep "\n" (srv: ''
         case "$networkservices" in
-          *'${srv}'*)
-            networksetup -setdnsservers '${srv}' ${quoteStrings (emptyList cfg.location.${location}.dns)}
-            networksetup -setsearchdomains '${srv}' ${quoteStrings (emptyList cfg.location.${location}.search)}
+          *${lib.escapeShellArg srv}*)
+            networksetup -setdnsservers ${
+              lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.location.${location}.dns))
+            }
+            networksetup -setsearchdomains ${
+              lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.location.${location}.search))
+            }
             ;;
         esac
       '') cfg.knownNetworkServices}
@@ -64,8 +65,30 @@ in
 
 {
   imports = [
-    (mkAliasOptionModule ["networking" "dns"] ["networking" "location" "Automatic" "dns"])
-    (mkAliasOptionModule ["networking" "search"] ["networking" "location" "Automatic" "search"])
+    (mkAliasOptionModule
+      [
+        "networking"
+        "dns"
+      ]
+      [
+        "networking"
+        "location"
+        "Automatic"
+        "dns"
+      ]
+    )
+    (mkAliasOptionModule
+      [
+        "networking"
+        "search"
+      ]
+      [
+        "networking"
+        "location"
+        "Automatic"
+        "search"
+      ]
+    )
   ];
 
   options = {
@@ -116,8 +139,12 @@ in
 
     networking.knownNetworkServices = mkOption {
       type = types.listOf types.str;
-      default = [];
-      example = [ "Wi-Fi" "Ethernet Adaptor" "Thunderbolt Ethernet" ];
+      default = [ ];
+      example = [
+        "Wi-Fi"
+        "Ethernet Adaptor"
+        "Thunderbolt Ethernet"
+      ];
       description = ''
         List of network services that should be configured.
 
@@ -127,23 +154,30 @@ in
     };
 
     networking.location = mkOption {
-      type = types.attrsOf (types.submodule {
-        options = {
-          dns = mkOption {
-            type = types.listOf types.str;
-            default = [];
-            example = [ "8.8.8.8" "8.8.4.4" "2001:4860:4860::8888" "2001:4860:4860::8844" ];
-            description = "The list of DNS servers used when resolving domain names.";
-          };
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            dns = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              example = [
+                "8.8.8.8"
+                "8.8.4.4"
+                "2001:4860:4860::8888"
+                "2001:4860:4860::8844"
+              ];
+              description = "The list of DNS servers used when resolving domain names.";
+            };
 
-          search = mkOption {
-            type = types.listOf types.str;
-            default = [];
-            description = "The list of search paths used when resolving domain names.";
+            search = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = "The list of search paths used when resolving domain names.";
+            };
           };
-        };
-      });
-      default = {};
+        }
+      );
+      default = { };
       description = ''
         Set of network locations to configure.
 
@@ -159,16 +193,14 @@ in
   config = {
 
     warnings = [
-      (
-        mkIf (cfg.knownNetworkServices == [] && (
-          builtins.any (l: l.dns != []) (builtins.attrValues cfg.location)
-        )) "networking.knownNetworkServices is empty, DNS servers will not be configured."
-      )
-      (
-        mkIf (cfg.knownNetworkServices == [] && (
-          builtins.any (l: l.search != []) (builtins.attrValues cfg.location)
-        )) "networking.knownNetworkServices is empty, DNS search domains will not be configured."
-      )
+      (mkIf (
+        cfg.knownNetworkServices == [ ]
+        && (builtins.any (l: l.dns != [ ]) (builtins.attrValues cfg.location))
+      ) "networking.knownNetworkServices is empty, DNS servers will not be configured.")
+      (mkIf (
+        cfg.knownNetworkServices == [ ]
+        && (builtins.any (l: l.search != [ ]) (builtins.attrValues cfg.location))
+      ) "networking.knownNetworkServices is empty, DNS search domains will not be configured.")
     ];
 
     system.activationScripts.networking.text = ''

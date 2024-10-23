@@ -1,11 +1,12 @@
 { name, lib, ... }:
 
-with lib;
-
 {
-  options = {
+  options = let
+    inherit (lib) literalExpression mkOption types;
+  in {
     name = mkOption {
-      type = types.str;
+      type = types.nonEmptyStr;
+      default = name;
       description = ''
         The name of the user account. If undefined, the name of the
         attribute set will be used.
@@ -13,12 +14,18 @@ with lib;
     };
 
     description = mkOption {
-      type = types.str;
-      default = "";
+      type = types.nullOr types.nonEmptyStr;
+      default = null;
       example = "Alice Q. User";
       description = ''
         A short description of the user account, typically the
         user's full name.
+
+        This defaults to `null` which means, on creation, `sysadminctl`
+        will pick the description which is usually always {option}`name`.
+
+        Using an empty name is not supported and breaks macOS like
+        making the user not appear in Directory Utility.
       '';
     };
 
@@ -74,11 +81,5 @@ with lib;
         which adds packages to all users.
       '';
     };
-  };
-
-  config = {
-
-    name = mkDefault name;
-
   };
 }
