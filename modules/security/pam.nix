@@ -17,7 +17,7 @@ let
   # should be deleted when the option is disabled.
   mkSudoTouchIdAuthScript = isEnabled:
   let
-    file   = "/etc/pam.d/sudo";
+    file   = "/etc/pam.d/sudo_local"; # Using sudo_local file instead of sudo file resolves the issue that it gets reset after system updates
     option = "security.pam.enableSudoTouchIdAuth";
     sed = "${pkgs.gnused}/bin/sed";
   in ''
@@ -44,17 +44,11 @@ in
         Enable sudo authentication with Touch ID.
 
         When enabled, this option adds the following line to
-        {file}`/etc/pam.d/sudo`:
+        {file}`/etc/pam.d/sudo_local`:
 
         ```
         auth       sufficient     pam_tid.so
         ```
-
-        ::: {.note}
-        macOS resets this file when doing a system update. As such, sudo
-        authentication with Touch ID won't work after a system update
-        until the nix-darwin configuration is reapplied.
-        :::
       '';
     };
   };
