@@ -34,7 +34,7 @@
      echo >&2 "checking compinit in /etc/zshrc"
      grep 'autoload -U compinit && compinit' ${config.out}/etc/zshrc
      echo >&2 "checking bashcompinit in /etc/zshrc"
-     grep -vq 'bashcompinit' ${config.out}/etc/zshrc
+     (! grep 'bashcompinit' ${config.out}/etc/zshrc)
 
      echo >&2 "checking zprofile.d in /etc/zprofile"
      grep 'source /etc/zprofile.d/\*.conf' ${config.out}/etc/zprofile

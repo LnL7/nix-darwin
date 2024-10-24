@@ -236,7 +236,13 @@ in
 
             requireFDA ${name} "created"
 
-            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])} 2> /dev/null
+            sysadminctl -addUser ${lib.escapeShellArgs ([
+              v.name
+              "-UID" v.uid
+              "-GID" v.gid ]
+              ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
+              ++ (lib.optionals (v.home != null) [ "-home" v.home ])
+              ++ (lib.optionals (v.shell != null) [ "-shell" (shellPath v.shell) ]))} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
             if ! id ${name} &> /dev/null; then
@@ -245,10 +251,14 @@ in
             fi
 
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu ${name}"}
           fi
-          # Always set the shell path, in case it was updated
-          dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
+
+          # Always update all properties on users to keep them inline with configuration
+          dscl . -create ${dsclUser} PrimaryGroupID ${toString v.gid}
+          ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${lib.escapeShellArg v.description}"}
+          ${optionalString (v.home != null) "dscl . -create ${dsclUser} NFSHomeDirectory ${lib.escapeShellArg v.home}"}
+          ${optionalString v.createHome "createhomedir -cu ${name}"}
+          ${optionalString (v.shell != null) "dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}"}
         fi
       '') createdUsers}
 
