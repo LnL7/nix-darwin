@@ -189,8 +189,10 @@ in
 
         requireFDA "$1" deleted
 
-        sysadminctl -deleteUser "$1" 2> /dev/null
+        dscl . -delete "/Users/$1" 2> /dev/null
 
+        # `dscl . -delete` should exit with a non-zero exit code when there's an error, but we'll leave
+        # this code here just in case and for when we switch to `sysadminctl -deleteUser`
         # We need to check as `sysadminctl -deleteUser` still exits with exit code 0 when there's an error
         if id "$1" &> /dev/null; then
           printf >&2 '\e[1;31merror: failed to delete user %s, aborting activation\e[0m\n', "$1"
