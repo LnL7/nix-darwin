@@ -73,10 +73,17 @@
     };
 
     shell = mkOption {
-      type = types.either types.shellPackage types.path;
-      default = "/sbin/nologin";
+      type = types.nullOr (types.either types.shellPackage types.path);
+      default = null;
       example = literalExpression "pkgs.bashInteractive";
-      description = "The user's shell.";
+      description = ''
+        The user's shell. This defaults to `null`.
+
+        When this is set to `null`, the value is managed by macOS instead of
+        `nix-darwin`. This means if the user has not been created yet,
+        `sysadminctl` will be called without the `-shell` flag which means the
+        user will have a default shell of `/bin/zsh`.
+      '';
     };
 
     packages = mkOption {
