@@ -245,9 +245,13 @@ in
             fi
 
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu ${name}"}
           fi
-          # Always set the shell path, in case it was updated
+
+          # Always update all properties on users to keep them inline with configuration
+          dscl . -create ${dsclUser} PrimaryGroupID ${toString v.gid}
+          ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${lib.escapeShellArg v.description}"}
+          dscl . -create ${dsclUser} NFSHomeDirectory ${lib.escapeShellArg v.home}
+          ${optionalString v.createHome "createhomedir -cu ${name}"}
           dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
         fi
       '') createdUsers}
