@@ -19,6 +19,8 @@
   users.users.foo.shell = pkgs.bashInteractive;
 
   users.users."created.user".uid = 42001;
+  users.users."created.user".description = null;
+
   users.users."unknown.user".uid = 42002;
 
   test = ''
@@ -39,6 +41,7 @@
     grep "dscl . -create ${lib.escapeShellArg "/Groups/created.group"} GroupMembership" ${config.out}/activate
 
     # checking unknown group in /activate
+    # checking groups not in knownGroups don't appear in /activate
     (! grep "dscl . -create ${lib.escapeShellArg "/Groups/unknown.group"}" ${config.out}/activate)
     (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/unknown.group"}" ${config.out}/activate)
 
@@ -50,15 +53,23 @@
     (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/created.user"}" ${config.out}/activate)
 
     # checking user properties always get updated in /activate
+    grep "dscl . -create ${lib.escapeShellArg "/Users/foo"} PrimaryGroupID 42000" ${config.out}/activate
+    grep "dscl . -create ${lib.escapeShellArg "/Users/foo"} RealName ${lib.escapeShellArg "Foo user"}" ${config.out}/activate
+    grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
     grep "dscl . -create ${lib.escapeShellArg "/Users/foo"} UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
+    grep "dscl . -create ${lib.escapeShellArg "/Users/foo"} IsHidden 0" ${config.out}/activate
+
+    # checking user properties that are null don't get updated in /activate
+    (! grep "dscl . -create ${lib.escapeShellArg "/Users/created.user"} RealName" ${config.out}/activate)
 
     # checking user deletion in /activate
     grep "deleteUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate)
 
-    # checking unknown user in /activate
+    # checking that users not specified in knownUsers doesn't get changed in /activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "unknown.user"}" ${config.out}/activate)
     (! grep "deleteUser ${lib.escapeShellArg "unknown.user"}" ${config.out}/activate)
+    (! grep "dscl . -create ${lib.escapeShellArg "/Users/unknown.user"}" ${config.out}/activate)
 
     set +v
   '';
