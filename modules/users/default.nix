@@ -236,7 +236,13 @@ in
 
             requireFDA ${name} "created"
 
-            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])} 2> /dev/null
+            sysadminctl -addUser ${lib.escapeShellArgs ([
+              v.name
+              "-UID" v.uid
+              "-GID" v.gid ]
+              ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
+              ++ (lib.optionals (v.home != null) [ "-home" v.home ])
+              ++ [ "-shell" (shellPath v.shell) ])} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
             if ! id ${name} &> /dev/null; then
@@ -245,7 +251,10 @@ in
             fi
 
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu ${name}"}
+
+            # `sysadminctl -addUser` won't create the home directory if we use the `-home`
+            # flag so we need to do it ourselves
+            ${optionalString (v.home != null && v.createHome) "createhomedir -cu ${name} > /dev/null"}
           fi
 
           # Update properties on known users to keep them inline with configuration
