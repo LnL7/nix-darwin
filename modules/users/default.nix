@@ -148,16 +148,7 @@ in
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
 
-      deleteUser() {
-        # TODO: add `darwin.primaryUser` as well
-        if [[ "$1" == "$SUDO_USER" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
-          exit 1
-        elif [[ "$1" == "root" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n', "$1"
-          exit 1
-        fi
-
+      requireFDA() {
         fullDiskAccess=false
 
         if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
@@ -165,8 +156,8 @@ in
         fi
 
         if [[ "$fullDiskAccess" != true ]]; then
-          printf >&2 '\e[1;31merror: users cannot be deleted without Full Disk Access, aborting activation\e[0m\n'
-          printf >&2 'The user %s could not be deleted as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1"
+          printf >&2 '\e[1;31merror: users cannot be %s without Full Disk Access, aborting activation\e[0m\n' "$2"
+          printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1" "$2"
           printf >&2 '\n'
           printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
           printf >&2 '\n'
@@ -184,10 +175,24 @@ in
 
           exit 1
         fi
+      }
+
+      deleteUser() {
+        # FIXME: add `darwin.primaryUser` as well
+        if [[ "$1" == "$SUDO_USER" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
+          exit 1
+        elif [[ "$1" == "root" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n', "$1"
+          exit 1
+        fi
+
+        requireFDA "$1" deleted
 
         sysadminctl -deleteUser "$1" 2> /dev/null
 
-        if id -u "$1" > /dev/null 2>&1; then
+        # We need to check as `sysadminctl -deleteUser` still exits with exit code 0 when there's an error
+        if id "$1" &> /dev/null; then
           printf >&2 '\e[1;31merror: failed to delete user %s, aborting activation\e[0m\n', "$1"
           exit 1
         fi
@@ -220,7 +225,17 @@ in
         else
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
-            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])}
+
+            requireFDA ${name} "created"
+
+            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])} 2> /dev/null
+
+            # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
+            if ! id ${name} &> /dev/null; then
+              printf >&2 '\e[1;31merror: failed to create user %s, aborting activation\e[0m\n' ${name}
+              exit 1
+            fi
+
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
             ${optionalString v.createHome "createhomedir -cu ${name}"}
           fi
