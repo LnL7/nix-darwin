@@ -31,6 +31,12 @@ let
     then "/run/current-system/sw${v.shellPath}"
     else v;
 
+  systemShells =
+    let
+      shells = mapAttrsToList (_: u: u.shell) cfg.users;
+    in
+      filter types.shellPackage.check shells;
+
 in
 
 {
@@ -258,6 +264,9 @@ in
         fi
       '') deletedUsers}
     '';
+
+    # Install all the user shells
+    environment.systemPackages = systemShells;
 
     environment.etc = mapAttrs' (name: { packages, ... }: {
       name = "profiles/per-user/${name}";
