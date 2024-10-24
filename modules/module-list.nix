@@ -51,6 +51,8 @@
   ./environment
   ./fonts
   ./launchd
+  ./power
+  ./power/sleep.nix
   ./services/activate-system
   ./services/aerospace
   ./services/autossh.nix
