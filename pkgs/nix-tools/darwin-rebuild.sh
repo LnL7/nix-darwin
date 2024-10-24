@@ -9,11 +9,13 @@ showSyntax() {
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
   echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&2
-  echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
+  echo "               [{--keep-going | -k}] [{--keep-failed | -K}] [--fallback] [--show-trace]" >&2
+  echo "               [{--print-build-logs | -L}]" >&2
   echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
-  echo "               [--flake flake] [--no-flake] [--update-input input flake] [--impure]" >&2
-  echo "               [--recreate-lock-file] [--no-update-lock-file] [--refresh]" >&2
-  echo "               [--offline] [--substituters substituters-list] ..." >&2
+  echo "               [--no-flake | [--flake flake] [--no-registries] [--commit-lock-file]" >&2
+  echo "               [--no-update-lock-file] [--no-write-lock-file] [--recreate-lock-file]" >&2
+  echo "               [--override-input input flake] [--update-input input]] [--impure]" >&2
+  echo "               [--refresh] [--offline] [--substituters substituters-list] ..." >&2
   exit 1
 }
 
