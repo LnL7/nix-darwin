@@ -47,7 +47,7 @@
     grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/sbin/nologin" ]}" ${config.out}/activate
     (! grep "deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate)
-    (! grep "deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate)
+    (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/created.user"}" ${config.out}/activate)
 
     # checking user properties always get updated in /activate
     grep "dscl . -create ${lib.escapeShellArg "/Users/foo"} UserShell ${lib.escapeShellArg "/run/current-system/sw/bin/bash"}" ${config.out}/activate
