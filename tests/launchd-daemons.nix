@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 
 {
-  launchd.daemons.foo.command = "foo";
-  launchd.agents.bar.command = "bar";
-  launchd.user.agents.baz.command = "baz";
+  launchd.daemons.foo.command = [ "foo" ];
+  launchd.agents.bar.command = [ "bar" ];
+  launchd.user.agents.baz.command = [ "baz" ];
 
   test = ''
     echo "checking launchd load in /activate" >&2

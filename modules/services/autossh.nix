@@ -40,8 +40,9 @@ in
               '';
             };
             extraArguments = mkOption {
-              type = types.str;
-              example = "-N -D4343 bill@socks.example.net";
+              type = types.listOf types.str;
+              default = [ ];
+              example = [ "-N" "-D4343" "bill@socks.example.net" ];
               description = ''
                 Arguments to be passed to AutoSSH and retransmitted to SSH
                 process. Some meaningful options include -N (don't run remote
@@ -91,7 +92,7 @@ in
               # How often AutoSSH checks the network, in seconds
               environment.AUTOSSH_POLL="30";
 
-              command = "${pkgs.autossh}/bin/autossh -M ${toString mport} ${s.extraArguments}";
+              command = [ (lib.getExe pkgs.autossh) "-M" "${toString mport}" ] ++ s.extraArguments;
 
               serviceConfig = {
                   KeepAlive = true;
