@@ -21,6 +21,7 @@
   users.users."created.user".uid = 42001;
   users.users."created.user".description = null;
   users.users."created.user".home = null;
+  users.users."created.user".shell = null;
 
   users.users."unknown.user".uid = 42002;
 
@@ -49,7 +50,7 @@
     # checking user creation in /activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "foo" "-UID" 42000 "-GID" 42000 "-fullName" "Foo user" "-home" "/Users/foo" "-shell" "/run/current-system/sw/bin/bash" ]}" ${config.out}/activate
     grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
-    grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/usr/bin/false" ]}" ${config.out}/activate
+    grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/usr/bin/false" ] }" ${config.out}/activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "created.user"} .* -home" ${config.out}/activate)
     (! grep "deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate)
     (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/created.user"}" ${config.out}/activate)
@@ -63,6 +64,7 @@
 
     # checking user properties that are null don't get updated in /activate
     (! grep "dscl . -create ${lib.escapeShellArg "/Users/created.user"} RealName" ${config.out}/activate)
+    (! grep "dscl . -create ${lib.escapeShellArg "/Users/created.user"} UserShell" ${config.out}/activate)
 
     # checking user deletion in /activate
     grep "deleteUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate

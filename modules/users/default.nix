@@ -242,7 +242,7 @@ in
               "-GID" v.gid ]
               ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
               ++ (lib.optionals (v.home != null) [ "-home" v.home ])
-              ++ [ "-shell" (shellPath v.shell) ])} 2> /dev/null
+              ++ [ "-shell" (if v.shell != null then shellPath v.shell else "/usr/bin/false") ])} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
             if ! id ${name} &> /dev/null; then
@@ -260,7 +260,7 @@ in
           # Update properties on known users to keep them inline with configuration
           dscl . -create ${dsclUser} PrimaryGroupID ${toString v.gid}
           ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${lib.escapeShellArg v.description}"}
-          dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
+          ${optionalString (v.shell != null) "dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}"}
         fi
       '') createdUsers}
 

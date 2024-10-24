@@ -73,10 +73,17 @@
     };
 
     shell = mkOption {
-      type = types.either types.shellPackage types.path;
-      default = "/usr/bin/false";
+      type = types.nullOr (types.either types.shellPackage types.path);
+      default = null;
       example = literalExpression "pkgs.bashInteractive";
-      description = "The user's shell.";
+      description = ''
+        The user's shell. This defaults to `null`.
+
+        When this is set to `null`, if the user has not been created yet,
+        they will be created with the shell `/usr/bin/false` to prevent
+        interactive login. If the user already exists, the value is
+        considered managed by macOS and `nix-darwin` will not change it.
+      '';
     };
 
     packages = mkOption {
