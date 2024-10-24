@@ -53,9 +53,17 @@
     # };
 
     home = mkOption {
-      type = types.path;
-      default = "/var/empty";
-      description = "The user's home directory.";
+      type = types.nullOr types.path;
+      default = null;
+      description = ''
+        The user's home directory. This defaults to `null`.
+
+        When this is set to `null`, the value is managed by macOS instead of
+        `nix-darwin`. This means if the user has not been created yet,
+        `sysadminctl` will be called without the `-home` flag which means the
+        user will have a default home directory of `/Users/<name>` which will
+        be created by `sysadminctl`.
+      '';
     };
 
     createHome = mkOption {
