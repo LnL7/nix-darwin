@@ -166,8 +166,8 @@ in
 
         if [[ "$fullDiskAccess" != true ]]; then
           printf >&2 '\e[1;31merror: users cannot be deleted without Full Disk Access, aborting activation\e[0m\n'
-          printf >&2 'The user %s could not be deleted as `darwin-rebuild` was not executed with Full Disk Access.' "$1"
-
+          printf >&2 'The user %s could not be deleted as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1"
+          printf >&2 '\n'
           printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
           printf >&2 '\n'
           # This command will fail if run as root and System Settings is already running
