@@ -88,7 +88,7 @@ If you don't have an existing `configuration.nix`, you can run the following com
 ```bash
 mkdir -p ~/.config/nix-darwin
 cd ~/.config/nix-darwin
-nix flake init -t nix-darwin
+nix flake init -t nix-darwin --extra-experimental-features "nix-command flakes"
 sed -i '' "s/simple/$(scutil --get LocalHostName)/" flake.nix
 ```
 
@@ -131,7 +131,7 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 Instead of using `darwin-installer`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-nix run nix-darwin -- switch --flake ~/.config/nix-darwin
+nix run --extra-experimental-features "nix-command flakes" nix-darwin -- switch --flake ~/.config/nix-darwin
 ```
 
 ### Step 3. Using `nix-darwin`
