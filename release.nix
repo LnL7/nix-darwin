@@ -61,7 +61,7 @@ let
     in
       buildFromConfig configuration (config: config.system.build.run-test);
 
-  release = import <nixpkgs/pkgs/top-level/release-lib.nix> {
+  release = import (nixpkgs + "/pkgs/top-level/release-lib.nix") {
     inherit supportedSystems scrubJobs;
     packageSet = import nixpkgs;
   };
