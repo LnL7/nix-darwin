@@ -9,6 +9,8 @@ let
 
   emptyList = lst: if lst != [] then lst else ["empty"];
 
+  onOff = cond: if cond then "on" else "off";
+
   setNetworkServices = optionalString (cfg.knownNetworkServices != []) ''
     networkservices=$(networksetup -listallnetworkservices)
     ${concatMapStringsSep "\n" (srv: ''
@@ -93,6 +95,16 @@ in
       default = [];
       description = "The list of search paths used when resolving domain names.";
     };
+
+    networking.wakeOnLan.enable = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable Wake-on-LAN for the device.
+
+        Battery powered devices may require being connected to power.
+      '';
+    };
   };
 
   config = {
@@ -116,6 +128,10 @@ in
       ''}
 
       ${setNetworkServices}
+
+      ${optionalString (cfg.wakeOnLan.enable != null) ''
+        systemsetup -setWakeOnNetworkAccess '${onOff cfg.wakeOnLan.enable}' &> /dev/null
+      ''}
     '';
 
   };
