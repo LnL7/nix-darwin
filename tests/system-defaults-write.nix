@@ -57,6 +57,8 @@
   system.defaults.finder.FXPreferredViewStyle = "Flwv";
   system.defaults.finder.AppleShowAllExtensions = true;
   system.defaults.finder.CreateDesktop = false;
+  system.defaults.finder.NewWindowTarget = "Other";
+  system.defaults.finder.NewWindowTargetPath = "file:///Library/Apple";
   system.defaults.finder.QuitMenuItem = true;
   system.defaults.finder._FXShowPosixPathInTitle = true;
   system.defaults.finder._FXSortFoldersFirst = true;
