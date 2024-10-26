@@ -94,6 +94,14 @@ in
   };
 
   config = {
+    assertions = [
+      {
+        # We don't check `root` like the rest of the users as on some systems `root`'s
+        # home directory is set to `/var/root /private/var/root`
+        assertion = cfg.users ? root -> (cfg.users.root.home == null || cfg.users.root.home == "/var/root");
+        message = "`users.users.root.home` must be set to either `null` or `/var/root`.";
+      }
+    ];
 
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
@@ -163,6 +171,22 @@ in
           if [ -z "$u" ]; then
             requireFDA ${name} created
           fi
+
+          ${optionalString (v.home != null && v.name != "root") ''
+            homeDirectory=$(dscl . -read ${dsclUser} NFSHomeDirectory)
+            homeDirectory=''${homeDirectory#NFSHomeDirectory: }
+            if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
+              printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
+              printf >&2 'nix-darwin does not support changing the home directory of existing users.
+              printf >&2 '\n'
+              printf >&2 'Please set:\n'
+              printf >&2 '\n'
+              printf >&2 '    users.users.%s.home = "%s";\n' ${name} "$homeDirectory"
+              printf >&2 '\n'
+              printf >&2 'or remove it from your configuration.\n'
+              exit 1
+            fi
+          ''}
         fi
       '') createdUsers}
 
