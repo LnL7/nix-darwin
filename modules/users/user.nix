@@ -74,7 +74,7 @@
 
     shell = mkOption {
       type = types.either types.shellPackage types.path;
-      default = "/sbin/nologin";
+      default = "/usr/bin/false";
       example = literalExpression "pkgs.bashInteractive";
       description = "The user's shell.";
     };
