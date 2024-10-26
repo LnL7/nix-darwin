@@ -1,8 +1,9 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
+  inherit (lib) concatStringsSep concatMapStringsSep elem filter filterAttrs
+    mapAttrs' mapAttrsToList mkIf mkMerge mkOption mkOrder optionalString types;
+
   cfg = config.users;
 
   group = import ./group.nix;
