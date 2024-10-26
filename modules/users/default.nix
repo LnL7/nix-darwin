@@ -98,6 +98,84 @@ in
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
 
+    # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
+    # however currently that runs at user level activation as that runs before system level activation
+    # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
+    system.checks.text = lib.mkAfter ''
+      requireFDA() {
+        fullDiskAccess=false
+
+        if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
+          fullDiskAccess=true
+        fi
+
+        if [[ "$fullDiskAccess" != true ]]; then
+          printf >&2 '\e[1;31merror: users cannot be %s without Full Disk Access, aborting activation\e[0m\n' "$2"
+          printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1" "$2"
+          printf >&2 '\n'
+          printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
+          printf >&2 '\n'
+          # This command will fail if run as root and System Settings is already running
+          # even if System Settings was launched by root.
+          open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+
+          if [[ -n "$SSH_CONNECTION" ]]; then
+            printf >&2 'Please enable Full Disk Access for programs over SSH by flipping\n'
+            printf >&2 'the switch for `sshd-keygen-wrapper`.\n'
+          else
+            printf >&2 'Please enable Full Disk Access for your terminal emulator by flipping\n'
+            printf >&2 'the switch in System Settings.\n'
+          fi
+
+          exit 1
+        fi
+      }
+
+      ensureDeletable() {
+        # TODO: add `darwin.primaryUser` as well
+        if [[ "$1" == "$USER" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
+          exit 1
+        elif [[ "$1" == "root" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
+          exit 1
+        fi
+
+        requireFDA "$1" deleted
+      }
+
+      ${concatMapStringsSep "\n" (v: let
+        name = lib.escapeShellArg v.name;
+        dsclUser = lib.escapeShellArg "/Users/${v.name}";
+      in ''
+        ${optionalString cfg.forceRecreate ''
+          u=$(id -u ${name} 2> /dev/null) || true
+          if [[ "$u" -eq ${toString v.uid} ]]; then
+            # TODO: add `darwin.primaryUser` as well
+            if [[ ${name} != "$USER" && ${name} != "root" ]]; then
+              ensureDeletable ${name}
+            fi
+          fi
+        ''}
+
+        u=$(id -u ${name} 2> /dev/null) || true
+        if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
+          if [ -z "$u" ]; then
+            requireFDA ${name} created
+          fi
+        fi
+      '') createdUsers}
+
+      ${concatMapStringsSep "\n" (name: ''
+        u=$(id -u ${lib.escapeShellArg name} 2> /dev/null) || true
+        if [ -n "$u" ]; then
+          if [ "$u" -gt 501 ]; then
+            ensureDeletable ${lib.escapeShellArg name}
+          fi
+        fi
+      '') deletedUsers}
+    '';
+
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
 
@@ -154,47 +232,7 @@ in
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
 
-      requireFDA() {
-        fullDiskAccess=false
-
-        if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
-          fullDiskAccess=true
-        fi
-
-        if [[ "$fullDiskAccess" != true ]]; then
-          printf >&2 '\e[1;31merror: users cannot be %s without Full Disk Access, aborting activation\e[0m\n' "$2"
-          printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1" "$2"
-          printf >&2 '\n'
-          printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
-          printf >&2 '\n'
-          # This command will fail if run as root and System Settings is already running
-          # even if System Settings was launched by root.
-          sudo -u $SUDO_USER open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
-
-          if [[ -n "$SSH_CONNECTION" ]]; then
-            printf >&2 'Please enable Full Disk Access for programs over SSH by flipping\n'
-            printf >&2 'the switch for `sshd-keygen-wrapper`.\n'
-          else
-            printf >&2 'Please enable Full Disk Access for your terminal emulator by flipping\n'
-            printf >&2 'the switch in System Settings.\n'
-          fi
-
-          exit 1
-        fi
-      }
-
       deleteUser() {
-        # FIXME: add `darwin.primaryUser` as well
-        if [[ "$1" == "$SUDO_USER" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
-          exit 1
-        elif [[ "$1" == "root" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n', "$1"
-          exit 1
-        fi
-
-        requireFDA "$1" deleted
-
         dscl . -delete "/Users/$1" 2> /dev/null
 
         # `dscl . -delete` should exit with a non-zero exit code when there's an error, but we'll leave
@@ -233,8 +271,6 @@ in
         else
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
-
-            requireFDA ${name} "created"
 
             sysadminctl -addUser ${lib.escapeShellArgs ([
               v.name
