@@ -86,6 +86,7 @@ in
       exit $_status
     '';
 
+    # FIXME: activationScripts.checks should be system level
     system.activationScripts.userScript.text = ''
       #! ${stdenv.shell}
       set -e

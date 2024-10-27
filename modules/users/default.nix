@@ -1,8 +1,9 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
 let
+  inherit (lib) concatStringsSep concatMapStringsSep elem filter filterAttrs
+    mapAttrs' mapAttrsToList mkIf mkMerge mkOption mkOrder optionalString types;
+
   cfg = config.users;
 
   group = import ./group.nix;
@@ -94,9 +95,123 @@ in
   };
 
   config = {
+    assertions = [
+      {
+        # We don't check `root` like the rest of the users as on some systems `root`'s
+        # home directory is set to `/var/root /private/var/root`
+        assertion = cfg.users ? root -> (cfg.users.root.home == null || cfg.users.root.home == "/var/root");
+        message = "`users.users.root.home` must be set to either `null` or `/var/root`.";
+      }
+    ];
 
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
+
+    # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
+    # however currently that runs at user level activation as that runs before system level activation
+    # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
+    system.checks.text = lib.mkAfter ''
+      ensurePerms() {
+        homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
+        homeDirectory=''${homeDirectory#NFSHomeDirectory: }
+
+        if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
+          if [[ -n "$SSH_CONNECTION" ]]; then
+            printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
+            printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
+            printf >&2 'You can either:\n'
+            printf >&2 '\n'
+            printf >&2 '  grant Full Disk Access to all programs run over SSH\n'
+            printf >&2 '\n'
+            printf >&2 'or\n'
+            printf >&2 '\n'
+            printf >&2 '  run `darwin-rebuild` in a graphical session.\n'
+            printf >&2 '\n'
+            printf >&2 'The option "Allow full disk access for remote users" can be found by\n'
+            printf >&2 'navigating to System Settings > General > Sharing > Remote Login\n'
+            printf >&2 'and then pressing on the i icon next to the switch.\n'
+            exit 1
+          else
+            # The TCC service required to change home directories is `kTCCServiceSystemPolicySysAdminFiles`
+            # and we can reset it to ensure the user gets another prompt
+            tccutil reset SystemPolicySysAdminFiles > /dev/null
+
+            if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
+              printf >&2 '\e[1;31merror: permission denied when trying to %s user %s, aborting activation\e[0m\n' "$2" "$1"
+              printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n' "$1" "$2"
+              printf >&2 'please accept the dialog that pops up.\n'
+              printf >&2 '\n'
+              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
+              printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
+              printf >&2 '\n'
+              printf >&2 'This can be found in System Settings > Privacy & Security > Full Disk Access.\n'
+              exit 1
+            fi
+          fi
+
+        fi
+      }
+
+      ensureDeletable() {
+        # TODO: add `darwin.primaryUser` as well
+        if [[ "$1" == "$USER" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
+          exit 1
+        elif [[ "$1" == "root" ]]; then
+          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
+          exit 1
+        fi
+
+        ensurePerms "$1" delete
+      }
+
+      ${concatMapStringsSep "\n" (v: let
+        name = lib.escapeShellArg v.name;
+        dsclUser = lib.escapeShellArg "/Users/${v.name}";
+      in ''
+        ${optionalString cfg.forceRecreate ''
+          u=$(id -u ${name} 2> /dev/null) || true
+          if [[ "$u" -eq ${toString v.uid} ]]; then
+            # TODO: add `darwin.primaryUser` as well
+            if [[ ${name} != "$USER" && ${name} != "root" ]]; then
+              ensureDeletable ${name}
+            fi
+          fi
+        ''}
+
+        u=$(id -u ${name} 2> /dev/null) || true
+        if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
+          if [ -z "$u" ]; then
+            ensurePerms ${name} create
+          fi
+
+          ${optionalString (v.home != null && v.name != "root") ''
+            homeDirectory=$(dscl . -read ${dsclUser} NFSHomeDirectory)
+            homeDirectory=''${homeDirectory#NFSHomeDirectory: }
+            if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
+              printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
+              printf >&2 'nix-darwin does not support changing the home directory of existing users.
+              printf >&2 '\n'
+              printf >&2 'Please set:\n'
+              printf >&2 '\n'
+              printf >&2 '    users.users.%s.home = "%s";\n' ${name} "$homeDirectory"
+              printf >&2 '\n'
+              printf >&2 'or remove it from your configuration.\n'
+              exit 1
+            fi
+          ''}
+        fi
+      '') createdUsers}
+
+      ${concatMapStringsSep "\n" (name: ''
+        u=$(id -u ${lib.escapeShellArg name} 2> /dev/null) || true
+        if [ -n "$u" ]; then
+          if [ "$u" -gt 501 ]; then
+            ensureDeletable ${lib.escapeShellArg name}
+          fi
+        fi
+      '') deletedUsers}
+    '';
 
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
@@ -109,7 +224,7 @@ in
           g=''${g#PrimaryGroupID: }
           if [[ "$g" -eq ${toString v.gid} ]]; then
             echo "deleting group ${v.name}..." >&2
-            dscl . -delete ${dsclGroup} 2> /dev/null
+            dscl . -delete ${dsclGroup}
           else
             echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
           fi
@@ -143,7 +258,7 @@ in
         if [ -n "$g" ]; then
           if [ "$g" -gt 501 ]; then
             echo "deleting group ${name}..." >&2
-            dscl . -delete ${dsclGroup} 2> /dev/null
+            dscl . -delete ${dsclGroup}
           else
             echo "[1;31mwarning: existing group '${name}' has unexpected gid $g, skipping...[0m" >&2
           fi
@@ -153,58 +268,6 @@ in
 
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
-
-      requireFDA() {
-        fullDiskAccess=false
-
-        if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
-          fullDiskAccess=true
-        fi
-
-        if [[ "$fullDiskAccess" != true ]]; then
-          printf >&2 '\e[1;31merror: users cannot be %s without Full Disk Access, aborting activation\e[0m\n' "$2"
-          printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1" "$2"
-          printf >&2 '\n'
-          printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
-          printf >&2 '\n'
-          # This command will fail if run as root and System Settings is already running
-          # even if System Settings was launched by root.
-          sudo -u $SUDO_USER open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
-
-          if [[ -n "$SSH_CONNECTION" ]]; then
-            printf >&2 'Please enable Full Disk Access for programs over SSH by flipping\n'
-            printf >&2 'the switch for `sshd-keygen-wrapper`.\n'
-          else
-            printf >&2 'Please enable Full Disk Access for your terminal emulator by flipping\n'
-            printf >&2 'the switch in System Settings.\n'
-          fi
-
-          exit 1
-        fi
-      }
-
-      deleteUser() {
-        # FIXME: add `darwin.primaryUser` as well
-        if [[ "$1" == "$SUDO_USER" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
-          exit 1
-        elif [[ "$1" == "root" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n', "$1"
-          exit 1
-        fi
-
-        requireFDA "$1" deleted
-
-        dscl . -delete "/Users/$1" 2> /dev/null
-
-        # `dscl . -delete` should exit with a non-zero exit code when there's an error, but we'll leave
-        # this code here just in case and for when we switch to `sysadminctl -deleteUser`
-        # We need to check as `sysadminctl -deleteUser` still exits with exit code 0 when there's an error
-        if id "$1" &> /dev/null; then
-          printf >&2 '\e[1;31merror: failed to delete user %s, aborting activation\e[0m\n', "$1"
-          exit 1
-        fi
-      }
 
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
@@ -220,7 +283,7 @@ in
               printf >&2 '[1;31mwarning: not going to recreate root, skipping...[0m\n'
             else
               printf >&2 'deleting user ${v.name}...\n'
-              deleteUser ${name}
+              dscl . -delete ${dsclUser}
             fi
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
@@ -234,9 +297,13 @@ in
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
 
-            requireFDA ${name} "created"
-
-            sysadminctl -addUser ${lib.escapeShellArgs ([ v.name "-UID" v.uid "-GID" v.gid ] ++ (lib.optionals (v.description != null) [ "-fullName" v.description ]) ++ [ "-home" v.home "-shell" (shellPath v.shell) ])} 2> /dev/null
+            sysadminctl -addUser ${lib.escapeShellArgs ([
+              v.name
+              "-UID" v.uid
+              "-GID" v.gid ]
+              ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
+              ++ (lib.optionals (v.home != null) [ "-home" v.home ])
+              ++ [ "-shell" (if v.shell != null then shellPath v.shell else "/usr/bin/false") ])} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
             if ! id ${name} &> /dev/null; then
@@ -245,10 +312,16 @@ in
             fi
 
             dscl . -create ${dsclUser} IsHidden ${if v.isHidden then "1" else "0"}
-            ${optionalString v.createHome "createhomedir -cu ${name}"}
+
+            # `sysadminctl -addUser` won't create the home directory if we use the `-home`
+            # flag so we need to do it ourselves
+            ${optionalString (v.home != null && v.createHome) "createhomedir -cu ${name} > /dev/null"}
           fi
-          # Always set the shell path, in case it was updated
-          dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}
+
+          # Update properties on known users to keep them inline with configuration
+          dscl . -create ${dsclUser} PrimaryGroupID ${toString v.gid}
+          ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${lib.escapeShellArg v.description}"}
+          ${optionalString (v.shell != null) "dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}"}
         fi
       '') createdUsers}
 
@@ -257,7 +330,7 @@ in
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            deleteUser ${lib.escapeShellArg name}
+            dscl . -delete ${lib.escapeShellArg "/Users/${name}"}
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi
