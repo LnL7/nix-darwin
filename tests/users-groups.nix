@@ -52,7 +52,7 @@
     grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/usr/bin/false" ] }" ${config.out}/activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "created.user"} .* -home" ${config.out}/activate)
-    (! grep "deleteUser ${lib.escapeShellArg "created.user"}" ${config.out}/activate)
+    (! grep "dscl . -delete ${lib.escapeShellArg "/Users/created.user"}" ${config.out}/activate)
     (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/created.user"}" ${config.out}/activate)
 
     # checking user properties always get updated in /activate
@@ -67,12 +67,12 @@
     (! grep "dscl . -create ${lib.escapeShellArg "/Users/created.user"} UserShell" ${config.out}/activate)
 
     # checking user deletion in /activate
-    grep "deleteUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate
+    grep "dscl . -delete ${lib.escapeShellArg "/Users/deleted.user"}" ${config.out}/activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "deleted.user"}" ${config.out}/activate)
 
     # checking that users not specified in knownUsers doesn't get changed in /activate
     (! grep "sysadminctl -addUser ${lib.escapeShellArg "unknown.user"}" ${config.out}/activate)
-    (! grep "deleteUser ${lib.escapeShellArg "unknown.user"}" ${config.out}/activate)
+    (! grep "dscl . -delete ${lib.escapeShellArg "/Users/unknown.user"}" ${config.out}/activate)
     (! grep "dscl . -create ${lib.escapeShellArg "/Users/unknown.user"}" ${config.out}/activate)
 
     set +v

@@ -110,32 +110,44 @@ in
     # however currently that runs at user level activation as that runs before system level activation
     # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
     system.checks.text = lib.mkAfter ''
-      requireFDA() {
-        fullDiskAccess=false
+      ensurePerms() {
+        homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
+        homeDirectory=''${homeDirectory#NFSHomeDirectory: }
 
-        if cat /Library/Preferences/com.apple.TimeMachine.plist > /dev/null 2>&1; then
-          fullDiskAccess=true
-        fi
-
-        if [[ "$fullDiskAccess" != true ]]; then
-          printf >&2 '\e[1;31merror: users cannot be %s without Full Disk Access, aborting activation\e[0m\n' "$2"
-          printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access.\n' "$1" "$2"
-          printf >&2 '\n'
-          printf >&2 'Opening "Privacy & Security" > "Full Disk Access" in System Settings\n'
-          printf >&2 '\n'
-          # This command will fail if run as root and System Settings is already running
-          # even if System Settings was launched by root.
-          open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
-
+        if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
           if [[ -n "$SSH_CONNECTION" ]]; then
-            printf >&2 'Please enable Full Disk Access for programs over SSH by flipping\n'
-            printf >&2 'the switch for `sshd-keygen-wrapper`.\n'
+            printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
+            printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
+            printf >&2 'You can either:\n'
+            printf >&2 '\n'
+            printf >&2 '  grant Full Disk Access to all programs run over SSH\n'
+            printf >&2 '\n'
+            printf >&2 'or\n'
+            printf >&2 '\n'
+            printf >&2 '  run `darwin-rebuild` in a graphical session.\n'
+            printf >&2 '\n'
+            printf >&2 'The option "Allow full disk access for remote users" can be found by\n'
+            printf >&2 'navigating to System Settings > General > Sharing > Remote Login\n'
+            printf >&2 'and then pressing on the i icon next to the switch.\n'
+            exit 1
           else
-            printf >&2 'Please enable Full Disk Access for your terminal emulator by flipping\n'
-            printf >&2 'the switch in System Settings.\n'
+            # The TCC service required to change home directories is `kTCCServiceSystemPolicySysAdminFiles`
+            # and we can reset it to ensure the user gets another prompt
+            tccutil reset SystemPolicySysAdminFiles > /dev/null
+
+            if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
+              printf >&2 '\e[1;31merror: permission denied when trying to %s user %s, aborting activation\e[0m\n' "$2" "$1"
+              printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n' "$1" "$2"
+              printf >&2 'please accept the dialog that pops up.\n'
+              printf >&2 '\n'
+              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
+              printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
+              printf >&2 '\n'
+              printf >&2 'This can be found in System Settings > Privacy & Security > Full Disk Access.\n'
+              exit 1
+            fi
           fi
 
-          exit 1
         fi
       }
 
@@ -149,7 +161,7 @@ in
           exit 1
         fi
 
-        requireFDA "$1" deleted
+        ensurePerms "$1" delete
       }
 
       ${concatMapStringsSep "\n" (v: let
@@ -169,7 +181,7 @@ in
         u=$(id -u ${name} 2> /dev/null) || true
         if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           if [ -z "$u" ]; then
-            requireFDA ${name} created
+            ensurePerms ${name} create
           fi
 
           ${optionalString (v.home != null && v.name != "root") ''
@@ -211,7 +223,7 @@ in
           g=''${g#PrimaryGroupID: }
           if [[ "$g" -eq ${toString v.gid} ]]; then
             echo "deleting group ${v.name}..." >&2
-            dscl . -delete ${dsclGroup} 2> /dev/null
+            dscl . -delete ${dsclGroup}
           else
             echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
           fi
@@ -245,7 +257,7 @@ in
         if [ -n "$g" ]; then
           if [ "$g" -gt 501 ]; then
             echo "deleting group ${name}..." >&2
-            dscl . -delete ${dsclGroup} 2> /dev/null
+            dscl . -delete ${dsclGroup}
           else
             echo "[1;31mwarning: existing group '${name}' has unexpected gid $g, skipping...[0m" >&2
           fi
@@ -255,18 +267,6 @@ in
 
     system.activationScripts.users.text = mkIf (cfg.knownUsers != []) ''
       echo "setting up users..." >&2
-
-      deleteUser() {
-        dscl . -delete "/Users/$1" 2> /dev/null
-
-        # `dscl . -delete` should exit with a non-zero exit code when there's an error, but we'll leave
-        # this code here just in case and for when we switch to `sysadminctl -deleteUser`
-        # We need to check as `sysadminctl -deleteUser` still exits with exit code 0 when there's an error
-        if id "$1" &> /dev/null; then
-          printf >&2 '\e[1;31merror: failed to delete user %s, aborting activation\e[0m\n', "$1"
-          exit 1
-        fi
-      }
 
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
@@ -282,7 +282,7 @@ in
               printf >&2 '[1;31mwarning: not going to recreate root, skipping...[0m\n'
             else
               printf >&2 'deleting user ${v.name}...\n'
-              deleteUser ${name}
+              dscl . -delete ${dsclUser}
             fi
           else
             echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
@@ -329,7 +329,7 @@ in
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            deleteUser ${lib.escapeShellArg name}
+            dscl . -delete ${lib.escapeShellArg "/Users/${name}"}
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi
