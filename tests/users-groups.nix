@@ -51,7 +51,7 @@
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "foo" "-UID" 42000 "-GID" 42000 "-fullName" "Foo user" "-home" "/Users/foo" "-shell" "/run/current-system/sw/bin/bash" ]}" ${config.out}/activate
     grep "createhomedir -cu ${lib.escapeShellArg "foo"}" ${config.out}/activate
     grep "sysadminctl -addUser ${lib.escapeShellArgs [ "created.user" "-UID" 42001 ]} .* ${lib.escapeShellArgs [ "-shell" "/usr/bin/false" ] }" ${config.out}/activate
-    (! grep "sysadminctl -addUser ${lib.escapeShellArg "created.user"} .* -home" ${config.out}/activate)
+    grep "sysadminctl -addUser ${lib.escapeShellArg "created.user"} .* ${lib.escapeShellArgs [ "-home" "/var/empty" ]}" ${config.out}/activate
     (! grep "dscl . -delete ${lib.escapeShellArg "/Users/created.user"}" ${config.out}/activate)
     (! grep "dscl . -delete ${lib.escapeShellArg "/Groups/created.user"}" ${config.out}/activate)
 

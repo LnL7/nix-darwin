@@ -58,11 +58,9 @@
       description = ''
         The user's home directory. This defaults to `null`.
 
-        When this is set to `null`, the value is managed by macOS instead of
-        `nix-darwin`. This means if the user has not been created yet,
-        `sysadminctl` will be called without the `-home` flag which means the
-        user will have a default home directory of `/Users/<name>` which will
-        be created by `sysadminctl`.
+        When this is set to `null`, if the user has not been created yet,
+        they will be created with the home directory `/var/empty` to match
+        the old default.
       '';
     };
 

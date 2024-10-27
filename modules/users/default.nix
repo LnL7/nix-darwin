@@ -260,7 +260,7 @@ in
               "-UID" v.uid
               "-GID" v.gid ]
               ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
-              ++ (lib.optionals (v.home != null) [ "-home" v.home ])
+              ++ [ "-home" (if v.home != null then v.home else "/var/empty") ]
               ++ [ "-shell" (if v.shell != null then shellPath v.shell else "/usr/bin/false") ])} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
