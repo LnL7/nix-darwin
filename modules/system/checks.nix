@@ -22,25 +22,9 @@ let
   '';
 
   runLink = ''
-    if ! test -e /run; then
-        echo "[1;31merror: Directory /run does not exist, aborting activation[0m" >&2
-        echo "Create a symlink to /var/run with:" >&2
-        if test -e /etc/synthetic.conf; then
-            echo >&2
-            echo "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
-            echo >&2
-            echo "The current contents of /etc/synthetic.conf is:" >&2
-            echo >&2
-            sed 's/^/    /' /etc/synthetic.conf >&2
-            echo >&2
-        else
-            echo >&2
-            echo "$ sudo ln -s private/var/run /run" >&2
-            echo >&2
-        fi
-        exit 2
+    if [[ ! -e /run ]]; then
+      printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
+      exit 1
     fi
   '';
 
@@ -59,7 +43,7 @@ let
         exit 2
      fi
    '';
- 
+
   preSequoiaBuildUsers = ''
     ${lib.optionalString config.nix.configureBuildUsers ''
       # Don’t complain when we’re about to migrate old‐style build users…
