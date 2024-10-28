@@ -88,7 +88,7 @@ let
 
   buildUsers = ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
-    if [ -z $buildUser ]; then
+    if [[ -z "$buildUser" ]]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
         echo "Create the build users or disable the daemon:" >&2
         echo "$ darwin-install" >&2
@@ -104,7 +104,7 @@ let
   buildGroupID = ''
     buildGroupID=$(dscl . -read /Groups/nixbld PrimaryGroupID | awk '{print $2}')
     expectedBuildGroupID=${toString config.ids.gids.nixbld}
-    if [[ $buildGroupID != $expectedBuildGroupID ]]; then
+    if [[ $buildGroupID != "$expectedBuildGroupID" ]]; then
         printf >&2 '\e[1;31merror: Build user group has mismatching GID, aborting activation\e[0m\n'
         printf >&2 'The default Nix build user group ID was changed from 30000 to 350.\n'
         printf >&2 'You are currently managing Nix build users with nix-darwin, but your\n'
@@ -114,6 +114,7 @@ let
         printf >&2 'Possible causes include setting up a new Nix installation with an\n'
         printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
         printf >&2 'installation with an existing Nix installation, or manually increasing\n'
+        # shellcheck disable=SC2016
         printf >&2 'your `system.stateVersion` setting.\n'
         printf >&2 '\n'
         printf >&2 'You can set the configured group ID to match the actual value:\n'
@@ -266,6 +267,7 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
+        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -334,7 +336,7 @@ in
     system.activationScripts.checks.text = ''
       ${cfg.text}
 
-      if test ''${checkActivation:-0} -eq 1; then
+      if [[ "''${checkActivation:-0}" -eq 1 ]]; then
         echo "ok" >&2
         exit 0
       fi
