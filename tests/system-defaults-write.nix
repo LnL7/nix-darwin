@@ -61,6 +61,7 @@
   system.defaults.finder._FXShowPosixPathInTitle = true;
   system.defaults.finder._FXSortFoldersFirst = true;
   system.defaults.finder.FXEnableExtensionChangeWarning = false;
+  system.defaults.hitoolbox.AppleFnUsageType = "Show Emoji & Symbols";
   system.defaults.screencapture.location = "/tmp";
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;

@@ -23,6 +23,7 @@ let
   menuExtraClock = defaultsToList "com.apple.menuextra.clock" cfg.menuExtraClock;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
+  hitoolbox = defaultsToList "com.apple.HIToolbox" cfg.hitoolbox;
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
   magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
@@ -76,6 +77,7 @@ in
         menuExtraClock
         dock
         finder
+        hitoolbox
         magicmouse
         magicmouseBluetooth
         screencapture
@@ -99,6 +101,7 @@ in
         ${concatStringsSep "\n" menuExtraClock}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
+        ${concatStringsSep "\n" hitoolbox}
         ${concatStringsSep "\n" magicmouse}
         ${concatStringsSep "\n" magicmouseBluetooth}
         ${concatStringsSep "\n" screencapture}
