@@ -41,6 +41,10 @@ let
 in
 
 {
+  imports = [
+    (lib.mkRemovedOptionModule [ "users" "forceRecreate" ] "")
+  ];
+
   options = {
     users.knownGroups = mkOption {
       type = types.listOf types.str;
@@ -84,13 +88,6 @@ in
       internal = true;
       type = types.attrsOf types.str;
       default = {};
-    };
-
-    users.forceRecreate = mkOption {
-      internal = true;
-      type = types.bool;
-      default = false;
-      description = "Remove and recreate existing groups/users.";
     };
   };
 
@@ -152,33 +149,11 @@ in
         fi
       }
 
-      ensureDeletable() {
-        # TODO: add `darwin.primaryUser` as well
-        if [[ "$1" == "$USER" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', "$1"
-          exit 1
-        elif [[ "$1" == "root" ]]; then
-          printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
-          exit 1
-        fi
-
-        ensurePerms "$1" delete
-      }
 
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
         dsclUser = lib.escapeShellArg "/Users/${v.name}";
       in ''
-        ${optionalString cfg.forceRecreate ''
-          u=$(id -u ${name} 2> /dev/null) || true
-          if [[ "$u" -eq ${toString v.uid} ]]; then
-            # TODO: add `darwin.primaryUser` as well
-            if [[ ${name} != "$USER" && ${name} != "root" ]]; then
-              ensureDeletable ${name}
-            fi
-          fi
-        ''}
-
         u=$(id -u ${name} 2> /dev/null) || true
         if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           if [ -z "$u" ]; then
@@ -190,7 +165,7 @@ in
             homeDirectory=''${homeDirectory#NFSHomeDirectory: }
             if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
               printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
-              printf >&2 'nix-darwin does not support changing the home directory of existing users.
+              printf >&2 'nix-darwin does not support changing the home directory of existing users.\n'
               printf >&2 '\n'
               printf >&2 'Please set:\n'
               printf >&2 '\n'
@@ -203,11 +178,22 @@ in
         fi
       '') createdUsers}
 
-      ${concatMapStringsSep "\n" (name: ''
-        u=$(id -u ${lib.escapeShellArg name} 2> /dev/null) || true
+      ${concatMapStringsSep "\n" (v: let
+        name = lib.escapeShellArg v;
+      in ''
+        u=$(id -u ${name} 2> /dev/null) || true
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
-            ensureDeletable ${lib.escapeShellArg name}
+            # TODO: add `darwin.primaryUser` as well
+            if [[ ${name} == "$USER" ]]; then
+              printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', ${name}
+              exit 1
+            elif [[ ${name} == "root" ]]; then
+              printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
+              exit 1
+            fi
+
+            ensurePerms ${name} delete
           fi
         fi
       '') deletedUsers}
@@ -219,17 +205,6 @@ in
       ${concatMapStringsSep "\n" (v: let
         dsclGroup = lib.escapeShellArg "/Groups/${v.name}";
       in ''
-        ${optionalString cfg.forceRecreate ''
-          g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
-          g=''${g#PrimaryGroupID: }
-          if [[ "$g" -eq ${toString v.gid} ]]; then
-            echo "deleting group ${v.name}..." >&2
-            dscl . -delete ${dsclGroup}
-          else
-            echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
-          fi
-        ''}
-
         g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
         if [ -z "$g" ]; then
@@ -273,23 +248,6 @@ in
         name = lib.escapeShellArg v.name;
         dsclUser = lib.escapeShellArg "/Users/${v.name}";
       in ''
-        ${optionalString cfg.forceRecreate ''
-          u=$(id -u ${name} 2> /dev/null) || true
-          if [[ "$u" -eq ${toString v.uid} ]]; then
-            # TODO: add `darwin.primaryUser` as well
-            if [[ ${name} == "$SUDO_USER" ]]; then
-              printf >&2 '[1;31mwarning: not going to recreate the user calling `darwin-rebuild` (%s), skipping...[0m\n' "$SUDO_USER"
-            elif [[ ${name} == "root" ]]; then
-              printf >&2 '[1;31mwarning: not going to recreate root, skipping...[0m\n'
-            else
-              printf >&2 'deleting user ${v.name}...\n'
-              dscl . -delete ${dsclUser}
-            fi
-          else
-            echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
-          fi
-        ''}
-
         u=$(id -u ${name} 2> /dev/null) || true
         if [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           echo "[1;31mwarning: existing user '${v.name}' has unexpected uid $u, skipping...[0m" >&2
@@ -302,7 +260,7 @@ in
               "-UID" v.uid
               "-GID" v.gid ]
               ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
-              ++ (lib.optionals (v.home != null) [ "-home" v.home ])
+              ++ [ "-home" (if v.home != null then v.home else "/var/empty") ]
               ++ [ "-shell" (if v.shell != null then shellPath v.shell else "/usr/bin/false") ])} 2> /dev/null
 
             # We need to check as `sysadminctl -addUser` still exits with exit code 0 when there's an error
