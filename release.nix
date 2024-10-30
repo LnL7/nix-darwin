@@ -132,6 +132,7 @@ let
     tests.services-aerospace = makeTest ./tests/services-aerospace.nix;
     tests.services-dnsmasq = makeTest ./tests/services-dnsmasq.nix;
     tests.services-eternal-terminal = makeTest ./tests/services-eternal-terminal.nix;
+    tests.services-krb5 = makeTest ./tests/services-krb5.nix;
     tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
     tests.services-nix-optimise = makeTest ./tests/services-nix-optimise.nix;
     tests.services-nextdns = makeTest ./tests/services-nextdns.nix;
