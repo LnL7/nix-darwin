@@ -99,6 +99,10 @@ in
         assertion = cfg.users ? root -> (cfg.users.root.home == null || cfg.users.root.home == "/var/root");
         message = "`users.users.root.home` must be set to either `null` or `/var/root`.";
       }
+      {
+        assertion = !builtins.elem "root" deletedUsers;
+        message = "Remove `root` from `users.knownUsers` if you no longer want nix-darwin to manage it.";
+      }
     ];
 
     users.gids = mkMerge gids;
@@ -193,9 +197,6 @@ in
             if [[ ${name} == "$USER" ]]; then
               # shellcheck disable=SC2016
               printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', ${name}
-              exit 1
-            elif [[ ${name} == "root" ]]; then
-              printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
               exit 1
             fi
 
