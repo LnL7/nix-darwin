@@ -18,7 +18,7 @@ in
   options = {
     programs.zsh.enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to configure zsh as an interactive shell.";
     };
 
