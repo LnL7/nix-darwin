@@ -277,7 +277,6 @@
     zle -N up-line-or-beginning-search
   '';
 
-  environment.loginShell = "${pkgs.zsh}/bin/zsh -l";
   environment.variables.SHELL = "${pkgs.zsh}/bin/zsh";
 
   environment.variables.LANG = "en_US.UTF-8";

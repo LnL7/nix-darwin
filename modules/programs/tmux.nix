@@ -41,6 +41,7 @@ in
 {
   imports = [
     (mkRenamedOptionModule [ "programs" "tmux" "tmuxConfig" ] [ "programs" "tmux" "extraConfig" ])
+    (mkRemovedOptionModule [ "programs" "tmux" "defaultCommand" ] "Use `programs.tmux.extraConfig` to configure the default command instead. If unset, tmux will default to using your system configured login shell.")
   ];
   options = {
     programs.tmux.enable = mkOption {
@@ -84,11 +85,6 @@ in
       description = "Cater to iTerm2 and its tmux integration, as appropriate.";
     };
 
-    programs.tmux.defaultCommand = mkOption {
-      type = types.either types.str types.package;
-      description = "The default command to use for tmux panes.";
-    };
-
     programs.tmux.tmuxOptions = mkOption {
       internal = true;
       type = types.attrsOf (types.submodule text);
@@ -118,12 +114,6 @@ in
       ${cfg.extraConfig}
 
       source-file -q /etc/tmux.conf.local
-    '';
-
-    programs.tmux.defaultCommand = mkDefault config.environment.loginShell;
-
-    programs.tmux.tmuxOptions.login-shell.text = ''
-      set -g default-command "${cfg.defaultCommand}"
     '';
 
     programs.tmux.tmuxOptions.sensible.text = mkIf cfg.enableSensible ''
