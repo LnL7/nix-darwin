@@ -9,18 +9,19 @@ let
 in
 
 {
-  options = {
-    services.karabiner-elements.enable = mkEnableOption "Karabiner-Elements";
+  options.services.karabiner-elements = {
+    enable = mkEnableOption "Karabiner-Elements";
+    package = mkPackageOption pkgs "karabiner-elements" { };
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.karabiner-elements ];
+    environment.systemPackages = [ cfg.package ];
 
     system.activationScripts.preActivation.text = ''
       rm -rf ${parentAppDir}
       mkdir -p ${parentAppDir}
       # Kernel extensions must reside inside of /Applications, they cannot be symlinks
-      cp -r ${pkgs.karabiner-elements.driver}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
+      cp -r ${cfg.package.driver}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
     '';
 
     system.activationScripts.postActivation.text = ''
@@ -49,7 +50,7 @@ in
 
     launchd.daemons.karabiner_grabber = {
       serviceConfig.ProgramArguments = [
-        "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_grabber"
+        "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_grabber"
       ];
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Label = "org.pqrs.karabiner.karabiner_grabber";
@@ -60,7 +61,7 @@ in
 
     launchd.daemons.karabiner_observer = {
       serviceConfig.ProgramArguments = [
-        "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_observer"
+        "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_observer"
       ];
 
       serviceConfig.Label = "org.pqrs.karabiner.karabiner_observer";
@@ -70,7 +71,7 @@ in
     };
 
     launchd.daemons.Karabiner-DriverKit-VirtualHIDDeviceClient = {
-      command = "\"${pkgs.karabiner-elements.driver}/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-DriverKit-VirtualHIDDeviceClient.app/Contents/MacOS/Karabiner-DriverKit-VirtualHIDDeviceClient\"";
+      command = "\"${cfg.package.driver}/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-DriverKit-VirtualHIDDeviceClient.app/Contents/MacOS/Karabiner-DriverKit-VirtualHIDDeviceClient\"";
       serviceConfig.ProcessType = "Interactive";
       serviceConfig.Label = "org.pqrs.Karabiner-DriverKit-VirtualHIDDeviceClient";
       serviceConfig.KeepAlive = true;
@@ -91,7 +92,7 @@ in
       script = ''
           rm -rf /run/wrappers
           mkdir -p /run/wrappers/bin
-          install -m4555 "${pkgs.karabiner-elements}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
+          install -m4555 "${cfg.package}/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_session_monitor" /run/wrappers/bin
       '';
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive.SuccessfulExit = false;
@@ -106,8 +107,8 @@ in
       serviceConfig.KeepAlive = true;
     };
 
-    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_grabber.plist".source = "${pkgs.karabiner-elements}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_grabber.plist";
-    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_observer.plist".source = "${pkgs.karabiner-elements}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_observer.plist";
-    environment.userLaunchAgents."org.pqrs.karabiner.karabiner_console_user_server.plist".source = "${pkgs.karabiner-elements}/Library/LaunchAgents/org.pqrs.karabiner.karabiner_console_user_server.plist";
+    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_grabber.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_grabber.plist";
+    environment.userLaunchAgents."org.pqrs.karabiner.agent.karabiner_observer.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.agent.karabiner_observer.plist";
+    environment.userLaunchAgents."org.pqrs.karabiner.karabiner_console_user_server.plist".source = "${cfg.package}/Library/LaunchAgents/org.pqrs.karabiner.karabiner_console_user_server.plist";
   };
 }
