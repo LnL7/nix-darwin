@@ -354,6 +354,11 @@ defaults write com.apple.finder '_FXSortFoldersFirst' $'<?xml version="1.0" enco
 <plist version="1.0">
 <true/>
 </plist>'
+defaults write com.apple.HIToolbox 'AppleFnUsageType' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>2</integer>
+</plist>'
 
 
 defaults write com.apple.screencapture 'location' $'<?xml version="1.0" encoding="UTF-8"?>

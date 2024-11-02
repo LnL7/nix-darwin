@@ -21,6 +21,7 @@
   ./system/defaults/clock.nix
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
+  ./system/defaults/hitoolbox.nix
   ./system/defaults/screencapture.nix
   ./system/defaults/screensaver.nix
   ./system/defaults/alf.nix
