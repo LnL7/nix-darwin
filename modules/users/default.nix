@@ -158,23 +158,24 @@ in
         if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
           if [ -z "$u" ]; then
             ensurePerms ${name} create
-          fi
 
-          ${optionalString (v.home != null && v.name != "root") ''
-            homeDirectory=$(dscl . -read ${dsclUser} NFSHomeDirectory)
-            homeDirectory=''${homeDirectory#NFSHomeDirectory: }
-            if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
-              printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
-              printf >&2 'nix-darwin does not support changing the home directory of existing users.\n'
-              printf >&2 '\n'
-              printf >&2 'Please set:\n'
-              printf >&2 '\n'
-              printf >&2 '    users.users.%s.home = "%s";\n' ${name} "$homeDirectory"
-              printf >&2 '\n'
-              printf >&2 'or remove it from your configuration.\n'
-              exit 1
-            fi
-          ''}
+            ${optionalString (v.home != null && v.name != "root") ''
+              else
+                homeDirectory=$(dscl . -read ${dsclUser} NFSHomeDirectory)
+                homeDirectory=''${homeDirectory#NFSHomeDirectory: }
+                if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
+                  printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
+                  printf >&2 'nix-darwin does not support changing the home directory of existing users.\n'
+                  printf >&2 '\n'
+                  printf >&2 'Please set:\n'
+                  printf >&2 '\n'
+                  printf >&2 '    users.users.%s.home = "%s";\n' ${name} "$homeDirectory"
+                  printf >&2 '\n'
+                  printf >&2 'or remove it from your configuration.\n'
+                  exit 1
+                fi
+            ''}
+          fi
         fi
       '') createdUsers}
 
