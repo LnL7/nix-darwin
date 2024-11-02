@@ -18,6 +18,11 @@ in
 {
   imports = [
     (mkRenamedOptionModule ["environment" "postBuild"] ["environment" "extraSetup"])
+    (mkRemovedOptionModule [ "environment" "loginShell" ] ''
+      This option was only used to change the default command in tmux.
+
+      This has been removed in favour of changing the default command or default shell in tmux directly.
+    '')
   ];
 
   options = {
@@ -72,12 +77,6 @@ in
         NOTE: Changing this requires running {command}`darwin-rebuild switch -I darwin-config=/path/to/configuration.nix`
         the first time to make darwin-rebuild aware of the custom location.
       '';
-    };
-
-    environment.loginShell = mkOption {
-      type = types.str;
-      default = "$SHELL -l";
-      description = "Configure default login shell.";
     };
 
     environment.variables = mkOption {
