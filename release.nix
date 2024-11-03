@@ -75,26 +75,6 @@ let
   }) (config: config.system.build.manual);
 
   jobs = {
-
-    unstable = pkgs.releaseTools.aggregate {
-      name = "darwin-${pkgs.lib.nixpkgsVersion}";
-      constituents =
-        [ jobs.stdenv.x86_64-darwin
-          jobs.bash.x86_64-darwin
-          jobs.zsh.x86_64-darwin
-          jobs.nix.x86_64-darwin
-          jobs.reattach-to-user-namespace.x86_64-darwin
-          jobs.tmux.x86_64-darwin
-          jobs.nano.x86_64-darwin
-          jobs.vim.x86_64-darwin
-          jobs.emacs.x86_64-darwin
-          jobs.examples.hydra.x86_64-darwin
-          jobs.examples.lnl.x86_64-darwin
-          jobs.examples.simple.x86_64-darwin
-        ];
-      meta.description = "Release-critical builds for the darwin channel";
-    };
-
     manualHTML = manual.manualHTML;
     manpages = manual.manpages;
     options = manual.optionsJSON;
