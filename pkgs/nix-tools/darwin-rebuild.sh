@@ -157,41 +157,15 @@ fi
 
 # For convenience, use the hostname as the default configuration to
 # build from the flake.
-if [ -n "$flake" ]; then
-    # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
-    if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
-       scheme=${BASH_REMATCH[1]} # eg. http:
-       authority=${BASH_REMATCH[3]} # eg. //www.ics.uci.edu
-       path=${BASH_REMATCH[5]} # eg. /pub/ietf/uri/
-       queryWithQuestion=${BASH_REMATCH[6]}
-       fragment=${BASH_REMATCH[9]}
-
-       flake=${scheme}${authority}${path}${queryWithQuestion}
-       flakeAttr=${fragment}
+if [[ -n "$flake" ]]; then
+    if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then
+       flake="${BASH_REMATCH[1]}"
+       flakeAttr="${BASH_REMATCH[2]}"
     fi
-    if [ -z "$flakeAttr" ]; then
+    if [[ -z "$flakeAttr" ]]; then
       flakeAttr=$(scutil --get LocalHostName)
     fi
     flakeAttr=darwinConfigurations.${flakeAttr}
-fi
-
-if [ -n "$flake" ]; then
-    if nix "${flakeFlags[@]}" flake metadata --version &>/dev/null; then
-        cmd=metadata
-    else
-        cmd=info
-    fi
-
-    metadata=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake")
-    flake=$(jq -r .url <<<"${metadata}")
-
-    if [ "$(jq -r .resolved.submodules <<<"${metadata}")" = "true" ]; then
-      if [[ "$flake" == *'?'* ]]; then
-        flake="${flake}&submodules=1"
-      else
-        flake="${flake}?submodules=1"
-      fi
-    fi
 fi
 
 if [ "$action" != build ]; then
