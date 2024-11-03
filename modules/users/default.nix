@@ -111,7 +111,7 @@ in
     # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
     # however currently that runs at user level activation as that runs before system level activation
     # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
-    system.checks.text = lib.mkAfter ''
+    system.checks.text = lib.mkIf (builtins.length (createdUsers ++ deletedUsers) > 0) (lib.mkAfter ''
       ensurePerms() {
         homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
@@ -156,7 +156,6 @@ in
 
         fi
       }
-
 
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
@@ -204,7 +203,7 @@ in
           fi
         fi
       '') deletedUsers}
-    '';
+    '');
 
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
