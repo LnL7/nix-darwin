@@ -168,16 +168,6 @@ if [[ -n "$flake" ]]; then
     flakeAttr=darwinConfigurations.${flakeAttr}
 fi
 
-if [ -n "$flake" ]; then
-    if nix "${flakeFlags[@]}" flake metadata --version &>/dev/null; then
-        cmd=metadata
-    else
-        cmd=info
-    fi
-
-    flake=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake" | jq -r .url)
-fi
-
 if [ "$action" != build ]; then
   if [ -n "$flake" ]; then
     extraBuildFlags+=("--no-link")
