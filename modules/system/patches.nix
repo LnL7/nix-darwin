@@ -30,9 +30,9 @@ in
         Set of patches to apply to {file}`/`.
 
         ::: {.warning}
-        
+
         This can modify everything so use with caution.
-        
+
         :::
 
         Useful for safely changing system files.  Unlike the etc module this
@@ -56,10 +56,13 @@ in
       # Applying patches to /.
       echo "applying patches..." >&2
 
-      for f in $(ls /run/current-system/patches 2> /dev/null); do
-          if test ! -e "${config.system.build.patches}/patches/$f"; then
-              patch --force --reverse --backup -d / -p1 < "/run/current-system/patches/$f" || true
-          fi
+      for f in /run/current-system/patches/*; do
+        [[ -e "$f" ]] || break  # handle when directory is empty
+        f=''${f#/run/current-system/patches/}
+
+        if [[ ! -e "${config.system.build.patches}/patches/$f" ]]; then
+          patch --force --reverse --backup -d / -p1 < "/run/current-system/patches/$f" || true
+        fi
       done
 
       ${concatMapStringsSep "\n" (f: ''
