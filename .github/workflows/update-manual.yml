@@ -21,7 +21,7 @@ jobs:
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-24.05-darwin -I darwin=. -A manualHTML
+        nix build .#manualHTML --override-input nixpkgs nixpkgs/nixpkgs-24.05-darwin
 
     - name: Push update to manual
       run: |

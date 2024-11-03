@@ -59,9 +59,9 @@ let
   }) (config: config.system.build.manual);
 
 in {
-  manualHTML = manual.manualHTML;
-  manpages = manual.manpages;
-  options = manual.optionsJSON;
+  docs = {
+    inherit (manual) manualHTML manpages optionsJSON;
+  };
 
   examples.hydra = makeSystem ./modules/examples/hydra.nix;
   examples.lnl = makeSystem ./modules/examples/lnl.nix;
