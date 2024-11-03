@@ -5,7 +5,12 @@
 }:
 
 let
-  inherit (release) pkgs;
+  release-lib = import (nixpkgs + "/pkgs/top-level/release-lib.nix") {
+    inherit supportedSystems scrubJobs system;
+    packageSet = import nixpkgs;
+  };
+
+  inherit (release-lib) pkgs;
 
   buildFromConfig = configuration: sel: sel
     (import ./. { inherit nixpkgs configuration system; }).config;
@@ -57,11 +62,6 @@ let
         };
     in
       buildFromConfig configuration (config: config.system.build.run-test);
-
-  release = import (nixpkgs + "/pkgs/top-level/release-lib.nix") {
-    inherit supportedSystems scrubJobs;
-    packageSet = import nixpkgs;
-  };
 
   manual = buildFromConfig ({ lib, config, ... }: {
     system.stateVersion = lib.mkDefault config.system.maxStateVersion;
