@@ -5,19 +5,10 @@
 }:
 
 let
-  release-lib = import (nixpkgs + "/pkgs/top-level/release-lib.nix") {
-    inherit supportedSystems scrubJobs system;
-    packageSet = import nixpkgs;
-  };
-
-  inherit (release-lib) pkgs;
-
   buildFromConfig = configuration: sel: sel
     (import ./. { inherit nixpkgs configuration system; }).config;
 
-  makeSystem = configuration: pkgs.lib.genAttrs [ system ] (system:
-    buildFromConfig configuration (config: config.system.build.toplevel)
-  );
+  makeSystem = configuration: buildFromConfig configuration (config: config.system.build.toplevel);
 
   makeTest = test:
     let
