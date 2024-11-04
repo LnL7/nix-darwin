@@ -1,10 +1,6 @@
 { config, lib, inputs, pkgs, ... }:
 
 {
-  # imports = [ ~/.config/nixpkgs/darwin/local-configuration.nix ];
-
-  # system.patches = [ ./pam.patch ];
-
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
@@ -52,7 +48,6 @@
       pkgs.jq
       pkgs.ripgrep
       pkgs.shellcheck
-      pkgs.vault
 
       pkgs.qes
     ];
@@ -94,7 +89,7 @@
   '';
 
   nix.settings.trusted-public-keys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
-  nix.settings.trusted-substituters = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
+  nix.settings.trusted-substituters = [ "https://d3i7ezr9vxxsfy.cloudfront.net" ];
 
   nix.settings.sandbox = true;
   nix.settings.extra-sandbox-paths = [ "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
@@ -299,8 +294,6 @@
         set +a
     fi
   '';
-
-  # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   nixpkgs.config.allowUnfree = true;
 
