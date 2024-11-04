@@ -63,8 +63,19 @@ stdenv.mkDerivation {
 
     ${uninstallSystem.system}/sw/bin/darwin-rebuild activate
 
-    if test -L /run/current-system; then
+    if [[ -L /run/current-system ]]; then
       sudo rm /run/current-system
+    fi
+
+    if [[ -L /run ]]; then
+      if [[ -e /etc/synthetic.conf ]]; then
+        sudo sed -i -E '/^run[[:space:]]/d' /etc/synthetic.conf
+        sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B &>/dev/null || true
+        sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t &>/dev/null || true
+        echo >&2 "NOTE: the /run symlink will be removed on reboot"
+      else
+        sudo rm /run
+      fi
     fi
 
     echo >&2
