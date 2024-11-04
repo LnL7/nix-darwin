@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-13
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # So that we fetch all branches, since we need to checkout the `gh-pages` branch later.
         fetch-depth: 0
