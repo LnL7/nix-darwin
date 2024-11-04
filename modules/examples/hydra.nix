@@ -53,4 +53,6 @@ in
     chown hydra:hydra ~hydra ~hydra/.ssh ~hydra/.ssh/authorized_keys
     echo "ok"
   '';
+
+  system.stateVersion = 5;
 }

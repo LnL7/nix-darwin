@@ -50,13 +50,11 @@
       pkgs.gnupg
       pkgs.htop
       pkgs.jq
-      pkgs.mosh
       pkgs.ripgrep
       pkgs.shellcheck
       pkgs.vault
 
       pkgs.qes
-      pkgs.darwin-zsh-completions
     ];
 
   services.yabai.enable = true;
@@ -331,4 +329,6 @@
 
   nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
+
+  system.stateVersion = 5;
 }
