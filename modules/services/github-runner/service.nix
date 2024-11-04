@@ -94,6 +94,10 @@ in
 
         script =
           let
+            # https://github.com/NixOS/nixpkgs/pull/333744 introduced an inconsistency with different
+            # versions of nixpkgs. Use the old version of escapeShellArg to make sure that labels
+            # are always escaped to avoid https://www.shellcheck.net/wiki/SC2054
+            escapeShellArgAlways = string: "'${replaceStrings ["'"] ["'\\''"] (toString string)}'";
             configure = pkgs.writeShellApplication {
               name = "configure-github-runner-${name}";
               text = /*bash*/''
@@ -104,7 +108,7 @@ in
                   --disableupdate
                   --work ${escapeShellArg workDir}
                   --url ${escapeShellArg cfg.url}
-                  --labels "${escapeShellArg (concatStringsSep "," cfg.extraLabels)}"
+                  --labels ${escapeShellArgAlways (concatStringsSep "," cfg.extraLabels)}
                   ${optionalString (cfg.name != null ) "--name ${escapeShellArg cfg.name}"}
                   ${optionalString cfg.replace "--replace"}
                   ${optionalString (cfg.runnerGroup != null) "--runnergroup ${escapeShellArg cfg.runnerGroup}"}
