@@ -46,5 +46,15 @@ with lib;
             echo >&2
         fi
     fi
+
+    # grep will return 1 when no lines matched which makes this line fail with `set -eo pipefail`
+    dscl . -list /Users UserShell | { grep "\s/run/" || true; } | awk '{print $1}' | while read -r user; do
+      shell=$(dscl . -read /Users/"$user" UserShell)
+      if [[ "$shell" != */bin/zsh ]]; then
+        echo >&2 "warning: changing $user's shell from $shell to /bin/zsh"
+      fi
+
+      dscl . -create /Users/"$user" UserShell /bin/zsh
+    done
   '';
 }
