@@ -48,7 +48,6 @@
 
     darwinModules.hydra = ./modules/examples/hydra.nix;
     darwinModules.lnl = ./modules/examples/lnl.nix;
-    darwinModules.ofborg = ./modules/examples/ofborg.nix;
     darwinModules.simple = ./modules/examples/simple.nix;
 
     templates.default = {
