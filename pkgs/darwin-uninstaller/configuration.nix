@@ -7,31 +7,29 @@ with lib;
   assertions = mkForce [];
   system.activationScripts.checks.text = mkForce "";
 
-  # Disable etc, launchd, ...
   environment.etc = mkForce {};
   launchd.agents = mkForce {};
   launchd.daemons = mkForce {};
   launchd.user.agents = mkForce {};
 
   system.activationScripts.postUserActivation.text = mkAfter ''
-    if test -L ~/.nix-defexpr/channels/darwin; then
+    if [[ -L ~/.nix-defexpr/channels/darwin ]]; then
         nix-channel --remove darwin || true
     fi
   '';
 
   system.activationScripts.postActivation.text = mkAfter ''
-    if test -L /Applications/Nix\ Apps; then
+    if [[ -L /Applications/Nix\ Apps ]]; then
         rm /Applications/Nix\ Apps
     fi
 
-    if test -L /etc/static; then
+    if [[ -L /etc/static ]]; then
         rm /etc/static
     fi
 
-    if test -O /nix/store; then
-        if ! test -e /Library/LaunchDaemons/org.nixos.nix-daemon.plist; then
-            sudo rm /Library/LaunchDaemons/org.nixos.nix-daemon.plist || true
-            sudo launchctl remove org.nixos.nix-daemon 2> /dev/null || true
+    # If the Nix Store is owned by root then we're on a multi-user system
+    if [[ -O /nix/store ]]; then
+        if [[ -e /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist ]]; then
             sudo cp /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
             sudo launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
         fi
