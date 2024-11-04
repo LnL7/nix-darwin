@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 with lib;
 
@@ -33,18 +33,6 @@ with lib;
             sudo cp /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
             sudo launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
         fi
-
-        if ! grep -q etc/profile.d/nix-daemon.sh /etc/bashrc; then
-            echo >&2 "Found no nix-daemon.sh reference in /etc/bashrc"
-            echo >&2 "add this snippet back to /etc/bashrc:"
-            echo >&2
-            echo >&2 "    # Nix"
-            echo >&2 "    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then"
-            echo >&2 "      . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'"
-            echo >&2 "    fi"
-            echo >&2 "    # End Nix"
-            echo >&2
-        fi
     fi
 
     # grep will return 1 when no lines matched which makes this line fail with `set -eo pipefail`
@@ -56,5 +44,9 @@ with lib;
 
       dscl . -create /Users/"$user" UserShell /bin/zsh
     done
+
+    while IFS= read -r -d "" file; do
+      mv "$file" "''${file%.*}"
+    done < <(find /etc -name '*.before-nix-darwin' -follow -print0)
   '';
 }
