@@ -66,9 +66,12 @@ jobs:
         darwin-rebuild switch -I darwin=.
     - name: Test uninstallation of nix-darwin
       run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
-        nix-shell -A uninstaller
-        nix-shell -A uninstaller.check
+        nix run .#darwin-uninstaller \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
+          --extra-experimental-features "nix-command flakes"
+        nix run .#darwin-uninstaller.tests.uninstaller \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
+          --extra-experimental-features "nix-command flakes"
     - name: Debugging tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
@@ -111,9 +114,12 @@ jobs:
         darwin-rebuild switch -I darwin=.
     - name: Test uninstallation of nix-darwin
       run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
-        nix-shell -A uninstaller
-        nix-shell -A uninstaller.check
+        nix run .#darwin-uninstaller \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
+          --extra-experimental-features "nix-command flakes"
+        nix run .#darwin-uninstaller.tests.uninstaller \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
+          --extra-experimental-features "nix-command flakes"
     - name: Debugging tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
