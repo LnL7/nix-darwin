@@ -225,6 +225,11 @@ fi
 
 if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback ]; then
   if [ "$USER" != root ]; then
+    # Running `$systemConfig/activate-user` causes subsequent sudo invocations to prompt
+    # for the password even if we previously ran sudo in the same session; indeed, by this
+    # point we've already run `nix-env --set` as sudo. To avoid prompting a second time,
+    # we become root *before* running activate-user and then drop down to the user to
+    # invoke it. This way, the call to activate doesn't require a password.
     sudo @shell@ -c "su $USER -c $systemConfig/activate-user && $systemConfig/activate"
   else
     "$systemConfig/activate-user"
