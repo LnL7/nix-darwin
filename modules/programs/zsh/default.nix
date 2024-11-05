@@ -117,8 +117,11 @@ in
 
   config = mkIf cfg.enable {
 
-    warnings = mkIf (cfg.enableFastSyntaxHighlighting && cfg.enableSyntaxHighlighting) [
-      "zsh-fast-syntax-highlighting and zsh-syntax-highlighting are mutually exclusive. Disable one of them."
+    assertions = [
+      {
+        assertion = !(cfg.enableSyntaxHighlighting && cfg.enableFastSyntaxHighlighting);
+        message = "zsh-syntax-highlighting and zsh-fast-syntax-highlighting are mutually exclusive, please disable one of them.";
+      }
     ];
     environment.systemPackages =
       [ # Include zsh package
