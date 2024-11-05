@@ -224,11 +224,10 @@ if [ "$action" = switch ]; then
 fi
 
 if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback ]; then
-  "$systemConfig/activate-user"
-
   if [ "$USER" != root ]; then
-    sudo "$systemConfig/activate"
+    sudo @shell@ -c "su $USER -c $systemConfig/activate-user && $systemConfig/activate"
   else
+    "$systemConfig/activate-user"
     "$systemConfig/activate"
   fi
 fi
