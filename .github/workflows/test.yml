@@ -10,7 +10,7 @@ env:
 
 jobs:
   test-stable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
@@ -23,7 +23,7 @@ jobs:
     - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A examples.simple
 
   test-unstable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
@@ -36,7 +36,7 @@ jobs:
     - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A examples.simple
 
   install-against-stable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
@@ -81,7 +81,7 @@ jobs:
         limit-access-to-actor: true
 
   install-against-unstable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
@@ -126,7 +126,7 @@ jobs:
         limit-access-to-actor: true
 
   install-flake-against-stable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
@@ -155,7 +155,7 @@ jobs:
         darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
 
   install-flake-against-unstable:
-    runs-on: macos-12
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3
