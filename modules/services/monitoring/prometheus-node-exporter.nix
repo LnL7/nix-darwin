@@ -81,7 +81,8 @@ in {
     users.users._prometheus-node-exporter = {
       uid = config.ids.uids._prometheus-node-exporter;
       gid = config.ids.gids._prometheus-node-exporter;
-      home = "/var/empty";
+      home = "/var/lib/prometheus-node-exporter";
+      createHome = true;
       shell = "/usr/bin/false";
       description = "System user for the Prometheus Node exporter";
     };
@@ -104,11 +105,14 @@ in {
         ++ (map (collector: "--collector.${collector}") cfg.enabledCollectors)
         ++ (map (collector: "--no-collector.${collector}") cfg.disabledCollectors)
       ) + escapeShellArgs cfg.extraFlags;
-      serviceConfig = {
+      serviceConfig = let
+        logPath = config.users.users._prometheus-node-exporter.home
+          + "/prometheus-node-exporter.log";
+      in {
         KeepAlive = true;
         RunAtLoad = true;
-        StandardErrorPath = "/var/log/prometheus-node-exporter.log";
-        StandardOutPath = "/var/log/prometheus-node-exporter.log";
+        StandardErrorPath = logPath;
+        StandardOutPath = logPath;
         GroupName = "_prometheus-node-exporter";
         UserName = "_prometheus-node-exporter";
       };
