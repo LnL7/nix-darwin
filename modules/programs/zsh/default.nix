@@ -107,15 +107,24 @@ in
       default = false;
       description = "Enable zsh-syntax-highlighting.";
     };
+
+    programs.zsh.enableFastSyntaxHighlighting = mkEnableOption "zsh-fast-syntax-highlighting";
   };
 
   config = mkIf cfg.enable {
 
+    assertions = [
+      {
+        assertion = !(cfg.enableSyntaxHighlighting && cfg.enableFastSyntaxHighlighting);
+        message = "zsh-syntax-highlighting and zsh-fast-syntax-highlighting are mutually exclusive, please disable one of them.";
+      }
+    ];
     environment.systemPackages =
       [ # Include zsh package
         pkgs.zsh
       ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
-        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
+        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting
+        ++ optional cfg.enableFastSyntaxHighlighting pkgs.zsh-fast-syntax-highlighting;
 
     environment.pathsToLink = [ "/share/zsh" ];
 
@@ -190,6 +199,10 @@ in
 
       ${optionalString cfg.enableSyntaxHighlighting
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      }
+
+      ${optionalString cfg.enableFastSyntaxHighlighting
+        "source ${pkgs.zsh-fast-syntax-highlighting}/share/zsh-fast-syntax-highlighting/zsh-fast-syntax-highlighting.zsh"
       }
 
       ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}
