@@ -108,11 +108,7 @@ in
       description = "Enable zsh-syntax-highlighting.";
     };
 
-    programs.zsh.enableFastSyntaxHighlighting = mkOption {
-      type = types.bool;
-      default = false;
-      description = lib.mdDoc "Enable zsh-fast-syntax-highlighting.";
-    };
+    programs.zsh.enableFastSyntaxHighlighting = mkEnableOption "zsh-fast-syntax-highlighting";
   };
 
   config = mkIf cfg.enable {
