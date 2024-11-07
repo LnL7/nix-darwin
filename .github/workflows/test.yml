@@ -13,33 +13,29 @@ jobs:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix corresponding to latest stable channel
       uses: cachix/install-nix-action@v30
       with:
         install_url: https://releases.nixos.org/nix/nix-2.18.8/install
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A tests
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }} -I darwin=. -A examples.simple
+    - run: nix flake check --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
 
   test-unstable:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v30
       with:
         install_url: https://releases.nixos.org/nix/nix-2.24.9/install
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A tests
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A manpages
-    - run: nix-build ./release.nix -I nixpkgs=channel:nixpkgs-unstable -I darwin=. -A examples.simple
+    - run: nix flake check --override-input nixpkgs nixpkgs/nixpkgs-unstable
 
   install-against-stable:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix corresponding to latest stable channel
       uses: cachix/install-nix-action@v30
       with:
@@ -84,7 +80,7 @@ jobs:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v30
       with:
@@ -129,7 +125,7 @@ jobs:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix version corresponding to latest stable channel
       uses: cachix/install-nix-action@v30
       with:
@@ -158,7 +154,7 @@ jobs:
     runs-on: macos-13
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install nix from current unstable channel
       uses: cachix/install-nix-action@v30
       with:

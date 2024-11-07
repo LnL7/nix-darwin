@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-13
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # So that we fetch all branches, since we need to checkout the `gh-pages` branch later.
         fetch-depth: 0
@@ -21,7 +21,7 @@ jobs:
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-24.05-darwin -I darwin=. -A manualHTML
+        nix build .#manualHTML --override-input nixpkgs nixpkgs/nixpkgs-24.05-darwin
 
     - name: Push update to manual
       run: |
