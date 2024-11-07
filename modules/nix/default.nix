@@ -174,6 +174,14 @@ in
         '';
       };
 
+      nixConfPath = mkOption {
+        type = types.string;
+        default = "nix/nix.conf";
+        description = ''
+          Path to the nix.conf file inside /etc. Customising this makes it possible to have extra configuration provided outside of nix options.
+        '';
+      };
+
       # Not in NixOS module
       useDaemon = mkOption {
         type = types.bool;
@@ -688,25 +696,26 @@ in
       ]
       ++ optional (config.programs.bash.completion.enable) pkgs.nix-bash-completions;
 
-    environment.etc."nix/nix.conf".source = nixConf;
-
-    # Not in NixOS module
-    environment.etc."nix/nix.conf".knownSha256Hashes = [
-      "7c2d80499b39256b03ee9abd3d6258343718306aca8d472c26ac32c9b0949093"  # official Nix installer
-      "19299897fa312d9d32b3c968c2872dd143085aa727140cec51f57c59083e93b9"
-      "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"
-      "ef78f401a9b5a42fd15e967c50da384f99ec62f9dbc66ea38f1390b46b63e1ff"  # official Nix installer 2.0
-      "c06b0c6080dd1d62e61a30cfad100c0cfed2d3bcd378e296632dc3b28b31dc69"  # official Nix installer as of 2.0.1
-      "ff08c12813680da98c4240328f828647b67a65ba7aa89c022bd8072cba862cf1"  # official Nix installer as of 2.4
-      "f3e03d851c240c1aa7daccd144ee929f0f5971982424c868c434eb6030e961d4"  # DeterminateSystems Nix installer 0.10.0
-      "c6080216f2a170611e339c3f46e4e1d61aaf0d8b417ad93ade8d647da1382c11"  # DeterminateSystems Nix installer 0.14.0
-      "97f4135d262ca22d65c9554aad795c10a4491fa61b67d9c2430f4d82bbfec9a2"  # DeterminateSystems Nix installer 0.15.1
-      "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0
-      "e4974acb79c56148cb8e92137fa4f2de9b7356e897b332fc4e6769e8c0b83e18"  # DeterminateSystems Nix installer 0.20.0
-      "966d22ef5bb9b56d481e8e0d5f7ca2deaf4d24c0f0fc969b2eeaa7ae0aa42907"  # DeterminateSystems Nix installer 0.22.0
-      "24797ac05542ff8b52910efc77870faa5f9e3275097227ea4e50c430a5f72916"  # lix-installer 0.17.1 with flakes
-      "b027b5cad320b5b8123d9d0db9f815c3f3921596c26dc3c471457098e4d3cc40"  # lix-installer 0.17.1 without flakes
-    ];
+    environment.etc."${cfg.nixConfPath}" = {
+      source = nixConf;
+      # Not in NixOS module
+      knownSha256Hashes = [
+        "7c2d80499b39256b03ee9abd3d6258343718306aca8d472c26ac32c9b0949093"  # official Nix installer
+        "19299897fa312d9d32b3c968c2872dd143085aa727140cec51f57c59083e93b9"
+        "c4ecc3d541c163c8fcc954ccae6b8cab28c973dc283fea5995c69aaabcdf785f"
+        "ef78f401a9b5a42fd15e967c50da384f99ec62f9dbc66ea38f1390b46b63e1ff"  # official Nix installer 2.0
+        "c06b0c6080dd1d62e61a30cfad100c0cfed2d3bcd378e296632dc3b28b31dc69"  # official Nix installer as of 2.0.1
+        "ff08c12813680da98c4240328f828647b67a65ba7aa89c022bd8072cba862cf1"  # official Nix installer as of 2.4
+        "f3e03d851c240c1aa7daccd144ee929f0f5971982424c868c434eb6030e961d4"  # DeterminateSystems Nix installer 0.10.0
+        "c6080216f2a170611e339c3f46e4e1d61aaf0d8b417ad93ade8d647da1382c11"  # DeterminateSystems Nix installer 0.14.0
+        "97f4135d262ca22d65c9554aad795c10a4491fa61b67d9c2430f4d82bbfec9a2"  # DeterminateSystems Nix installer 0.15.1
+        "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0
+        "e4974acb79c56148cb8e92137fa4f2de9b7356e897b332fc4e6769e8c0b83e18"  # DeterminateSystems Nix installer 0.20.0
+        "966d22ef5bb9b56d481e8e0d5f7ca2deaf4d24c0f0fc969b2eeaa7ae0aa42907"  # DeterminateSystems Nix installer 0.22.0
+        "24797ac05542ff8b52910efc77870faa5f9e3275097227ea4e50c430a5f72916"  # lix-installer 0.17.1 with flakes
+        "b027b5cad320b5b8123d9d0db9f815c3f3921596c26dc3c471457098e4d3cc40"  # lix-installer 0.17.1 without flakes
+      ];
+    };
 
     environment.etc."nix/registry.json".text = builtins.toJSON {
       version = 2;
@@ -820,7 +829,7 @@ in
 
     # Unrelated to use in NixOS module
     system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
-      if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
+      if ! diff /etc/${cfg.nixConfPath} /run/current-system/etc/${cfg.nixConfPath} &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
       fi
