@@ -48,14 +48,20 @@ in
         text = mkBefore (''
           echo >&2 "setting up GitHub Runner '${cfg.name}'..."
 
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkStateDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+          (
+            umask -S u=rwx,g=rx,o=
 
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkLogDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
-        '' + optionalString (cfg.workDir == null) ''
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkWorkDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkStateDir cfg)}
+            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+
+            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkLogDir cfg)}
+            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
+
+            ${optionalString (cfg.workDir == null) ''
+              ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkWorkDir cfg)}
+              ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+            ''}
+          )
         '');
       };
     }));

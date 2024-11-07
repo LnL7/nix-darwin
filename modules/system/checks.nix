@@ -22,25 +22,9 @@ let
   '';
 
   runLink = ''
-    if ! test -e /run; then
-        echo "[1;31merror: Directory /run does not exist, aborting activation[0m" >&2
-        echo "Create a symlink to /var/run with:" >&2
-        if test -e /etc/synthetic.conf; then
-            echo >&2
-            echo "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
-            echo >&2
-            echo "The current contents of /etc/synthetic.conf is:" >&2
-            echo >&2
-            sed 's/^/    /' /etc/synthetic.conf >&2
-            echo >&2
-        else
-            echo >&2
-            echo "$ sudo ln -s private/var/run /run" >&2
-            echo >&2
-        fi
-        exit 2
+    if [[ ! -e /run ]]; then
+      printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
+      exit 1
     fi
   '';
 
@@ -59,7 +43,7 @@ let
         exit 2
      fi
    '';
- 
+
   preSequoiaBuildUsers = ''
     ${lib.optionalString config.nix.configureBuildUsers ''
       # Don’t complain when we’re about to migrate old‐style build users…
@@ -104,7 +88,7 @@ let
 
   buildUsers = ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
-    if [ -z $buildUser ]; then
+    if [[ -z "$buildUser" ]]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
         echo "Create the build users or disable the daemon:" >&2
         echo "$ darwin-install" >&2
@@ -120,7 +104,7 @@ let
   buildGroupID = ''
     buildGroupID=$(dscl . -read /Groups/nixbld PrimaryGroupID | awk '{print $2}')
     expectedBuildGroupID=${toString config.ids.gids.nixbld}
-    if [[ $buildGroupID != $expectedBuildGroupID ]]; then
+    if [[ $buildGroupID != "$expectedBuildGroupID" ]]; then
         printf >&2 '\e[1;31merror: Build user group has mismatching GID, aborting activation\e[0m\n'
         printf >&2 'The default Nix build user group ID was changed from 30000 to 350.\n'
         printf >&2 'You are currently managing Nix build users with nix-darwin, but your\n'
@@ -130,6 +114,7 @@ let
         printf >&2 'Possible causes include setting up a new Nix installation with an\n'
         printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
         printf >&2 'installation with an existing Nix installation, or manually increasing\n'
+        # shellcheck disable=SC2016
         printf >&2 'your `system.stateVersion` setting.\n'
         printf >&2 '\n'
         printf >&2 'You can set the configured group ID to match the actual value:\n'
@@ -282,6 +267,7 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
+        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -350,7 +336,7 @@ in
     system.activationScripts.checks.text = ''
       ${cfg.text}
 
-      if test ''${checkActivation:-0} -eq 1; then
+      if [[ "''${checkActivation:-0}" -eq 1 ]]; then
         echo "ok" >&2
         exit 0
       fi

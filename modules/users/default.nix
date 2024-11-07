@@ -99,6 +99,10 @@ in
         assertion = cfg.users ? root -> (cfg.users.root.home == null || cfg.users.root.home == "/var/root");
         message = "`users.users.root.home` must be set to either `null` or `/var/root`.";
       }
+      {
+        assertion = !builtins.elem "root" deletedUsers;
+        message = "Remove `root` from `users.knownUsers` if you no longer want nix-darwin to manage it.";
+      }
     ];
 
     users.gids = mkMerge gids;
@@ -107,7 +111,7 @@ in
     # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
     # however currently that runs at user level activation as that runs before system level activation
     # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
-    system.checks.text = lib.mkAfter ''
+    system.checks.text = lib.mkIf (builtins.length (createdUsers ++ deletedUsers) > 0) (lib.mkAfter ''
       ensurePerms() {
         homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
@@ -115,6 +119,7 @@ in
         if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
           if [[ -n "$SSH_CONNECTION" ]]; then
             printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
+            # shellcheck disable=SC2016
             printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
             printf >&2 'You can either:\n'
             printf >&2 '\n'
@@ -122,6 +127,7 @@ in
             printf >&2 '\n'
             printf >&2 'or\n'
             printf >&2 '\n'
+            # shellcheck disable=SC2016
             printf >&2 '  run `darwin-rebuild` in a graphical session.\n'
             printf >&2 '\n'
             printf >&2 'The option "Allow full disk access for remote users" can be found by\n'
@@ -135,9 +141,11 @@ in
 
             if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
               printf >&2 '\e[1;31merror: permission denied when trying to %s user %s, aborting activation\e[0m\n' "$2" "$1"
-              printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n' "$1" "$2"
+              # shellcheck disable=SC2016
+              printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n'
               printf >&2 'please accept the dialog that pops up.\n'
               printf >&2 '\n'
+              # shellcheck disable=SC2016
               printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
               printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
               printf >&2 '\n'
@@ -148,7 +156,6 @@ in
 
         fi
       }
-
 
       ${concatMapStringsSep "\n" (v: let
         name = lib.escapeShellArg v.name;
@@ -187,10 +194,8 @@ in
           if [ "$u" -gt 501 ]; then
             # TODO: add `darwin.primaryUser` as well
             if [[ ${name} == "$USER" ]]; then
+              # shellcheck disable=SC2016
               printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', ${name}
-              exit 1
-            elif [[ ${name} == "root" ]]; then
-              printf >&2 '\e[1;31merror: refusing to delete `root`, aborting activation\e[0m\n'
               exit 1
             fi
 
@@ -198,7 +203,7 @@ in
           fi
         fi
       '') deletedUsers}
-    '';
+    '');
 
     system.activationScripts.groups.text = mkIf (cfg.knownGroups != []) ''
       echo "setting up groups..." >&2
