@@ -114,12 +114,13 @@ jobs:
         darwin-rebuild switch -I darwin=.
     - name: Test uninstallation of nix-darwin
       run: |
+        # A regression in Nix 2.19 means we need to put `--extra-experimental-features` before `--override-input`
         nix run .#darwin-uninstaller \
-          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
-          --extra-experimental-features "nix-command flakes"
+           --extra-experimental-features "nix-command flakes" \
+           --override-input nixpkgs nixpkgs/nixpkgs-unstable
         nix run .#darwin-uninstaller.tests.uninstaller \
-          --override-input nixpkgs nixpkgs/nixpkgs-unstable \
-          --extra-experimental-features "nix-command flakes"
+           --extra-experimental-features "nix-command flakes" \
+           --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Debugging tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
