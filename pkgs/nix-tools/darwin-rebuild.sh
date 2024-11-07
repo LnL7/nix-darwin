@@ -26,9 +26,11 @@ showSyntax() {
 if /usr/bin/sudo --help | grep -- --preserve-env= >/dev/null; then
   # We use `env` before our command to ensure the preserved PATH gets checked
   # when trying to resolve the command to execute
-  sudo="/usr/bin/sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
+  sudo_base="/usr/bin/sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
+  sudo="$sudo_base env"
 else
-  sudo="/usr/bin/sudo -H"
+  sudo_base="/usr/bin/sudo -H"
+  sudo="$sudo_base"
 fi
 sudo() { $sudo "$@"; }
 
@@ -229,7 +231,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
     # point we've already run `nix-env --set` as sudo. To avoid prompting a second time,
     # we become root *before* running activate-user and then drop down to the user to
     # invoke it. This way, the call to activate doesn't require a password.
-    sudo @shell@ -c "$sudo -u $USER $systemConfig/activate-user && $systemConfig/activate"
+    sudo @shell@ -c "$sudo_base -u $USER $systemConfig/activate-user && $systemConfig/activate"
   else
     "$systemConfig/activate-user"
     "$systemConfig/activate"
