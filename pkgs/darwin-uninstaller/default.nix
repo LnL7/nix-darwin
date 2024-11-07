@@ -81,12 +81,14 @@ in writeShellApplication {
       test -e /etc/static && exit 1
       echo >&2 "checking /run/current-system"
       test -e /run/current-system && exit 1
-      echo >&2 "checking nix-daemon service (assuming a multi-user install)"
-      sudo launchctl list | grep org.nixos.nix-daemon || echo "FIXME? sudo launchctl list | grep org.nixos.nix-daemon"
-      pgrep -l nix-daemon || echo "FIXME? pgrep -l nix-daemon"
-      readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist || echo "FIXME? readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist"
-      grep /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /Library/LaunchDaemons/org.nixos.nix-daemon.plist || echo "FIXME? grep /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /Library/LaunchDaemons/org.nixos.nix-daemon.plist"
-      echo >&2 ok
+      if [[ $(stat -f '%Su' /nix/store) == "root" ]]; then
+        echo >&2 "checking nix-daemon service"
+        launchctl print system/org.nixos.nix-daemon
+        pgrep -l nix-daemon
+        test -e /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        [[ "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" == "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" ]]
+        echo >&2 ok
+      fi
     '';
   };
 }
