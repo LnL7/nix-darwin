@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     //     UID/GID, and thus don't have env vars stripped automatically
     //
     // We're using musl, which doesn't drop environment variables in secure mode,
-    // and we'd also like glibc-specific variables to be covered.
+    // and we'd also like dyld-specific variables to be covered.
     //
     // If we don't explicitly unset them, it's quite easy to just set DYLD_INSERT_LIBRARIES,
     // have it passed through to the wrapped program, and gain privileges.
