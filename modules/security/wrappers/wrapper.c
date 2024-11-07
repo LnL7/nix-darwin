@@ -1,24 +1,9 @@
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdnoreturn.h>
 #include <sys/errno.h>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <sys/xattr.h>
-// #include <fcntl.h>
-// #include <dirent.h>
-// #include <errno.h>
-// #include <sys/prctl.h>
-// #include <limits.h>
-// #include <stdint.h>
-// #include <syscall.h>
-// #include <byteswap.h>
-
-// imported from glibc
-// #include "unsecvars.h"
 
 #ifndef SOURCE_PROG
 #error SOURCE_PROG should be defined via preprocessor commandline
@@ -38,6 +23,10 @@ static noreturn void assert_failure(const char *assertion) {
     abort();
 }
 
+// The following comment and list of env vars are taken from the NixOS wrapper.
+// Most of them likely have no effect on Darwin, but I have chosen to continue
+// unsetting them just in case.
+
 // These are environment variable aliases for glibc tunables.
 // This list shouldn't grow further, since this is a legacy mechanism.
 // Any future tunables are expected to only be accessible through GLIBC_TUNABLES.
@@ -51,21 +40,15 @@ static noreturn void assert_failure(const char *assertion) {
 // Except for MALLOC_CHECK_ (which is marked SXID_ERASE), these are all
 // marked SXID_IGNORE (ignored in secure mode), so even the glibc version
 // of this wrapper would leave them intact.
-#define UNSECURE_ENVVARS_TUNABLES \
-    "MALLOC_CHECK_\0" \
-    "MALLOC_TOP_PAD_\0" \
-    "MALLOC_PERTURB_\0" \
-    "MALLOC_MMAP_THRESHOLD_\0" \
-    "MALLOC_TRIM_THRESHOLD_\0" \
-    "MALLOC_MMAP_MAX_\0" \
-    "MALLOC_ARENA_MAX\0" \
-    "MALLOC_ARENA_TEST\0"
 
-#define UNSECURE_ENVVARS \
+#define GLIBC_UNSECURE_ENVVARS \
   "GCONV_PATH\0"							      \
   "GETCONF_DIR\0"							      \
+  "GLIBC_TUNABLES\0"							      \
   "HOSTALIASES\0"							      \
   "LD_AUDIT\0"								      \
+  "LD_BIND_NOT\0"							      \
+  "LD_BIND_NOW\0"							      \
   "LD_DEBUG\0"								      \
   "LD_DEBUG_OUTPUT\0"							      \
   "LD_DYNAMIC_WEAK\0"							      \
@@ -75,16 +58,50 @@ static noreturn void assert_failure(const char *assertion) {
   "LD_PRELOAD\0"							      \
   "LD_PROFILE\0"							      \
   "LD_SHOW_AUXV\0"							      \
-  "LD_USE_LOAD_BIAS\0"							      \
+  "LD_VERBOSE\0"							      \
+  "LD_WARN\0"								      \
   "LOCALDOMAIN\0"							      \
   "LOCPATH\0"								      \
+  "MALLOC_ARENA_MAX\0"							      \
+  "MALLOC_ARENA_TEST\0"							      \
+  "MALLOC_CHECK\0"            \
+  "MALLOC_MMAP_MAX_\0"							      \
+  "MALLOC_MMAP_THRESHOLD_\0"  \
+  "MALLOC_PERTURB_\0"							      \
+  "MALLOC_TOP_PAD_\0"							      \
   "MALLOC_TRACE\0"							      \
+  "MALLOC_TRIM_THRESHOLD_\0"						      \
   "NIS_PATH\0"								      \
   "NLSPATH\0"								      \
   "RESOLV_HOST_CONF\0"							      \
   "RES_OPTIONS\0"							      \
   "TMPDIR\0"								      \
-  // GLIBC_TUNABLES_ENVVAR							      \
+  "TZDIR\0"
+
+// These are the variables that dyld refers to to load libraries.
+// Taken from `man dyld` on macOS 14.6.1.
+// macOS appears to ignore these variables for setuid binaries,
+// but again we err on the side of caution.
+#define DYLD_UNSECURE_ENVVARS \
+  "DYLD_FRAMEWORK_PATH\0" \
+  "DYLD_FALLBACK_FRAMEWORK_PATH\0" \
+  "DYLD_VERSIONED_FRAMEWORK_PATH\0" \
+  "DYLD_LIBRARY_PATH\0" \
+  "DYLD_FALLBACK_LIBRARY_PATH\0" \
+  "DYLD_VERSIONED_LIBRARY_PATH\0" \
+  "DYLD_IMAGE_SUFFIX\0" \
+  "DYLD_INSERT_LIBRARIES\0" \
+  "DYLD_PRINT_TO_FILE\0" \
+  "DYLD_PRINT_LIBRARIES\0" \
+  "DYLD_PRINT_LOADERS\0" \
+  "DYLD_PRINT_SEARCHING\0" \
+  "DYLD_PRINT_APIS\0" \
+  "DYLD_PRINT_BINDINGS\0" \
+  "DYLD_PRINT_INITIALIZERS\0" \
+  "DYLD_PRINT_SEGMENTS\0" \
+  "DYLD_PRINT_ENV\0" \
+  "DYLD_SHARED_REGION\0" \
+  "DYLD_SHARED_CACHE_DIR\0" \
 
 int main(int argc, char **argv) {
     ASSERT(argc >= 1);
@@ -100,19 +117,19 @@ int main(int argc, char **argv) {
 
     // Drop insecure environment variables explicitly
     //
-    // glibc does this automatically in SUID binaries, but we'd like to cover this:
+    // dyld does this automatically in SUID binaries (for everything in DYLD_ENVVARS),
+    // but we'd like to cover this:
     //
-    //  a) before it gets to glibc
-    //  b) in binaries that are only granted ambient capabilities by the wrapper,
-    //     but don't run with an altered effective UID/GID, nor directly gain
-    //     capabilities themselves, and thus don't run in secure mode.
+    //  a) for variables that dyld does not unset (such as TMPDIR)
+    //  b) in binaries with entitlements, but don't run with an altered effective
+    //     UID/GID, and thus don't have env vars stripped automatically
     //
     // We're using musl, which doesn't drop environment variables in secure mode,
     // and we'd also like glibc-specific variables to be covered.
     //
-    // If we don't explicitly unset them, it's quite easy to just set LD_PRELOAD,
+    // If we don't explicitly unset them, it's quite easy to just set DYLD_INSERT_LIBRARIES,
     // have it passed through to the wrapped program, and gain privileges.
-    for (char *unsec = UNSECURE_ENVVARS_TUNABLES UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
+    for (char *unsec = GLIBC_UNSECURE_ENVVARS DYLD_UNSECURE_ENVVARS; *unsec; unsec = strchr(unsec, 0) + 1) {
         if (debug) {
             fprintf(stderr, "unsetting %s\n", unsec);
         }
