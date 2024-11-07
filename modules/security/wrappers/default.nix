@@ -181,7 +181,7 @@ in
 
       # We want to place the tmpdirs for the wrappers to the parent dir.
       wrapperDir=$(mktemp --directory --tmpdir="${parentWrapperDir}" wrappers.XXXXXXXXXX)
-      chmod a+rx $wrapperDir
+      chmod a+rx "$wrapperDir"
 
       ${builtins.concatStringsSep "\n" mkWrappedPrograms}
 
@@ -189,12 +189,12 @@ in
         # Atomically replace the symlink
         # See https://axialcorps.com/2013/07/03/atomically-replacing-files-and-directories/
         old=$(readlink -f ${cfg.wrapperDir})
-        ln --symbolic --force --no-dereference $wrapperDir ${cfg.wrapperDir}-tmp
+        ln --symbolic --force --no-dereference "$wrapperDir" ${cfg.wrapperDir}-tmp
         mv --no-target-directory ${cfg.wrapperDir}-tmp ${cfg.wrapperDir}
-        rm --force --recursive $old
+        rm --force --recursive "$old"
       else
         # For initial setup
-        ln --symbolic $wrapperDir ${cfg.wrapperDir}
+        ln --symbolic "$wrapperDir" ${cfg.wrapperDir}
       fi
     '';
   };
