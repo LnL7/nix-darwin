@@ -9,9 +9,16 @@ Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 This project aims to bring the convenience of a declarative system approach to macOS.
 nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOS](https://nixos.org/).
 
-## Installing
+## Prerequisites
 
-To install nix-darwin, a working installation of [Nix](https://github.com/NixOS/nix#installation) is required.
+The only prerequisite is a Nix implementation, both Nix and Lix are supported.
+
+As the official Nix installer does not include an automated uninstaller, and manual uninstallation on macOS is a complex process, we recommend using one of the following installers instead:
+
+- The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
+* The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
+
+## Installing
 
 If you wish to use nix-darwin with flakes, please refer to the [flakes](#flakes) section.
 
