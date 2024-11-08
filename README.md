@@ -20,13 +20,6 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-> NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
-> updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
-> Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
-
-- `mv /etc/bashrc /etc/bashrc.before-nix-darwin`
-- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
-
 ## Updating
 
 The installer will configure a channel for this repository.
