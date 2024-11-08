@@ -2,7 +2,7 @@
 
 # nix-darwin
 
-![Test](https://github.com/LnL7/nix-darwin/workflows/Test/badge.svg)
+[![Test](https://github.com/LnL7/nix-darwin/actions/workflows/test.yml/badge.svg)](https://github.com/LnL7/nix-darwin/actions/workflows/test.yml)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
