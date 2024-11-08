@@ -7,6 +7,8 @@
 
     jobs = forAllSystems (system: import ./release.nix {
       inherit nixpkgs system;
+
+      nix-darwin = self;
     });
   in {
     lib = {
