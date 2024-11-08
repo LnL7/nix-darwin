@@ -149,6 +149,38 @@ in {
         else map (folder: { tile-data = { file-data = { _CFURLString = "file://" + folder; _CFURLStringType = 15; }; }; tile-type = if strings.hasInfix "." (last (splitString "/" folder)) then "file-tile" else "directory-tile"; }) value;
     };
 
+    system.defaults.dock.showAppExposeGestureEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable trackpad gestures (three- or four-finger vertical swipe) to show App Exposé. The default is false. This feature interacts with `system.defaults.trackpad.TrackpadFourFingerVertSwipeGesture` and `system.defaults.trackpad.TrackpadThreeFingerVertSwipeGesture` to determine which gesture triggers App Exposé.
+      '';
+    };
+
+    system.defaults.dock.showDesktopGestureEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable four-finger spread gesture to show the Desktop. The default is false. 
+      '';
+    };
+
+    system.defaults.dock.showLaunchpadGestureEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable four-finger pinch gesture to show the Launchpad. The default is false. 
+      '';
+    };
+
+    system.defaults.dock.showMissionControlGestureEnabled = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Whether to enable trackpad gestures (three- or four-finger vertical swipe) to show Mission Control. The default is false. This feature interacts with `system.defaults.trackpad.TrackpadFourFingerVertSwipeGesture` and `system.defaults.trackpad.TrackpadThreeFingerVertSwipeGesture` to determine which gesture triggers Mission Control.
+      '';
+    };
+
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
