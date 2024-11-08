@@ -10902,8 +10902,10 @@ list of string</p>
 <dd>
 <p>If set to true, Nix automatically detects files in the store that have
 identical contents, and replaces them with hard links to a single copy.
-This saves disk space. If set to false (the default), you can still run
-nix-store --optimise to get rid of duplicate files.</p>
+This saves disk space. If set to false (the default), you can enable
+<code class="option">nix.optimise.automatic</code> to run <span class="command"><strong>nix-store --optimise</strong></span>
+periodically to get rid of duplicate files. You can also run
+<span class="command"><strong>nix-store --optimise</strong></span> manually.</p>
 
 <p><span class="emphasis"><em>Type:</em></span>
 boolean</p>
