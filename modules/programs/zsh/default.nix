@@ -136,16 +136,18 @@ in
       if [ -n "''${__ETC_ZSHENV_SOURCED-}" ]; then return; fi
       __ETC_ZSHENV_SOURCED=1
 
-      if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
-        . ${config.system.build.setEnvironment}
+      if [[ -o rcs ]]; then
+        if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
+          . ${config.system.build.setEnvironment}
+        fi
+
+        # Tell zsh how to find installed completions
+        for p in ''${(z)NIX_PROFILES}; do
+          fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
+        done
+
+        ${cfg.shellInit}
       fi
-
-      # Tell zsh how to find installed completions
-      for p in ''${(z)NIX_PROFILES}; do
-        fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
-      done
-
-      ${cfg.shellInit}
 
       # Read system-wide modifications.
       if test -f /etc/zshenv.local; then
