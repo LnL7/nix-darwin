@@ -2,10 +2,13 @@
   description = "A collection of darwin modules";
 
   outputs = { self, nixpkgs }: let
-    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
+    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
+    forDarwinSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
 
     jobs = forAllSystems (system: import ./release.nix {
       inherit nixpkgs system;
+
+      nix-darwin = self;
     });
   in {
     lib = {
@@ -58,9 +61,11 @@
       description = "nix flake init -t nix-darwin";
     };
 
-    checks = forAllSystems (system: jobs.${system}.tests // jobs.${system}.examples);
+    checks = forDarwinSystems (system: jobs.${system}.tests // jobs.${system}.examples);
 
-    packages = forAllSystems (system: let
+    packages = forAllSystems (system: {
+      inherit (jobs.${system}.docs) manualHTML manpages optionsJSON;
+    } // (nixpkgs.lib.optionalAttrs (nixpkgs.lib.hasSuffix "darwin" system) (let
       pkgs = import nixpkgs {
         inherit system;
         overlays = [ self.overlays.default ];
@@ -69,8 +74,6 @@
       default = self.packages.${system}.darwin-rebuild;
 
       inherit (pkgs) darwin-option darwin-rebuild darwin-version darwin-uninstaller;
-
-      inherit (jobs.${system}.docs) manualHTML manpages optionsJSON;
-    });
+    })));
   };
 }
