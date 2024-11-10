@@ -107,15 +107,24 @@ in
       default = false;
       description = "Enable zsh-syntax-highlighting.";
     };
+
+    programs.zsh.enableFastSyntaxHighlighting = mkEnableOption "zsh-fast-syntax-highlighting";
   };
 
   config = mkIf cfg.enable {
 
+    assertions = [
+      {
+        assertion = !(cfg.enableSyntaxHighlighting && cfg.enableFastSyntaxHighlighting);
+        message = "zsh-syntax-highlighting and zsh-fast-syntax-highlighting are mutually exclusive, please disable one of them.";
+      }
+    ];
     environment.systemPackages =
       [ # Include zsh package
         pkgs.zsh
       ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
-        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
+        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting
+        ++ optional cfg.enableFastSyntaxHighlighting pkgs.zsh-fast-syntax-highlighting;
 
     environment.pathsToLink = [ "/share/zsh" ];
 
@@ -127,16 +136,18 @@ in
       if [ -n "''${__ETC_ZSHENV_SOURCED-}" ]; then return; fi
       __ETC_ZSHENV_SOURCED=1
 
-      if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
-        . ${config.system.build.setEnvironment}
+      if [[ -o rcs ]]; then
+        if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
+          . ${config.system.build.setEnvironment}
+        fi
+
+        # Tell zsh how to find installed completions
+        for p in ''${(z)NIX_PROFILES}; do
+          fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
+        done
+
+        ${cfg.shellInit}
       fi
-
-      # Tell zsh how to find installed completions
-      for p in ''${(z)NIX_PROFILES}; do
-        fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
-      done
-
-      ${cfg.shellInit}
 
       # Read system-wide modifications.
       if test -f /etc/zshenv.local; then
@@ -190,6 +201,10 @@ in
 
       ${optionalString cfg.enableSyntaxHighlighting
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      }
+
+      ${optionalString cfg.enableFastSyntaxHighlighting
+        "source ${pkgs.zsh-fast-syntax-highlighting}/share/zsh-fast-syntax-highlighting/zsh-fast-syntax-highlighting.zsh"
       }
 
       ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}

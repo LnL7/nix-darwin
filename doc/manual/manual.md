@@ -1,4 +1,4 @@
-# Darwin Configuration Options {#book-darwin-manual}
+# nix-darwin Configuration Options {#book-darwin-manual}
 ## Version @DARWIN_VERSION@
 
 ```{=include=} options

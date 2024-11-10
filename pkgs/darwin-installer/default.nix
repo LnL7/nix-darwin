@@ -95,7 +95,7 @@ stdenv.mkDerivation {
     echo >&2 "    Open '$config' to get started."
     echo >&2 "    See the README for more information: [0;34mhttps://github.com/LnL7/nix-darwin/blob/master/README.md[0m"
     echo >&2
-    echo >&2 "    Don't forget to start a new shell or source /etc/static/bashrc."
+    echo >&2 "    Please log out and log in again to make sure nix-darwin is properly loaded."
     echo >&2
     exit
   '';

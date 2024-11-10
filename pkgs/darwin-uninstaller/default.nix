@@ -1,4 +1,4 @@
-{ stdenv, lib, pkgs }:
+{ lib, path, stdenv, writeShellApplication }:
 
 let
   uninstallSystem = import ../../eval-config.nix {
@@ -6,39 +6,23 @@ let
     modules = [
       ./configuration.nix
       {
-        nixpkgs.source = pkgs.path;
-        nixpkgs.hostPlatform = pkgs.stdenv.hostPlatform.system;
+        nixpkgs.source = path;
+        nixpkgs.hostPlatform = stdenv.hostPlatform.system;
         system.includeUninstaller = false;
       }
     ];
   };
-in
-
-stdenv.mkDerivation {
+in writeShellApplication {
   name = "darwin-uninstaller";
-  preferLocalBuild = true;
-
-  unpackPhase = ":";
-
-  installPhase = ''
-    mkdir -p $out/bin
-    echo "$shellHook" > $out/bin/darwin-uninstaller
-    chmod +x $out/bin/darwin-uninstaller
-  '';
-
-  shellHook = ''
-    #!${stdenv.shell}
-    set -e
-
-    action=switch
+  text = ''
     while [ "$#" -gt 0 ]; do
-        i="$1"; shift 1
-        case "$i" in
-            --help)
-                echo "darwin-uninstaller: [--help]"
-                exit
-                ;;
-        esac
+      i="$1"; shift 1
+      case "$i" in
+        --help)
+          echo "darwin-uninstaller: [--help]"
+          exit
+          ;;
+      esac
     done
 
     echo >&2
@@ -50,21 +34,32 @@ stdenv.mkDerivation {
     echo >&2 "    - restore daemon service from nix installer (only when this is a multi-user install)"
     echo >&2
 
-    if test -t 0; then
-        read -p "Proceed? [y/n] " i
-        case "$i" in
-            y|Y)
-                ;;
-            *)
-                exit 3
-                ;;
-        esac
+    if [[ -t 0 ]]; then
+      read -r -p "Proceed? [y/n] " i
+      case "$i" in
+        y|Y)
+          ;;
+        *)
+          exit 3
+          ;;
+      esac
     fi
 
     ${uninstallSystem.system}/sw/bin/darwin-rebuild activate
 
-    if test -L /run/current-system; then
+    if [[ -L /run/current-system ]]; then
       sudo rm /run/current-system
+    fi
+
+    if [[ -L /run ]]; then
+      if [[ -e /etc/synthetic.conf ]]; then
+        sudo sed -i -E '/^run[[:space:]]/d' /etc/synthetic.conf
+        sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B &>/dev/null || true
+        sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t &>/dev/null || true
+        echo >&2 "NOTE: the /run symlink will be removed on reboot"
+      else
+        sudo rm /run
+      fi
     fi
 
     echo >&2
@@ -72,29 +67,28 @@ stdenv.mkDerivation {
     echo >&2
     echo >&2 "Done!"
     echo >&2
-    exit
   '';
 
-  passthru.check = stdenv.mkDerivation {
-     name = "run-darwin-test";
-     shellHook = ''
-        set -e
-        echo >&2 "running uninstaller tests..."
-        echo >&2
+  derivationArgs.passthru.tests.uninstaller = writeShellApplication {
+    name = "post-uninstall-test";
+    text = ''
+      echo >&2 "running uninstaller tests..."
+      echo >&2
 
-        echo >&2 "checking darwin channel"
-        ! test -e ~/.nix-defexpr/channels/darwin
-        echo >&2 "checking /etc"
-        ! test -e /etc/static
-        echo >&2 "checking /run/current-system"
-        ! test -e /run/current-system
-        echo >&2 "checking nix-daemon service (assuming a multi-user install)"
-        sudo launchctl list | grep org.nixos.nix-daemon || echo "FIXME? sudo launchctl list | grep org.nixos.nix-daemon"
-        pgrep -l nix-daemon || echo "FIXME? pgrep -l nix-daemon"
-        readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist || echo "FIXME? readlink /Library/LaunchDaemons/org.nixos.nix-daemon.plist"
-        grep /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /Library/LaunchDaemons/org.nixos.nix-daemon.plist || echo "FIXME? grep /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /Library/LaunchDaemons/org.nixos.nix-daemon.plist"
+      echo >&2 "checking darwin channel"
+      test -e ~/.nix-defexpr/channels/darwin && exit 1
+      echo >&2 "checking /etc"
+      test -e /etc/static && exit 1
+      echo >&2 "checking /run/current-system"
+      test -e /run/current-system && exit 1
+      if [[ $(stat -f '%Su' /nix/store) == "root" ]]; then
+        echo >&2 "checking nix-daemon service"
+        launchctl print system/org.nixos.nix-daemon
+        pgrep -l nix-daemon
+        test -e /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        [[ "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" == "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" ]]
         echo >&2 ok
-        exit
+      fi
     '';
   };
 }

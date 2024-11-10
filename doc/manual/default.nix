@@ -118,18 +118,18 @@ in rec {
 
       # TODO: get these parameterized in upstream nixos-render-docs
       sed -i -e '
-        /^\.TH / s|NixOS|Darwin|g
+        /^\.TH / s|NixOS|nix-darwin|g
 
         /^\.SH "NAME"$/ {
           N
-          s|NixOS|Darwin|g
+          s|NixOS|nix-darwin|g
         }
 
         /^\.SH "DESCRIPTION"$/ {
           N; N
           s|/etc/nixos/configuration|configuration|g
-          s|NixOS|Darwin|g
-          s|nixos|darwin|g
+          s|NixOS|nix-darwin|g
+          s|nixos|nix-darwin|g
         }
 
         /\.SH "AUTHORS"$/ {

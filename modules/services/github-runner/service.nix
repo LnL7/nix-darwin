@@ -48,14 +48,20 @@ in
         text = mkBefore (''
           echo >&2 "setting up GitHub Runner '${cfg.name}'..."
 
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkStateDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+          (
+            umask -S u=rwx,g=rx,o=
 
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkLogDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
-        '' + optionalString (cfg.workDir == null) ''
-          ${pkgs.coreutils}/bin/mkdir -p -m 0750 ${escapeShellArg (mkWorkDir cfg)}
-          ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkStateDir cfg)}
+            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+
+            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkLogDir cfg)}
+            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
+
+            ${optionalString (cfg.workDir == null) ''
+              ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkWorkDir cfg)}
+              ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+            ''}
+          )
         '');
       };
     }));
@@ -88,6 +94,10 @@ in
 
         script =
           let
+            # https://github.com/NixOS/nixpkgs/pull/333744 introduced an inconsistency with different
+            # versions of nixpkgs. Use the old version of escapeShellArg to make sure that labels
+            # are always escaped to avoid https://www.shellcheck.net/wiki/SC2054
+            escapeShellArgAlways = string: "'${replaceStrings ["'"] ["'\\''"] (toString string)}'";
             configure = pkgs.writeShellApplication {
               name = "configure-github-runner-${name}";
               text = /*bash*/''
@@ -98,7 +108,7 @@ in
                   --disableupdate
                   --work ${escapeShellArg workDir}
                   --url ${escapeShellArg cfg.url}
-                  --labels "${escapeShellArg (concatStringsSep "," cfg.extraLabels)}"
+                  --labels ${escapeShellArgAlways (concatStringsSep "," cfg.extraLabels)}
                   ${optionalString (cfg.name != null ) "--name ${escapeShellArg cfg.name}"}
                   ${optionalString cfg.replace "--replace"}
                   ${optionalString (cfg.runnerGroup != null) "--runnergroup ${escapeShellArg cfg.runnerGroup}"}
