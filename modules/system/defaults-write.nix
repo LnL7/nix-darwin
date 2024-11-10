@@ -17,6 +17,7 @@ let
   SoftwareUpdate = defaultsToList "/Library/Preferences/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
 
   # userDefaults
+  controlcenter = defaultsToList "~/Library/Preferences/ByHost/com.apple.controlcenter" cfg.controlcenter;
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
@@ -71,6 +72,7 @@ in
 
     system.activationScripts.userDefaults.text = mkIfAttrs
       [
+        controlcenter
         GlobalPreferences
         LaunchServices
         NSGlobalDomain
@@ -113,6 +115,7 @@ in
         ${concatStringsSep "\n" ActivityMonitor}
         ${concatStringsSep "\n" CustomUserPreferences}
         ${concatStringsSep "\n" WindowManager}
+        ${concatStringsSep "\n" controlcenter}
 
         ${optionalString (length dock > 0) ''
           # Only restart Dock if current user is logged in

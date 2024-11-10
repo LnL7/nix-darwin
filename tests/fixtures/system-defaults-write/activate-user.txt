@@ -489,3 +489,38 @@ defaults write com.apple.WindowManager 'StandardHideWidgets' $'<?xml version="1.
 <plist version="1.0">
 <true/>
 </plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'AirDrop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>18</integer>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'BatteryShowPercentage' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'Bluetooth' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>18</integer>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'Display' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>24</integer>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'FocusModes' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>24</integer>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'NowPlaying' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>18</integer>
+</plist>'
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter 'Sound' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<integer>24</integer>
+</plist>'

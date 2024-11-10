@@ -94,6 +94,13 @@
         true;
     };
   };
+  system.defaults.controlcenter.BatteryShowPercentage = true;
+  system.defaults.controlcenter.Sound = false;
+  system.defaults.controlcenter.Bluetooth = true;
+  system.defaults.controlcenter.AirDrop = true;
+  system.defaults.controlcenter.Display = false;
+  system.defaults.controlcenter.FocusModes = false;
+  system.defaults.controlcenter.NowPlaying = true;
   test = lib.strings.concatMapStringsSep "\n"
     (x: ''
       echo >&2 "checking defaults write in /${x}"

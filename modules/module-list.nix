@@ -14,6 +14,7 @@
   ./system/activation-scripts.nix
   ./system/applications.nix
   ./system/defaults-write.nix
+  ./system/defaults/controlcenter.nix
   ./system/defaults/LaunchServices.nix
   ./system/defaults/NSGlobalDomain.nix
   ./system/defaults/GlobalPreferences.nix
