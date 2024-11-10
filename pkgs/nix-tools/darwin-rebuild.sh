@@ -23,13 +23,13 @@ showSyntax() {
 
 # REMOVEME when support for macOS 10.13 is dropped
 # macOS 10.13 does not support sudo --preserve-env so we make this conditional
-if /usr/bin/sudo --help | grep -- --preserve-env= >/dev/null; then
+if command sudo --help | grep -- --preserve-env= >/dev/null; then
   # We use `env` before our command to ensure the preserved PATH gets checked
   # when trying to resolve the command to execute
-  sudo_base="/usr/bin/sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
+  sudo_base="command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
   sudo="$sudo_base env"
 else
-  sudo_base="/usr/bin/sudo -H"
+  sudo_base="command sudo -H"
   sudo="$sudo_base"
 fi
 sudo() { $sudo "$@"; }
