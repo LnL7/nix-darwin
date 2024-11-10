@@ -26,13 +26,11 @@ showSyntax() {
 if command sudo --help | grep -- --preserve-env= >/dev/null; then
   # We use `env` before our command to ensure the preserved PATH gets checked
   # when trying to resolve the command to execute
-  sudo_base="command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
-  sudo="$sudo_base env"
+  sudo="command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
 else
-  sudo_base="command sudo -H"
-  sudo="$sudo_base"
+  sudo="command sudo -H"
 fi
-sudo() { $sudo "$@"; }
+sudo() { $sudo env "$@"; }
 
 # Parse the command line.
 origArgs=("$@")
@@ -148,6 +146,21 @@ done
 
 if [ -z "$action" ]; then showSyntax; fi
 
+# We currently need to invoke `activate-user` as a non-root user,
+# but need to be root for other actions such as switching profiles and
+# running `activate`. To avoid prompting for a password multiple times,
+# we re-invoke ourselves as root but remember the user who called us
+# so that we can later drop down to that user when invoking `activate-user`.
+if [[ "$USER" != root ]]; then
+  sudo NIX_DARWIN_PRIMARY_USER="$USER" @out@/bin/darwin-rebuild "${origArgs[@]}"
+  exit $?
+elif [[ -z "$NIX_DARWIN_PRIMARY_USER" ]]; then
+  echo "$0: must be invoked as a non-root user"
+  exit 1
+fi
+
+sudo_user() { $sudo -u "$NIX_DARWIN_PRIMARY_USER" env "$@"; }
+
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
 # Use /etc/nix-darwin/flake.nix if it exists. It can be a symlink to the
@@ -199,11 +212,7 @@ if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ] || [
 fi
 
 if [ "$action" = list ] || [ "$action" = rollback ]; then
-  if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p "$profile" "${extraProfileFlags[@]}"
-  else
-    nix-env -p "$profile" "${extraProfileFlags[@]}"
-  fi
+  nix-env -p "$profile" "${extraProfileFlags[@]}"
 fi
 
 if [ "$action" = rollback ]; then
@@ -217,26 +226,12 @@ fi
 if [ -z "$systemConfig" ]; then exit 0; fi
 
 if [ "$action" = switch ]; then
-  if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
-    sudo nix-env -p "$profile" --set "$systemConfig"
-  else
-    nix-env -p "$profile" --set "$systemConfig"
-  fi
+  nix-env -p "$profile" --set "$systemConfig"
 fi
 
 if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback ]; then
-  if [ "$USER" != root ]; then
-    # Running `$systemConfig/activate-user` may cause subsequent sudo invocations to prompt
-    # for the password even if we previously ran sudo in the same session, since `brew` resets
-    # the sudo timestamp: see https://github.com/Homebrew/brew/pull/17694.
-    # Indeed, by this point we've already run `nix-env --set` as sudo. So to avoid prompting a
-    # second time, we become root *before* running activate-user and then drop down to the user
-    # to invoke it. This way, the call to `activate` doesn't require a password.
-    sudo @shell@ -c "$sudo_base -u $USER $systemConfig/activate-user && $systemConfig/activate"
-  else
-    "$systemConfig/activate-user"
-    "$systemConfig/activate"
-  fi
+  sudo_user "$systemConfig/activate-user"
+  "$systemConfig/activate"
 fi
 
 if [ "$action" = changelog ]; then
@@ -245,5 +240,5 @@ fi
 
 if [ "$action" = check ]; then
   export checkActivation=1
-  "$systemConfig/activate-user"
+  sudo_user "$systemConfig/activate-user"
 fi
