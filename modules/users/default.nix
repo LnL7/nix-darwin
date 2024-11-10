@@ -129,6 +129,12 @@ in
       ]
     ));
 
+    warnings = flatten (flip mapAttrsToList cfg.users (name: user:
+      mkIf
+        (user.shell.pname or null == "bash")
+        "Set `users.users.${name}.shell = pkgs.bashInteractive;` instead of `pkgs.bash` as it does not include `readline`."
+    ));
+
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
 
