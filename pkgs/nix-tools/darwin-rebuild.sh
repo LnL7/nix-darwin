@@ -157,7 +157,6 @@ if [ "$USER" = root ]; then
     echo "$0: must be invoked as a non-root user"
     exit 1
   fi
-  sudo_user() { $sudo -u "$NIX_DARWIN_PRIMARY_USER" env "$@"; }
 else
   case $action in
     edit|switch|activate|rollback|list)
@@ -165,11 +164,9 @@ else
       exit $?
       ;;
   esac
-  sudo_user() { env "$@"; }
 fi
 
 # From here on, if we are in the case list above, we are running as root.
-# To perform actions that must be run as the invoking user, use sudo_user.
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
@@ -240,7 +237,7 @@ if [ "$action" = switch ]; then
 fi
 
 if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback ]; then
-  sudo_user "$systemConfig/activate-user"
+  $sudo -u "$NIX_DARWIN_PRIMARY_USER" "$systemConfig/activate-user"
   "$systemConfig/activate"
 fi
 
