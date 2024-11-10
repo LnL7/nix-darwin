@@ -149,17 +149,27 @@ if [ -z "$action" ]; then showSyntax; fi
 # We currently need to invoke `activate-user` as a non-root user,
 # but need to be root for other actions such as switching profiles and
 # running `activate`. To avoid prompting for a password multiple times,
-# we re-invoke ourselves as root but remember the user who called us
-# so that we can later drop down to that user when invoking `activate-user`.
-if [[ "$USER" != root ]]; then
-  sudo NIX_DARWIN_PRIMARY_USER="$USER" @out@/bin/darwin-rebuild "${origArgs[@]}"
-  exit $?
-elif [[ -z "$NIX_DARWIN_PRIMARY_USER" ]]; then
-  echo "$0: must be invoked as a non-root user"
-  exit 1
+# if we need to perform one of these actions we preemptively re-invoke
+# ourselves as root but remember the user who called us so that we can
+# later drop down to that user when invoking `activate-user`.
+if [ "$USER" = root ]; then
+  if [[ -z "$NIX_DARWIN_PRIMARY_USER" ]]; then
+    echo "$0: must be invoked as a non-root user"
+    exit 1
+  fi
+  sudo_user() { $sudo -u "$NIX_DARWIN_PRIMARY_USER" env "$@"; }
+else
+  case $action in
+    edit|switch|activate|rollback|list)
+      sudo NIX_DARWIN_PRIMARY_USER="$USER" @out@/bin/darwin-rebuild "${origArgs[@]}"
+      exit $?
+      ;;
+  esac
+  sudo_user() { env "$@"; }
 fi
 
-sudo_user() { $sudo -u "$NIX_DARWIN_PRIMARY_USER" env "$@"; }
+# From here on, if we are in the case list above, we are running as root.
+# To perform actions that must be run as the invoking user, use sudo_user.
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
@@ -240,5 +250,5 @@ fi
 
 if [ "$action" = check ]; then
   export checkActivation=1
-  sudo_user "$systemConfig/activate-user"
+  "$systemConfig/activate-user"
 fi
