@@ -84,6 +84,17 @@
       '';
     };
 
+    ignoreShellProgramCheck = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        By default, nix-darwin will check that programs.SHELL.enable is set to
+        true if the user has a custom shell specified. If that behavior isn't
+        required and there are custom overrides in place to make sure that the
+        shell is functional, set this to true.
+      '';
+    };
+
     packages = mkOption {
       type = types.listOf types.package;
       default = [];

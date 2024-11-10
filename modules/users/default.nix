@@ -2,8 +2,8 @@
 
 let
   inherit (lib) concatStringsSep concatMapStringsSep elem escapeShellArg
-    escapeShellArgs filter filterAttrs mapAttrs' mapAttrsToList mkAfter
-    mkIf mkMerge mkOption mkOrder mkRemovedOptionModule optionals
+    escapeShellArgs filter filterAttrs flatten flip mapAttrs' mapAttrsToList
+    mkAfter mkIf mkMerge mkOption mkOrder mkRemovedOptionModule optionals
     optionalString types;
 
   cfg = config.users;
@@ -105,7 +105,29 @@ in
         assertion = !builtins.elem "root" deletedUsers;
         message = "Remove `root` from `users.knownUsers` if you no longer want nix-darwin to manage it.";
       }
-    ];
+    ] ++ flatten (flip mapAttrsToList cfg.users (name: user:
+      map (shell: {
+        assertion = let
+          s = user.shell.pname or null;
+        in
+          !user.ignoreShellProgramCheck -> (s == shell || (shell == "bash" && s == "bash-interactive")) -> (config.programs.${shell}.enable == true);
+        message = ''
+          users.users.${user.name}.shell is set to ${shell}, but
+          programs.${shell}.enable is not true. This will cause the ${shell}
+          shell to lack the basic Nix directories in its PATH and might make
+          logging in as that user impossible. You can fix it with:
+          programs.${shell}.enable = true;
+
+          If you know what you're doing and you are fine with the behavior,
+          set users.users.${user.name}.ignoreShellProgramCheck = true;
+          instead.
+        '';
+      }) [
+        "bash"
+        "fish"
+        "zsh"
+      ]
+    ));
 
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
