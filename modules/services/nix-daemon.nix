@@ -1,9 +1,9 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
+{ config, lib, ... }:
 
 let
   cfg = config.services.nix-daemon;
+
+  inherit (lib) mkDefault mkIf mkMerge mkOption types;
 in
 
 {
