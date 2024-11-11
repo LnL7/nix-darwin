@@ -89,8 +89,9 @@ in writeShellApplication {
         pgrep -l nix-daemon
         test -e /Library/LaunchDaemons/org.nixos.nix-daemon.plist
         [[ "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" == "$(shasum -a 256 /Library/LaunchDaemons/org.nixos.nix-daemon.plist | awk '{print $1}')" ]]
-        echo >&2 ok
+        nix-store --store daemon -q --hash ${stdenv.shell}
       fi
+      echo >&2 ok
     '';
   };
 }
