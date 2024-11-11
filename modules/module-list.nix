@@ -109,4 +109,5 @@
   ./programs/zsh
   ./homebrew.nix
   ./users
+  ./virtualisation/rosetta/gc.nix
 ]
