@@ -31,7 +31,9 @@ in writeShellApplication {
     echo >&2 "    - remove /Applications/Nix Apps symlink"
     echo >&2 "    - cleanup static /etc files"
     echo >&2 "    - disable and remove all launchd services managed by nix-darwin"
-    echo >&2 "    - restore daemon service from nix installer (only when this is a multi-user install)"
+    if [[ $(stat -f '%Su' /nix/store) == "root" ]]; then
+      echo >&2 "    - restore nix-daemon service from nix installer as this is a multi-user install"
+    fi
     echo >&2
 
     if [[ -t 0 ]]; then

@@ -12,6 +12,9 @@ with lib;
   launchd.daemons = mkForce {};
   launchd.user.agents = mkForce {};
 
+  # Don't try to reload `nix-daemon`
+  nix.useDaemon = mkForce false;
+
   system.activationScripts.postUserActivation.text = mkAfter ''
     if [[ -L ~/.nix-defexpr/channels/darwin ]]; then
         nix-channel --remove darwin || true
