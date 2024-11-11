@@ -11,9 +11,6 @@
   # $ darwin-rebuild switch -I darwin-config=$HOME/.config/nixpkgs/darwin/configuration.nix
   # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
-  # Auto upgrade nix package and the daemon service.
-  # nix.package = pkgs.nix;
-
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
 

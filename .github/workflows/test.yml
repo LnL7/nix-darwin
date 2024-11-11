@@ -55,7 +55,7 @@ jobs:
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
-          "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+          "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
           ~/.nixpkgs/darwin-configuration.nix
 
         nix-shell -A installer
@@ -103,7 +103,7 @@ jobs:
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
-          "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+          "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
           ~/.nixpkgs/darwin-configuration.nix
 
         nix-shell -A installer
@@ -145,7 +145,7 @@ jobs:
           nix flake init -t $darwin
           nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
           /usr/bin/sed -i.bak \
-            "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
         popd
         nix run .#darwin-rebuild -- \
@@ -178,7 +178,7 @@ jobs:
           nix flake init -t $darwin
           nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
           /usr/bin/sed -i.bak \
-            "s/# nix.package = pkgs.nix;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
         popd
         nix run .#darwin-rebuild -- \
