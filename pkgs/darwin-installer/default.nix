@@ -53,11 +53,6 @@ stdenv.mkDerivation {
         mkdir -p "$HOME/.nixpkgs"
         cp "${../../modules/examples/simple.nix}" "$config"
         chmod u+w "$config"
-
-        # Enable nix-daemon service for multi-user installs.
-        if [ ! -w /nix/var/nix/db ]; then
-            sed -i 's/# services.nix-daemon.enable/services.nix-daemon.enable/' "$config"
-        fi
     fi
 
     # Skip when stdin is not a tty, eg.
