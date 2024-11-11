@@ -8,8 +8,6 @@ let
 in
 
 {
-  services.nix-daemon.enable = true;
-
   nix.settings.substituters = [ "http://cache1" ];
   nix.settings.trusted-public-keys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
 

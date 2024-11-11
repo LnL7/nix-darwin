@@ -68,7 +68,6 @@ Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
     ];
 
   # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
   nix.package = pkgs.nix;
 }
 ```
