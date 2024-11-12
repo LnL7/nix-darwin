@@ -1,8 +1,10 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) concatStringsSep concatMapStringsSep elem filter filterAttrs
-    mapAttrs' mapAttrsToList mkIf mkMerge mkOption mkOrder optionalString types;
+  inherit (lib) concatStringsSep concatMapStringsSep elem escapeShellArg
+    escapeShellArgs filter filterAttrs flatten flip mapAttrs' mapAttrsToList
+    mkAfter mkIf mkMerge mkOption mkOrder mkRemovedOptionModule optionals
+    optionalString types;
 
   cfg = config.users;
 
@@ -42,7 +44,7 @@ in
 
 {
   imports = [
-    (lib.mkRemovedOptionModule [ "users" "forceRecreate" ] "")
+    (mkRemovedOptionModule [ "users" "forceRecreate" ] "")
   ];
 
   options = {
@@ -103,7 +105,35 @@ in
         assertion = !builtins.elem "root" deletedUsers;
         message = "Remove `root` from `users.knownUsers` if you no longer want nix-darwin to manage it.";
       }
-    ];
+    ] ++ flatten (flip mapAttrsToList cfg.users (name: user:
+      map (shell: {
+        assertion = let
+          s = user.shell.pname or null;
+        in
+          !user.ignoreShellProgramCheck -> (s == shell || (shell == "bash" && s == "bash-interactive")) -> (config.programs.${shell}.enable == true);
+        message = ''
+          users.users.${user.name}.shell is set to ${shell}, but
+          programs.${shell}.enable is not true. This will cause the ${shell}
+          shell to lack the basic Nix directories in its PATH and might make
+          logging in as that user impossible. You can fix it with:
+          programs.${shell}.enable = true;
+
+          If you know what you're doing and you are fine with the behavior,
+          set users.users.${user.name}.ignoreShellProgramCheck = true;
+          instead.
+        '';
+      }) [
+        "bash"
+        "fish"
+        "zsh"
+      ]
+    ));
+
+    warnings = flatten (flip mapAttrsToList cfg.users (name: user:
+      mkIf
+        (user.shell.pname or null == "bash")
+        "Set `users.users.${name}.shell = pkgs.bashInteractive;` instead of `pkgs.bash` as it does not include `readline`."
+    ));
 
     users.gids = mkMerge gids;
     users.uids = mkMerge uids;
@@ -111,7 +141,7 @@ in
     # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
     # however currently that runs at user level activation as that runs before system level activation
     # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
-    system.checks.text = lib.mkIf (builtins.length (createdUsers ++ deletedUsers) > 0) (lib.mkAfter ''
+    system.checks.text = mkIf (builtins.length (createdUsers ++ deletedUsers) > 0) (mkAfter ''
       ensurePerms() {
         homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
@@ -158,8 +188,8 @@ in
       }
 
       ${concatMapStringsSep "\n" (v: let
-        name = lib.escapeShellArg v.name;
-        dsclUser = lib.escapeShellArg "/Users/${v.name}";
+        name = escapeShellArg v.name;
+        dsclUser = escapeShellArg "/Users/${v.name}";
       in ''
         u=$(id -u ${name} 2> /dev/null) || true
         if ! [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
@@ -170,7 +200,7 @@ in
               else
                 homeDirectory=$(dscl . -read ${dsclUser} NFSHomeDirectory)
                 homeDirectory=''${homeDirectory#NFSHomeDirectory: }
-                if [[ ${lib.escapeShellArg v.home} != "$homeDirectory" ]]; then
+                if [[ ${escapeShellArg v.home} != "$homeDirectory" ]]; then
                   printf >&2 '\e[1;31merror: config contains the wrong home directory for %s, aborting activation\e[0m\n' ${name}
                   printf >&2 'nix-darwin does not support changing the home directory of existing users.\n'
                   printf >&2 '\n'
@@ -187,7 +217,7 @@ in
       '') createdUsers}
 
       ${concatMapStringsSep "\n" (v: let
-        name = lib.escapeShellArg v;
+        name = escapeShellArg v;
       in ''
         u=$(id -u ${name} 2> /dev/null) || true
         if [ -n "$u" ]; then
@@ -209,14 +239,14 @@ in
       echo "setting up groups..." >&2
 
       ${concatMapStringsSep "\n" (v: let
-        dsclGroup = lib.escapeShellArg "/Groups/${v.name}";
+        dsclGroup = escapeShellArg "/Groups/${v.name}";
       in ''
         g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
         if [ -z "$g" ]; then
           echo "creating group ${v.name}..." >&2
           dscl . -create ${dsclGroup} PrimaryGroupID ${toString v.gid}
-          dscl . -create ${dsclGroup} RealName ${lib.escapeShellArg v.description}
+          dscl . -create ${dsclGroup} RealName ${escapeShellArg v.description}
           g=${toString v.gid}
         fi
 
@@ -224,7 +254,7 @@ in
           g=$(dscl . -read ${dsclGroup} GroupMembership 2> /dev/null) || true
           if [ "$g" != 'GroupMembership: ${concatStringsSep " " v.members}' ]; then
             echo "updating group members ${v.name}..." >&2
-            dscl . -create ${dsclGroup} GroupMembership ${lib.escapeShellArgs v.members}
+            dscl . -create ${dsclGroup} GroupMembership ${escapeShellArgs v.members}
           fi
         else
           echo "[1;31mwarning: existing group '${v.name}' has unexpected gid $g, skipping...[0m" >&2
@@ -232,7 +262,7 @@ in
       '') createdGroups}
 
       ${concatMapStringsSep "\n" (name: let
-        dsclGroup = lib.escapeShellArg "/Groups/${name}";
+        dsclGroup = escapeShellArg "/Groups/${name}";
       in ''
         g=$(dscl . -read ${dsclGroup} PrimaryGroupID 2> /dev/null) || true
         g=''${g#PrimaryGroupID: }
@@ -251,8 +281,8 @@ in
       echo "setting up users..." >&2
 
       ${concatMapStringsSep "\n" (v: let
-        name = lib.escapeShellArg v.name;
-        dsclUser = lib.escapeShellArg "/Users/${v.name}";
+        name = escapeShellArg v.name;
+        dsclUser = escapeShellArg "/Users/${v.name}";
       in ''
         u=$(id -u ${name} 2> /dev/null) || true
         if [[ -n "$u" && "$u" -ne "${toString v.uid}" ]]; then
@@ -261,11 +291,11 @@ in
           if [ -z "$u" ]; then
             echo "creating user ${v.name}..." >&2
 
-            sysadminctl -addUser ${lib.escapeShellArgs ([
+            sysadminctl -addUser ${escapeShellArgs ([
               v.name
               "-UID" v.uid
               "-GID" v.gid ]
-              ++ (lib.optionals (v.description != null) [ "-fullName" v.description ])
+              ++ (optionals (v.description != null) [ "-fullName" v.description ])
               ++ [ "-home" (if v.home != null then v.home else "/var/empty") ]
               ++ [ "-shell" (if v.shell != null then shellPath v.shell else "/usr/bin/false") ])} 2> /dev/null
 
@@ -284,17 +314,17 @@ in
 
           # Update properties on known users to keep them inline with configuration
           dscl . -create ${dsclUser} PrimaryGroupID ${toString v.gid}
-          ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${lib.escapeShellArg v.description}"}
-          ${optionalString (v.shell != null) "dscl . -create ${dsclUser} UserShell ${lib.escapeShellArg (shellPath v.shell)}"}
+          ${optionalString (v.description != null) "dscl . -create ${dsclUser} RealName ${escapeShellArg v.description}"}
+          ${optionalString (v.shell != null) "dscl . -create ${dsclUser} UserShell ${escapeShellArg (shellPath v.shell)}"}
         fi
       '') createdUsers}
 
       ${concatMapStringsSep "\n" (name: ''
-        u=$(id -u ${lib.escapeShellArg name} 2> /dev/null) || true
+        u=$(id -u ${escapeShellArg name} 2> /dev/null) || true
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
             echo "deleting user ${name}..." >&2
-            dscl . -delete ${lib.escapeShellArg "/Users/${name}"}
+            dscl . -delete ${escapeShellArg "/Users/${name}"}
           else
             echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
           fi
