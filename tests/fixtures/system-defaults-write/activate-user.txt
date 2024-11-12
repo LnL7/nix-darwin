@@ -205,6 +205,11 @@ defaults write .GlobalPreferences 'com.apple.sound.beep.sound' $'<?xml version="
 <string>/System/Library/Sounds/Funk.aiff</string>
 </plist>'
 
+defaults write com.apple.menuextra.clock 'FlashDateSeparators' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write com.apple.menuextra.clock 'Show24Hour' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -299,6 +304,11 @@ defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding
 	</dict>
 </array>
 </plist>'
+defaults write com.apple.dock 'scroll-to-open' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write com.apple.finder 'AppleShowAllExtensions' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -329,6 +339,11 @@ defaults write com.apple.finder 'FXPreferredViewStyle' $'<?xml version="1.0" enc
 <plist version="1.0">
 <string>Flwv</string>
 </plist>'
+defaults write com.apple.finder 'FXRemoveOldTrashItems' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write com.apple.finder 'NewWindowTarget' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -344,10 +359,30 @@ defaults write com.apple.finder 'QuitMenuItem' $'<?xml version="1.0" encoding="U
 <plist version="1.0">
 <true/>
 </plist>'
+defaults write com.apple.finder 'ShowExternalHardDrivesOnDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.finder 'ShowHardDrivesOnDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
+defaults write com.apple.finder 'ShowMountedServersOnDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write com.apple.finder 'ShowPathbar' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <true/>
+</plist>'
+defaults write com.apple.finder 'ShowRemovableMediaOnDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
 </plist>'
 defaults write com.apple.finder 'ShowStatusBar' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -364,6 +399,11 @@ defaults write com.apple.finder '_FXSortFoldersFirst' $'<?xml version="1.0" enco
 <plist version="1.0">
 <true/>
 </plist>'
+defaults write com.apple.finder '_FXSortFoldersFirstOnDesktop' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<false/>
+</plist>'
 defaults write com.apple.HIToolbox 'AppleFnUsageType' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -371,6 +411,11 @@ defaults write com.apple.HIToolbox 'AppleFnUsageType' $'<?xml version="1.0" enco
 </plist>'
 
 
+defaults write com.apple.screencapture 'include-date' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
 defaults write com.apple.screencapture 'location' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">

@@ -17,7 +17,6 @@ let
   SoftwareUpdate = defaultsToList "/Library/Preferences/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
 
   # userDefaults
-  controlcenter = defaultsToList "~/Library/Preferences/ByHost/com.apple.controlcenter" cfg.controlcenter;
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
@@ -35,8 +34,10 @@ let
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
   WindowManager = defaultsToList "com.apple.WindowManager" cfg.WindowManager;
+  controlcenter = defaultsToList "~/Library/Preferences/ByHost/com.apple.controlcenter" cfg.controlcenter;  
   CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
   CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
+
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -72,7 +73,6 @@ in
 
     system.activationScripts.userDefaults.text = mkIfAttrs
       [
-        controlcenter
         GlobalPreferences
         LaunchServices
         NSGlobalDomain
@@ -91,6 +91,7 @@ in
         ActivityMonitor
         CustomUserPreferences
         WindowManager
+        controlcenter
       ]
       ''
         # Set defaults
