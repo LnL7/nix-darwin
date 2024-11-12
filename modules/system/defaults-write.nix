@@ -34,8 +34,10 @@ let
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
   WindowManager = defaultsToList "com.apple.WindowManager" cfg.WindowManager;
+  controlcenter = defaultsToList "~/Library/Preferences/ByHost/com.apple.controlcenter" cfg.controlcenter;  
   CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
   CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
+
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -89,6 +91,7 @@ in
         ActivityMonitor
         CustomUserPreferences
         WindowManager
+        controlcenter
       ]
       ''
         # Set defaults
@@ -113,6 +116,7 @@ in
         ${concatStringsSep "\n" ActivityMonitor}
         ${concatStringsSep "\n" CustomUserPreferences}
         ${concatStringsSep "\n" WindowManager}
+        ${concatStringsSep "\n" controlcenter}
 
         ${optionalString (length dock > 0) ''
           # Only restart Dock if current user is logged in
