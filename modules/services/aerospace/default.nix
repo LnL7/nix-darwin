@@ -71,9 +71,17 @@ in
               description = "Default orientation for the root container.";
             };
             on-window-detected = lib.mkOption {
-              type = listOf str;
+              type = listOf (attrsOf anything);
               default = [ ];
               description = "Commands to run every time a new window is detected.";
+              example = [
+                {
+                  "if".app-id = "Another.Cool.App";
+                  "if".during-aerospace-startup = false;
+                  "check-further-callbacks" = false;
+                  "run" = "move-node-to-workspace m";
+                }
+              ];
             };
             on-focus-changed = lib.mkOption {
               type = listOf str;
