@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 
 {
-  services.activate-system.enable = true;
   launchd.labelPrefix = "org.nix-darwin";
 
   test = ''

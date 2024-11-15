@@ -172,7 +172,7 @@ Furthermore there's `darwin-option` to introspect the settings of a system and i
 > NOTE: `darwin-option` is only available to non-flake installations.
 
 ```
-$ darwin-option services.activate-system.enable
+$ darwin-option nix.linux-builder.enable
 Value:
 true
 
@@ -180,10 +180,10 @@ Default:
 false
 
 Example:
-no example
+true
 
 Description:
-Whether to activate system at boot time.
+Whether to enable Linux builder.
 ```
 
 There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
