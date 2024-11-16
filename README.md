@@ -115,14 +115,18 @@ nix-darwin.lib.darwinSystem {
 <details>
 <summary>Channels</summary>
 
-### Installing
+### Step 1. Creating `configuration.nix`
+
+Copy the [simple](./modules/examples/simple.nix) example to `~/.config/nix-darwin/configuration.nix`.
+
+### Step 2. Installing `nix-darwin`
 
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-### Updating
+### Step 3. Updating `nix-darwin`
 
 The installer will configure a channel for this repository.
 
@@ -133,23 +137,6 @@ darwin-rebuild changelog
 
 > NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
 > Use `sudo -i nix-channel --update darwin` instead.
-
-### Example configuration
-
-Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
-[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-
-```nix
-{ pkgs, ... }:
-{
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.vim
-    ];
-}
-```
-
 </details>
 
 ## Documentation

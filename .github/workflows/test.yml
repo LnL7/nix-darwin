@@ -49,17 +49,15 @@ jobs:
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
-        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
-        # but we expect it to fail setting up /etc/nix/nix.conf
-        nix-shell -A installer || true
+        mkdir -p ~/.config/nix-darwin
+        cp modules/examples/simple.nix ~/.config/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
-          ~/.nixpkgs/darwin-configuration.nix
+          ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer
-        nix-shell -A installer.check
+        nix-shell -A installer -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Build and activate default derivation
       run: |
         . /etc/static/bashrc
@@ -97,17 +95,15 @@ jobs:
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
-        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
-        # but we expect it to fail setting up /etc/nix/nix.conf
-        nix-shell -A installer || true
+        mkdir -p ~/.config/nix-darwin
+        cp modules/examples/simple.nix ~/.config/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
-          ~/.nixpkgs/darwin-configuration.nix
+          ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer
-        nix-shell -A installer.check
+        nix-shell -A installer -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Build and activate default derivation
       run: |
         . /etc/static/bashrc

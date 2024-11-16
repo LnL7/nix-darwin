@@ -47,25 +47,6 @@ stdenv.mkDerivation {
     echo >&2 "Installing nix-darwin..."
     echo >&2
 
-    config="$HOME/.nixpkgs/darwin-configuration.nix"
-    if ! test -f "$config"; then
-        echo "copying example configuration.nix" >&2
-        mkdir -p "$HOME/.nixpkgs"
-        cp "${../../modules/examples/simple.nix}" "$config"
-        chmod u+w "$config"
-    fi
-
-    # Skip when stdin is not a tty, eg.
-    # $ yes | darwin-installer
-    if test -t 0; then
-        read -p "Would you like to edit the default configuration.nix before starting? [y/N] " i
-        case "$i" in
-            y|Y)
-                PATH=$_PATH ''${EDITOR:-nano} "$config"
-                ;;
-        esac
-    fi
-
     i=y
     darwinPath=$(NIX_PATH=$HOME/.nix-defexpr/channels nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
     if ! test -e "$darwinPath"; then
@@ -81,13 +62,13 @@ stdenv.mkDerivation {
     fi
 
     export NIX_PATH=${nixPath}
-    system=$(nix-build '<darwin>' -I "darwin-config=$config" -A system --no-out-link --show-trace)
+    system=$(nix-build '<darwin>' -A system --no-out-link --show-trace)
 
     export PATH=$system/sw/bin:$PATH
-    darwin-rebuild "$action" -I "darwin-config=$config"
+    darwin-rebuild "$action"
 
     echo >&2
-    echo >&2 "    Open '$config' to get started."
+    echo >&2 "    Installation complete."
     echo >&2 "    See the README for more information: [0;34mhttps://github.com/LnL7/nix-darwin/blob/master/README.md[0m"
     echo >&2
     echo >&2 "    Please log out and log in again to make sure nix-darwin is properly loaded."
