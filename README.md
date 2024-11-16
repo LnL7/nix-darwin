@@ -119,24 +119,26 @@ nix-darwin.lib.darwinSystem {
 
 Copy the [simple](./modules/examples/simple.nix) example to `~/.config/nix-darwin/configuration.nix`.
 
-### Step 2. Installing `nix-darwin`
+### Step 2. Adding `nix-darwin` channel
+
+```bash
+nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+nix-channel --update
+```
+
+### Step 3. Installing `nix-darwin`
 
 ```bash
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-### Step 3. Updating `nix-darwin`
-
-The installer will configure a channel for this repository.
+### Step 4. Updating `nix-darwin`
 
 ```bash
 nix-channel --update darwin
 darwin-rebuild changelog
 ```
-
-> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
-> Use `sudo -i nix-channel --update darwin` instead.
 </details>
 
 ## Documentation

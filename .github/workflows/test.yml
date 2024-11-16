@@ -41,8 +41,9 @@ jobs:
       with:
         install_url: https://releases.nixos.org/nix/nix-2.18.8/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
-    - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
+    - name: Install channels
       run: |
+        nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin and test
@@ -87,8 +88,9 @@ jobs:
       with:
         install_url: https://releases.nixos.org/nix/nix-2.24.9/install
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Install nixpkgs-unstable channel
+    - name: Install channels
       run: |
+        nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
     - name: Install nix-darwin and test

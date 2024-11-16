@@ -47,20 +47,6 @@ stdenv.mkDerivation {
     echo >&2 "Installing nix-darwin..."
     echo >&2
 
-    i=y
-    darwinPath=$(NIX_PATH=$HOME/.nix-defexpr/channels nix-instantiate --eval -E '<darwin>' 2> /dev/null) || true
-    if ! test -e "$darwinPath"; then
-        if test -t 0; then
-            read -p "Would you like to manage <darwin> with nix-channel? [y/N] " i
-        fi
-        case "$i" in
-            y|Y)
-                nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-                nix-channel --update
-                ;;
-        esac
-    fi
-
     export NIX_PATH=${nixPath}
     system=$(nix-build '<darwin>' -A system --no-out-link --show-trace)
 
