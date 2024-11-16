@@ -91,7 +91,7 @@ in
       #! ${stdenv.shell}
       set -e
       set -o pipefail
-      export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin"
+      export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
       systemConfig=@out@
 
