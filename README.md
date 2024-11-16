@@ -18,60 +18,14 @@ As the official Nix installer does not include an automated uninstaller, and man
 - The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
 * The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
 
-## Installing
 
-If you wish to use nix-darwin with flakes, please refer to the [flakes](#flakes) section.
 
-```bash
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
-./result/bin/darwin-installer
-```
+## Getting started
 
-## Updating
+Despite being an experimental feature in Nix currently, nix-darwin recommends that beginners use flakes to manage their nix-darwin configurations.
 
-The installer will configure a channel for this repository.
-
-```bash
-nix-channel --update darwin
-darwin-rebuild changelog
-```
-
-> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
-> Use `sudo -i nix-channel --update darwin` instead.
-
-## Uninstalling
-
-To run the latest version of the uninstaller, you can run the following command:
-
-```
-nix --extra-experimental-features "nix-command flakes" run nix-darwin#darwin-uninstaller
-```
-
-If that command doesn't work for you, you can try the locally installed uninstaller:
-
-```
-darwin-uninstaller
-```
-
-## Example configuration
-
-Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
-[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-
-```nix
-{ pkgs, ... }:
-{
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.vim
-    ];
-}
-```
-
-## Flakes
-
-nix-darwin aims for both non-flake and flake configurations to be well supported despite flakes being an experimental feature in Nix.
+<details>
+<summary>Flakes (Recommended for beginners)</summary>
 
 ### Step 1. Creating `flake.nix`
 
@@ -156,6 +110,47 @@ nix-darwin.lib.darwinSystem {
 { pkgs, lib, inputs }:
 # inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
 ```
+</details>
+
+<details>
+<summary>Channels</summary>
+
+### Installing
+
+```bash
+nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
+./result/bin/darwin-installer
+```
+
+### Updating
+
+The installer will configure a channel for this repository.
+
+```bash
+nix-channel --update darwin
+darwin-rebuild changelog
+```
+
+> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
+> Use `sudo -i nix-channel --update darwin` instead.
+
+### Example configuration
+
+Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
+[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
+
+```nix
+{ pkgs, ... }:
+{
+  # List packages installed in system profile. To search by name, run:
+  # $ nix-env -qaP | grep wget
+  environment.systemPackages =
+    [ pkgs.vim
+    ];
+}
+```
+
+</details>
 
 ## Documentation
 
@@ -184,6 +179,20 @@ Whether to enable Linux builder.
 
 There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
 specific topics, like macOS upgrades.
+
+## Uninstalling
+
+To run the latest version of the uninstaller, you can run the following command:
+
+```
+nix --extra-experimental-features "nix-command flakes" run nix-darwin#darwin-uninstaller
+```
+
+If that command doesn't work for you, you can try the locally installed uninstaller:
+
+```
+darwin-uninstaller
+```
 
 ## Tests
 
