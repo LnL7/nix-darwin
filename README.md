@@ -78,7 +78,7 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 
 ### Step 2. Installing `nix-darwin`
 
-Instead of using `darwin-installer`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
+Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
 nix run nix-darwin -- switch --flake ~/.config/nix-darwin
@@ -128,9 +128,10 @@ nix-channel --update
 
 ### Step 3. Installing `nix-darwin`
 
+To install `nix-darwin`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
+
 ```bash
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
-./result/bin/darwin-installer
+nix --extra-experimental-features "nix-command flakes" run nix-darwin -- switch -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
 ```
 
 ### Step 4. Using `nix-darwin`

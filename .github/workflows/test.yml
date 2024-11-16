@@ -46,7 +46,7 @@ jobs:
         nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
         nix-channel --update
-    - name: Install nix-darwin and test
+    - name: Install nix-darwin
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
@@ -58,7 +58,9 @@ jobs:
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
           ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+        nix run .#darwin-rebuild \
+          -- switch \
+          -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Build and activate default derivation
       run: |
         . /etc/static/bashrc
@@ -93,7 +95,7 @@ jobs:
         nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
-    - name: Install nix-darwin and test
+    - name: Install nix-darwin
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
@@ -105,7 +107,9 @@ jobs:
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
           ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+        nix run .#darwin-rebuild \
+          -- switch \
+          -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Build and activate default derivation
       run: |
         . /etc/static/bashrc
