@@ -52,14 +52,13 @@ with lib;
       '';
     };
 
-    #system.defaults.universalaccess.showWindowTitlebarIcons = mkOption {
-    #  # Disabled because it requires sudo
-    #  # type = types.nullOr types.bool;
-    #  default = null;
-    #  description = ''
-    #    Always show folder icon before title in the title bar
-    #  '';
-    #};
+    system.defaults.universalaccess.showWindowTitlebarIcons = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Always show folder icon before title in the title bar
+      '';
+    };
 
   };
 }
