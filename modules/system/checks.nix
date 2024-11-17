@@ -3,6 +3,9 @@
 with lib;
 
 let
+  # Similar to lib.escapeShellArg but escapes "s instead of 's, to allow for parameter expansion in shells
+  escapeDoubleQuote = arg: ''"${replaceStrings ["\""] ["\"\\\"\""] (toString arg)}"'';
+
   cfg = config.system.checks;
 
   darwinChanges = ''
@@ -188,7 +191,7 @@ let
   '';
 
   nixPath = ''
-    nixPath=${concatStringsSep ":" config.nix.nixPath}:$HOME/.nix-defexpr/channels
+    nixPath=${concatMapStringsSep ":" escapeDoubleQuote config.nix.nixPath}:$HOME/.nix-defexpr/channels
 
     darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
