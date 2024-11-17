@@ -61,10 +61,17 @@ jobs:
         nix run .#darwin-rebuild \
           -- switch \
           -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
-    - name: Build and activate default derivation
+    - name: Switch to new configuration
       run: |
         . /etc/static/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/configuration.nix
+
         darwin-rebuild switch -I darwin=.
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller \
@@ -110,10 +117,17 @@ jobs:
         nix run .#darwin-rebuild \
           -- switch \
           -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
-    - name: Build and activate default derivation
+    - name: Switch to new configuration
       run: |
         . /etc/static/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/configuration.nix
+
         darwin-rebuild switch -I darwin=.
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         # A regression in Nix 2.19 means we need to put `--extra-experimental-features` before `--override-input`
@@ -157,12 +171,19 @@ jobs:
           switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
-    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
+    - name: Switch to new configuration
       run: |
         . /etc/static/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/flake.nix
+
         darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
@@ -195,12 +216,19 @@ jobs:
           switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
-    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
+    - name: Switch to new configuration
       run: |
         . /etc/static/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/flake.nix
+
         darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/nixpkgs-unstable
