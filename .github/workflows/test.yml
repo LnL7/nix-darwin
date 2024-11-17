@@ -149,6 +149,9 @@ jobs:
           /usr/bin/sed -i.bak \
             "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
+          /usr/bin/sed -i.bak \
+            's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
+            flake.nix
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
@@ -157,7 +160,9 @@ jobs:
     - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+        darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
@@ -182,6 +187,9 @@ jobs:
           /usr/bin/sed -i.bak \
             "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
+          /usr/bin/sed -i.bak \
+            's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
+            flake.nix
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
@@ -190,7 +198,9 @@ jobs:
     - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
       run: |
         . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/nixpkgs-unstable
+        darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/nixpkgs-unstable
