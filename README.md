@@ -133,11 +133,20 @@ nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-### Step 4. Updating `nix-darwin`
+### Step 4. Using `nix-darwin`
+
+After installing, you can run `darwin-rebuild` to apply changes to your system:
+
+```bash
+darwin-rebuild switch
+```
+
+### Step 5. Updating `nix-darwin`
+
+You can update `nix-darwin` using the following command:
 
 ```bash
 nix-channel --update darwin
-darwin-rebuild changelog
 ```
 </details>
 
