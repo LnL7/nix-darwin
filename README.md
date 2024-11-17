@@ -153,31 +153,9 @@ nix-channel --update darwin
 
 ## Documentation
 
-Reference documentation of all the options is available [here](https://daiderd.com/nix-darwin/manual/index.html).
-This can also be accessed locally using `man 5 configuration.nix`.
+`darwin-help` will open up a local copy of the reference documentation, it can also be found online [here](https://daiderd.com/nix-darwin/manual/index.html).
 
-`darwin-help` will open a HTML version of the manpage in the default browser.
-
-Furthermore there's `darwin-option` to introspect the settings of a system and its available options.
-> NOTE: `darwin-option` is only available to non-flake installations.
-
-```
-$ darwin-option nix.linux-builder.enable
-Value:
-true
-
-Default:
-false
-
-Example:
-true
-
-Description:
-Whether to enable Linux builder.
-```
-
-There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
-specific topics, like macOS upgrades.
+The documentation is also available as manpages by running `man 5 configuration.nix`.
 
 ## Uninstalling
 
