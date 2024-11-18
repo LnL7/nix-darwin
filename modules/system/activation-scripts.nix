@@ -55,6 +55,7 @@ in
       # We run `etcChecks` again just in case someone runs `activate`
       # directly without `activate-user`.
       ${cfg.activationScripts.etcChecks.text}
+      ${cfg.activationScripts.filesChecks.text}
       ${cfg.activationScripts.extraActivation.text}
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
@@ -71,6 +72,7 @@ in
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
+      ${cfg.activationScripts.files.text}
 
       ${cfg.activationScripts.postActivation.text}
 
