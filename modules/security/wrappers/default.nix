@@ -149,10 +149,6 @@ in
 
   ###### implementation
   config = {
-    assertions = [
-      { assertion = cfg.wrappers != {} -> config.services.activate-system.enable; message = "security.wrappers requires services.activate-system because `/run` is wiped on boot"; }
-    ];
-
     environment.extraInit = ''
       # Wrappers override other bin directories.
       export PATH="${cfg.wrapperDir}:$PATH"
