@@ -63,7 +63,7 @@ jobs:
           -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
 
         /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
@@ -119,7 +119,7 @@ jobs:
           -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
 
         /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
@@ -173,7 +173,7 @@ jobs:
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
 
         /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
@@ -218,7 +218,7 @@ jobs:
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
     - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
 
         /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
