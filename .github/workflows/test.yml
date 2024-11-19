@@ -74,12 +74,14 @@ jobs:
         hello
     - name: Test uninstallation of nix-darwin
       run: |
+        # We need to specify `--extra-experimental-features` because `experimental-features` is set by
+        # `cachix/install-nix-action` but not by our default config above
         nix run .#darwin-uninstaller \
-          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
-          --extra-experimental-features "nix-command flakes"
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
         nix run .#darwin-uninstaller.tests.uninstaller \
-          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
-          --extra-experimental-features "nix-command flakes"
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Debugging tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
@@ -130,7 +132,8 @@ jobs:
         hello
     - name: Test uninstallation of nix-darwin
       run: |
-        # A regression in Nix 2.19 means we need to put `--extra-experimental-features` before `--override-input`
+        # We need to specify `--extra-experimental-features` because `experimental-features` is set by
+        # `cachix/install-nix-action` but not by our default config above
         nix run .#darwin-uninstaller \
            --extra-experimental-features "nix-command flakes" \
            --override-input nixpkgs nixpkgs/nixpkgs-unstable
