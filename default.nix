@@ -17,5 +17,7 @@ let
   };
 in
 eval // {
-  uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { };
+  darwin-uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { };
+
+  inherit (pkgs.callPackage ./pkgs/nix-tools { }) darwin-option darwin-rebuild darwin-version;
 }
