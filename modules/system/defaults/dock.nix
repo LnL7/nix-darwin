@@ -134,10 +134,14 @@ in {
       description = ''
         Persistent applications in the dock.
       '';
-      apply = value:
-        if !(isList value)
-        then value
-        else map (app: { tile-data = { file-data = { _CFURLString = app; _CFURLStringType = 0; }; }; }) value;
+      apply =
+      let
+        tileTypes = ["spacer-tile" "small-spacer-tile"];
+        toSpecialTile = type: { tile-data = {}; tile-type = type; };
+        toAppTile = cfurl: { tile-data = { file-data = { _CFURLString = cfurl; _CFURLStringType = 0; }; }; };
+        toTile = s: if elem s tileTypes then toSpecialTile s else toAppTile s;
+      in
+      value: if isList value then map toTile value else value;
     };
 
     system.defaults.dock.persistent-others = mkOption {
