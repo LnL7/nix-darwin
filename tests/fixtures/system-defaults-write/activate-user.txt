@@ -273,6 +273,22 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			</dict>
 		</dict>
 	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+
+		</dict>
+		<key>tile-type</key>
+		<string>small-spacer-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+
+		</dict>
+		<key>tile-type</key>
+		<string>spacer-tile</string>
+	</dict>
 </array>
 </plist>'
 defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding="UTF-8"?>
