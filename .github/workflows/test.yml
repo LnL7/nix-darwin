@@ -41,37 +41,47 @@ jobs:
       with:
         install_url: https://releases.nixos.org/nix/nix-2.18.8/install
         nix_path: nixpkgs=channel:${{ env.CURRENT_STABLE_CHANNEL }}
-    - name: Install ${{ env.CURRENT_STABLE_CHANNEL }} channel
+    - name: Install channels
       run: |
+        nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.CURRENT_STABLE_CHANNEL }} nixpkgs
         nix-channel --update
-    - name: Install nix-darwin and test
+    - name: Install nix-darwin
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
-        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
-        # but we expect it to fail setting up /etc/nix/nix.conf
-        nix-shell -A installer || true
+        mkdir -p ~/.config/nix-darwin
+        cp modules/examples/simple.nix ~/.config/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
-          ~/.nixpkgs/darwin-configuration.nix
+          ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer
-        nix-shell -A installer.check
-    - name: Build and activate default derivation
+        nix run .#darwin-rebuild \
+          -- switch \
+          -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+    - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/configuration.nix
+
         darwin-rebuild switch -I darwin=.
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
+        # We need to specify `--extra-experimental-features` because `experimental-features` is set by
+        # `cachix/install-nix-action` but not by our default config above
         nix run .#darwin-uninstaller \
-          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
-          --extra-experimental-features "nix-command flakes"
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
         nix run .#darwin-uninstaller.tests.uninstaller \
-          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }} \
-          --extra-experimental-features "nix-command flakes"
+          --extra-experimental-features "nix-command flakes" \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
     - name: Debugging tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
@@ -89,32 +99,41 @@ jobs:
       with:
         install_url: https://releases.nixos.org/nix/nix-2.24.9/install
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Install nixpkgs-unstable channel
+    - name: Install channels
       run: |
+        nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
         nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
         nix-channel --update
-    - name: Install nix-darwin and test
+    - name: Install nix-darwin
       run: |
         export NIX_PATH=$HOME/.nix-defexpr/channels
 
-        # We run nix-darwin twice to test that it can create darwin-configuration correctly for us
-        # but we expect it to fail setting up /etc/nix/nix.conf
-        nix-shell -A installer || true
+        mkdir -p ~/.config/nix-darwin
+        cp modules/examples/simple.nix ~/.config/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
           "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
-          ~/.nixpkgs/darwin-configuration.nix
+          ~/.config/nix-darwin/configuration.nix
 
-        nix-shell -A installer
-        nix-shell -A installer.check
-    - name: Build and activate default derivation
+        nix run .#darwin-rebuild \
+          -- switch \
+          -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+    - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
+        . /etc/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/configuration.nix
+
         darwin-rebuild switch -I darwin=.
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
-        # A regression in Nix 2.19 means we need to put `--extra-experimental-features` before `--override-input`
+        # We need to specify `--extra-experimental-features` because `experimental-features` is set by
+        # `cachix/install-nix-action` but not by our default config above
         nix run .#darwin-uninstaller \
            --extra-experimental-features "nix-command flakes" \
            --override-input nixpkgs nixpkgs/nixpkgs-unstable
@@ -147,15 +166,27 @@ jobs:
           /usr/bin/sed -i.bak \
             "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
+          /usr/bin/sed -i.bak \
+            's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
+            flake.nix
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
-    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
+    - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+        . /etc/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/flake.nix
+
+        darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/${{ env.CURRENT_STABLE_CHANNEL }}
@@ -180,15 +211,27 @@ jobs:
           /usr/bin/sed -i.bak \
             "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
+          /usr/bin/sed -i.bak \
+            's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
+            flake.nix
         popd
         nix run .#darwin-rebuild -- \
           switch --flake ~/.config/nix-darwin#simple \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/nixpkgs-unstable
-    - name: Rebuild and activate simple flake, but this time using nix-darwin's flake interface
+    - name: Switch to new configuration
       run: |
-        . /etc/static/bashrc
-        darwin-rebuild build --flake ./modules/examples/flake#simple --override-input nix-darwin . --override-input nixpkgs nixpkgs/nixpkgs-unstable
+        . /etc/bashrc
+
+        /usr/bin/sed -i.bak \
+          "s/pkgs.vim/pkgs.hello/" \
+          ~/.config/nix-darwin/flake.nix
+
+        darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
+          --override-input nix-darwin . \
+          --override-input nixpkgs nixpkgs/nixpkgs-unstable
+
+        hello
     - name: Test uninstallation of nix-darwin
       run: |
         nix run .#darwin-uninstaller --override-input nixpkgs nixpkgs/nixpkgs-unstable
