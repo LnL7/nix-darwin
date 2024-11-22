@@ -235,6 +235,11 @@ defaults write com.apple.dock 'autohide-delay' $'<?xml version="1.0" encoding="U
 <plist version="1.0">
 <real>0.240000</real>
 </plist>'
+defaults write com.apple.dock 'expose-group-apps' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
 defaults write com.apple.dock 'orientation' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
