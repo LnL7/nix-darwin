@@ -49,7 +49,7 @@ in
           echo >&2 "setting up GitHub Runner '${cfg.name}'..."
 
           (
-            umask -S u=rwx,g=rx,o=
+            umask -S u=rwx,g=rx,o= > /dev/null
 
             ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkStateDir cfg)}
             ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
