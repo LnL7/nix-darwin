@@ -1,16 +1,16 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
+{ config, lib, ... }:
 
 let
   cfg = config.services.nix-daemon;
+
+  inherit (lib) mkDefault mkIf mkMerge mkOption types;
 in
 
 {
   options = {
     services.nix-daemon.enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to enable the nix-daemon service.";
     };
 
@@ -44,10 +44,7 @@ in
     nix.useDaemon = true;
 
     launchd.daemons.nix-daemon = {
-      serviceConfig.ProgramArguments = [
-        "/bin/sh" "-c"
-        "/bin/wait4path ${config.nix.package}/bin/nix-daemon &amp;&amp; exec ${config.nix.package}/bin/nix-daemon"
-      ];
+      command = lib.getExe' config.nix.package "nix-daemon";
       serviceConfig.ProcessType = config.nix.daemonProcessType;
       serviceConfig.LowPriorityIO = config.nix.daemonIOLowPriority;
       serviceConfig.Label = "org.nixos.nix-daemon"; # must match daemon installed by Nix regardless of the launchd label Prefix

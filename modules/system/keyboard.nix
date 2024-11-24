@@ -38,6 +38,12 @@ in
       description = "Whether to swap the left Command key and left Alt key.";
     };
 
+    system.keyboard.swapLeftCtrlAndFn = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to swap the left Control key and Fn (Globe) key.";
+    };
+
     system.keyboard.userKeyMapping = mkOption {
       internal = true;
       type = types.listOf (types.attrsOf types.int);
@@ -65,6 +71,14 @@ in
       (mkIf cfg.swapLeftCommandAndLeftAlt {
         HIDKeyboardModifierMappingSrc = 30064771298;
         HIDKeyboardModifierMappingDst = 30064771299;
+      })
+      (mkIf cfg.swapLeftCtrlAndFn {
+        HIDKeyboardModifierMappingSrc = 30064771296;
+        HIDKeyboardModifierMappingDst = 1095216660483;
+      })
+      (mkIf cfg.swapLeftCtrlAndFn {
+        HIDKeyboardModifierMappingSrc = 1095216660483;
+        HIDKeyboardModifierMappingDst = 30064771296;
       })
     ];
 

@@ -1,15 +1,12 @@
 { config, lib, inputs, pkgs, ... }:
 
 {
-  # imports = [ ~/.config/nixpkgs/darwin/local-configuration.nix ];
-
-  # system.patches = [ ./pam.patch ];
-
   system.defaults.NSGlobalDomain.AppleKeyboardUIMode = 3;
   system.defaults.NSGlobalDomain.ApplePressAndHoldEnabled = false;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 10;
   system.defaults.NSGlobalDomain.KeyRepeat = 1;
   system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+  system.defaults.NSGlobalDomain.NSAutomaticInlinePredictionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
@@ -49,13 +46,10 @@
       pkgs.gnupg
       pkgs.htop
       pkgs.jq
-      pkgs.mosh
       pkgs.ripgrep
       pkgs.shellcheck
-      pkgs.vault
 
       pkgs.qes
-      pkgs.darwin-zsh-completions
     ];
 
   services.yabai.enable = true;
@@ -83,7 +77,6 @@
   #   serviceConfig.ProcessType = "Background";
   # };
 
-  services.nix-daemon.enable = true;
   # services.nix-daemon.enableSocketListener = true;
 
   nix.extraOptions = ''
@@ -95,7 +88,7 @@
   '';
 
   nix.settings.trusted-public-keys = [ "cache.daiderd.com-1:R8KOWZ8lDaLojqD+v9dzXAqGn29gEzPTTbr/GIpCTrI=" ];
-  nix.settings.trusted-substituters = [ https://d3i7ezr9vxxsfy.cloudfront.net ];
+  nix.settings.trusted-substituters = [ "https://d3i7ezr9vxxsfy.cloudfront.net" ];
 
   nix.settings.sandbox = true;
   nix.settings.extra-sandbox-paths = [ "/private/tmp" "/private/var/tmp" "/usr/bin/env" ];
@@ -198,7 +191,7 @@
   # Dotfiles.
   # programs.vim.package = mkForce pkgs.lnl.vim;
 
-  programs.bash.enableCompletion = true;
+  programs.bash.completion.enable = true;
 
   programs.zsh.enable = true;
   programs.zsh.enableBashCompletion = true;
@@ -276,7 +269,6 @@
     zle -N up-line-or-beginning-search
   '';
 
-  environment.loginShell = "${pkgs.zsh}/bin/zsh -l";
   environment.variables.SHELL = "${pkgs.zsh}/bin/zsh";
 
   environment.variables.LANG = "en_US.UTF-8";
@@ -301,8 +293,6 @@
         set +a
     fi
   '';
-
-  # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   nixpkgs.config.allowUnfree = true;
 
@@ -331,4 +321,6 @@
 
   nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
+
+  system.stateVersion = 5;
 }

@@ -11,7 +11,9 @@
   system.defaults.NSGlobalDomain.AppleShowAllExtensions = true;
   system.defaults.NSGlobalDomain.AppleShowScrollBars = "Always";
   system.defaults.NSGlobalDomain.AppleScrollerPagingBehavior = true;
+  system.defaults.NSGlobalDomain.AppleSpacesSwitchOnActivate = false;
   system.defaults.NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+  system.defaults.NSGlobalDomain.NSAutomaticInlinePredictionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
   system.defaults.NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
@@ -40,6 +42,7 @@
   system.defaults.NSGlobalDomain."com.apple.springing.delay" = 0.0;
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.".GlobalPreferences"."com.apple.sound.beep.sound" = "/System/Library/Sounds/Funk.aiff";
+  system.defaults.menuExtraClock.FlashDateSeparators = false;
   system.defaults.menuExtraClock.Show24Hour = false;
   system.defaults.menuExtraClock.ShowDayOfWeek = true;
   system.defaults.menuExtraClock.ShowDate = 2;
@@ -48,7 +51,29 @@
   system.defaults.dock.orientation = "left";
   system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
+  system.defaults.dock.scroll-to-open = false;
+  system.defaults.finder.AppleShowAllFiles = true;
+  system.defaults.finder.ShowStatusBar = true;
+  system.defaults.finder.ShowPathbar = true;
+  system.defaults.finder.FXDefaultSearchScope = "SCcf";
+  system.defaults.finder.FXPreferredViewStyle = "Flwv";
+  system.defaults.finder.FXRemoveOldTrashItems = false;
+  system.defaults.finder.AppleShowAllExtensions = true;
+  system.defaults.finder.CreateDesktop = false;
+  system.defaults.finder.NewWindowTarget = "Other";
+  system.defaults.finder.NewWindowTargetPath = "file:///Library/Apple";
+  system.defaults.finder.QuitMenuItem = true;
+  system.defaults.finder._FXShowPosixPathInTitle = true;
+  system.defaults.finder._FXSortFoldersFirst = true;
+  system.defaults.finder._FXSortFoldersFirstOnDesktop = false;
+  system.defaults.finder.FXEnableExtensionChangeWarning = false;
+  system.defaults.finder.ShowExternalHardDrivesOnDesktop = false;
+  system.defaults.finder.ShowHardDrivesOnDesktop = false;
+  system.defaults.finder.ShowMountedServersOnDesktop = false;
+  system.defaults.finder.ShowRemovableMediaOnDesktop = false;
+  system.defaults.hitoolbox.AppleFnUsageType = "Show Emoji & Symbols";
   system.defaults.screencapture.location = "/tmp";
+  system.defaults.screencapture.include-date = true;
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;
   system.defaults.smb.NetBIOSName = "IMAC-000000";
@@ -63,25 +88,41 @@
   system.defaults.ActivityMonitor.SortColumn = "CPUUsage";
   system.defaults.ActivityMonitor.SortDirection = 0;
   system.defaults.ActivityMonitor.OpenMainWindow = true;
+  system.defaults.WindowManager.GloballyEnabled = false;
+  system.defaults.WindowManager.EnableStandardClickToShowDesktop = false;
+  system.defaults.WindowManager.AutoHide = false;
+  system.defaults.WindowManager.AppWindowGroupingBehavior = true;
+  system.defaults.WindowManager.StandardHideDesktopIcons = false;
+  system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.StandardHideWidgets = true;
+  system.defaults.WindowManager.StageManagerHideWidgets = true;
   system.defaults.CustomUserPreferences = {
-      "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
-      "com.apple.Safari" = {
-        "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
-          true;
-      };
+    "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
+    "com.apple.Safari" = {
+      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
+        true;
     };
-  test = lib.strings.concatMapStringsSep "\n" (x: ''
-    echo >&2 "checking defaults write in /${x}"
-    ${pkgs.python3}/bin/python3 <<EOL
-import sys
-from pathlib import Path
-fixture = '${./fixtures/system-defaults-write}/${x}.txt'
-out = '${config.out}/${x}'
-if Path(fixture).read_text() not in Path(out).read_text():
-  print("Did not find content from %s in %s" % (fixture, out), file=sys.stderr)
-  sys.exit(1)
-EOL
-  '') [
+  };
+  system.defaults.controlcenter.BatteryShowPercentage = true;
+  system.defaults.controlcenter.Sound = false;
+  system.defaults.controlcenter.Bluetooth = true;
+  system.defaults.controlcenter.AirDrop = true;
+  system.defaults.controlcenter.Display = false;
+  system.defaults.controlcenter.FocusModes = false;
+  system.defaults.controlcenter.NowPlaying = true;
+  test = lib.strings.concatMapStringsSep "\n"
+    (x: ''
+      echo >&2 "checking defaults write in /${x}"
+      ${pkgs.python3}/bin/python3 <<EOL
+      import sys
+      from pathlib import Path
+      fixture = '${./fixtures/system-defaults-write}/${x}.txt'
+      out = '${config.out}/${x}'
+      if Path(fixture).read_text() not in Path(out).read_text():
+        print("Did not find content from %s in %s" % (fixture, out), file=sys.stderr)
+        sys.exit(1)
+      EOL
+    '') [
     "activate"
     "activate-user"
   ];

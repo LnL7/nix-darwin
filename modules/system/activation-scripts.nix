@@ -67,6 +67,7 @@ in
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
+      ${cfg.activationScripts.power.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
@@ -85,6 +86,7 @@ in
       exit $_status
     '';
 
+    # FIXME: activationScripts.checks should be system level
     system.activationScripts.userScript.text = ''
       #! ${stdenv.shell}
       set -e
@@ -101,6 +103,8 @@ in
 
       ${cfg.activationScripts.preUserActivation.text}
 
+      # This should be running at the system level, but as user activation runs first
+      # we run it here with sudo
       ${cfg.activationScripts.createRun.text}
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.etcChecks.text}

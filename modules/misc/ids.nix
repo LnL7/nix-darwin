@@ -8,7 +8,7 @@
 # to change uids/gids on service start, in example a service with a lot of
 # files.
 
-{ lib, ... }:
+{ lib, config, ... }:
 
 let
   inherit (lib) types;
@@ -34,15 +34,16 @@ in
 
   };
 
-
   config = {
 
     ids.uids = {
-      nixbld = 300;
+      nixbld = lib.mkDefault 350;
+      _prometheus-node-exporter = 534;
     };
 
     ids.gids = {
-      nixbld = 30000;
+      nixbld = lib.mkDefault (if config.system.stateVersion < 5 then 30000 else 350);
+      _prometheus-node-exporter = 534;
     };
 
   };

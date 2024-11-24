@@ -18,7 +18,7 @@ in
   options = {
     programs.zsh.enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to configure zsh as an interactive shell.";
     };
 
@@ -107,15 +107,24 @@ in
       default = false;
       description = "Enable zsh-syntax-highlighting.";
     };
+
+    programs.zsh.enableFastSyntaxHighlighting = mkEnableOption "zsh-fast-syntax-highlighting";
   };
 
   config = mkIf cfg.enable {
 
+    assertions = [
+      {
+        assertion = !(cfg.enableSyntaxHighlighting && cfg.enableFastSyntaxHighlighting);
+        message = "zsh-syntax-highlighting and zsh-fast-syntax-highlighting are mutually exclusive, please disable one of them.";
+      }
+    ];
     environment.systemPackages =
       [ # Include zsh package
         pkgs.zsh
       ] ++ optional cfg.enableCompletion pkgs.nix-zsh-completions
-        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting;
+        ++ optional cfg.enableSyntaxHighlighting pkgs.zsh-syntax-highlighting
+        ++ optional cfg.enableFastSyntaxHighlighting pkgs.zsh-fast-syntax-highlighting;
 
     environment.pathsToLink = [ "/share/zsh" ];
 
@@ -124,18 +133,21 @@ in
       # This file is read for all shells.
 
       # Only execute this file once per shell.
-      # But don't clobber the environment of interactive non-login children!
-      if [ -n "$__ETC_ZSHENV_SOURCED" ]; then return; fi
-      export __ETC_ZSHENV_SOURCED=1
+      if [ -n "''${__ETC_ZSHENV_SOURCED-}" ]; then return; fi
+      __ETC_ZSHENV_SOURCED=1
 
-      # Don't execute this file when running in a pure nix-shell.
-      if test -n "$IN_NIX_SHELL"; then return; fi
+      if [[ -o rcs ]]; then
+        if [ -z "''${__NIX_DARWIN_SET_ENVIRONMENT_DONE-}" ]; then
+          . ${config.system.build.setEnvironment}
+        fi
 
-      if [ -z "$__NIX_DARWIN_SET_ENVIRONMENT_DONE" ]; then
-        . ${config.system.build.setEnvironment}
+        # Tell zsh how to find installed completions
+        for p in ''${(z)NIX_PROFILES}; do
+          fpath=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions $fpath)
+        done
+
+        ${cfg.shellInit}
       fi
-
-      ${cfg.shellInit}
 
       # Read system-wide modifications.
       if test -f /etc/zshenv.local; then
@@ -148,7 +160,7 @@ in
       # This file is read for login shells.
 
       # Only execute this file once per shell.
-      if [ -n "$__ETC_ZPROFILE_SOURCED" ]; then return; fi
+      if [ -n "''${__ETC_ZPROFILE_SOURCED-}" ]; then return; fi
       __ETC_ZPROFILE_SOURCED=1
 
       ${concatStringsSep "\n" zshVariables}
@@ -182,11 +194,6 @@ in
       ${config.environment.interactiveShellInit}
       ${cfg.interactiveShellInit}
 
-      # Tell zsh how to find installed completions
-      for p in ''${(z)NIX_PROFILES}; do
-        fpath+=($p/share/zsh/site-functions $p/share/zsh/$ZSH_VERSION/functions $p/share/zsh/vendor-completions)
-      done
-
       ${cfg.promptInit}
 
       ${optionalString cfg.enableGlobalCompInit "autoload -U compinit && compinit"}
@@ -194,6 +201,10 @@ in
 
       ${optionalString cfg.enableSyntaxHighlighting
         "source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      }
+
+      ${optionalString cfg.enableFastSyntaxHighlighting
+        "source ${pkgs.zsh-fast-syntax-highlighting}/share/zsh-fast-syntax-highlighting/zsh-fast-syntax-highlighting.zsh"
       }
 
       ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}

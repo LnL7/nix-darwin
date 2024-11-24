@@ -191,9 +191,6 @@ in
         description = ''
           Whether to distribute builds to the machines listed in
           {option}`nix.buildMachines`.
-
-          NOTE: This requires services.nix-daemon.enable for a
-          multi-user install.
         '';
       };
 
@@ -380,14 +377,38 @@ in
         '';
       };
 
+      channel = {
+        enable = mkOption {
+          description = ''
+            Whether the `nix-channel` command and state files are made available on the machine.
+
+            The following files are initialized when enabled:
+              - `/nix/var/nix/profiles/per-user/root/channels`
+              - `$HOME/.nix-defexpr/channels` (on login)
+
+            Disabling this option will not remove the state files from the system.
+          '';
+          type = types.bool;
+          default = true;
+        };
+      };
+
       # Definition differs substantially from NixOS module
       nixPath = mkOption {
         type = nixPathType;
-        default = [
+        default = lib.optionals cfg.channel.enable [
+          # Include default path <darwin-config>.
+          { darwin-config = "${config.environment.darwinConfig}"; }
+          "/nix/var/nix/profiles/per-user/root/channels"
+        ];
+
+        defaultText = lib.literalExpression ''
+          lib.optionals cfg.channel.enable [
             # Include default path <darwin-config>.
-            { darwin-config = "${config.environment.darwinConfig}"; }
+            { darwin-config = "''${config.environment.darwinConfig}"; }
             "/nix/var/nix/profiles/per-user/root/channels"
-          ];
+          ]
+        '';
         description = ''
           The default Nix expression search path, used by the Nix
           evaluator to look up paths enclosed in angle brackets
@@ -503,8 +524,10 @@ in
               description = ''
                 If set to true, Nix automatically detects files in the store that have
                 identical contents, and replaces them with hard links to a single copy.
-                This saves disk space. If set to false (the default), you can still run
-                nix-store --optimise to get rid of duplicate files.
+                This saves disk space. If set to false (the default), you can enable
+                {option}`nix.optimise.automatic` to run {command}`nix-store --optimise`
+                periodically to get rid of duplicate files. You can also run
+                {command}`nix-store --optimise` manually.
               '';
             };
 
@@ -662,7 +685,7 @@ in
         nixPackage
         pkgs.nix-info
       ]
-      ++ optional (config.programs.bash.enableCompletion) pkgs.nix-bash-completions;
+      ++ optional (config.programs.bash.completion.enable) pkgs.nix-bash-completions;
 
     environment.etc."nix/nix.conf".source = nixConf;
 
@@ -677,7 +700,9 @@ in
       "f3e03d851c240c1aa7daccd144ee929f0f5971982424c868c434eb6030e961d4"  # DeterminateSystems Nix installer 0.10.0
       "c6080216f2a170611e339c3f46e4e1d61aaf0d8b417ad93ade8d647da1382c11"  # DeterminateSystems Nix installer 0.14.0
       "97f4135d262ca22d65c9554aad795c10a4491fa61b67d9c2430f4d82bbfec9a2"  # DeterminateSystems Nix installer 0.15.1
-      "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0+
+      "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0
+      "e4974acb79c56148cb8e92137fa4f2de9b7356e897b332fc4e6769e8c0b83e18"  # DeterminateSystems Nix installer 0.20.0
+      "966d22ef5bb9b56d481e8e0d5f7ca2deaf4d24c0f0fc969b2eeaa7ae0aa42907"  # DeterminateSystems Nix installer 0.22.0
       "24797ac05542ff8b52910efc77870faa5f9e3275097227ea4e50c430a5f72916"  # lix-installer 0.17.1 with flakes
       "b027b5cad320b5b8123d9d0db9f815c3f3921596c26dc3c471457098e4d3cc40"  # lix-installer 0.17.1 without flakes
     ];
@@ -735,36 +760,36 @@ in
         { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
         { assertion = elem "_nixbld1" config.users.knownGroups -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
         { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
+
+        {
+          # Should be fixed in Lix by https://gerrit.lix.systems/c/lix/+/2100
+          # As `isNixAtLeast "2.92.0" "2.92.0-devpre20241107" == false`, we need to explicitly check if the user is running Lix 2.92.0
+          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0-devpre20241107" || cfg.package.version == "2.92.0"));
+          message = "`nix.settings.auto-optimise-store` is known to corrupt the Nix Store, please use `nix.optimise.automatic` instead.";
+        }
       ];
 
     # Not in NixOS module
     warnings = [
-      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
 
     # Not in NixOS module
-    nix.nixPath = mkMerge [
-      (mkIf (config.system.stateVersion < 2) (mkDefault
-      [ "darwin=$HOME/.nix-defexpr/darwin"
-        "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ]))
-      (mkIf (config.system.stateVersion > 3) (mkOrder 1200
-      [ { darwin-config = "${config.environment.darwinConfig}"; }
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ]))
-    ];
+    nix.nixPath = mkIf (config.system.stateVersion < 2) (mkDefault [
+      "darwin=$HOME/.nix-defexpr/darwin"
+      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+      "/nix/var/nix/profiles/per-user/root/channels"
+    ]);
 
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
-    environment.extraInit =
-      ''
+    environment.extraInit = mkMerge [
+      (mkIf cfg.channel.enable ''
         if [ -e "$HOME/.nix-defexpr/channels" ]; then
           export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
         fi
-      '' +
+      '')
       # Not in NixOS module
       ''
         # Set up secure multi-user builds: non-root users build through the
@@ -772,7 +797,12 @@ in
         if [ ! -w /nix/var/nix/db ]; then
             export NIX_REMOTE=daemon
         fi
-      '';
+      ''
+    ];
+
+    environment.extraSetup = mkIf (!cfg.channel.enable) ''
+      rm --force $out/bin/nix-channel
+    '';
 
     nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
 

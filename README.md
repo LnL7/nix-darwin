@@ -2,76 +2,30 @@
 
 # nix-darwin
 
-![Test](https://github.com/LnL7/nix-darwin/workflows/Test/badge.svg)
+[![Test](https://github.com/LnL7/nix-darwin/actions/workflows/test.yml/badge.svg)](https://github.com/LnL7/nix-darwin/actions/workflows/test.yml)
 
 Nix modules for darwin, `/etc/nixos/configuration.nix` for macOS.
 
 This project aims to bring the convenience of a declarative system approach to macOS.
 nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite similar to [NixOS](https://nixos.org/).
 
-## Installing
+## Prerequisites
 
-To install nix-darwin, a working installation of [Nix](https://github.com/NixOS/nix#installation) is required.
+The only prerequisite is a Nix implementation, both Nix and Lix are supported.
 
-If you wish to use nix-darwin with flakes, please refer to the [flakes](#flakes) section.
+As the official Nix installer does not include an automated uninstaller, and manual uninstallation on macOS is a complex process, we recommend using one of the following installers instead:
 
-```bash
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
-./result/bin/darwin-installer
-```
+- The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
+* The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
 
-> NOTE: the system activation scripts don't overwrite existing etc files, so files like `/etc/bashrc` and `/etc/zshrc` won't be
-> updated by default. If you didn't use the installer or skipped some of the options you'll have to take care of this yourself.
-> Either modify the existing file to source/import the one from `/etc/static` or remove it. Some examples:
 
-- `mv /etc/bashrc /etc/bashrc.before-nix-darwin`
-- `echo 'if test -e /etc/static/bashrc; then . /etc/static/bashrc; fi' | sudo tee -a /etc/bashrc`
 
-## Updating
+## Getting started
 
-The installer will configure a channel for this repository.
+Despite being an experimental feature in Nix currently, nix-darwin recommends that beginners use flakes to manage their nix-darwin configurations.
 
-```bash
-nix-channel --update darwin
-darwin-rebuild changelog
-```
-
-> NOTE: If you are using Nix as a daemon service the channel for that will be owned by root.
-> Use `sudo -i nix-channel --update darwin` instead.
-
-## Uninstalling
-
-There's also an uninstaller if you don't like the project and want to
-remove the configured files and services.
-
-```bash
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A uninstaller
-./result/bin/darwin-uninstaller
-```
-
-## Example configuration
-
-Configuration lives in `~/.nixpkgs/darwin-configuration.nix`. Check out
-[modules/examples](https://github.com/LnL7/nix-darwin/tree/master/modules/examples) for some example configurations.
-
-```nix
-{ pkgs, ... }:
-{
-  # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP | grep wget
-  environment.systemPackages =
-    [ pkgs.vim
-    ];
-
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-  nix.package = pkgs.nix;
-}
-```
-
-## Flakes
-
-nix-darwin aims for both non-flake and flake configurations to be well supported despite flakes being an experimental feature in Nix.
+<details>
+<summary>Flakes (Recommended for beginners)</summary>
 
 ### Step 1. Creating `flake.nix`
 
@@ -124,7 +78,7 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 
 ### Step 2. Installing `nix-darwin`
 
-Instead of using `darwin-installer`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
+Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
 nix run nix-darwin -- switch --flake ~/.config/nix-darwin
@@ -156,85 +110,67 @@ nix-darwin.lib.darwinSystem {
 { pkgs, lib, inputs }:
 # inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
 ```
+</details>
 
-## Manual Install
+<details>
+<summary>Channels</summary>
+
+### Step 1. Creating `configuration.nix`
+
+Copy the [simple](./modules/examples/simple.nix) example to `~/.config/nix-darwin/configuration.nix`.
+
+### Step 2. Adding `nix-darwin` channel
 
 ```bash
-# Configure the channel
 nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
 nix-channel --update
-export NIX_PATH=darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels:$NIX_PATH
-
-# Or use a local git repository
-git clone git@github.com:LnL7/nix-darwin.git ~/.nix-defexpr/darwin
-export NIX_PATH=darwin=$HOME/.nix-defexpr/darwin:darwin-config=$HOME/.nixpkgs/darwin-configuration.nix:$NIX_PATH
-
-cp ~/.nix-defexpr/darwin/modules/examples/simple.nix ~/.nixpkgs/darwin-configuration.nix
-
-# you can also use this to rebootstrap nix-darwin in case
-# darwin-rebuild is too old to activate the system.
-$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
-$(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
-
-. /etc/static/bashrc
 ```
 
-... or for `fish`:
+### Step 3. Installing `nix-darwin`
 
-```fish
-(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild build
-(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
+To install `nix-darwin`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
+
+```bash
+nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A darwin-rebuild
+./result/bin/darwin-rebuild switch -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
 ```
 
-This will create and manage a system profile in `/run/current-system`, just like NixOS.
+### Step 4. Using `nix-darwin`
 
+After installing, you can run `darwin-rebuild` to apply changes to your system:
 
-By default, nix-darwin will look in your `NIX_PATH` for this repository at `~/.nix-defexpr/darwin` and your configuration at `~/.nixpkgs/darwin-configuration.nix`.
-If you want to change these you can set your own with `nix.nixPath = [ ];`.
-
+```bash
+darwin-rebuild switch
 ```
-$ darwin-rebuild switch
-building the system configuration...
-these derivations will be built:
-  /nix/store/vfad6xgjzr56jcs051cg6vzch4dby92y-etc-zprofile.drv
-  /nix/store/cbmkscxsz0k02ynaph5xaxm1aql0p3vq-etc.drv
-  /nix/store/r5fpn177jhc16f8iyzk12gcw4pivzpbw-nixdarwin-system-16.09.drv
-building path(s) ‘/nix/store/wlq89shja597ip7mrmjv7yzk2lwyh8n0-etc-zprofile’
-building path(s) ‘/nix/store/m8kcm1pa5j570h3indp71a439wsh9lzq-etc’
-building path(s) ‘/nix/store/l735ffcdvcvy60i8pqf6v00vx7lnm6mz-nixdarwin-system-16.09’
-setting up /etc...
-setting up launchd services...
-writing defaults...
-$
+
+### Step 5. Updating `nix-darwin`
+
+You can update `nix-darwin` using the following command:
+
+```bash
+nix-channel --update darwin
 ```
+</details>
 
 ## Documentation
 
-Reference documentation of all the options is available [here](https://daiderd.com/nix-darwin/manual/index.html).
-This can also be accessed locally using `man 5 configuration.nix`.
+`darwin-help` will open up a local copy of the reference documentation, it can also be found online [here](https://daiderd.com/nix-darwin/manual/index.html).
 
-`darwin-help` will open a HTML version of the manpage in the default browser.
+The documentation is also available as manpages by running `man 5 configuration.nix`.
 
-Furthermore there's `darwin-option` to introspect the settings of a system and its available options.
-> NOTE: `darwin-option` is only available to non-flake installations.
+## Uninstalling
+
+To run the latest version of the uninstaller, you can run the following command:
 
 ```
-$ darwin-option services.activate-system.enable
-Value:
-true
-
-Default:
-false
-
-Example:
-no example
-
-Description:
-Whether to activate system at boot time.
+nix --extra-experimental-features "nix-command flakes" run nix-darwin#darwin-uninstaller
 ```
 
-There's also a small wiki https://github.com/LnL7/nix-darwin/wiki about
-specific topics, like macOS upgrades.
+If that command doesn't work for you, you can try the locally installed uninstaller:
+
+```
+darwin-uninstaller
+```
 
 ## Tests
 

@@ -92,6 +92,8 @@ in
       name = "darwin-system-${cfg.darwinLabel}";
       preferLocalBuild = true;
 
+      nativeBuildInputs = [ pkgs.shellcheck ];
+
       activationScript = cfg.activationScripts.script.text;
       activationUserScript = cfg.activationScripts.userScript.text;
       inherit (cfg) darwinLabel;
@@ -132,6 +134,8 @@ in
         substituteInPlace $out/activate-user --subst-var out
         chmod u+x $out/activate-user
         unset activationUserScript
+
+        shellcheck $out/activate $out/activate-user
 
         echo -n "$systemConfig" > $out/systemConfig
 

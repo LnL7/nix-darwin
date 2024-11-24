@@ -20,7 +20,7 @@ in {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to automatically hide and show the dock.  The default is false.
+        Whether to automatically hide and show the dock. The default is false.
       '';
     };
 
@@ -159,6 +159,14 @@ in {
         ) value;
     };
 
+    system.defaults.dock.scroll-to-open = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Scroll up on a Dock icon to show all Space's opened windows for an app, or open stack. The default is false.
+      '';
+    };
+
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
@@ -180,6 +188,14 @@ in {
       default = null;
       description = ''
         Show recent applications in the dock. The default is true.
+      '';
+    };
+
+    system.defaults.dock.slow-motion-allowed = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Allow for slow-motion minimize effect while holding Shift key. The default is false.
       '';
     };
 

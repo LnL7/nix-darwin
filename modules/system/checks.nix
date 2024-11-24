@@ -3,6 +3,9 @@
 with lib;
 
 let
+  # Similar to lib.escapeShellArg but escapes "s instead of 's, to allow for parameter expansion in shells
+  escapeDoubleQuote = arg: ''"${replaceStrings ["\""] ["\"\\\"\""] (toString arg)}"'';
+
   cfg = config.system.checks;
 
   darwinChanges = ''
@@ -22,42 +25,74 @@ let
   '';
 
   runLink = ''
-    if ! test -e /run; then
-        echo "[1;31merror: Directory /run does not exist, aborting activation[0m" >&2
-        echo "Create a symlink to /var/run with:" >&2
-        if test -e /etc/synthetic.conf; then
-            echo >&2
-            echo "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B # For Catalina" >&2
-            echo "$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t # For Big Sur and later" >&2
-            echo >&2
-            echo "The current contents of /etc/synthetic.conf is:" >&2
-            echo >&2
-            sed 's/^/    /' /etc/synthetic.conf >&2
-            echo >&2
-        else
-            echo >&2
-            echo "$ sudo ln -s private/var/run /run" >&2
-            echo >&2
-        fi
-        exit 2
+    if [[ ! -e /run ]]; then
+      printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
+      exit 1
     fi
   '';
 
+
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
-        echo "[1;31mwarning: Detected old style nixbld users[0m" >&2
+        echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
         echo "These can cause migration problems when upgrading to certain macOS versions" >&2
         echo "You can enable the following option to migrate to new style nixbld users" >&2
         echo >&2
         echo "    nix.configureBuildUsers = true;" >&2
         echo >&2
+        echo "or disable this check with" >&2
+        echo >&2
+        echo "    system.checks.verifyBuildUsers = false;" >&2
+        echo >&2
+        exit 2
+     fi
+   '';
+
+  preSequoiaBuildUsers = ''
+    ${lib.optionalString config.nix.configureBuildUsers ''
+      # Don’t complain when we’re about to migrate old‐style build users…
+      if ! dscl . -list /Users | grep -q '^nixbld'; then
+    ''}
+    firstBuildUserID=$(dscl . -read /Users/_nixbld1 UniqueID | awk '{print $2}')
+    if [[ $firstBuildUserID != ${toString (config.ids.uids.nixbld + 1)} ]]; then
+        printf >&2 '\e[1;31merror: Build users have unexpected UIDs, aborting activation\e[0m\n'
+        printf >&2 'The default Nix build user ID range has been adjusted for\n'
+        printf >&2 'compatibility with macOS Sequoia 15. Your _nixbld1 user currently has\n'
+        printf >&2 'UID %d rather than the new default of 351.\n' "$firstBuildUserID"
+        printf >&2 '\n'
+        printf >&2 'You can automatically migrate the users with the following command:\n'
+        printf >&2 '\n'
+        if [[ -e /nix/receipt.json ]]; then
+            if
+                ${pkgs.jq}/bin/jq --exit-status \
+                'try(.planner.settings | has("enable_flakes"))' \
+                /nix/receipt.json \
+                >/dev/null
+            then
+                installerUrl="https://install.lix.systems/lix"
+            else
+                installerUrl="https://install.determinate.systems/nix"
+            fi
+            printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L %s | sh -s -- repair sequoia --move-existing-users\n" \
+                "$installerUrl"
+        else
+            printf >&2 "    curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -\n"
+        fi
+        printf >&2 '\n'
+        printf >&2 'If you have no intention of upgrading to macOS Sequoia 15, or already\n'
+        printf >&2 'have a custom UID range that you know is compatible with Sequoia, you\n'
+        printf >&2 'can disable this check by setting:\n'
+        printf >&2 '\n'
+        printf >&2 '    ids.uids.nixbld = %d;\n' "$((firstBuildUserID - 1))"
+        printf >&2 '\n'
+        exit 2
     fi
+    ${lib.optionalString config.nix.configureBuildUsers "fi"}
   '';
 
   buildUsers = ''
     buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
-    if [ -z $buildUser ]; then
+    if [[ -z "$buildUser" ]]; then
         echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
         echo "Create the build users or disable the daemon:" >&2
         echo "$ darwin-install" >&2
@@ -70,18 +105,53 @@ let
     fi
   '';
 
-  singleUser = ''
-    if grep -q 'build-users-group =' /etc/nix/nix.conf; then
-        echo "[1;31merror: The daemon is not enabled but this is a multi-user install, aborting activation[0m" >&2
-        echo "Enable the nix-daemon service:" >&2
-        echo >&2
-        echo "    services.nix-daemon.enable = true;" >&2
-        echo >&2
-        echo "or set" >&2
-        echo >&2
-        echo "    nix.useDaemon = true;" >&2
-        echo >&2
+  buildGroupID = ''
+    buildGroupID=$(dscl . -read /Groups/nixbld PrimaryGroupID | awk '{print $2}')
+    expectedBuildGroupID=${toString config.ids.gids.nixbld}
+    if [[ $buildGroupID != "$expectedBuildGroupID" ]]; then
+        printf >&2 '\e[1;31merror: Build user group has mismatching GID, aborting activation\e[0m\n'
+        printf >&2 'The default Nix build user group ID was changed from 30000 to 350.\n'
+        printf >&2 'You are currently managing Nix build users with nix-darwin, but your\n'
+        printf >&2 'nixbld group has GID %d, whereas we expected %d.\n' \
+          "$buildGroupID" "$expectedBuildGroupID"
+        printf >&2 '\n'
+        printf >&2 'Possible causes include setting up a new Nix installation with an\n'
+        printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
+        printf >&2 'installation with an existing Nix installation, or manually increasing\n'
+        # shellcheck disable=SC2016
+        printf >&2 'your `system.stateVersion` setting.\n'
+        printf >&2 '\n'
+        printf >&2 'You can set the configured group ID to match the actual value:\n'
+        printf >&2 '\n'
+        printf >&2 '    ids.gids.nixbld = %d;\n' "$buildGroupID"
+        printf >&2 '\n'
+        printf >&2 'We do not recommend trying to change the group ID with macOS user\n'
+        printf >&2 'management tools without a complete uninstallation and reinstallation\n'
+        printf >&2 'of Nix.\n'
         exit 2
+    fi
+  '';
+
+  nixDaemon = if config.nix.useDaemon then ''
+    if ! dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
+      printf >&2 '[1;31merror: The daemon should not be enabled for single-user installs, aborting activation[0m\n'
+      printf >&2 'Disable the nix-daemon service:\n'
+      printf >&2 '\n'
+      printf >&2 '    services.nix-daemon.enable = false;\n'
+      printf >&2 '\n'
+      # shellcheck disable=SC2016
+      printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
+      printf >&2 '\n'
+      exit 2
+    fi
+  '' else ''
+    if dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
+      printf >&2 '[1;31merror: The daemon should be enabled for multi-user installs, aborting activation[0m\n'
+      printf >&2 'Enable the nix-daemon service:\n'
+      printf >&2 '\n'
+      printf >&2 '    services.nix-daemon.enable = true;\n'
+      printf >&2 '\n'
+      exit 2
     fi
   '';
 
@@ -121,7 +191,7 @@ let
   '';
 
   nixPath = ''
-    nixPath=${concatStringsSep ":" config.nix.nixPath}:$HOME/.nix-defexpr/channels
+    nixPath=${concatMapStringsSep ":" escapeDoubleQuote config.nix.nixPath}:$HOME/.nix-defexpr/channels
 
     darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
@@ -197,7 +267,7 @@ let
         echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
         echo "Configure the optimiser to run as the current user:" >&2
         echo >&2
-        echo "    nix.optimiser.user = \"$USER\";" >&2
+        echo "    nix.optimise.user = \"$USER\";" >&2
         echo >&2
         exit 2
     fi
@@ -209,6 +279,7 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
+        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -224,6 +295,19 @@ let
         exit 2
     fi
   '';
+
+  homebrewInstalled = ''
+    if [[ ! -f ${escapeShellArg config.homebrew.brewPrefix}/brew && -z "''${INSTALLING_HOMEBREW:-}" ]]; then
+        echo "[1;31merror: Using the homebrew module requires homebrew installed, aborting activation[0m" >&2
+        echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
+        echo "You can install homebrew using the following command:" >&2
+        echo >&2
+        # shellcheck disable=SC2016
+        echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -236,13 +320,15 @@ in
 
     system.checks.verifyNixChannels = mkOption {
       type = types.bool;
-      default = true;
+      default = config.nix.channel.enable;
       description = "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
-      default = !(config.nix.settings.auto-allocate-uids or false);
+      default =
+        (config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+        || config.nix.configureBuildUsers;
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -258,9 +344,11 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
-      oldBuildUsers
-      (mkIf (config.nix.useDaemon && cfg.verifyBuildUsers) buildUsers)
-      (mkIf (!config.nix.useDaemon) singleUser)
+      (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
+      (mkIf cfg.verifyBuildUsers buildUsers)
+      (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
+      (mkIf config.nix.configureBuildUsers buildGroupID)
+      nixDaemon
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
@@ -268,12 +356,13 @@ in
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
+      (mkIf config.homebrew.enable homebrewInstalled)
     ];
 
     system.activationScripts.checks.text = ''
       ${cfg.text}
 
-      if test ''${checkActivation:-0} -eq 1; then
+      if [[ "''${checkActivation:-0}" -eq 1 ]]; then
         echo "ok" >&2
         exit 0
       fi

@@ -1,9 +1,15 @@
 {
-  # WARNING this is very much still experimental.
   description = "A collection of darwin modules";
 
   outputs = { self, nixpkgs }: let
-    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
+    forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
+    forDarwinSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
+
+    jobs = forAllSystems (system: import ./release.nix {
+      inherit nixpkgs system;
+
+      nix-darwin = self;
+    });
   in {
     lib = {
       evalConfig = import ./eval-config.nix;
@@ -27,6 +33,7 @@
             }
             ++ [ ({ lib, ... }: {
               nixpkgs.source = lib.mkDefault nixpkgs;
+              nixpkgs.flake.source = lib.mkDefault nixpkgs.outPath;
 
               system.checks.verifyNixPath = lib.mkDefault false;
 
@@ -47,7 +54,6 @@
 
     darwinModules.hydra = ./modules/examples/hydra.nix;
     darwinModules.lnl = ./modules/examples/lnl.nix;
-    darwinModules.ofborg = ./modules/examples/ofborg.nix;
     darwinModules.simple = ./modules/examples/simple.nix;
 
     templates.default = {
@@ -55,23 +61,11 @@
       description = "nix flake init -t nix-darwin";
     };
 
-    checks = forAllSystems (system: let
-      simple = self.lib.darwinSystem {
-        modules = [
-          self.darwinModules.simple
-          { nixpkgs.hostPlatform = system; }
-        ];
-      };
-    in {
-      simple = simple.system;
+    checks = forDarwinSystems (system: jobs.${system}.tests // jobs.${system}.examples);
 
-      inherit (simple.config.system.build.manual)
-        optionsJSON
-        manualHTML
-        manpages;
-    });
-
-    packages = forAllSystems (system: let
+    packages = forAllSystems (system: {
+      inherit (jobs.${system}.docs) manualHTML manpages optionsJSON;
+    } // (nixpkgs.lib.optionalAttrs (nixpkgs.lib.hasSuffix "darwin" system) (let
       pkgs = import nixpkgs {
         inherit system;
         overlays = [ self.overlays.default ];
@@ -80,6 +74,6 @@
       default = self.packages.${system}.darwin-rebuild;
 
       inherit (pkgs) darwin-option darwin-rebuild darwin-version darwin-uninstaller;
-    });
+    })));
   };
 }

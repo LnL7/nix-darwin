@@ -9,17 +9,25 @@ showSyntax() {
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
   echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&2
-  echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
-  echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
-  echo "               [--flake flake] [--update-input input flake] [--impure] [--recreate-lock-file]" >&2
-  echo "               [--no-update-lock-file] [--refresh]" >&2
-  echo "               [--offline] [--substituters substituters-list] ..." >&2
+  echo "               [--keep-going | -k] [--keep-failed | -K] [--fallback] [--show-trace]" >&2
+  echo "               [--print-build-logs | -L] [--impure] [-I path]" >&2
+  echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
+  echo "               [--no-flake | [--flake flake]" >&2
+  echo "                             [--commit-lock-file] [--recreate-lock-file]" >&2
+  echo "                             [--no-update-lock-file] [--no-write-lock-file]" >&2
+  echo "                             [--override-input input flake] [--update-input input]" >&2
+  echo "                             [--no-registries] [--offline] [--refresh]]" >&2
+  echo "               [--substituters substituters-list] ..." >&2
   exit 1
 }
 
 sudo() {
+  # REMOVEME when support for macOS 10.13 is dropped
+  # macOS 10.13 does not support sudo --preserve-env so we make this conditional
   if command sudo --help | grep -- --preserve-env= >/dev/null; then
-    command sudo -H --preserve-env=PATH env "$@"
+    # We use `env` before our command to ensure the preserved PATH gets checked
+    # when trying to resolve the command to execute
+    command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION env "$@"
   else
     command sudo -H "$@"
   fi
@@ -34,6 +42,7 @@ extraProfileFlags=()
 profile=@profile@
 action=
 flake=
+noFlake=
 
 while [ $# -gt 0 ]; do
   i=$1; shift 1
@@ -76,6 +85,9 @@ while [ $# -gt 0 ]; do
     --flake)
       flake=$1
       shift 1
+      ;;
+    --no-flake)
+      noFlake=1
       ;;
     -L|-vL|--print-build-logs|--impure|--recreate-lock-file|--no-update-lock-file|--no-write-lock-file|--no-registries|--commit-lock-file|--refresh)
       extraLockFlags+=("$i")
@@ -137,41 +149,23 @@ if [ -z "$action" ]; then showSyntax; fi
 
 flakeFlags=(--extra-experimental-features 'nix-command flakes')
 
-if [ -n "$flake" ]; then
-    # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
-    if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
-       scheme=${BASH_REMATCH[1]} # eg. http:
-       authority=${BASH_REMATCH[3]} # eg. //www.ics.uci.edu
-       path=${BASH_REMATCH[5]} # eg. /pub/ietf/uri/
-       queryWithQuestion=${BASH_REMATCH[6]}
-       fragment=${BASH_REMATCH[9]}
+# Use /etc/nix-darwin/flake.nix if it exists. It can be a symlink to the
+# actual flake.
+if [[ -z $flake && -e /etc/nix-darwin/flake.nix && -z $noFlake ]]; then
+  flake="$(dirname "$(readlink -f /etc/nix-darwin/flake.nix)")"
+fi
 
-       flake=${scheme}${authority}${path}${queryWithQuestion}
-       flakeAttr=${fragment}
+# For convenience, use the hostname as the default configuration to
+# build from the flake.
+if [[ -n "$flake" ]]; then
+    if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then
+       flake="${BASH_REMATCH[1]}"
+       flakeAttr="${BASH_REMATCH[2]}"
     fi
-    if [ -z "$flakeAttr" ]; then
+    if [[ -z "$flakeAttr" ]]; then
       flakeAttr=$(scutil --get LocalHostName)
     fi
     flakeAttr=darwinConfigurations.${flakeAttr}
-fi
-
-if [ -n "$flake" ]; then
-    if nix "${flakeFlags[@]}" flake metadata --version &>/dev/null; then
-        cmd=metadata
-    else
-        cmd=info
-    fi
-
-    metadata=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake")
-    flake=$(jq -r .url <<<"${metadata}")
-
-    if [ "$(jq -r .resolved.submodules <<<"${metadata}")" = "true" ]; then
-      if [[ "$flake" == *'?'* ]]; then
-        flake="${flake}&submodules=1"
-      else
-        flake="${flake}?submodules=1"
-      fi
-    fi
 fi
 
 if [ "$action" != build ]; then
@@ -191,7 +185,7 @@ if [ "$action" = edit ]; then
   fi
 fi
 
-if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ]; then
+if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ] || [ "$action" = changelog ]; then
   echo "building the system configuration..." >&2
   if [ -z "$flake" ]; then
     systemConfig="$(nix-build '<darwin>' "${extraBuildFlags[@]}" -A system)"
@@ -240,11 +234,7 @@ if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback 
 fi
 
 if [ "$action" = changelog ]; then
-  echo >&2
-  echo "[1;1mCHANGELOG[0m" >&2
-  echo >&2
-  head -n 32 "$systemConfig/darwin-changes"
-  echo >&2
+  ${PAGER:-less} -- "$systemConfig/darwin-changes"
 fi
 
 if [ "$action" = check ]; then

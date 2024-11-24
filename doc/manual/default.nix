@@ -79,11 +79,17 @@ in rec {
           '@DARWIN_OPTIONS_JSON@' \
           ${optionsJSON}/share/doc/darwin/options.json
 
+      # Pass --redirects option if nixos-render-docs supports it
+      if nixos-render-docs manual html --help | grep --silent -E '^\s+--redirects\s'; then
+        redirects_opt="--redirects ${./redirects.json}"
+      fi
+
       # TODO: --manpage-urls?
       nixos-render-docs -j $NIX_BUILD_CORES manual html \
         --manpage-urls ${pkgs.writeText "manpage-urls.json" "{}"} \
         --revision ${lib.escapeShellArg revision} \
         --generator "nixos-render-docs ${lib.version}" \
+        $redirects_opt \
         --stylesheet style.css \
         --stylesheet highlightjs/mono-blue.css \
         --script ./highlightjs/highlight.pack.js \
@@ -118,18 +124,18 @@ in rec {
 
       # TODO: get these parameterized in upstream nixos-render-docs
       sed -i -e '
-        /^\.TH / s|NixOS|Darwin|g
+        /^\.TH / s|NixOS|nix-darwin|g
 
         /^\.SH "NAME"$/ {
           N
-          s|NixOS|Darwin|g
+          s|NixOS|nix-darwin|g
         }
 
         /^\.SH "DESCRIPTION"$/ {
           N; N
           s|/etc/nixos/configuration|configuration|g
-          s|NixOS|Darwin|g
-          s|nixos|darwin|g
+          s|NixOS|nix-darwin|g
+          s|nixos|nix-darwin|g
         }
 
         /\.SH "AUTHORS"$/ {

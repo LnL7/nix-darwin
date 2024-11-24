@@ -9,13 +9,22 @@ let
     mapAttrsToList (n: v: ''export ${n}="${v}"'') cfg.variables;
 
   aliasCommands =
-    mapAttrsFlatten (n: v: ''alias ${n}=${escapeShellArg v}'')
+    mapAttrsToList (n: v: ''alias ${n}=${escapeShellArg v}'')
       (filterAttrs (k: v: v != null) cfg.shellAliases);
 
   makeDrvBinPath = concatMapStringsSep ":" (p: if isDerivation p then "${p}/bin" else p);
 in
 
 {
+  imports = [
+    (mkRenamedOptionModule ["environment" "postBuild"] ["environment" "extraSetup"])
+    (mkRemovedOptionModule [ "environment" "loginShell" ] ''
+      This option was only used to change the default command in tmux.
+
+      This has been removed in favour of changing the default command or default shell in tmux directly.
+    '')
+  ];
+
   options = {
     environment.systemPackages = mkOption {
       type = types.listOf types.package;
@@ -43,12 +52,6 @@ in
       description = "A list of profiles used to setup the global environment.";
     };
 
-    environment.postBuild = mkOption {
-      type = types.lines;
-      default = "";
-      description = "Commands to execute when building the global environment.";
-    };
-
     environment.extraOutputsToInstall = mkOption {
       type = types.listOf types.str;
       default = [];
@@ -74,12 +77,6 @@ in
         NOTE: Changing this requires running {command}`darwin-rebuild switch -I darwin-config=/path/to/configuration.nix`
         the first time to make darwin-rebuild aware of the custom location.
       '';
-    };
-
-    environment.loginShell = mkOption {
-      type = types.str;
-      default = "$SHELL -l";
-      description = "Configure default login shell.";
     };
 
     environment.variables = mkOption {
@@ -147,6 +144,17 @@ in
       '';
       type = types.lines;
     };
+
+    environment.extraSetup = mkOption {
+      type = types.lines;
+      default = "";
+      description = ''
+        Shell fragments to be run after the system environment has been created.
+        This should only be used for things that need to modify the internals
+        of the environment, e.g. generating MIME caches.
+        The environment being built can be accessed at $out.
+      '';
+    };
   };
 
   config = {
@@ -188,7 +196,9 @@ in
     system.path = pkgs.buildEnv {
       name = "system-path";
       paths = cfg.systemPackages;
-      inherit (cfg) postBuild pathsToLink extraOutputsToInstall;
+      postBuild = cfg.extraSetup;
+      ignoreCollisions = true;
+      inherit (cfg) pathsToLink extraOutputsToInstall;
     };
 
     system.build.setEnvironment = pkgs.writeText "set-environment" ''
@@ -205,6 +215,5 @@ in
     system.build.setAliases = pkgs.writeText "set-aliases" ''
       ${concatStringsSep "\n" aliasCommands}
     '';
-
   };
 }
