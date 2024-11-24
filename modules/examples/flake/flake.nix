@@ -1,5 +1,5 @@
 {
-  description = "Example Darwin system flake";
+  description = "Example nix-darwin system flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -16,15 +16,10 @@
         [ pkgs.vim
         ];
 
-      # Auto upgrade nix package and the daemon service.
-      services.nix-daemon.enable = true;
-      # nix.package = pkgs.nix;
-
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";
 
-      # Create /etc/zshrc that loads the nix-darwin environment.
-      programs.zsh.enable = true;  # default shell on catalina
+      # Enable alternative shell support in nix-darwin.
       # programs.fish.enable = true;
 
       # Set Git commit hash for darwin-version.
@@ -35,7 +30,7 @@
       system.stateVersion = 5;
 
       # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "x86_64-darwin";
+      nixpkgs.hostPlatform = "aarch64-darwin";
     };
   in
   {
@@ -44,8 +39,5 @@
     darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
       modules = [ configuration ];
     };
-
-    # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations."simple".pkgs;
   };
 }

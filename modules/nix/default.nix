@@ -191,9 +191,6 @@ in
         description = ''
           Whether to distribute builds to the machines listed in
           {option}`nix.buildMachines`.
-
-          NOTE: This requires services.nix-daemon.enable for a
-          multi-user install.
         '';
       };
 
@@ -404,7 +401,7 @@ in
           { darwin-config = "${config.environment.darwinConfig}"; }
           "/nix/var/nix/profiles/per-user/root/channels"
         ];
-        
+
         defaultText = lib.literalExpression ''
           lib.optionals cfg.channel.enable [
             # Include default path <darwin-config>.
@@ -527,8 +524,10 @@ in
               description = ''
                 If set to true, Nix automatically detects files in the store that have
                 identical contents, and replaces them with hard links to a single copy.
-                This saves disk space. If set to false (the default), you can still run
-                nix-store --optimise to get rid of duplicate files.
+                This saves disk space. If set to false (the default), you can enable
+                {option}`nix.optimise.automatic` to run {command}`nix-store --optimise`
+                periodically to get rid of duplicate files. You can also run
+                {command}`nix-store --optimise` manually.
               '';
             };
 
@@ -686,7 +685,7 @@ in
         nixPackage
         pkgs.nix-info
       ]
-      ++ optional (config.programs.bash.enableCompletion) pkgs.nix-bash-completions;
+      ++ optional (config.programs.bash.completion.enable) pkgs.nix-bash-completions;
 
     environment.etc."nix/nix.conf".source = nixConf;
 
@@ -761,11 +760,17 @@ in
         { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
         { assertion = elem "_nixbld1" config.users.knownGroups -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
         { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
+
+        {
+          # Should be fixed in Lix by https://gerrit.lix.systems/c/lix/+/2100
+          # As `isNixAtLeast "2.92.0" "2.92.0-devpre20241107" == false`, we need to explicitly check if the user is running Lix 2.92.0
+          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0-devpre20241107" || cfg.package.version == "2.92.0"));
+          message = "`nix.settings.auto-optimise-store` is known to corrupt the Nix Store, please use `nix.optimise.automatic` instead.";
+        }
       ];
 
     # Not in NixOS module
     warnings = [
-      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
 

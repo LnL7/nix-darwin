@@ -3,25 +3,23 @@ on:
   push:
     branches:
     - master
-    paths:
-    - '**.nix'
 
 jobs:
   update-manual:
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         # So that we fetch all branches, since we need to checkout the `gh-pages` branch later.
         fetch-depth: 0
 
     - name: Install Nix
-      uses: cachix/install-nix-action@v27
+      uses: cachix/install-nix-action@v30
 
     - name: Build manual
       run: |
-        nix-build ./release.nix -I nixpkgs=channel:nixpkgs-24.05-darwin -I darwin=. -A manualHTML
+        nix build .#manualHTML
 
     - name: Push update to manual
       run: |

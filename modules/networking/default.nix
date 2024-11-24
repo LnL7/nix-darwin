@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 
@@ -8,15 +8,16 @@ let
   hostnameRegEx = ''^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'';
 
   emptyList = lst: if lst != [] then lst else ["empty"];
-  quoteStrings = concatMapStringsSep " " (str: "'${str}'");
+
+  onOff = cond: if cond then "on" else "off";
 
   setNetworkServices = optionalString (cfg.knownNetworkServices != []) ''
     networkservices=$(networksetup -listallnetworkservices)
     ${concatMapStringsSep "\n" (srv: ''
       case "$networkservices" in
-        *'${srv}'*)
-          networksetup -setdnsservers '${srv}' ${quoteStrings (emptyList cfg.dns)}
-          networksetup -setsearchdomains '${srv}' ${quoteStrings (emptyList cfg.search)}
+        *${lib.escapeShellArg srv}*)
+          networksetup -setdnsservers ${lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.dns))}
+          networksetup -setsearchdomains ${lib.escapeShellArgs ([ srv ] ++ (emptyList cfg.search))}
           ;;
       esac
     '') cfg.knownNetworkServices}
@@ -94,6 +95,16 @@ in
       default = [];
       description = "The list of search paths used when resolving domain names.";
     };
+
+    networking.wakeOnLan.enable = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable Wake-on-LAN for the device.
+
+        Battery powered devices may require being connected to power.
+      '';
+    };
   };
 
   config = {
@@ -107,6 +118,7 @@ in
       echo "configuring networking..." >&2
 
       ${optionalString (cfg.computerName != null) ''
+        # shellcheck disable=SC1112
         scutil --set ComputerName ${escapeShellArg cfg.computerName}
       ''}
       ${optionalString (cfg.hostName != null) ''
@@ -117,6 +129,10 @@ in
       ''}
 
       ${setNetworkServices}
+
+      ${optionalString (cfg.wakeOnLan.enable != null) ''
+        systemsetup -setWakeOnNetworkAccess '${onOff cfg.wakeOnLan.enable}' &> /dev/null
+      ''}
     '';
 
   };

@@ -105,19 +105,29 @@ in
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchAgents" attr.target) launchAgents}
       ${concatMapStringsSep "\n" (attr: launchdActivation "LaunchDaemons" attr.target) launchDaemons}
 
-      for f in $(ls /run/current-system/Library/LaunchAgents 2> /dev/null); do
-        if test ! -e "${cfg.build.launchd}/Library/LaunchAgents/$f"; then
-          echo "removing service $(basename $f .plist)" >&2
+      for f in /run/current-system/Library/LaunchAgents/*; do
+        [[ -e "$f" ]] || break  # handle when directory is empty
+        f=''${f#/run/current-system/Library/LaunchAgents/}
+
+        if [[ ! -e "${cfg.build.launchd}/Library/LaunchAgents/$f" ]]; then
+          echo "removing service $(basename "$f" .plist)" >&2
           launchctl unload "/Library/LaunchAgents/$f" || true
-          if test -e "/Library/LaunchAgents/$f"; then rm -f "/Library/LaunchAgents/$f"; fi
+          if [[ -e "/Library/LaunchAgents/$f" ]]; then
+            rm -f "/Library/LaunchAgents/$f"
+          fi
         fi
       done
 
-      for f in $(ls /run/current-system/Library/LaunchDaemons 2> /dev/null); do
-        if test ! -e "${cfg.build.launchd}/Library/LaunchDaemons/$f"; then
-          echo "removing service $(basename $f .plist)" >&2
+      for f in /run/current-system/Library/LaunchDaemons/*; do
+        [[ -e "$f" ]] || break  # handle when directory is empty
+        f=''${f#/run/current-system/Library/LaunchDaemons/}
+
+        if [[ ! -e "${cfg.build.launchd}/Library/LaunchDaemons/$f" ]]; then
+          echo "removing service $(basename "$f" .plist)" >&2
           launchctl unload "/Library/LaunchDaemons/$f" || true
-          if test -e "/Library/LaunchDaemons/$f"; then rm -f "/Library/LaunchDaemons/$f"; fi
+          if [[ -e "/Library/LaunchDaemons/$f" ]]; then
+            rm -f "/Library/LaunchDaemons/$f"
+          fi
         fi
       done
     '';
@@ -133,11 +143,16 @@ in
       ''}
       ${concatMapStringsSep "\n" (attr: userLaunchdActivation attr.target) userLaunchAgents}
 
-      for f in $(ls /run/current-system/user/Library/LaunchAgents 2> /dev/null); do
-        if test ! -e "${cfg.build.launchd}/user/Library/LaunchAgents/$f"; then
-          echo "removing user service $(basename $f .plist)" >&2
-          launchctl unload ~/Library/LaunchAgents/$f || true
-          if test -e ~/Library/LaunchAgents/$f; then rm -f ~/Library/LaunchAgents/$f; fi
+      for f in /run/current-system/user/Library/LaunchAgents/*; do
+        [[ -e "$f" ]] || break  # handle when directory is empty
+        f=''${f#/run/current-system/user/Library/LaunchAgents/}
+
+        if [[ ! -e "${cfg.build.launchd}/user/Library/LaunchAgents/$f" ]]; then
+          echo "removing user service $(basename "$f" .plist)" >&2
+          launchctl unload ~/Library/LaunchAgents/"$f" || true
+          if [[ -e ~/Library/LaunchAgents/"$f" ]]; then
+            rm -f ~/Library/LaunchAgents/"$f"
+          fi
         fi
       done
     '';

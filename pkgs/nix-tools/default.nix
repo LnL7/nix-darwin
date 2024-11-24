@@ -17,6 +17,7 @@ let
       inherit name src;
       dir = "bin";
       isExecutable = true;
+      meta.mainProgram = name;
     } // env);
 
   path = "${extraPath}:${systemPath}";

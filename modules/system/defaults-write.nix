@@ -14,7 +14,7 @@ let
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
   loginwindow = defaultsToList "/Library/Preferences/com.apple.loginwindow" cfg.loginwindow;
   smb = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.smb.server" cfg.smb;
-  SoftwareUpdate = defaultsToList "/Library/Preferences/SystemConfiguration/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
+  SoftwareUpdate = defaultsToList "/Library/Preferences/com.apple.SoftwareUpdate" cfg.SoftwareUpdate;
 
   # userDefaults
   GlobalPreferences = defaultsToList ".GlobalPreferences" cfg.".GlobalPreferences";
@@ -23,6 +23,7 @@ let
   menuExtraClock = defaultsToList "com.apple.menuextra.clock" cfg.menuExtraClock;
   dock = defaultsToList "com.apple.dock" cfg.dock;
   finder = defaultsToList "com.apple.finder" cfg.finder;
+  hitoolbox = defaultsToList "com.apple.HIToolbox" cfg.hitoolbox;
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
   magicmouseBluetooth = defaultsToList "com.apple.driver.AppleMultitouchMouse.mouse" cfg.magicmouse;
   screencapture = defaultsToList "com.apple.screencapture" cfg.screencapture;
@@ -33,8 +34,10 @@ let
   universalaccess = defaultsToList "com.apple.universalaccess" cfg.universalaccess;
   ActivityMonitor = defaultsToList "com.apple.ActivityMonitor" cfg.ActivityMonitor;
   WindowManager = defaultsToList "com.apple.WindowManager" cfg.WindowManager;
+  controlcenter = defaultsToList "~/Library/Preferences/ByHost/com.apple.controlcenter" cfg.controlcenter;  
   CustomUserPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomUserPreferences);
   CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
+
 
   mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
 in
@@ -76,6 +79,7 @@ in
         menuExtraClock
         dock
         finder
+        hitoolbox
         magicmouse
         magicmouseBluetooth
         screencapture
@@ -87,6 +91,7 @@ in
         ActivityMonitor
         CustomUserPreferences
         WindowManager
+        controlcenter
       ]
       ''
         # Set defaults
@@ -99,6 +104,7 @@ in
         ${concatStringsSep "\n" menuExtraClock}
         ${concatStringsSep "\n" dock}
         ${concatStringsSep "\n" finder}
+        ${concatStringsSep "\n" hitoolbox}
         ${concatStringsSep "\n" magicmouse}
         ${concatStringsSep "\n" magicmouseBluetooth}
         ${concatStringsSep "\n" screencapture}
@@ -110,10 +116,11 @@ in
         ${concatStringsSep "\n" ActivityMonitor}
         ${concatStringsSep "\n" CustomUserPreferences}
         ${concatStringsSep "\n" WindowManager}
+        ${concatStringsSep "\n" controlcenter}
 
         ${optionalString (length dock > 0) ''
           # Only restart Dock if current user is logged in
-          if pgrep -xu $UID Dock; then
+          if pgrep -xu $UID Dock >/dev/null; then
             echo >&2 "restarting Dock..."
             killall Dock || true
           fi

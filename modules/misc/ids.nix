@@ -38,10 +38,12 @@ in
 
     ids.uids = {
       nixbld = lib.mkDefault 350;
+      _prometheus-node-exporter = 534;
     };
 
     ids.gids = {
       nixbld = lib.mkDefault (if config.system.stateVersion < 5 then 30000 else 350);
+      _prometheus-node-exporter = 534;
     };
 
   };

@@ -1,22 +1,11 @@
 { config, lib, pkgs, ... }:
 
-with lib;
-
-let
-  cfg = config.services.activate-system;
-in
-
 {
-  options = {
-    services.activate-system.enable = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Whether to activate system at boot time.";
-    };
-  };
+  imports = [
+    (lib.mkRemovedOptionModule [ "services" "activate-system" "enable" ] "The `activate-system` service is now always enabled as it is necessary for a working `nix-darwin` setup.")
+  ];
 
-  config = mkIf cfg.enable {
-
+  config = {
     launchd.daemons.activate-system = {
       script = ''
         set -e
@@ -41,6 +30,5 @@ in
       serviceConfig.RunAtLoad = true;
       serviceConfig.KeepAlive.SuccessfulExit = false;
     };
-
   };
 }

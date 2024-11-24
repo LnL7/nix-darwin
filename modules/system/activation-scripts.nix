@@ -67,6 +67,7 @@ in
       ${cfg.activationScripts.nix-daemon.text}
       ${cfg.activationScripts.time.text}
       ${cfg.activationScripts.networking.text}
+      ${cfg.activationScripts.power.text}
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
@@ -85,6 +86,7 @@ in
       exit $_status
     '';
 
+    # FIXME: activationScripts.checks should be system level
     system.activationScripts.userScript.text = ''
       #! ${stdenv.shell}
       set -e

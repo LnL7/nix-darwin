@@ -9,17 +9,25 @@ showSyntax() {
   echo "               [--list-generations] [{--profile-name | -p} name] [--rollback]" >&2
   echo "               [{--switch-generation | -G} generation] [--verbose...] [-v...]" >&2
   echo "               [-Q] [{--max-jobs | -j} number] [--cores number] [--dry-run]" >&2
-  echo "               [--keep-going] [-k] [--keep-failed] [-K] [--fallback] [--show-trace]" >&2
-  echo "               [-I path] [--option name value] [--arg name value] [--argstr name value]" >&2
-  echo "               [--flake flake] [--no-flake] [--update-input input flake] [--impure]" >&2
-  echo "               [--recreate-lock-file] [--no-update-lock-file] [--refresh]" >&2
-  echo "               [--offline] [--substituters substituters-list] ..." >&2
+  echo "               [--keep-going | -k] [--keep-failed | -K] [--fallback] [--show-trace]" >&2
+  echo "               [--print-build-logs | -L] [--impure] [-I path]" >&2
+  echo "               [--option name value] [--arg name value] [--argstr name value]" >&2
+  echo "               [--no-flake | [--flake flake]" >&2
+  echo "                             [--commit-lock-file] [--recreate-lock-file]" >&2
+  echo "                             [--no-update-lock-file] [--no-write-lock-file]" >&2
+  echo "                             [--override-input input flake] [--update-input input]" >&2
+  echo "                             [--no-registries] [--offline] [--refresh]]" >&2
+  echo "               [--substituters substituters-list] ..." >&2
   exit 1
 }
 
 sudo() {
+  # REMOVEME when support for macOS 10.13 is dropped
+  # macOS 10.13 does not support sudo --preserve-env so we make this conditional
   if command sudo --help | grep -- --preserve-env= >/dev/null; then
-    command sudo -H --preserve-env=PATH env "$@"
+    # We use `env` before our command to ensure the preserved PATH gets checked
+    # when trying to resolve the command to execute
+    command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION env "$@"
   else
     command sudo -H "$@"
   fi
@@ -149,41 +157,15 @@ fi
 
 # For convenience, use the hostname as the default configuration to
 # build from the flake.
-if [ -n "$flake" ]; then
-    # Offical regex from https://www.rfc-editor.org/rfc/rfc3986#appendix-B
-    if [[ "${flake}" =~ ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? ]]; then
-       scheme=${BASH_REMATCH[1]} # eg. http:
-       authority=${BASH_REMATCH[3]} # eg. //www.ics.uci.edu
-       path=${BASH_REMATCH[5]} # eg. /pub/ietf/uri/
-       queryWithQuestion=${BASH_REMATCH[6]}
-       fragment=${BASH_REMATCH[9]}
-
-       flake=${scheme}${authority}${path}${queryWithQuestion}
-       flakeAttr=${fragment}
+if [[ -n "$flake" ]]; then
+    if [[ $flake =~ ^(.*)\#([^\#\"]*)$ ]]; then
+       flake="${BASH_REMATCH[1]}"
+       flakeAttr="${BASH_REMATCH[2]}"
     fi
-    if [ -z "$flakeAttr" ]; then
+    if [[ -z "$flakeAttr" ]]; then
       flakeAttr=$(scutil --get LocalHostName)
     fi
     flakeAttr=darwinConfigurations.${flakeAttr}
-fi
-
-if [ -n "$flake" ]; then
-    if nix "${flakeFlags[@]}" flake metadata --version &>/dev/null; then
-        cmd=metadata
-    else
-        cmd=info
-    fi
-
-    metadata=$(nix "${flakeFlags[@]}" flake "$cmd" --json "${extraMetadataFlags[@]}" "${extraLockFlags[@]}" -- "$flake")
-    flake=$(jq -r .url <<<"${metadata}")
-
-    if [ "$(jq -r .resolved.submodules <<<"${metadata}")" = "true" ]; then
-      if [[ "$flake" == *'?'* ]]; then
-        flake="${flake}&submodules=1"
-      else
-        flake="${flake}?submodules=1"
-      fi
-    fi
 fi
 
 if [ "$action" != build ]; then

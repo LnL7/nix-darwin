@@ -46,12 +46,6 @@ in
   };
 
   config = mkIf cfg.enable {
-
-    assertions = [
-      { assertion = elem "ofborg" config.users.knownGroups; message = "set users.knownGroups to enable ofborg group"; }
-      { assertion = elem "ofborg" config.users.knownUsers; message = "set users.knownUsers to enable ofborg user"; }
-    ];
-
     warnings = mkIf (isDerivation cfg.configFile) [
       "services.ofborg.configFile is a derivation, credentials will be world readable"
     ];
@@ -87,8 +81,12 @@ in
     users.users.ofborg.shell = "/bin/bash";
     users.users.ofborg.description = "OfBorg service user";
 
+    users.knownUsers = [ "ofborg" ];
+
     users.groups.ofborg.gid = mkDefault 531;
     users.groups.ofborg.description = "Nix group for OfBorg service";
+
+    users.knownGroups = [ "ofborg" ];
 
     # FIXME: create logfiles automatically if defined.
     system.activationScripts.preActivation.text = ''

@@ -14,6 +14,7 @@
   ./system/activation-scripts.nix
   ./system/applications.nix
   ./system/defaults-write.nix
+  ./system/defaults/controlcenter.nix
   ./system/defaults/LaunchServices.nix
   ./system/defaults/NSGlobalDomain.nix
   ./system/defaults/GlobalPreferences.nix
@@ -21,6 +22,7 @@
   ./system/defaults/clock.nix
   ./system/defaults/dock.nix
   ./system/defaults/finder.nix
+  ./system/defaults/hitoolbox.nix
   ./system/defaults/screencapture.nix
   ./system/defaults/screensaver.nix
   ./system/defaults/alf.nix
@@ -52,7 +54,10 @@
   ./environment
   ./fonts
   ./launchd
+  ./power
+  ./power/sleep.nix
   ./services/activate-system
+  ./services/aerospace
   ./services/autossh.nix
   ./services/buildkite-agents.nix
   ./services/chunkwm.nix
@@ -72,6 +77,7 @@
   ./services/mopidy.nix
   ./services/monitoring/telegraf.nix
   ./services/monitoring/netdata.nix
+  ./services/monitoring/prometheus-node-exporter.nix
   ./services/netbird.nix
   ./services/nix-daemon.nix
   ./services/nix-gc
