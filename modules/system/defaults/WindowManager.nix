@@ -72,5 +72,13 @@ with lib;
         Hide widgets in Stage Manager.
       '';
     };
+
+    system.defaults.WindowManager.EnableTiledWindowMargins = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Tiled windows have margins. Default is true
+      '';
+    };
   };
 }
