@@ -5,6 +5,16 @@
     IFS="." read -r -a macOSVersion <<< "$(sw_vers -productVersion)"
 
     if [[ ''${macOSVersion[0]} -gt 10 || ( ''${macOSVersion[0]} -eq 10 && ''${macOSVersion[1]} -ge 15 ) ]]; then
+      if [[ $(stat -c '%a' /etc/synthetic.conf) != "644" ]]; then
+        echo "fixing permissions on /etc/synthetic.conf..."
+        sudo chmod 644 /etc/synthetic.conf
+      fi
+
+      if [[ $(grep -c '^run\b' /etc/synthetic.conf) -gt 1 ]]; then
+        echo "found duplicate run entries in /etc/synthetic.conf, removing..."
+        sudo sed -i "" -e '/^run\tprivate\/var\/run$/d' /etc/synthetic.conf
+      fi
+
       if ! grep -q '^run\b' /etc/synthetic.conf 2>/dev/null; then
         echo "setting up /run via /etc/synthetic.conf..."
         printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf >/dev/null
