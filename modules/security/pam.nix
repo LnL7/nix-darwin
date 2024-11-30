@@ -51,10 +51,10 @@ in
   {
     environment.etc."pam.d/sudo_local" = {
       enable = isPamEnabled;
-      text = lib.concatLines [
-        (lib.mkIf cfg.enablePamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
-        (lib.mkIf cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
-      ];
+      text = lib.concatLines (
+        (lib.optional cfg.enablePamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
+        ++ (lib.optional cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
+      );
     };
     system.activationScripts.pam.text =
     let
