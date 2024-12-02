@@ -9,6 +9,9 @@ let
     "defaults write ${domain} '${key}' $'${strings.escape [ "'" ] (generators.toPlist { } value)}'";
 
   defaultsToList = domain: attrs: mapAttrsToList (writeDefault domain) (filterAttrs (n: v: v != null) attrs);
+  # Filter out options to not pass through
+  # dock has alias options that we need to ignore
+  dockFiltered = (builtins.removeAttrs cfg.dock ["expose-group-by-app"]);
 
   # defaults
   alf = defaultsToList "/Library/Preferences/com.apple.alf" cfg.alf;
@@ -21,7 +24,7 @@ let
   LaunchServices = defaultsToList "com.apple.LaunchServices" cfg.LaunchServices;
   NSGlobalDomain = defaultsToList "-g" cfg.NSGlobalDomain;
   menuExtraClock = defaultsToList "com.apple.menuextra.clock" cfg.menuExtraClock;
-  dock = defaultsToList "com.apple.dock" cfg.dock;
+  dock = defaultsToList "com.apple.dock" dockFiltered;
   finder = defaultsToList "com.apple.finder" cfg.finder;
   hitoolbox = defaultsToList "com.apple.HIToolbox" cfg.hitoolbox;
   magicmouse = defaultsToList "com.apple.AppleMultitouchMouse" cfg.magicmouse;
