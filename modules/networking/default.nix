@@ -201,7 +201,10 @@ in
     in mkBefore [ localhostHosts stringHosts extraHosts ];
 
     environment.etc.hosts = {
-      copy = true;
+      knownSha256Hashes = [
+        "c7dd0e2ed261ce76d76f852596c5b54026b9a894fa481381ffd399b556c0e2da"
+      ];
+
       source = pkgs.concatText "hosts" cfg.hostFiles;
     };
   };
