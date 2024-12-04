@@ -36,7 +36,8 @@ in
             after-startup-command = lib.mkOption {
               type = listOf str;
               default = [ ];
-              description = "Do not use AeroSpace to run commands after startup. (Managed by launchd instead)";
+              description = "Add commands that run after AeroSpace startup";
+              example = [ "layout tiles" ];
             };
             enable-normalization-flatten-containers = lib.mkOption {
               type = bool;
@@ -140,10 +141,6 @@ in
         }
         {
           assertion = cfg.settings.after-login-command == [ ];
-          message = "AeroSpace will not run these commands as it does not start itself.";
-        }
-        {
-          assertion = cfg.settings.after-startup-command == [ ];
           message = "AeroSpace will not run these commands as it does not start itself.";
         }
       ];
