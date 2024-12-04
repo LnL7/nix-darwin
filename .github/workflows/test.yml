@@ -47,12 +47,14 @@ jobs:
         sudo cp modules/examples/simple.nix /etc/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+        etcHostsHash=$(shasum -a 256 /etc/hosts | cut -d ' ' -f 1)
         sudo /usr/bin/sed -i.bak \
           "s/# programs.fish.enable = true;/ \
             imports = [ \
               ({ options, ... }: { \
                 nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; \
                 environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ]; \
+                environment.etc.hosts.knownSha256Hashes = [ \"$etcHostsHash\" ]; \
                 nix.nixPath = \
                   [ { darwin = \"${PWD////\/}\"; } ] \
                   ++ options.nix.nixPath.default; \
@@ -102,8 +104,9 @@ jobs:
         pushd /etc/nix-darwin
           sudo nix flake init -t $darwin
           nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
+          etcHostsHash=$(shasum -a 256 /etc/hosts | cut -d ' ' -f 1)
           sudo /usr/bin/sed -i.bak \
-            "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+            "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ]; environment.etc.hosts.knownSha256Hashes = [ \"$etcHostsHash\" ];/" \
             flake.nix
           sudo /usr/bin/sed -i.bak \
             's/darwinConfigurations."simple"/darwinConfigurations."'$(scutil --get LocalHostName)'"/g' \

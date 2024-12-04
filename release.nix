@@ -86,6 +86,7 @@ in {
   tests.launchd-daemons = makeTest ./tests/launchd-daemons.nix;
   tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
   tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
+  tests.networking-hosts = makeTest ./tests/networking-hosts.nix;
   tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
   tests.nix-enable = makeTest ./tests/nix-enable.nix;
   tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
