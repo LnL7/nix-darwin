@@ -763,8 +763,8 @@ in
 
         {
           # Should be fixed in Lix by https://gerrit.lix.systems/c/lix/+/2100
-          # As `isNixAtLeast "2.92.0" "2.92.0-devpre20241107" == false`, we need to explicitly check if the user is running Lix 2.92.0
-          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0-devpre20241107" || cfg.package.version == "2.92.0"));
+          # Lix 2.92.0 will set `VERSION_SUFFIX` to `""`; `lib.versionAtLeast "" "pre20241107"` will return `true`.
+          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0" && versionAtLeast (strings.removePrefix "-" cfg.package.VERSION_SUFFIX) "pre20241107"));
           message = "`nix.settings.auto-optimise-store` is known to corrupt the Nix Store, please use `nix.optimise.automatic` instead.";
         }
       ];
