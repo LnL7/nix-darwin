@@ -8,6 +8,7 @@ in
   services.aerospace.enable = true;
   services.aerospace.package = aerospace;
   services.aerospace.settings = {
+    after-startup-command = [ "layout tiles" ];
     gaps = {
       outer.left = 8;
       outer.bottom = 8;
@@ -31,6 +32,16 @@ in
       ${config.out}/user/Library/LaunchAgents/org.nixos.aerospace.plist`
 
     echo >&2 "checking config in $conf"
-    if [ `cat $conf | wc -l` -eq "27" ]; then echo "aerospace.toml config correctly contains 27 lines"; else return 1; fi
+    grep 'after-startup-command = \["layout tiles"\]' $conf
+
+    grep 'bottom = 8' $conf
+    grep 'left = 8' $conf
+    grep 'right = 8' $conf
+    grep 'top = 8' $conf
+
+    grep 'alt-h = "focus left"' $conf
+    grep 'alt-j = "focus down"' $conf
+    grep 'alt-k = "focus up"' $conf
+    grep 'alt-l = "focus right"' $conf
   '';
 }
