@@ -11,24 +11,16 @@
 
     file=${config.out}/etc/hosts
 
-    if [[ ! $(grep '127.0.0.1' $file | head -n1) =~ localhost$ ]]; then
-      cat $file
-      echo "'$(grep '127.0.0.1' $file | head -n1)'"
+    if ! grep '127.0.0.1' $file | head -n1 | grep localhost$; then
       exit 1
     fi
-    if [[ ! $(grep '127.0.0.1' $file | tail -n1) =~ my.super.host$ ]]; then
-      cat $file
-      echo "'$(grep '127.0.0.1' $file | tail -n1)'"
+    if ! grep '127.0.0.1' $file | tail -n1 | grep my.super.host$; then
       exit 2
     fi
-    if [[ ! $(grep '::1' $file) =~ localhost$ ]]; then
-      cat $file
-      echo "'$(grep '::1' $file)'"
+    if ! grep '::1' $file | grep localhost$; then
       exit 3
     fi
-    if [[ ! $(grep '10.0.0.1' $file) =~ my.super.host\ my.other.host$ ]]; then
-      cat $file
-      echo "'$(grep '10.0.0.1' $file)'"
+    if ! grep '10.0.0.1' $file | grep my.super.host\ my.other.host$; then
       exit 4
     fi
   '';
