@@ -9,7 +9,9 @@ let
   cfg = config.services.aerospace;
 
   format = pkgs.formats.toml { };
-  configFile = format.generate "aerospace.toml" cfg.settings;
+  baseConfigFile = format.generate "aerospace-base.toml" cfg.settings;
+  baseConfig = builtins.readFile baseConfigFile;
+  configFile = pkgs.writeText "aerospace.toml" (baseConfig + "\n" + cfg.extraConfig);
 in
 
 {
@@ -71,11 +73,6 @@ in
               default = "auto";
               description = "Default orientation for the root container.";
             };
-            on-window-detected = lib.mkOption {
-              type = listOf str;
-              default = [ ];
-              description = "Commands to run every time a new window is detected.";
-            };
             on-focus-changed = lib.mkOption {
               type = listOf str;
               default = [ ];
@@ -129,6 +126,17 @@ in
           for supported values.
         '';
       };
+
+      extraConfig = lib.mkOption {
+        type = str;
+        default = "";
+        example = ''
+          [[on-window-detected]]
+          if.app-id = "com.alexandersandberg.balance"
+          run = "layout floating"
+        '';
+        description = "Extra configuration to append to the generated configuration file.";
+      };
     };
   };
 
@@ -142,6 +150,10 @@ in
         {
           assertion = cfg.settings.after-login-command == [ ];
           message = "AeroSpace will not run these commands as it does not start itself.";
+        }
+        {
+          assertion = !(cfg.settings ? on-window-detected);
+          message = "Nix TOML formatter cannot parse this option, entries must be manually added to extraConfig. See https://nikitabobko.github.io/AeroSpace/guide#on-window-detected-callback for format.";
         }
       ];
       environment.systemPackages = [ cfg.package ];
