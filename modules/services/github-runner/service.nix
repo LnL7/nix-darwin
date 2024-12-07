@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
-with lib;
+
 let
+  inherit (lib) any attrValues boolToString concatStringsSep escapeShellArg
+    flatten flip getExe hasAttr hasPrefix mapAttrsToList mapAttrs' mkBefore
+    mkDefault mkIf mkMerge nameValuePair optionalAttrs optionalString replaceStrings;
+
   mkSvcName = name: "github-runner-${name}";
   mkStateDir = cfg: "/var/lib/github-runners/${cfg.name}";
   mkLogDir = cfg: "/var/log/github-runners/${cfg.name}";

@@ -3,7 +3,9 @@
 , ...
 }:
 
-with lib;
+let
+  inherit (lib) literalExpression mkOption mkPackageOption types;
+in
 {
   options.services.github-runners = mkOption {
     description = ''
