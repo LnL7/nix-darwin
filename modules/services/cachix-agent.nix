@@ -61,7 +61,7 @@ in {
       path = [ config.nix.package pkgs.coreutils config.environment.systemPath ];
 
       environment = {
-        NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        inherit (config.environment.variables) NIX_SSL_CERT_FILE;
         USER = "root";
       };
 
