@@ -59,6 +59,8 @@ in
             ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
 
             ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkLogDir cfg)}
+            # launchd will fail to start the service if the outer direction doesn't have sufficient permissions
+            ${getExe' pkgs.coreutils "chmod"} o+rx ${escapeShellArg (mkLogDir { name = ""; })}
             ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
 
             ${optionalString (cfg.workDir == null) ''
