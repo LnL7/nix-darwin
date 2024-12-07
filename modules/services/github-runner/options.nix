@@ -90,6 +90,9 @@ in
 
             Changing this option or the `tokenFile`’s content triggers a new runner registration.
 
+            You can also manually trigger a new runner registration by deleting
+            {file}`/var/lib/github-runners/<name>/.runner` and restarting the service.
+
             We suggest using the fine-grained PATs. A runner registration token is valid
             only for 1 hour after creation, so the next time the runner configuration changes
             this will give you hard-to-debug HTTP 404 errors in the configure step.
