@@ -2,7 +2,7 @@
 
 let
   inherit (lib) any attrValues boolToString concatStringsSep escapeShellArg
-    flatten flip getExe hasAttr hasPrefix mapAttrsToList mapAttrs' mkBefore
+    flatten flip getExe getExe' hasAttr hasPrefix mapAttrsToList mapAttrs' mkBefore
     mkDefault mkIf mkMerge nameValuePair optionalAttrs optionalString replaceStrings;
 
   mkSvcName = name: "github-runner-${name}";
@@ -55,15 +55,15 @@ in
           (
             umask -S u=rwx,g=rx,o= > /dev/null
 
-            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkStateDir cfg)}
-            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+            ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkStateDir cfg)}
+            ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
 
-            ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkLogDir cfg)}
-            ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
+            ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkLogDir cfg)}
+            ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
 
             ${optionalString (cfg.workDir == null) ''
-              ${pkgs.coreutils}/bin/mkdir -p ${escapeShellArg (mkWorkDir cfg)}
-              ${pkgs.coreutils}/bin/chown ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+              ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkWorkDir cfg)}
+              ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
             ''}
           )
         '');
@@ -127,7 +127,7 @@ in
                 else
                   args+=(--token "$token")
                 fi
-                ${package}/bin/config.sh "''${args[@]}"
+                ${getExe' package "config.sh"} "''${args[@]}"
               '';
             };
           in
@@ -135,12 +135,12 @@ in
             echo "Configuring GitHub Actions Runner"
 
             # Always clean the working directory
-            ${pkgs.findutils}/bin/find ${escapeShellArg workDir} -mindepth 1 -delete
+            ${getExe pkgs.findutils} ${escapeShellArg workDir} -mindepth 1 -delete
 
             # Clean the $RUNNER_ROOT if we are in ephemeral mode
             if ${boolToString cfg.ephemeral}; then
               echo "Cleaning $RUNNER_ROOT"
-              ${pkgs.findutils}/bin/find "$RUNNER_ROOT" -mindepth 1 -delete
+              ${getExe pkgs.findutils} "$RUNNER_ROOT" -mindepth 1 -delete
             fi
 
             # If the `.runner` file does not exist, we assume the runner is not configured
@@ -149,7 +149,7 @@ in
             fi
 
             # Start the service
-            ${package}/bin/Runner.Listener run --startuptype service
+            ${getExe' package "Runner.Listener"} run --startuptype service
           '';
 
         serviceConfig = mkMerge [
