@@ -51,7 +51,16 @@
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
   system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
-  system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
+  system.defaults.dock.persistent-others = [
+    "~/Documents"
+    "~/Downloads/file.txt"
+    {
+      path = "~/Appications";
+      displayas = "folder";
+      showas = "fan";
+      arrangement = "date-modified";
+    }
+  ];
   system.defaults.dock.scroll-to-open = false;
   system.defaults.finder.AppleShowAllFiles = true;
   system.defaults.finder.ShowStatusBar = true;
@@ -122,6 +131,10 @@
       out = '${config.out}/${x}'
       if Path(fixture).read_text() not in Path(out).read_text():
         print("Did not find content from %s in %s" % (fixture, out), file=sys.stderr)
+        print("Expected:", file=sys.stderr)
+        print(Path(fixture).read_text(), file=sys.stderr)
+        print("Got:", file=sys.stderr)
+        print(Path(out).read_text(), file=sys.stderr)
         sys.exit(1)
       EOL
     '') [
