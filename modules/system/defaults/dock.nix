@@ -5,6 +5,54 @@ with lib;
 let
   # Should only be used with options that previously used floats defined as strings.
   inherit (config.lib.defaults.types) floatWithDeprecationError;
+
+persistentOther = types.submodule {
+    options = {
+      path = lib.mkOption {
+        type = types.either types.path types.str;
+        description = "Path as either a path type or string";
+      };
+      arrangement = let
+        values = [
+          "automatic"       # 0
+          "name"            # 1
+          "date-added"      # 2
+          "date-modified"   # 3
+          "date-created"    # 4
+          "kind"            # 5
+        ];
+      in lib.mkOption {
+        type = types.nullOr (types.enum values);
+        default = null;
+        description = "Sort items by specified criteria";
+        apply = value: lib.lists.findFirstIndex (x: x == value) 0 values;
+      };
+      showas = let
+        values = [
+          "automatic"      # 0
+          "fan"            # 1
+          "grid"           # 2
+          "list"           # 3
+        ];
+      in lib.mkOption {
+        type = types.nullOr (types.enum values);
+        default = null;
+        description = "View content as specified style";
+        apply = value: lib.lists.findFirstIndex (x: x == value) 0 values;
+      };
+      displayas = let
+        values = [
+          "stack"          # 0
+          "folder"         # 1
+        ];
+      in lib.mkOption {
+        type = types.nullOr (types.enum values);
+        default = null;
+        description = "Display item as stack or folder";
+        apply = value: lib.lists.findFirstIndex (x: x == value) 0 values;
+      };
+    };
+  };
 in {
   imports = [
     (mkRenamedOptionModule [ "system" "defaults" "dock" "expose-group-by-app" ] [ "system" "defaults" "dock" "expose-group-apps" ])
@@ -141,16 +189,34 @@ in {
     };
 
     system.defaults.dock.persistent-others = mkOption {
-      type = types.nullOr (types.listOf (types.either types.path types.str));
+      type = types.nullOr (types.listOf (types.oneOf [ types.path types.str persistentOther ]));
       default = null;
       example = [ "~/Documents" "~/Downloads" ];
       description = ''
         Persistent folders in the dock.
       '';
       apply = value:
-        if !(isList value)
+        if !(lib.isList value)
         then value
-        else map (folder: { tile-data = { file-data = { _CFURLString = "file://" + folder; _CFURLStringType = 15; }; }; tile-type = if strings.hasInfix "." (last (splitString "/" folder)) then "file-tile" else "directory-tile"; }) value;
+        else map (folder: 
+          let
+            folderPath = if builtins.isAttrs folder then toString folder.path else toString folder;
+            isSimplePath = !(builtins.isAttrs folder);
+          in {
+            tile-data = {
+              file-data = {
+                _CFURLString = "file://" + folderPath;
+                _CFURLStringType = 15;
+              };
+            } // (if isSimplePath then {} else lib.filterAttrs (n: v: v != null) {
+              arrangement = folder.arrangement;
+              showas = folder.showas;
+              displayas = folder.displayas;
+            });
+            tile-type = if lib.strings.hasInfix "." (lib.last (lib.splitString "/" folderPath))
+              then "file-tile"
+              else "directory-tile";
+          }) value;
     };
 
     system.defaults.dock.scroll-to-open = mkOption {
