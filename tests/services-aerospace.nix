@@ -21,6 +21,32 @@ in
       alt-k = "focus up";
       alt-l = "focus right";
     };
+    on-window-detected = [
+      {
+        "if" = {
+          app-id = "Another.Cool.App";
+          during-aerospace-startup = false;
+        };
+        check-further-callbacks = false;
+        run = "move-node-to-workspace m";
+      }
+      {
+        "if".app-name-regex-substring = "finder|calendar";
+        run = "layout floating";
+      }
+      {
+        "if".workspace = "1";
+        run = "layout h_accordion";
+      }
+    ];
+    workspace-to-monitor-force-assignment = {
+        "1" = 1;
+        "2" = "main";
+        "3" = "secondary";
+        "4" = "built-in";
+        "5" = "^built-in retina display$";
+        "6" = [ "secondary" "dell" ];
+    };
   };
 
   test = ''
@@ -43,5 +69,24 @@ in
     grep 'alt-j = "focus down"' $conf
     grep 'alt-k = "focus up"' $conf
     grep 'alt-l = "focus right"' $conf
+
+    grep 'check-further-callbacks = false' $conf
+    grep 'run = "move-node-to-workspace m"' $conf
+    grep 'app-id = "Another.Cool.App"' $conf
+    grep 'during-aerospace-startup = false' $conf
+
+    grep 'run = "layout floating"' $conf
+    grep 'app-name-regex-substring = "finder|calendar"' $conf
+    (! grep 'window-title-regex-substring' $conf)
+    
+    grep 'workspace = "1"' $conf
+    grep 'run = "layout h_accordion"' $conf
+
+    grep '1 = 1' $conf
+    grep '2 = "main"' $conf
+    grep '3 = "secondary"' $conf
+    grep '4 = "built-in"' $conf
+    grep '5 = "^built-in retina display$"' $conf
+    grep '6 = \["secondary", "dell"\]' $conf
   '';
 }
