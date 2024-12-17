@@ -34,6 +34,10 @@ in
         "if".app-name-regex-substring = "finder|calendar";
         run = "layout floating";
       }
+      {
+        "if".workspace = "1";
+        run = "layout h_accordion";
+      }
     ];
     workspace-to-monitor-force-assignment = {
         "1" = 1;
@@ -73,6 +77,10 @@ in
 
     grep 'run = "layout floating"' $conf
     grep 'app-name-regex-substring = "finder|calendar"' $conf
+    (! grep 'window-title-regex-substring' $conf)
+    
+    grep 'workspace = "1"' $conf
+    grep 'run = "layout h_accordion"' $conf
 
     grep '1 = 1' $conf
     grep '2 = "main"' $conf
