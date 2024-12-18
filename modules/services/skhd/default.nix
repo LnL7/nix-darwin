@@ -29,6 +29,20 @@ in
       example = "alt + shift - r   :   chunkc quit";
       description = "Config to use for {file}`skhdrc`.";
     };
+
+    errorLogFile = mkOption {
+      type = types.path;
+      default = "/tmp/skhd.err.log";
+      example = "/Users/khaneliman/Library/Logs/skhd.log";
+      description = "Path to the error log file.";
+    };
+
+    outLogFile = mkOption {
+      type = types.path;
+      default = "/tmp/skhd.out.log";
+      example = "/Users/khaneliman/Library/Logs/skhd.log";
+      description = "Path to the stdout log file.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -49,6 +63,8 @@ in
           ];
         KeepAlive = true;
         ProcessType = "Interactive";
+        StandardErrorPath = cfg.errorLogFile;
+        StandardOutPath = cfg.outLogFile;
       };
     };
   };
