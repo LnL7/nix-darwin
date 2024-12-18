@@ -1,15 +1,26 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  inherit (lib) literalExpression maintainers mkEnableOption mkIf mkPackageOption mkOption optionals types;
+  inherit (lib)
+    literalExpression
+    maintainers
+    mkEnableOption
+    mkIf
+    mkPackageOption
+    mkOption
+    optionals
+    types
+    ;
 
   cfg = config.services.sketchybar;
 
   configFile = pkgs.writeScript "sketchybarrc" cfg.config;
 in
-
 {
-
   meta.maintainers = [
     maintainers.azuwis or "azuwis"
   ];
@@ -43,6 +54,13 @@ in
         and [example](https://github.com/FelixKratz/SketchyBar/blob/master/sketchybarrc).
       '';
     };
+
+    logFile = mkOption {
+      type = types.nullOr types.path;
+      default = "/var/tmp/sketchybar.log";
+      example = "/Users/khaneliman/Library/Logs/sketchybar.log";
+      description = "Absolute path to log all stderr and stdout";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -50,10 +68,18 @@ in
 
     launchd.user.agents.sketchybar = {
       path = [ cfg.package ] ++ cfg.extraPackages ++ [ config.environment.systemPath ];
-      serviceConfig.ProgramArguments = [ "${cfg.package}/bin/sketchybar" ]
-        ++ optionals (cfg.config != "") [ "--config" "${configFile}" ];
-      serviceConfig.KeepAlive = true;
-      serviceConfig.RunAtLoad = true;
+      serviceConfig = {
+        ProgramArguments =
+          [ "${cfg.package}/bin/sketchybar" ]
+          ++ optionals (cfg.config != "") [
+            "--config"
+            "${configFile}"
+          ];
+        KeepAlive = true;
+        RunAtLoad = true;
+        StandardErrorPath = cfg.logFile;
+        StandardOutPath = cfg.logFile;
+      };
     };
   };
 }
