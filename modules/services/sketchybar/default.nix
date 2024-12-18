@@ -54,6 +54,20 @@ in
         and [example](https://github.com/FelixKratz/SketchyBar/blob/master/sketchybarrc).
       '';
     };
+
+    errorLogFile = mkOption {
+      type = types.nullOr types.path;
+      default = "/tmp/sketchybar.err.log";
+      example = "/Users/khaneliman/Library/Logs/sketchybar.log";
+      description = "Absolute path to log all stderr output.";
+    };
+
+    outLogFile = mkOption {
+      type = types.nullOr types.path;
+      default = "/tmp/sketchybar.out.log";
+      example = "/Users/khaneliman/Library/Logs/sketchybar.log";
+      description = "Absolute path to log all stdout output.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -70,6 +84,8 @@ in
           ];
         KeepAlive = true;
         RunAtLoad = true;
+        StandardErrorPath = cfg.errorLogFile;
+        StandardOutPath = cfg.outLogFile;
       };
     };
   };
