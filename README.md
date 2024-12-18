@@ -16,9 +16,8 @@ The only prerequisite is a Nix implementation, both Nix and Lix are supported.
 As the official Nix installer does not include an automated uninstaller, and manual uninstallation on macOS is a complex process, we recommend using one of the following installers instead:
 
 - The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
+
 * The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
-
-
 
 ## Getting started
 
@@ -81,8 +80,12 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-nix run nix-darwin -- switch --flake ~/.config/nix-darwin
+nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake ~/.config/nix-darwin
 ```
+
+Remember to back up and remove your `/etc/nix/nix.conf` beforehand. If you forget, you will be reminded.
+
+Since removing `/etc/nix/nix.conf` would disable experimental features, you must have `--extra-experimental-features 'nix-command flakes'` passed as arguments to `nix run`.
 
 ### Step 3. Using `nix-darwin`
 
@@ -110,6 +113,7 @@ nix-darwin.lib.darwinSystem {
 { pkgs, lib, inputs }:
 # inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
 ```
+
 </details>
 
 <details>
@@ -150,6 +154,7 @@ You can update `nix-darwin` using the following command:
 ```bash
 nix-channel --update darwin
 ```
+
 </details>
 
 ## Documentation
@@ -212,5 +217,6 @@ The `or` operator takes care of graceful degradation when `lib` from Nixpkgs
 goes out of sync.
 
 Also feel free to contact me if you have questions,
+
 - Matrix - @daiderd:matrix.org, you can find me in [#macos:nixos.org](https://matrix.to/#/#macos:nixos.org)
 - @LnL7 on twitter
