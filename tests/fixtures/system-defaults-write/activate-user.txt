@@ -255,7 +255,7 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>MyApp.app</string>
+				<string>/Applications/MyApp.app</string>
 				<key>_CFURLStringType</key>
 				<integer>0</integer>
 			</dict>
@@ -267,7 +267,7 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>Cool.app</string>
+				<string>/Applications/Cool.app</string>
 				<key>_CFURLStringType</key>
 				<integer>0</integer>
 			</dict>
@@ -288,6 +288,34 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 		</dict>
 		<key>tile-type</key>
 		<string>spacer-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file:///Applications/Utilities</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>directory-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file:///Users/example/Downloads/test.csv</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>file-tile</string>
 	</dict>
 </array>
 </plist>'
