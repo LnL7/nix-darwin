@@ -72,6 +72,20 @@ in
       '';
       description = "Extra arbitrary configuration to append to the configuration file";
     };
+
+    errorLogFile = mkOption {
+      type = types.path;
+      default = "/tmp/yabai.err.log";
+      example = "/Users/khaneliman/Library/Logs/yabai.log";
+      description = "Path to the yabai error log file";
+    };
+
+    outLogFile = mkOption {
+      type = types.path;
+      default = "/tmp/yabai.out.log";
+      example = "/Users/khaneliman/Library/Logs/yabai.log";
+      description = "Path to the yabai stdout log file";
+    };
   };
 
   config = lib.mkMerge [
@@ -91,6 +105,8 @@ in
           EnvironmentVariables = {
             PATH = "${cfg.package}/bin:${config.environment.systemPath}";
           };
+          StandardOutPath = cfg.outLogFile;
+          StandardErrorPath = cfg.errorLogFile;
         };
       };
     })
@@ -102,6 +118,8 @@ in
         serviceConfig = {
           RunAtLoad = true;
           KeepAlive.SuccessfulExit = false;
+          StandardOutPath = "/var/log/yabai-sa.out.log";
+          StandardErrorPath = "/var/log/yabai-sa.err.log";
         };
       };
 
