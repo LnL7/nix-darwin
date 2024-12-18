@@ -128,18 +128,69 @@ in {
     };
 
     system.defaults.dock.persistent-apps = mkOption {
-      type = types.nullOr (types.listOf (types.either types.path types.str));
+      type = let
+        taggedType = types.attrTag {
+              app = mkOption {
+                description = "An application to be added to the dock.";
+                type = types.submodule {
+                  options.path = mkOption {
+                    description = "Path to the application.";
+                    type = types.str;
+                  };
+                };
+              };
+              spacer = mkOption {
+                description = "A spacer to be added to the dock. Can be small or regular size.";
+                type = types.submodule {
+                  options.small = mkOption {
+                    description = "Whether the spacer is small.";
+                    type = types.bool;
+                    default = false;
+                  };
+                };
+              };
+              folder = mkOption {
+                description = "A folder to be added to the dock.";
+                type = types.submodule {
+                  options.path = mkOption {
+                    description = "Path to the folder.";
+                    type = types.str;
+                  };
+                };
+              };
+            };
+
+        simpleType = types.either types.str types.path;
+        toTagged = (path: {app = {inherit path;};});
+        in
+      types.nullOr (types.listOf (types.coercedTo simpleType toTagged taggedType));
       default = null;
-      example = [ "/Applications/Safari.app" "/System/Applications/Utilities/Terminal.app" ];
+      example = [
+        { app = { path = "/Applications/Safari.app"; }; }
+        { spacer = { small = false; }; }
+        { spacer = { small = true; }; }
+        { folder = { path = "/System/Applications/Utilities"; }; }
+      ];
       description = ''
-        Persistent applications in the dock.
+        Persistent applications, spacers, and folders in the dock.
       '';
       apply =
       let
-        tileTypes = ["spacer-tile" "small-spacer-tile"];
-        toSpecialTile = type: { tile-data = {}; tile-type = type; };
-        toAppTile = cfurl: { tile-data = { file-data = { _CFURLString = cfurl; _CFURLStringType = 0; }; }; };
-        toTile = s: if elem s tileTypes then toSpecialTile s else toAppTile s;
+        toTile = item: if item ? app then {
+        tile-data.file-data = {
+          _CFURLString = item.app.path;
+          _CFURLStringType = 0;
+        };
+        } else if item ? spacer then {
+          tile-data = { };
+          tile-type = if item.spacer.small then "small-spacer-tile" else "spacer-tile";
+        } else if item ? folder then {
+          tile-data.file-data = {
+            _CFURLString = "file://" + item.folder.path;
+            _CFURLStringType = 15;
+          };
+          tile-type = if strings.hasInfix "." (last (splitString "/" item.folder.path)) then "file-tile" else "directory-tile";
+        } else item;
       in
       value: if isList value then map toTile value else value;
     };
