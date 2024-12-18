@@ -29,6 +29,13 @@ in
       example = "alt + shift - r   :   chunkc quit";
       description = "Config to use for {file}`skhdrc`.";
     };
+
+    logFile = mkOption {
+      type = types.path;
+      default = "/var/tmp/skhd.log";
+      example = "/Users/khaneliman/Library/Logs/skhd.log";
+      description = "Path to the log file.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -49,6 +56,8 @@ in
           ];
         KeepAlive = true;
         ProcessType = "Interactive";
+        StandardErrorPath = cfg.logFile;
+        StandardOutPath = cfg.logFile;
       };
     };
   };
