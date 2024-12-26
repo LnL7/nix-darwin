@@ -5,6 +5,15 @@ with lib;
 {
   options = {
 
+    system.defaults.universalaccess.flashScreen = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable screen flash as interface feedback.
+        The default is false.
+      '';
+    };
+
     system.defaults.universalaccess.mouseDriverCursorSize = mkOption {
       type = types.nullOr types.float;
       default = null;
