@@ -15,6 +15,8 @@ in
       default = null;
       description = ''
         Whether to restart the computer after a power failure.
+
+        Option is not supported on all devices.
       '';
     };
 
@@ -33,8 +35,10 @@ in
       echo "configuring power..." >&2
 
       ${lib.optionalString (cfg.restartAfterPowerFailure != null) ''
-        systemsetup -setRestartPowerFailure \
-          '${onOff cfg.restartAfterPowerFailure}' &> /dev/null
+        if ! systemsetup -getRestartPowerFailure | grep -q "Not supported"; then
+          systemsetup -setRestartPowerFailure \
+            '${onOff cfg.restartAfterPowerFailure}' &> /dev/null
+        fi
       ''}
 
       ${lib.optionalString (cfg.restartAfterFreeze != null) ''
