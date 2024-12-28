@@ -48,5 +48,20 @@ with lib;
         Show thumbnail after screencapture before writing to file. The default is true.
       '';
     };
+
+    system.defaults.screencapture.target = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Target to which screencapture should save screenshot to. The default is "file".
+        Valid values include:
+
+        * `file`: Saves as a file in location specified by `system.defaults.screencapture.location`
+        * `clipboard`: Saves screenshot to clipboard
+        * `preview`: Opens screenshot in Preview app
+        * `mail`
+        * `messages`
+      '';
+    };
   };
 }
