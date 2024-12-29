@@ -308,6 +308,15 @@ let
         exit 2
     fi
   '';
+
+  # some mac devices, notably notebook do not support restartAfterPowerFailure option
+  restartAfterPowerFailureIsSupported = ''
+    if sudo /usr/sbin/systemsetup -getRestartPowerFailure | grep -q "Not supported"; then
+       echo "[1;31merror: Your system do not support the restartAfterPowerFailure feature[0m" >&2
+       echo "Please ensure that power.restartAfterPowerFailure is not set." >&2
+       exit 2
+    fi
+  '';
 in
 
 {
@@ -357,6 +366,7 @@ in
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
       (mkIf config.homebrew.enable homebrewInstalled)
+      (mkIf (config.power.restartAfterPowerFailure != null) restartAfterPowerFailureIsSupported)
     ];
 
     system.activationScripts.checks.text = ''

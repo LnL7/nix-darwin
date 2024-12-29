@@ -35,10 +35,8 @@ in
       echo "configuring power..." >&2
 
       ${lib.optionalString (cfg.restartAfterPowerFailure != null) ''
-        if ! systemsetup -getRestartPowerFailure | grep -q "Not supported"; then
-          systemsetup -setRestartPowerFailure \
-            '${onOff cfg.restartAfterPowerFailure}' &> /dev/null
-        fi
+        systemsetup -setRestartPowerFailure \
+          '${onOff cfg.restartAfterPowerFailure}' &> /dev/null
       ''}
 
       ${lib.optionalString (cfg.restartAfterFreeze != null) ''
