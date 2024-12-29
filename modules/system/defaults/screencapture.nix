@@ -50,7 +50,7 @@ with lib;
     };
 
     system.defaults.screencapture.target = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr (types.enum [ "file" "clipboard" "preview" "mail" "messages" ]);
       default = null;
       description = ''
         Target to which screencapture should save screenshot to. The default is "file".
