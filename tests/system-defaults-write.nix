@@ -74,6 +74,7 @@
   system.defaults.finder.ShowRemovableMediaOnDesktop = false;
   system.defaults.hitoolbox.AppleFnUsageType = "Show Emoji & Symbols";
   system.defaults.screencapture.location = "/tmp";
+  system.defaults.screencapture.target = "file";
   system.defaults.screencapture.include-date = true;
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;
