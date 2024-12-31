@@ -551,7 +551,7 @@ in
     launchd.daemons.gitlab-runner = {
       environment = { #config.networking.proxy.envVars // {
         HOME = "${config.users.users.gitlab-runner.home}";
-        NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        inherit (config.environment.variables) NIX_SSL_CERT_FILE;
       } // (if config.nix.useDaemon then { NIX_REMOTE = "daemon"; } else {});
       path = with pkgs; [
         bash

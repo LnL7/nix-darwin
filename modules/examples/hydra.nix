@@ -3,7 +3,7 @@
 let
   environment = lib.concatStringsSep " "
     [ "NIX_REMOTE=daemon"
-      "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+      "NIX_SSL_CERT_FILE=${config.environment.variables.NIX_SSL_CERT_FILE}"
     ];
 in
 

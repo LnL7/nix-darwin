@@ -63,7 +63,7 @@ in
       path = [ config.nix.package pkgs.bash pkgs.coreutils pkgs.curl pkgs.git ];
       environment =
         { RUST_BACKTRACE = "1";
-          NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+          inherit (config.environment.variables) NIX_SSL_CERT_FILE;
         };
 
       serviceConfig.KeepAlive = true;
