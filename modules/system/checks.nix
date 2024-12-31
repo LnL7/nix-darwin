@@ -312,8 +312,8 @@ let
   # some mac devices, notably notebook do not support restartAfterPowerFailure option
   restartAfterPowerFailureIsSupported = ''
     if sudo /usr/sbin/systemsetup -getRestartPowerFailure | grep -q "Not supported"; then
-       echo "[1;31merror: Your system do not support the restartAfterPowerFailure feature[0m" >&2
-       echo "Please ensure that power.restartAfterPowerFailure is not set." >&2
+       printf >&2 "�[1;31merror: restarting after power failure is not supported on your machine�[0m\n" >&2
+       printf >&2 "Please ensure that `power.restartAfterPowerFailure` is not set.\n" >&2
        exit 2
     fi
   '';
