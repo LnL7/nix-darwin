@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  CURRENT_STABLE_CHANNEL: nixpkgs-24.05-darwin
+  CURRENT_STABLE_CHANNEL: nixpkgs-24.11-darwin
 
 jobs:
   test-stable:
