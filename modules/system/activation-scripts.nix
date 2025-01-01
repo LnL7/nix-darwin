@@ -71,6 +71,7 @@ in
       ${cfg.activationScripts.keyboard.text}
       ${cfg.activationScripts.fonts.text}
       ${cfg.activationScripts.nvram.text}
+      ${cfg.activationScripts.jdks.text}
 
       ${cfg.activationScripts.postActivation.text}
 
