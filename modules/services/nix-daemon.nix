@@ -1,16 +1,16 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
+{ config, lib, ... }:
 
 let
   cfg = config.services.nix-daemon;
+
+  inherit (lib) mkDefault mkIf mkMerge mkOption types;
 in
 
 {
   options = {
     services.nix-daemon.enable = mkOption {
       type = types.bool;
-      default = false;
+      default = true;
       description = "Whether to enable the nix-daemon service.";
     };
 

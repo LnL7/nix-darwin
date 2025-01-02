@@ -114,6 +114,15 @@ in
       type = with types; attrsOf (submodule userOptions);
     };
 
+    programs.ssh.extraConfig = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = ''
+        Extra configuration text loaded in {file}`ssh_config`.
+        See {manpage}`ssh_config(5)` for help.
+      '';
+    };
+
     programs.ssh.knownHosts = mkOption {
       default = {};
       type = types.attrsOf (types.submodule host);
@@ -151,6 +160,7 @@ in
               + (if h.publicKey != null then h.publicKey else readFile h.publicKeyFile)
             )) + "\n";
         };
+        "ssh/ssh_config.d/100-nix-darwin.conf".text = config.programs.ssh.extraConfig;
         "ssh/sshd_config.d/101-authorized-keys.conf" = {
           text = ''
             # sshd doesn't like reading from symbolic links, so we cat

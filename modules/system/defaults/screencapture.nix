@@ -29,11 +29,38 @@ with lib;
         '';
     };
 
+    system.defaults.screencapture.include-date = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Include date and time in screenshot filenames. The default is true.
+        Screenshot 2024-01-09 at 13.27.20.png would be an example for true.
+        
+        Screenshot.png
+        Screenshot 1.png would be an example for false.
+      '';
+    };
+
     system.defaults.screencapture.show-thumbnail = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
         Show thumbnail after screencapture before writing to file. The default is true.
+      '';
+    };
+
+    system.defaults.screencapture.target = mkOption {
+      type = types.nullOr (types.enum [ "file" "clipboard" "preview" "mail" "messages" ]);
+      default = null;
+      description = ''
+        Target to which screencapture should save screenshot to. The default is "file".
+        Valid values include:
+
+        * `file`: Saves as a file in location specified by `system.defaults.screencapture.location`
+        * `clipboard`: Saves screenshot to clipboard
+        * `preview`: Opens screenshot in Preview app
+        * `mail`
+        * `messages`
       '';
     };
   };

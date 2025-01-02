@@ -42,19 +42,23 @@
   system.defaults.NSGlobalDomain."com.apple.springing.delay" = 0.0;
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
   system.defaults.".GlobalPreferences"."com.apple.sound.beep.sound" = "/System/Library/Sounds/Funk.aiff";
+  system.defaults.menuExtraClock.FlashDateSeparators = false;
   system.defaults.menuExtraClock.Show24Hour = false;
   system.defaults.menuExtraClock.ShowDayOfWeek = true;
   system.defaults.menuExtraClock.ShowDate = 2;
+  system.defaults.dock.expose-group-apps = true;
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
   system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
+  system.defaults.dock.scroll-to-open = false;
   system.defaults.finder.AppleShowAllFiles = true;
   system.defaults.finder.ShowStatusBar = true;
   system.defaults.finder.ShowPathbar = true;
   system.defaults.finder.FXDefaultSearchScope = "SCcf";
   system.defaults.finder.FXPreferredViewStyle = "Flwv";
+  system.defaults.finder.FXRemoveOldTrashItems = false;
   system.defaults.finder.AppleShowAllExtensions = true;
   system.defaults.finder.CreateDesktop = false;
   system.defaults.finder.NewWindowTarget = "Other";
@@ -62,9 +66,16 @@
   system.defaults.finder.QuitMenuItem = true;
   system.defaults.finder._FXShowPosixPathInTitle = true;
   system.defaults.finder._FXSortFoldersFirst = true;
+  system.defaults.finder._FXSortFoldersFirstOnDesktop = false;
   system.defaults.finder.FXEnableExtensionChangeWarning = false;
+  system.defaults.finder.ShowExternalHardDrivesOnDesktop = false;
+  system.defaults.finder.ShowHardDrivesOnDesktop = false;
+  system.defaults.finder.ShowMountedServersOnDesktop = false;
+  system.defaults.finder.ShowRemovableMediaOnDesktop = false;
   system.defaults.hitoolbox.AppleFnUsageType = "Show Emoji & Symbols";
   system.defaults.screencapture.location = "/tmp";
+  system.defaults.screencapture.target = "file";
+  system.defaults.screencapture.include-date = true;
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;
   system.defaults.smb.NetBIOSName = "IMAC-000000";
@@ -85,6 +96,7 @@
   system.defaults.WindowManager.AppWindowGroupingBehavior = true;
   system.defaults.WindowManager.StandardHideDesktopIcons = false;
   system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.EnableTiledWindowMargins = true;
   system.defaults.WindowManager.StandardHideWidgets = true;
   system.defaults.WindowManager.StageManagerHideWidgets = true;
   system.defaults.CustomUserPreferences = {
@@ -94,6 +106,13 @@
         true;
     };
   };
+  system.defaults.controlcenter.BatteryShowPercentage = true;
+  system.defaults.controlcenter.Sound = false;
+  system.defaults.controlcenter.Bluetooth = true;
+  system.defaults.controlcenter.AirDrop = true;
+  system.defaults.controlcenter.Display = false;
+  system.defaults.controlcenter.FocusModes = false;
+  system.defaults.controlcenter.NowPlaying = true;
   test = lib.strings.concatMapStringsSep "\n"
     (x: ''
       echo >&2 "checking defaults write in /${x}"

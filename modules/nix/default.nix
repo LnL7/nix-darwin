@@ -191,9 +191,6 @@ in
         description = ''
           Whether to distribute builds to the machines listed in
           {option}`nix.buildMachines`.
-
-          NOTE: This requires services.nix-daemon.enable for a
-          multi-user install.
         '';
       };
 
@@ -766,15 +763,14 @@ in
 
         {
           # Should be fixed in Lix by https://gerrit.lix.systems/c/lix/+/2100
-          # As `isNixAtLeast "2.92.0" "2.92.0-devpre20241107" == false`, we need to explicitly check if the user is running Lix 2.92.0
-          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0-devpre20241107" || cfg.package.version == "2.92.0"));
+          # Lix 2.92.0 will set `VERSION_SUFFIX` to `""`; `lib.versionAtLeast "" "pre20241107"` will return `true`.
+          assertion = cfg.settings.auto-optimise-store -> (cfg.package.pname == "lix" && (isNixAtLeast "2.92.0" && versionAtLeast (strings.removePrefix "-" cfg.package.VERSION_SUFFIX) "pre20241107"));
           message = "`nix.settings.auto-optimise-store` is known to corrupt the Nix Store, please use `nix.optimise.automatic` instead.";
         }
       ];
 
     # Not in NixOS module
     warnings = [
-      (mkIf (!config.services.activate-system.enable && cfg.distributedBuilds) "services.activate-system is not enabled, a reboot could cause distributed builds to stop working.")
       (mkIf (!cfg.distributedBuilds && cfg.buildMachines != []) "nix.distributedBuilds is not enabled, build machines won't be configured.")
     ];
 

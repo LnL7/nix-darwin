@@ -3,6 +3,9 @@
 with lib;
 
 let
+  # Similar to lib.escapeShellArg but escapes "s instead of 's, to allow for parameter expansion in shells
+  escapeDoubleQuote = arg: ''"${replaceStrings ["\""] ["\"\\\"\""] (toString arg)}"'';
+
   cfg = config.system.checks;
 
   darwinChanges = ''
@@ -27,6 +30,7 @@ let
       exit 1
     fi
   '';
+
 
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
@@ -128,18 +132,26 @@ let
     fi
   '';
 
-  singleUser = ''
-    if grep -q 'build-users-group =' /etc/nix/nix.conf; then
-        echo "[1;31merror: The daemon is not enabled but this is a multi-user install, aborting activation[0m" >&2
-        echo "Enable the nix-daemon service:" >&2
-        echo >&2
-        echo "    services.nix-daemon.enable = true;" >&2
-        echo >&2
-        echo "or set" >&2
-        echo >&2
-        echo "    nix.useDaemon = true;" >&2
-        echo >&2
-        exit 2
+  nixDaemon = if config.nix.useDaemon then ''
+    if ! dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
+      printf >&2 '[1;31merror: The daemon should not be enabled for single-user installs, aborting activation[0m\n'
+      printf >&2 'Disable the nix-daemon service:\n'
+      printf >&2 '\n'
+      printf >&2 '    services.nix-daemon.enable = false;\n'
+      printf >&2 '\n'
+      # shellcheck disable=SC2016
+      printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
+      printf >&2 '\n'
+      exit 2
+    fi
+  '' else ''
+    if dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
+      printf >&2 '[1;31merror: The daemon should be enabled for multi-user installs, aborting activation[0m\n'
+      printf >&2 'Enable the nix-daemon service:\n'
+      printf >&2 '\n'
+      printf >&2 '    services.nix-daemon.enable = true;\n'
+      printf >&2 '\n'
+      exit 2
     fi
   '';
 
@@ -179,7 +191,7 @@ let
   '';
 
   nixPath = ''
-    nixPath=${concatStringsSep ":" config.nix.nixPath}:$HOME/.nix-defexpr/channels
+    nixPath=${concatMapStringsSep ":" escapeDoubleQuote config.nix.nixPath}:$HOME/.nix-defexpr/channels
 
     darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
@@ -283,6 +295,19 @@ let
         exit 2
     fi
   '';
+
+  homebrewInstalled = ''
+    if [[ ! -f ${escapeShellArg config.homebrew.brewPrefix}/brew && -z "''${INSTALLING_HOMEBREW:-}" ]]; then
+        echo "[1;31merror: Using the homebrew module requires homebrew installed, aborting activation[0m" >&2
+        echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
+        echo "You can install homebrew using the following command:" >&2
+        echo >&2
+        # shellcheck disable=SC2016
+        echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
+        echo >&2
+        exit 2
+    fi
+  '';
 in
 
 {
@@ -323,7 +348,7 @@ in
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf config.nix.configureBuildUsers buildGroupID)
-      (mkIf (!config.nix.useDaemon) singleUser)
+      nixDaemon
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
@@ -331,6 +356,7 @@ in
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
+      (mkIf config.homebrew.enable homebrewInstalled)
     ];
 
     system.activationScripts.checks.text = ''

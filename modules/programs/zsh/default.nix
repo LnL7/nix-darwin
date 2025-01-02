@@ -204,7 +204,7 @@ in
       }
 
       ${optionalString cfg.enableFastSyntaxHighlighting
-        "source ${pkgs.zsh-fast-syntax-highlighting}/share/zsh-fast-syntax-highlighting/zsh-fast-syntax-highlighting.zsh"
+        "source ${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions/fast-syntax-highlighting.plugin.zsh"
       }
 
       ${optionalString cfg.enableFzfCompletion "source ${fzfCompletion}"}

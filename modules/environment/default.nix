@@ -197,6 +197,7 @@ in
       name = "system-path";
       paths = cfg.systemPackages;
       postBuild = cfg.extraSetup;
+      ignoreCollisions = true;
       inherit (cfg) pathsToLink extraOutputsToInstall;
     };
 

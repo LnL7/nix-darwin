@@ -6,6 +6,10 @@ let
   # Should only be used with options that previously used floats defined as strings.
   inherit (config.lib.defaults.types) floatWithDeprecationError;
 in {
+  imports = [
+    (mkRenamedOptionModule [ "system" "defaults" "dock" "expose-group-by-app" ] [ "system" "defaults" "dock" "expose-group-apps" ])
+  ];
+
   options = {
 
     system.defaults.dock.appswitcher-all-displays = mkOption {
@@ -67,11 +71,11 @@ in {
       '';
     };
 
-    system.defaults.dock.expose-group-by-app = mkOption {
+    system.defaults.dock.expose-group-apps = mkOption {
       type = types.nullOr types.bool;
       default = null;
       description = ''
-        Whether to group windows by application in Mission Control's Exposé. The default is true.
+        Whether to group windows by application in Mission Control's Exposé. The default is false.
       '';
     };
 
@@ -149,6 +153,14 @@ in {
         else map (folder: { tile-data = { file-data = { _CFURLString = "file://" + folder; _CFURLStringType = 15; }; }; tile-type = if strings.hasInfix "." (last (splitString "/" folder)) then "file-tile" else "directory-tile"; }) value;
     };
 
+    system.defaults.dock.scroll-to-open = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Scroll up on a Dock icon to show all Space's opened windows for an app, or open stack. The default is false.
+      '';
+    };
+
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
@@ -212,7 +224,6 @@ in {
         Magnified icon size on hover. The default is 16.
       '';
     };
-   
 
     system.defaults.dock.wvous-tl-corner = mkOption {
       type = types.nullOr types.ints.positive;

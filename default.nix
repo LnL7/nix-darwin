@@ -1,8 +1,8 @@
 { nixpkgs ? <nixpkgs>
 , configuration ? <darwin-config>
-, lib ? pkgs.lib
-, pkgs ? import nixpkgs { inherit system; }
 , system ? builtins.currentSystem
+, pkgs ? import nixpkgs { inherit system; }
+, lib ? pkgs.lib
 }:
 
 let
@@ -15,20 +15,9 @@ let
       nixpkgs.system = lib.mkDefault system;
     };
   };
-
-  # The source code of this repo needed by the installer.
-  nix-darwin = lib.cleanSource (
-    lib.cleanSourceWith {
-      # We explicitly specify a name here otherwise `cleanSource` will use the
-      # basename of ./.  which might be different for different clones of this
-      # repo leading to non-reproducible outputs.
-      name = "nix-darwin";
-      src = ./.;
-    }
-  );
 in
-
 eval // {
-  installer = pkgs.callPackage ./pkgs/darwin-installer { inherit nix-darwin; };
-  uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { };
+  darwin-uninstaller = pkgs.callPackage ./pkgs/darwin-uninstaller { };
+
+  inherit (pkgs.callPackage ./pkgs/nix-tools { }) darwin-option darwin-rebuild darwin-version;
 }
