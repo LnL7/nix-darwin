@@ -15,6 +15,8 @@ in
       default = null;
       description = ''
         Whether to restart the computer after a power failure.
+
+        Option is not supported on all devices.
       '';
     };
 
