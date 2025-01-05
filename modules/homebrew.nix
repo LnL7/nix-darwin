@@ -396,6 +396,9 @@ let
       no_binaries = mkNullOrBoolOption {
         description = "Whether to disable linking of helper executables.";
       };
+      ignore_dependencies = mkNullOrBoolOption {
+        description = "Ignore casks dependencies in case you manage them extrenally";
+      };
 
       brewfileLine = mkInternalOption { type = types.nullOr types.str; };
     };
