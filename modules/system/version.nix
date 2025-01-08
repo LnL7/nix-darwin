@@ -59,11 +59,18 @@ in
       description = "Label to be used in the names of generated outputs.";
     };
 
+    system.darwinRelease = mkOption {
+      readOnly = true;
+      type = types.str;
+      default = (lib.importJSON ../../version.json).release;
+      description = "The nix-darwin release (e.g. `24.11`).";
+    };
+
     system.darwinVersion = mkOption {
       internal = true;
       type = types.str;
-      default = "darwin${toString cfg.stateVersion}${cfg.darwinVersionSuffix}";
-      description = "The full darwin version (e.g. `darwin4.2abdb5a`).";
+      default = cfg.darwinRelease + cfg.darwinVersionSuffix;
+      description = "The full nix-darwin version (e.g. `24.11.2abdb5a`).";
     };
 
     system.darwinVersionSuffix = mkOption {
@@ -72,7 +79,7 @@ in
       default = if cfg.darwinRevision != null
         then ".${substring 0 7 cfg.darwinRevision}"
         else "";
-      description = "The short darwin version suffix (e.g. `.2abdb5a`).";
+      description = "The short nix-darwin version suffix (e.g. `.2abdb5a`).";
     };
 
     system.darwinRevision = mkOption {
@@ -86,14 +93,15 @@ in
       readOnly = true;
       type = types.str;
       default = lib.trivial.release;
-      description = "The nixpkgs release (e.g. `16.03`).";
+      description = "The nixpkgs release (e.g. `24.11`).";
     };
 
+    # TODO: Shouldn’t mismatch the Darwin release, rethink all this…
     system.nixpkgsVersion = mkOption {
       internal = true;
       type = types.str;
       default = cfg.nixpkgsRelease + cfg.nixpkgsVersionSuffix;
-      description = "The full nixpkgs version (e.g. `16.03.1160.f2d4ee1`).";
+      description = "The full nixpkgs version (e.g. `24.11.1160.f2d4ee1`).";
     };
 
     system.nixpkgsVersionSuffix = mkOption {
@@ -124,7 +132,7 @@ in
   config = {
     # This default is set here rather than up there so that the options
     # documentation is not reprocessed on every commit
-    system.darwinLabel = mkDefault "${cfg.nixpkgsVersion}+${cfg.darwinVersion}";
+    system.darwinLabel = mkDefault cfg.darwinVersion;
 
     assertions = [
       {
