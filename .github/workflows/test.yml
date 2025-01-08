@@ -3,11 +3,11 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - nix-darwin-24.11
 
 env:
-  NIXPKGS_BRANCH: nixpkgs-unstable
-  NIX_DARWIN_BRANCH: master
+  NIXPKGS_BRANCH: nixpkgs-24.11-darwin
+  NIX_DARWIN_BRANCH: nix-darwin-24.11
   NIX_VERSION: 2.24.11
 
 jobs:
