@@ -132,12 +132,7 @@ in {
         taggedType = types.attrTag {
               app = mkOption {
                 description = "An application to be added to the dock.";
-                type = types.submodule {
-                  options.path = mkOption {
-                    description = "Path to the application.";
-                    type = types.str;
-                  };
-                };
+                type = types.str;
               };
               spacer = mkOption {
                 description = "A spacer to be added to the dock. Can be small or regular size.";
@@ -151,25 +146,20 @@ in {
               };
               folder = mkOption {
                 description = "A folder to be added to the dock.";
-                type = types.submodule {
-                  options.path = mkOption {
-                    description = "Path to the folder.";
-                    type = types.str;
-                  };
-                };
+                type = types.str;
               };
             };
 
         simpleType = types.either types.str types.path;
-        toTagged = (path: {app = {inherit path;};});
+        toTagged = path: { app = path; };
         in
       types.nullOr (types.listOf (types.coercedTo simpleType toTagged taggedType));
       default = null;
       example = [
-        { app = { path = "/Applications/Safari.app"; }; }
+        { app = "/Applications/Safari.app"; }
         { spacer = { small = false; }; }
         { spacer = { small = true; }; }
-        { folder = { path = "/System/Applications/Utilities"; }; }
+        { folder = "/System/Applications/Utilities"; }
       ];
       description = ''
         Persistent applications, spacers, and folders in the dock.
@@ -178,7 +168,7 @@ in {
       let
         toTile = item: if item ? app then {
         tile-data.file-data = {
-          _CFURLString = item.app.path;
+          _CFURLString = item.app;
           _CFURLStringType = 0;
         };
         } else if item ? spacer then {
@@ -186,10 +176,10 @@ in {
           tile-type = if item.spacer.small then "small-spacer-tile" else "spacer-tile";
         } else if item ? folder then {
           tile-data.file-data = {
-            _CFURLString = "file://" + item.folder.path;
+            _CFURLString = "file://" + item.folder;
             _CFURLStringType = 15;
           };
-          tile-type = if strings.hasInfix "." (last (splitString "/" item.folder.path)) then "file-tile" else "directory-tile";
+          tile-type = if strings.hasInfix "." (last (splitString "/" item.folder)) then "file-tile" else "directory-tile";
         } else item;
       in
       value: if isList value then map toTile value else value;

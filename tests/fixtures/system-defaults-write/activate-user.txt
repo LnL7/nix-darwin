@@ -267,18 +267,6 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>/Applications/MyApp.app</string>
-				<key>_CFURLStringType</key>
-				<integer>0</integer>
-			</dict>
-		</dict>
-	</dict>
-	<dict>
-		<key>tile-data</key>
-		<dict>
-			<key>file-data</key>
-			<dict>
-				<key>_CFURLString</key>
 				<string>/Applications/Cool.app</string>
 				<key>_CFURLStringType</key>
 				<integer>0</integer>

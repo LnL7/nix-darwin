@@ -51,12 +51,11 @@
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
   system.defaults.dock.persistent-apps = [
-    "/Applications/MyApp.app" 
-    { app = { path = "/Applications/MyApp.app"; }; }
-    { app = { path = "/Applications/Cool.app"; }; }
+    "/Applications/MyApp.app"
+    { app = "/Applications/Cool.app"; }
     { spacer = { small = true; }; }
     { spacer = { small = false; }; }
-    { folder = { path = "/Applications/Utilities"; }; }
+    { folder = "/Applications/Utilities"; }
   ];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
   system.defaults.dock.scroll-to-open = false;
