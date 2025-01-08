@@ -617,7 +617,6 @@ in
 
             trusted-users = mkOption {
               type = types.listOf types.str;
-              default = [ "root" ];
               example = [ "root" "alice" "@admin" ];
               description = ''
                 A list of names of users that have additional rights when
@@ -835,10 +834,10 @@ in
       done
     '';
 
-    # Legacy configuration conversion.
     nix.settings = mkMerge [
       {
         trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+        trusted-users = [ "root" ];
         substituters = mkAfter [ "https://cache.nixos.org/" ];
 
         # Not implemented yet
