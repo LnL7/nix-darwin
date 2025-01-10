@@ -47,6 +47,25 @@ in {
       '';
     };
 
+    system.defaults.NSGlobalDomain.AppleAccentColor = mkOption {
+      type = types.nullOr (types.enum [ -1 0 1 2 3 4 5 6 ]);
+      default = null;
+      description = ''
+        Specifies the accent color used throughout the system interface. The value can be one of the following:
+
+        -1: Graphite
+        0: Red
+        1: Orange
+        2: Yellow
+        3: Green
+        4: Blue
+        5: Purple
+        6: Pink
+        
+        Set this option to change the system-wide accent color. If not set, the default accent color will be used.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleInterfaceStyleSwitchesAutomatically = mkOption {
       type = types.nullOr types.bool;
       default = null;
