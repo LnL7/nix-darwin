@@ -155,7 +155,7 @@ in
         homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
 
-        if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
+        if ! dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
           if [[ "$(launchctl managername)" != Aqua ]]; then
             printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
             printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
@@ -176,7 +176,7 @@ in
             # and we can reset it to ensure the user gets another prompt
             tccutil reset SystemPolicySysAdminFiles > /dev/null
 
-            if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
+            if ! dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
               printf >&2 '\e[1;31merror: permission denied when trying to %s user %s, aborting activation\e[0m\n' "$2" "$1"
               printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n'
               printf >&2 'please accept the dialog that pops up.\n'

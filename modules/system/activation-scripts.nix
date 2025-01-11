@@ -62,6 +62,23 @@ in
 
   config = {
 
+    assertions =
+      map
+        (userActivationOption: {
+          assertion = !config.system.activationScripts ? ${userActivationOption};
+          message = ''
+            The `system.activationScripts.${userActivationOption}` option has
+            been removed, as all activation now takes place as `root`. Please
+            restructure your custom activation scripts appropriately,
+            potentially using `sudo` if you need to run commands as a user.
+          '';
+        })
+        [
+          "extraUserActivation"
+          "preUserActivation"
+          "postUserActivation"
+        ];
+
     system.activationScripts.script.text = ''
       #! ${stdenv.shell}
       set -e
@@ -77,9 +94,9 @@ in
 
       ${cfg.activationScripts.preActivation.text}
 
-      # We run `etcChecks` again just in case someone runs `activate`
-      # directly without `activate-user`.
       ${cfg.activationScripts.etcChecks.text}
+      ${cfg.activationScripts.createRun.text}
+      ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraActivation.text}
       ${cfg.activationScripts.groups.text}
       ${cfg.activationScripts.users.text}
@@ -114,45 +131,11 @@ in
       fi
     '';
 
-    # FIXME: activationScripts.checks should be system level
-    system.activationScripts.userScript.text = ''
-      #! ${stdenv.shell}
-      set -e
-      set -o pipefail
-
-      PATH="${activationPath}"
-      export PATH
-
-      systemConfig=@out@
-
-      _status=0
-      trap "_status=1" ERR
-
-      # Ensure a consistent umask.
-      umask 0022
-
-      ${cfg.activationScripts.preUserActivation.text}
-
-      # This should be running at the system level, but as user activation runs first
-      # we run it here with sudo
-      ${cfg.activationScripts.createRun.text}
-      ${cfg.activationScripts.checks.text}
-      ${cfg.activationScripts.etcChecks.text}
-      ${cfg.activationScripts.extraUserActivation.text}
-
-      ${cfg.activationScripts.postUserActivation.text}
-
-      exit $_status
-    '';
-
     # Extra activation scripts, that can be customized by users
     # don't use this unless you know what you are doing.
     system.activationScripts.extraActivation.text = mkDefault "";
     system.activationScripts.preActivation.text = mkDefault "";
     system.activationScripts.postActivation.text = mkDefault "";
-    system.activationScripts.extraUserActivation.text = mkDefault "";
-    system.activationScripts.preUserActivation.text = mkDefault "";
-    system.activationScripts.postUserActivation.text = mkDefault "";
 
   };
 }

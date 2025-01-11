@@ -190,6 +190,7 @@ if [ "$action" = switch ] || [ "$action" = build ] || [ "$action" = check ] || [
       -- "$flake#$flakeAttr.system" \
       | jq -r '.[0].outputs.out')
   fi
+
 fi
 
 if [ "$action" = list ] || [ "$action" = rollback ]; then
@@ -210,6 +211,17 @@ fi
 
 if [ -z "$systemConfig" ]; then exit 0; fi
 
+# TODO: Remove this backwards‐compatibility hack in 25.11.
+
+if
+  [[ -x $systemConfig/activate-user ]] \
+  && ! grep -q '^# nix-darwin: deprecated$' "$systemConfig/activate-user"
+then
+  hasActivateUser=1
+else
+  hasActivateUser=
+fi
+
 if [ "$action" = switch ]; then
   if [ "$USER" != root ] && [ ! -w $(dirname "$profile") ]; then
     sudo nix-env -p "$profile" --set "$systemConfig"
@@ -219,7 +231,9 @@ if [ "$action" = switch ]; then
 fi
 
 if [ "$action" = switch ] || [ "$action" = activate ] || [ "$action" = rollback ]; then
-  "$systemConfig/activate-user"
+  if [[ -n $hasActivateUser ]]; then
+    "$systemConfig/activate-user"
+  fi
 
   if [ "$USER" != root ]; then
     sudo "$systemConfig/activate"
@@ -234,5 +248,13 @@ fi
 
 if [ "$action" = check ]; then
   export checkActivation=1
-  "$systemConfig/activate-user"
+  if [[ -n $hasActivateUser ]]; then
+    "$systemConfig/activate-user"
+  else
+    if [ "$USER" != root ]; then
+      sudo "$systemConfig/activate"
+    else
+      "$systemConfig/activate"
+    fi
+  fi
 fi
