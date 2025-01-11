@@ -876,7 +876,7 @@ in
     #
     # TODO: Maybe this could use a more general file placement mechanism
     # to express that we want it deleted and know only one hash?
-    system.activationScripts.etcChecks.text = mkAfter ''
+    system.activationScripts.checks.text = mkAfter ''
       nixCustomConfKnownSha256Hashes=(
         # v0.33.0
         6787fade1cf934f82db554e78e1fc788705c2c5257fddf9b59bdd963ca6fec63

@@ -65,7 +65,7 @@ in
           ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
         fi
 
-        ${config.system.activationScripts.etcChecks.text}
+        ${config.system.activationScripts.checks.text}
         ${config.system.activationScripts.etc.text}
         ${config.system.activationScripts.keyboard.text}
       '';
