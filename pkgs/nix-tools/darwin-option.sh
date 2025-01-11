@@ -1,7 +1,7 @@
 #! @shell@
 set -e
 set -o pipefail
-export PATH=@path@:$PATH
+export PATH=@path@
 
 evalNix() {
   nix-instantiate --eval --strict "${extraEvalFlags[@]}" -E "with import <darwin> {}; $*" 2>/dev/null
