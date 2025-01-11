@@ -21,6 +21,11 @@
   "/usr/sbin"
   "/sbin"
 ]
+, # This should be kept in sync with the default `nix.nixPath`.
+  nixPath ? lib.concatStringsSep ":" [
+  "darwin-config=/etc/nix-darwin/configuration.nix"
+  "/nix/var/nix/profiles/per-user/root/channels"
+]
 }:
 
 let
@@ -39,14 +44,14 @@ in
 {
   darwin-option = writeProgram "darwin-option"
     {
-      inherit path;
+      inherit path nixPath;
       inherit (stdenv) shell;
     }
     ./darwin-option.sh;
 
   darwin-rebuild = writeProgram "darwin-rebuild"
     {
-      inherit path profile;
+      inherit path nixPath profile;
       inherit (stdenv) shell;
       postInstall = ''
         mkdir -p $out/share/zsh/site-functions
