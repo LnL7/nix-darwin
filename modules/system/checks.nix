@@ -31,6 +31,18 @@ let
     fi
   '';
 
+  primaryUser = ''
+    primaryUser=${escapeShellArg config.system.primaryUser}
+    if ! id -- "$primaryUser" >/dev/null 2>&1; then
+      printf >&2 '\e[1;31merror: primary user `%s` does not exist, aborting activation\e[0m\n' \
+        "$primaryUser"
+      printf >&2 'Please ensure that `system.primaryUser` is set to the name of an\n'
+      printf >&2 'existing user. Usually this should be the user you have been using to\n'
+      printf >&2 'run `darwin-rebuild`.\n'
+      exit 2
+    fi
+  '';
+
   determinate = ''
     if [[ -e /usr/local/bin/determinate-nixd ]]; then
       printf >&2 '\e[1;31merror: Determinate detected, aborting activation\e[0m\n'
@@ -275,6 +287,7 @@ in
 
     system.checks.text = mkMerge [
       (mkIf cfg.verifyMacOSVersion macOSVersion)
+      (mkIf (config.system.primaryUser != null) primaryUser)
       (mkIf config.nix.enable determinate)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf cfg.verifyBuildUsers buildGroupID)
