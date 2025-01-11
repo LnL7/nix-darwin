@@ -113,7 +113,6 @@ in
 
       ${cfg.activationScripts.preActivation.text}
 
-      ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.createRun.text}
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.extraActivation.text}
