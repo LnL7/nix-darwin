@@ -28,7 +28,6 @@
         ${config.system.activationScripts.keyboard.text}
       '';
       serviceConfig.RunAtLoad = true;
-      serviceConfig.KeepAlive.SuccessfulExit = false;
     };
   };
 }
