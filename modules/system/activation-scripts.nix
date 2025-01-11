@@ -88,6 +88,7 @@ in
       ${cfg.activationScripts.patches.text}
       ${cfg.activationScripts.etc.text}
       ${cfg.activationScripts.defaults.text}
+      ${cfg.activationScripts.userDefaults.text}
       ${cfg.activationScripts.launchd.text}
       ${cfg.activationScripts.userLaunchd.text}
       ${cfg.activationScripts.nix-daemon.text}
@@ -138,7 +139,6 @@ in
       ${cfg.activationScripts.checks.text}
       ${cfg.activationScripts.etcChecks.text}
       ${cfg.activationScripts.extraUserActivation.text}
-      ${cfg.activationScripts.userDefaults.text}
 
       ${cfg.activationScripts.postUserActivation.text}
 
