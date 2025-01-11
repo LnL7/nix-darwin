@@ -18,8 +18,5 @@ in
     grep "<string>nixuser</string>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-gc.plist
 
     (! grep "<key>KeepAlive</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-gc.plist)
-
-    echo checking nix-gc validation >&2
-    (! grep "nix.gc.user = " ${config.out}/activate-user)
   '';
 }

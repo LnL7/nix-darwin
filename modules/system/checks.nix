@@ -152,25 +152,6 @@ let
     fi
   '';
 
-  nixChannels = ''
-    channelsLink=$(readlink "$HOME/.nix-defexpr/channels") || true
-    case "$channelsLink" in
-      *"$USER"*)
-        ;;
-      "")
-        ;;
-      *)
-        echo "[1;31merror: The ~/.nix-defexpr/channels symlink does not point your users channels, aborting activation[0m" >&2
-        echo "Running nix-channel will regenerate it" >&2
-        echo >&2
-        echo "    rm ~/.nix-defexpr/channels" >&2
-        echo "    nix-channel --update" >&2
-        echo >&2
-        exit 2
-        ;;
-    esac
-  '';
-
   nixInstaller = ''
     if grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
         echo "[1;31merror: Found nix-daemon.sh reference in /etc/profile, aborting activation[0m" >&2
@@ -233,43 +214,6 @@ let
     fi
   '';
 
-  nixStore = ''
-    if test -w /nix/var/nix/db -a ! -O /nix/store; then
-        echo >&2 "[1;31merror: the store is not owned by this user, but /nix/var/nix/db is writable[0m"
-        echo >&2 "If you are using the daemon:"
-        echo >&2
-        echo >&2 "    sudo chown -R root:wheel /nix/var/nix/db"
-        echo >&2
-        echo >&2 "Otherwise:"
-        echo >&2
-        echo >&2 "    sudo chown -R $USER:staff /nix/store"
-        echo >&2
-        exit 2
-    fi
-  '';
-
-  nixGarbageCollector = ''
-    if test -O /nix/store; then
-        echo "[1;31merror: A single-user install can't run gc as root, aborting activation[0m" >&2
-        echo "Configure the garbage collector to run as the current user:" >&2
-        echo >&2
-        echo "    nix.gc.user = \"$USER\";" >&2
-        echo >&2
-        exit 2
-    fi
-  '';
-
-  nixStoreOptimiser = ''
-    if test -O /nix/store; then
-        echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
-        echo "Configure the optimiser to run as the current user:" >&2
-        echo >&2
-        echo "    nix.optimise.user = \"$USER\";" >&2
-        echo >&2
-        exit 2
-    fi
-  '';
-
   # TODO: Remove this a couple years down the line when we can assume
   # that anyone who cares about security has upgraded.
   oldSshAuthorizedKeysDirectory = ''
@@ -315,17 +259,15 @@ let
 in
 
 {
+  imports = [
+    (mkRemovedOptionModule [ "system" "checks" "verifyNixChannels" ] "This check has been removed.")
+  ];
+
   options = {
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
       default = true;
       description = "Whether to run the NIX_PATH validation checks.";
-    };
-
-    system.checks.verifyNixChannels = mkOption {
-      type = types.bool;
-      default = config.nix.channel.enable;
-      description = "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
@@ -358,10 +300,6 @@ in
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf config.nix.configureBuildUsers buildGroupID)
       nixDaemon
-      nixStore
-      (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
-      (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
-      (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory

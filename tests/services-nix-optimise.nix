@@ -18,8 +18,5 @@ in
     grep "<key>UserName</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
     grep "<string>nixuser</string>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist
     (! grep "<key>KeepAlive</key>" ${config.out}/Library/LaunchDaemons/org.nixos.nix-optimise.plist)
-
-    echo checking nix-optimise validation >&2
-    (! grep "nix.optimise.user = " ${config.out}/activate-user)
   '';
 }
