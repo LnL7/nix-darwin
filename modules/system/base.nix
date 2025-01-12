@@ -23,7 +23,7 @@
       printf >&2 '[1;31merror: apfs.util failed to symlink /run, aborting activation[0m\n'
       printf >&2 'To create a symlink from /run to /var/run, please run:\n'
       printf >&2 '\n'
-      printf >&2 "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf"
+      printf >&2 "$ printf 'run\tprivate/var/run\n' | sudo tee -a /etc/synthetic.conf\n"
       printf >&2 '$ sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t\n'
       printf >&2 '\n'
       printf >&2 'The current contents of /etc/synthetic.conf is:\n'
