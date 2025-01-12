@@ -28,7 +28,6 @@ with lib;
       default = null;
       description = ''
         Disable transparency in the menu bar and elsewhere.
-        Requires macOS Yosemite or later.
         The default is false.
       '';
     };
