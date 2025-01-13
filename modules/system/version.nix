@@ -51,7 +51,7 @@ in
     system.maxStateVersion = mkOption {
       internal = true;
       type = types.int;
-      default = 5;
+      default = 6;
     };
 
     system.darwinLabel = mkOption {
