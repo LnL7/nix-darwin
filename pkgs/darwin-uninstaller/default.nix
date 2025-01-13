@@ -77,7 +77,7 @@ in writeShellApplication {
       echo >&2
 
       echo >&2 "checking darwin channel"
-      test -e ~/.nix-defexpr/channels/darwin && exit 1
+      nix-instantiate --find-file darwin && exit 1
       echo >&2 "checking /etc"
       test -e /etc/static && exit 1
       echo >&2 "checking /run/current-system"
