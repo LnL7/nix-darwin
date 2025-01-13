@@ -19,6 +19,13 @@
       '';
     };
 
+    system.primaryUserHome = lib.mkOption {
+      internal = true;
+      type = lib.types.str;
+      default =
+        config.users.users.${config.system.primaryUser}.home or "/Users/${config.system.primaryUser}";
+    };
+
     system.requiresPrimaryUser = lib.mkOption {
       internal = true;
       type = lib.types.listOf lib.types.str;
