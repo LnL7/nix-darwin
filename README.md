@@ -142,11 +142,7 @@ sudo nix-channel --update
 To install `nix-darwin`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-# If you use Nixpkgs unstable (the default):
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A darwin-rebuild
-# If you use Nixpkgs 24.11:
-nix-build https://github.com/LnL7/nix-darwin/archive/nix-darwin-24.11.tar.gz -A darwin-rebuild
-
+nix-build '<darwin>' -A darwin-rebuild
 ./result/bin/darwin-rebuild switch -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
 ```
 
