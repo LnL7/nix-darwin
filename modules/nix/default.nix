@@ -825,10 +825,17 @@ in
 
     # Not in NixOS module
     nix.nixPath = mkIf (config.system.stateVersion < 2) (mkDefault [
-      "darwin=$HOME/.nix-defexpr/darwin"
-      "darwin-config=$HOME/.nixpkgs/darwin-configuration.nix"
+      "darwin=${config.system.primaryUserHome}/.nix-defexpr/darwin"
+      "darwin-config=${config.system.primaryUserHome}/.nixpkgs/darwin-configuration.nix"
       "/nix/var/nix/profiles/per-user/root/channels"
     ]);
+
+    system.requiresPrimaryUser = mkIf (
+      config.system.stateVersion < 2
+      && options.nix.nixPath.highestPrio == (mkDefault {}).priotity
+    ) [
+      "nix.nixPath"
+    ];
 
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
