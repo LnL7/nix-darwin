@@ -161,7 +161,7 @@ in
 
     environment.systemPath = mkMerge [
       [ (makeBinPath cfg.profiles) ]
-      (mkOrder 1200 [ "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ])
+      (mkOrder 1200 [ "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" ])
     ];
 
     # Use user, default and system profiles.
