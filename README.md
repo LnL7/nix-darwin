@@ -38,7 +38,12 @@ If you don't have an existing `configuration.nix`, you can run the following com
 ```bash
 mkdir -p ~/.config/nix-darwin
 cd ~/.config/nix-darwin
-nix flake init -t nix-darwin
+
+# To use Nixpkgs unstable:
+nix flake init -t nix-darwin/master
+# To use Nixpkgs 24.11:
+nix flake init -t nix-darwin/nix-darwin-24.11
+
 sed -i '' "s/simple/$(scutil --get LocalHostName)/" flake.nix
 ```
 
@@ -57,8 +62,10 @@ Add the following to `flake.nix` in the same folder as `configuration.nix`:
   description = "John's darwin system";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
-    nix-darwin.url = "github:LnL7/nix-darwin";
+    # Use `github:NixOS/nixpkgs/nixpkgs-24.11-darwin` to use Nixpkgs 24.11.
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Use `github:LnL7/nix-darwin/nix-darwin-24.11` to use Nixpkgs 24.11.
+    nix-darwin.url = "github:LnL7/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -122,8 +129,12 @@ Copy the [simple](./modules/examples/simple.nix) example to `~/.config/nix-darwi
 ### Step 2. Adding `nix-darwin` channel
 
 ```bash
-nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
-nix-channel --update
+# If you use Nixpkgs unstable (the default):
+sudo nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin
+# If you use Nixpkgs 24.11:
+sudo nix-channel --add https://github.com/LnL7/nix-darwin/archive/nix-darwin-24.11.tar.gz darwin
+
+sudo nix-channel --update
 ```
 
 ### Step 3. Installing `nix-darwin`
@@ -131,7 +142,11 @@ nix-channel --update
 To install `nix-darwin`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
+# If you use Nixpkgs unstable (the default):
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A darwin-rebuild
+# If you use Nixpkgs 24.11:
+nix-build https://github.com/LnL7/nix-darwin/archive/nix-darwin-24.11.tar.gz -A darwin-rebuild
+
 ./result/bin/darwin-rebuild switch -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
 ```
 
@@ -145,10 +160,10 @@ darwin-rebuild switch
 
 ### Step 5. Updating `nix-darwin`
 
-You can update `nix-darwin` using the following command:
+You can update Nixpkgs and `nix-darwin` using the following command:
 
 ```bash
-nix-channel --update darwin
+sudo nix-channel --update
 ```
 </details>
 
