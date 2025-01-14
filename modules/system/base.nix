@@ -28,7 +28,7 @@
       printf >&2 '\n'
       printf >&2 'The current contents of /etc/synthetic.conf is:\n'
       printf >&2 '\n'
-      sudo sed 's/^/    /' /etc/synthetic.conf >&2
+      sed 's/^/    /' /etc/synthetic.conf >&2
       printf >&2 '\n'
       exit 1
     fi
