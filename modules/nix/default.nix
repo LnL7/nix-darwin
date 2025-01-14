@@ -702,6 +702,8 @@ in
       "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0
       "e4974acb79c56148cb8e92137fa4f2de9b7356e897b332fc4e6769e8c0b83e18"  # DeterminateSystems Nix installer 0.20.0
       "966d22ef5bb9b56d481e8e0d5f7ca2deaf4d24c0f0fc969b2eeaa7ae0aa42907"  # DeterminateSystems Nix installer 0.22.0
+      "53712b4335030e2dbfb46bb235f8cffcac83fea404bd32dc99417ac89e2dd7c5"  # DeterminateSystems Nix installer 0.33.0
+      "6bb8d6b0dd16b44ee793a9b8382dac76c926e4c16ffb8ddd2bb4884d1ca3f811"  # DeterminateSystems Nix installer 0.34.0
       "24797ac05542ff8b52910efc77870faa5f9e3275097227ea4e50c430a5f72916"  # lix-installer 0.17.1 with flakes
       "b027b5cad320b5b8123d9d0db9f815c3f3921596c26dc3c471457098e4d3cc40"  # lix-installer 0.17.1 without flakes
     ];
