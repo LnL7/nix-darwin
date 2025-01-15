@@ -105,6 +105,16 @@ in
         assertion = !builtins.elem "root" deletedUsers;
         message = "Remove `root` from `users.knownUsers` if you no longer want nix-darwin to manage it.";
       }
+      {
+        assertion =
+          config.system.primaryUser != null
+          -> !builtins.elem config.system.primaryUser deletedUsers;
+        message = ''
+          Refusing to delete the primary user. Remove
+          `${config.system.primaryUser}` from `users.knownUsers` if
+          you no longer want nix-darwin to manage it.
+        '';
+      }
     ] ++ flatten (flip mapAttrsToList cfg.users (name: user:
       map (shell: {
         assertion = let
@@ -140,7 +150,6 @@ in
 
     # NOTE: We put this in `system.checks` as we want this to run first to avoid partial activations
     # however currently that runs at user level activation as that runs before system level activation
-    # TODO: replace `$USER` with `$SUDO_USER` when system.checks runs from system level
     system.checks.text = mkIf (builtins.length (createdUsers ++ deletedUsers) > 0) (mkAfter ''
       ensurePerms() {
         homeDirectory=$(dscl . -read /Users/nobody NFSHomeDirectory)
@@ -218,12 +227,6 @@ in
         u=$(id -u ${name} 2> /dev/null) || true
         if [ -n "$u" ]; then
           if [ "$u" -gt 501 ]; then
-            # TODO: add `darwin.primaryUser` as well
-            if [[ ${name} == "$USER" ]]; then
-              printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', ${name}
-              exit 1
-            fi
-
             ensurePerms ${name} delete
           fi
         fi
