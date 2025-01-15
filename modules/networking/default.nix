@@ -118,7 +118,6 @@ in
       echo "configuring networking..." >&2
 
       ${optionalString (cfg.computerName != null) ''
-        # shellcheck disable=SC1112
         scutil --set ComputerName ${escapeShellArg cfg.computerName}
       ''}
       ${optionalString (cfg.hostName != null) ''

@@ -149,7 +149,6 @@ in
         if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
           if [[ -n "$SSH_CONNECTION" ]]; then
             printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
-            # shellcheck disable=SC2016
             printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
             printf >&2 'You can either:\n'
             printf >&2 '\n'
@@ -157,7 +156,6 @@ in
             printf >&2 '\n'
             printf >&2 'or\n'
             printf >&2 '\n'
-            # shellcheck disable=SC2016
             printf >&2 '  run `darwin-rebuild` in a graphical session.\n'
             printf >&2 '\n'
             printf >&2 'The option "Allow full disk access for remote users" can be found by\n'
@@ -171,11 +169,9 @@ in
 
             if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
               printf >&2 '\e[1;31merror: permission denied when trying to %s user %s, aborting activation\e[0m\n' "$2" "$1"
-              # shellcheck disable=SC2016
               printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n'
               printf >&2 'please accept the dialog that pops up.\n'
               printf >&2 '\n'
-              # shellcheck disable=SC2016
               printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
               printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
               printf >&2 '\n'
@@ -224,7 +220,6 @@ in
           if [ "$u" -gt 501 ]; then
             # TODO: add `darwin.primaryUser` as well
             if [[ ${name} == "$USER" ]]; then
-              # shellcheck disable=SC2016
               printf >&2 '\e[1;31merror: refusing to delete the user calling `darwin-rebuild` (%s), aborting activation\e[0m\n', ${name}
               exit 1
             fi

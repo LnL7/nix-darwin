@@ -118,7 +118,6 @@ let
         printf >&2 'Possible causes include setting up a new Nix installation with an\n'
         printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
         printf >&2 'installation with an existing Nix installation, or manually increasing\n'
-        # shellcheck disable=SC2016
         printf >&2 'your `system.stateVersion` setting.\n'
         printf >&2 '\n'
         printf >&2 'You can set the configured group ID to match the actual value:\n'
@@ -139,7 +138,6 @@ let
       printf >&2 '\n'
       printf >&2 '    services.nix-daemon.enable = false;\n'
       printf >&2 '\n'
-      # shellcheck disable=SC2016
       printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
       printf >&2 '\n'
       exit 2
@@ -279,7 +277,6 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
-        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -302,7 +299,6 @@ let
         echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
         echo "You can install homebrew using the following command:" >&2
         echo >&2
-        # shellcheck disable=SC2016
         echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
         echo >&2
         exit 2
