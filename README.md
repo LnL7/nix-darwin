@@ -89,7 +89,10 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-nix run nix-darwin -- switch
+# To use Nixpkgs unstable:
+nix run nix-darwin/master#darwin-rebuild -- switch
+# To use Nixpkgs 24.11:
+nix run nix-darwin/nix-darwin-24.11#darwin-rebuild -- switch
 ```
 
 ### Step 3. Using `nix-darwin`
