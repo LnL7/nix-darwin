@@ -24,6 +24,29 @@ let
     fi
   '';
 
+  macOSVersion = ''
+    IFS=. read -ra osVersion <<<"$(sw_vers --productVersion)"
+    if (( osVersion[0] < 11 || (osVersion[0] == 11 && osVersion[1] < 3) )); then
+      printf >&2 '\e[1;31merror: macOS version is less than 11.3, aborting activation\e[0m\n'
+      printf >&2 'Nixpkgs 25.05 requires macOS Big Sur 11.3 or newer, and 25.11 will\n'
+      printf >&2 'require macOS Sonoma 14.\n'
+      printf >&2 '\n'
+      printf >&2 'For more information on your options going forward, see the 25.05\n'
+      printf >&2 'release notes:\n'
+      printf >&2 '<https://nixos.org/manual/nixos/unstable/release-notes#sec-release-25.05>\n'
+      printf >&2 '\n'
+      printf >&2 'Nixpkgs 24.11 and nix-darwin 24.11 continue to support down to macOS\n'
+      printf >&2 'Sierra 10.12, and will be supported through June 2025.\n'
+      printf >&2 '\n'
+      printf >&2 'You can override this check by setting:\n'
+      printf >&2 '\n'
+      printf >&2 '    system.checks.verifyMacOSVersion = false;\n'
+      printf >&2 '\n'
+      printf >&2 'However, we are unable to provide support if you do so.\n'
+      exit 1
+    fi
+  '';
+
   runLink = ''
     if [[ ! -e /run ]]; then
       printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
@@ -341,6 +364,12 @@ in
       description = "Whether to run the Nix build users validation checks.";
     };
 
+    system.checks.verifyMacOSVersion = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to run the macOS version check.";
+    };
+
     system.checks.text = mkOption {
       internal = true;
       type = types.lines;
@@ -352,6 +381,7 @@ in
 
     system.checks.text = mkMerge [
       darwinChanges
+      (mkIf cfg.verifyMacOSVersion macOSVersion)
       runLink
       (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
