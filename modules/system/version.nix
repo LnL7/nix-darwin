@@ -12,21 +12,6 @@ let
     else if pathExists "${path}/.git-revision"
     then fileContents "${path}/.git-revision"
     else null;
-
-  nixpkgsSrc = config.nixpkgs.source;
-
-  # If `nixpkgs.constructedByUs` is true, then Nixpkgs was imported from
-  # `nixpkgs.source` and we can use revision information (flake input,
-  # `builtins.fetchGit`, etc.) from it. Otherwise `pkgs` could be
-  # anything and we can't reliably determine exact version information,
-  # but if the configuration explicitly sets `nixpkgs.source` we
-  # trust it.
-  useSourceRevision =
-    (config.nixpkgs.constructedByUs
-      || options.nixpkgs.source.highestPrio < (lib.mkDefault {}).priority)
-    && isAttrs nixpkgsSrc
-    && (nixpkgsSrc._type or null == "flake"
-      || isString (nixpkgsSrc.rev or null));
 in
 
 {
@@ -107,18 +92,14 @@ in
     system.nixpkgsVersionSuffix = mkOption {
       internal = true;
       type = types.str;
-      default = if useSourceRevision
-        then ".${lib.substring 0 8 (nixpkgsSrc.lastModifiedDate or nixpkgsSrc.lastModified or "19700101")}.${nixpkgsSrc.shortRev or "dirty"}"
-        else lib.trivial.versionSuffix;
+      default = lib.trivial.versionSuffix;
       description = "The short nixpkgs version suffix (e.g. `.1160.f2d4ee1`).";
     };
 
     system.nixpkgsRevision = mkOption {
       internal = true;
       type = types.nullOr types.str;
-      default = if useSourceRevision && nixpkgsSrc ? rev
-        then nixpkgsSrc.rev
-        else lib.trivial.revisionWithDefault null;
+      default = lib.trivial.revisionWithDefault null;
       description = "The nixpkgs git revision from which this configuration was built.";
     };
 
