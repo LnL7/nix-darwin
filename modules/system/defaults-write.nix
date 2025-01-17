@@ -42,7 +42,7 @@ let
   CustomSystemPreferences = flatten (mapAttrsToList (name: value: defaultsToList name value) cfg.CustomSystemPreferences);
 
 
-  mkIfAttrs = list: mkIf (any (attrs: attrs != { }) list);
+  mkIfLists = list: mkIf (any (attrs: attrs != [ ]) list);
 in
 
 {
@@ -57,7 +57,7 @@ in
         else types.float.check x;
     };
 
-    system.activationScripts.defaults.text = mkIfAttrs [
+    system.activationScripts.defaults.text = mkIfLists [
       alf
       loginwindow
       smb
@@ -74,7 +74,7 @@ in
         ${concatStringsSep "\n" CustomSystemPreferences}
       '';
 
-    system.activationScripts.userDefaults.text = mkIfAttrs
+    system.activationScripts.userDefaults.text = mkIfLists
       [
         GlobalPreferences
         LaunchServices
