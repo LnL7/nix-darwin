@@ -47,14 +47,6 @@ let
     fi
   '';
 
-  runLink = ''
-    if [[ ! -e /run ]]; then
-      printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
-      exit 1
-    fi
-  '';
-
-
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
         echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
@@ -382,7 +374,6 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       (mkIf cfg.verifyMacOSVersion macOSVersion)
-      runLink
       (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
