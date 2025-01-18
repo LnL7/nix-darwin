@@ -5,7 +5,22 @@
 , substituteAll
 , stdenv
 , profile ? "/nix/var/nix/profiles/system"
-, systemPath ? "$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+, # This should be kept in sync with the default
+  # `environment.systemPath`. We err on side of including conditional
+  # things like the profile directories, since they’re more likely to
+  # help than hurt, and this default is mostly used for fresh
+  # installations anyway.
+  systemPath ? lib.concatStringsSep ":" [
+  "$HOME/.nix-profile/bin"
+  "/etc/profiles/per-user/$USER/bin"
+  "/run/current-system/sw/bin"
+  "/nix/var/nix/profiles/default/bin"
+  "/usr/local/bin"
+  "/usr/bin"
+  "/bin"
+  "/usr/sbin"
+  "/sbin"
+]
 }:
 
 let
