@@ -52,10 +52,6 @@ let
       (opts: mkWrapper opts)
       (builtins.attrValues cfg.wrappers);
 
-  securityWrapper = sourceProg : pkgs.pkgsStatic.callPackage ./wrapper.nix {
-    inherit sourceProg;
-  };
-
   mkWrapper =
     { program
     , source
@@ -71,10 +67,10 @@ let
       codesigned = if codesign
         then ''
           # codesign ${source} to "$wrapperDir/${program}" INSTEAD OF the next line
-          cp ${securityWrapper source}/bin/security-wrapper "$wrapperDir/${program}"
+          cp ${source} "$wrapperDir/${program}"
         ''
         else ''
-          cp ${securityWrapper source}/bin/security-wrapper "$wrapperDir/${program}"
+          cp ${source} "$wrapperDir/${program}"
         '';
     in
     ''
