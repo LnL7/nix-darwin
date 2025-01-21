@@ -171,8 +171,8 @@ if [ "$action" != build ]; then
 fi
 
 if [ "$action" = edit ]; then
-  darwinConfig=$(nix-instantiate --find-file darwin-config)
   if [ -z "$flake" ]; then
+    darwinConfig=$(nix-instantiate "${extraBuildFlags[@]}" --find-file darwin-config)
     exec "${EDITOR:-vi}" "$darwinConfig"
   else
     exec nix "${flakeFlags[@]}" edit "${extraLockFlags[@]}" -- "$flake#$flakeAttr"
