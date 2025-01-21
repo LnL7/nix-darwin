@@ -96,6 +96,9 @@
   system.defaults.WindowManager.AppWindowGroupingBehavior = true;
   system.defaults.WindowManager.StandardHideDesktopIcons = false;
   system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.EnableTilingByEdgeDrag = true;
+  system.defaults.WindowManager.EnableTopTilingByEdgeDrag = true;
+  system.defaults.WindowManager.EnableTilingOptionAccelerator = true;
   system.defaults.WindowManager.EnableTiledWindowMargins = true;
   system.defaults.WindowManager.StandardHideWidgets = true;
   system.defaults.WindowManager.StageManagerHideWidgets = true;

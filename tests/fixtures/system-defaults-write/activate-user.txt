@@ -524,6 +524,21 @@ defaults write com.apple.WindowManager 'EnableTiledWindowMargins' $'<?xml versio
 <plist version="1.0">
 <true/>
 </plist>'
+defaults write com.apple.WindowManager 'EnableTilingByEdgeDrag' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.WindowManager 'EnableTilingOptionAccelerator' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
+defaults write com.apple.WindowManager 'EnableTopTilingByEdgeDrag' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<true/>
+</plist>'
 defaults write com.apple.WindowManager 'GloballyEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
