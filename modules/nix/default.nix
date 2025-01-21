@@ -702,6 +702,8 @@ in
       "5d23e6d7015756c6f300f8cd558ec4d9234ca61deefd4f2478e91a49760b0747"  # DeterminateSystems Nix installer 0.16.0
       "e4974acb79c56148cb8e92137fa4f2de9b7356e897b332fc4e6769e8c0b83e18"  # DeterminateSystems Nix installer 0.20.0
       "966d22ef5bb9b56d481e8e0d5f7ca2deaf4d24c0f0fc969b2eeaa7ae0aa42907"  # DeterminateSystems Nix installer 0.22.0
+      "53712b4335030e2dbfb46bb235f8cffcac83fea404bd32dc99417ac89e2dd7c5"  # DeterminateSystems Nix installer 0.33.0
+      "6bb8d6b0dd16b44ee793a9b8382dac76c926e4c16ffb8ddd2bb4884d1ca3f811"  # DeterminateSystems Nix installer 0.34.0
       "24797ac05542ff8b52910efc77870faa5f9e3275097227ea4e50c430a5f72916"  # lix-installer 0.17.1 with flakes
       "b027b5cad320b5b8123d9d0db9f815c3f3921596c26dc3c471457098e4d3cc40"  # lix-installer 0.17.1 without flakes
     ];
@@ -822,8 +824,58 @@ in
       ]);
     users.knownGroups = mkIf cfg.configureBuildUsers [ "nixbld" ];
 
+    # The Determinate Systems installer puts user‐specified settings in
+    # `/etc/nix/nix.custom.conf` since v0.33.0. Supplement the
+    # `/etc/nix/nix.conf` hash check so that we don’t accidentally
+    # clobber user configuration.
+    #
+    # TODO: Maybe this could use a more general file placement mechanism
+    # to express that we want it deleted and know only one hash?
+    system.activationScripts.etcChecks.text = mkAfter ''
+      nixCustomConfKnownSha256Hashes=(
+        # v0.33.0
+        6787fade1cf934f82db554e78e1fc788705c2c5257fddf9b59bdd963ca6fec63
+        # v0.34.0
+        3bd68ef979a42070a44f8d82c205cfd8e8cca425d91253ec2c10a88179bb34aa
+      )
+      if [[ -e /etc/nix/nix.custom.conf ]]; then
+        nixCustomConfSha256Output=$(shasum -a 256 /etc/nix/nix.custom.conf)
+        nixCustomConfSha256Hash=''${nixCustomConfSha256Output%% *}
+        nixCustomConfIsKnown=
+        for nixCustomConfKnownSha256Hash
+          in "''${nixCustomConfKnownSha256Hashes[@]}"
+        do
+          if
+            [[ $nixCustomConfSha256Hash == "$nixCustomConfKnownSha256Hash" ]]
+          then
+            nixCustomConfIsKnown=1
+            break
+          fi
+        done
+        if [[ ! $nixCustomConfIsKnown ]]; then
+          # shellcheck disable=SC2016
+          printf >&2 '\e[1;31merror: custom settings in `/etc/nix/nix.custom.conf`, aborting activation\e[0m\n'
+          # shellcheck disable=SC2016
+          printf >&2 'You will need to migrate these to nix-darwin `nix.*` settings if you\n'
+          printf >&2 'wish to keep them. Check the manual for the appropriate settings and\n'
+          printf >&2 'add them to your system configuration, then run:\n'
+          printf >&2 '\n'
+          printf >&2 '  $ sudo mv /etc/nix/nix.custom.conf{,.before-nix-darwin}\n'
+          printf >&2 '\n'
+          printf >&2 'and activate your system again.\n'
+          exit 2
+        fi
+      fi
+    '';
+
     # Unrelated to use in NixOS module
-    system.activationScripts.nix-daemon.text = mkIf cfg.useDaemon ''
+    system.activationScripts.nix-daemon.text = ''
+      # Follow up on the `/etc/nix/nix.custom.conf` check.
+      # TODO: Use a more generalized file placement mechanism for this.
+      if [[ -e /etc/nix/nix.custom.conf ]]; then
+        mv /etc/nix/nix.custom.conf{,.before-nix-darwin}
+      fi
+    '' + optionalString cfg.useDaemon ''
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
