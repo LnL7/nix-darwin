@@ -853,9 +853,7 @@ in
           fi
         done
         if [[ ! $nixCustomConfIsKnown ]]; then
-          # shellcheck disable=SC2016
           printf >&2 '\e[1;31merror: custom settings in `/etc/nix/nix.custom.conf`, aborting activation\e[0m\n'
-          # shellcheck disable=SC2016
           printf >&2 'You will need to migrate these to nix-darwin `nix.*` settings if you\n'
           printf >&2 'wish to keep them. Check the manual for the appropriate settings and\n'
           printf >&2 'add them to your system configuration, then run:\n'
