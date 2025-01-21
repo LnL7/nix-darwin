@@ -16,12 +16,12 @@ with lib;
   nix.useDaemon = mkForce false;
 
   system.activationScripts.postUserActivation.text = mkAfter ''
-    if [[ -L ~/.nix-defexpr/channels/darwin ]]; then
-        nix-channel --remove darwin || true
-    fi
+    nix-channel --remove darwin || true
   '';
 
   system.activationScripts.postActivation.text = mkAfter ''
+    nix-channel --remove darwin || true
+
     if [[ -L /Applications/Nix\ Apps ]]; then
         rm /Applications/Nix\ Apps
     fi
