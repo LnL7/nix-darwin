@@ -1,8 +1,9 @@
 #! @shell@
 set -e
 set -o pipefail
-export PATH=@path@:$PATH
 
+export PATH=@path@
+export NIX_PATH=${NIX_PATH:-@nixPath@}
 
 showSyntax() {
   echo "darwin-rebuild [--help] {edit | switch | activate | build | check | changelog}" >&2
