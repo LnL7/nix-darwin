@@ -7,7 +7,6 @@ on:
 
 env:
   NIXPKGS_BRANCH: nixpkgs-unstable
-  NIX_DARWIN_BRANCH: master
   NIX_VERSION: 2.24.11
 
 jobs:
@@ -40,7 +39,6 @@ jobs:
         nix_path: nixpkgs=channel:${{ env.NIXPKGS_BRANCH }}
     - name: Install channels
       run: |
-        nix-channel --add https://github.com/LnL7/nix-darwin/archive/${{ env.NIX_DARWIN_BRANCH }}.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.NIXPKGS_BRANCH }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin
@@ -52,11 +50,22 @@ jobs:
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
         /usr/bin/sed -i.bak \
-          "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
+          "s/# programs.fish.enable = true;/ \
+            imports = [ \
+              ({ options, ... }: { \
+                nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; \
+                environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ]; \
+                nix.nixPath = \
+                  [ { darwin = \"${PWD////\/}\"; } ] \
+                  ++ options.nix.nixPath.default; \
+              }) \
+            ]; \
+          /" \
           ~/.config/nix-darwin/configuration.nix
 
         nix run .#darwin-rebuild \
           -- switch \
+          -I darwin=. \
           -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
     - name: Switch to new configuration
       run: |
@@ -66,7 +75,7 @@ jobs:
           "s/pkgs.vim/pkgs.hello/" \
           ~/.config/nix-darwin/configuration.nix
 
-        darwin-rebuild switch -I darwin=.
+        darwin-rebuild switch
 
         hello
     - name: Test uninstallation of nix-darwin
