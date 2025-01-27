@@ -202,6 +202,7 @@ in
 
     environment.etc.hosts = {
       knownSha256Hashes = [
+        # Comes from MacOS: Darwin 24.1.0 Darwin Kernel Version 24.1.0.
         "c7dd0e2ed261ce76d76f852596c5b54026b9a894fa481381ffd399b556c0e2da"
       ];
 
