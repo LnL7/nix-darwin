@@ -8,22 +8,6 @@ let
 
   cfg = config.system.checks;
 
-  darwinChanges = ''
-    darwinChanges=/dev/null
-    if test -e /run/current-system/darwin-changes; then
-      darwinChanges=/run/current-system/darwin-changes
-    fi
-
-    darwinChanges=$(diff --changed-group-format='%>' --unchanged-group-format= /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
-    if test -n "$darwinChanges"; then
-      echo >&2
-      echo "[1;1mCHANGELOG[0m" >&2
-      echo >&2
-      echo "$darwinChanges" >&2
-      echo >&2
-    fi
-  '';
-
   macOSVersion = ''
     IFS=. read -ra osVersion <<<"$(sw_vers --productVersion)"
     if (( osVersion[0] < 11 || (osVersion[0] == 11 && osVersion[1] < 3) )); then
@@ -368,7 +352,6 @@ in
   config = {
 
     system.checks.text = mkMerge [
-      darwinChanges
       (mkIf cfg.verifyMacOSVersion macOSVersion)
       (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
