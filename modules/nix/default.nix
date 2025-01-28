@@ -134,6 +134,26 @@ let
         namedPaths ++ searchPaths;
   };
 
+  handleUnmanaged = managedConfig: mkMerge [
+    (mkIf cfg.enable managedConfig)
+    (mkIf (!cfg.enable) {
+      system.activationScripts.nix-daemon.text = ''
+        # Restore unmanaged Nix daemon if present
+        unmanagedNixProfile=/nix/var/nix/profiles/default
+        if [[
+          -e /run/current-system/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+          && -e $unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        ]]; then
+          printf >&2 'restoring unmanaged Nix daemon...\n'
+          cp \
+            "$unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist" \
+            /Library/LaunchDaemons
+          launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        fi
+      '';
+    })
+  ];
+
 in
 
 {
@@ -144,7 +164,6 @@ in
     in
     [
       # Only ever in NixOS
-      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivalent to this NixOS option.")
       (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
@@ -165,9 +184,36 @@ in
 
     nix = {
 
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Whether to enable Nix.
+
+          Disabling this will stop nix-darwin from managing the
+          installed version of Nix, the nix-daemon launchd daemon, and
+          the settings in {file}`/etc/nix/nix.conf`.
+
+          This allows you to use nix-darwin without it taking over your
+          system installation of Nix. Some nix-darwin functionality
+          that relies on managing the Nix installation, like the
+          `nix.*` options to adjust Nix settings or configure a Linux
+          builder, will be unavailable. You will also have to upgrade
+          Nix yourself, as nix-darwin will no longer do so.
+
+          ::: {.warning}
+          If you have already removed your global system installation
+          of Nix, this will break nix-darwin and you will have to
+          reinstall Nix to fix it.
+          :::
+        '';
+      };
+
       package = mkOption {
         type = types.package;
-        default = pkgs.nix;
+        default = warnIf (!cfg.enable)
+          "nix.package: accessed when `nix.enable` is off; this is a bug"
+          pkgs.nix;
         defaultText = literalExpression "pkgs.nix";
         description = ''
           This option specifies the Nix package instance to use throughout the system.
@@ -678,7 +724,7 @@ in
 
   ###### implementation
 
-  config = {
+  config = handleUnmanaged {
     environment.systemPackages =
       [
         nixPackage
