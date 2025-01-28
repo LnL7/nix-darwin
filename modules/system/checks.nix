@@ -303,15 +303,16 @@ in
   options = {
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
-      default = true;
+      default = config.nix.enable;
       description = "Whether to run the NIX_PATH validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
       default =
-        (config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
-        || config.nix.configureBuildUsers;
+        config.nix.enable &&
+        ((config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+          || config.nix.configureBuildUsers);
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -336,7 +337,7 @@ in
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf config.nix.configureBuildUsers buildGroupID)
-      nixDaemon
+      (mkIf config.nix.enable nixDaemon)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
