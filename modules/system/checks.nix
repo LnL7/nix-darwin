@@ -193,7 +193,7 @@ let
     darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
-        echo "Create ''${darwinConfig:-~/.nixpkgs/darwin-configuration.nix} or set environment.darwinConfig:" >&2
+        echo "Create ''${darwinConfig:-/etc/nix-darwin/configuration.nix} or set environment.darwinConfig:" >&2
         echo >&2
         echo "    environment.darwinConfig = \"$(nix-instantiate --find-file darwin-config 2> /dev/null || echo '***')\";" >&2
         echo >&2
