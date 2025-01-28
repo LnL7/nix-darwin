@@ -10,14 +10,7 @@
       script = ''
         set -e
         set -o pipefail
-
         export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-        export USER=root
-        export LOGNAME=root
-        export HOME=~root
-        export SHELL=$BASH
-        export LANG=C
-        export LC_CTYPE=UTF-8
 
         systemConfig=$(cat ${config.system.profile}/systemConfig)
 
