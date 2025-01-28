@@ -12,6 +12,8 @@ let
 
   isNixAtLeast = versionAtLeast (getVersion nixPackage);
 
+  configureBuildUsers = !(config.nix.settings.auto-allocate-uids or false);
+
   makeNixBuildUser = nr: {
     name = "_nixbld${toString nr}";
     value = {
@@ -179,6 +181,10 @@ in
       (mkRemovedOptionModule [ "nix" "useDaemon" ] ''
         nix-darwin now only supports managing multi‐user daemon
         installations of Nix.
+      '')
+      (mkRemovedOptionModule [ "nix" "configureBuildUsers" ] ''
+        nix-darwin now manages build users unconditionally when
+        `nix.enable` is on.
       '')
     ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
@@ -395,15 +401,6 @@ in
         internal = true;
         default = { };
         description = "Environment variables used by Nix.";
-      };
-
-      # Not in NixOS module
-      configureBuildUsers = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Enable configuration for nixbld group and users.
-        '';
       };
 
       nrBuildUsers = mkOption {
@@ -836,10 +833,10 @@ in
 
     nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
 
-    users.users = mkIf cfg.configureBuildUsers nixbldUsers;
+    users.users = mkIf configureBuildUsers nixbldUsers;
 
     # Not in NixOS module
-    users.groups.nixbld = mkIf cfg.configureBuildUsers {
+    users.groups.nixbld = mkIf configureBuildUsers {
       description = "Nix build group for nix-daemon";
       gid = config.ids.gids.nixbld;
       members = attrNames nixbldUsers;
@@ -847,11 +844,11 @@ in
     users.knownUsers =
       let nixbldUserNames = attrNames nixbldUsers;
       in
-      mkIf cfg.configureBuildUsers (mkMerge [
+      mkMerge [
         nixbldUserNames
         (map (removePrefix "_") nixbldUserNames) # delete old style nixbld users
-      ]);
-    users.knownGroups = mkIf cfg.configureBuildUsers [ "nixbld" ];
+      ];
+    users.knownGroups = [ "nixbld" ];
 
     # The Determinate Systems installer puts user‐specified settings in
     # `/etc/nix/nix.custom.conf` since v0.33.0. Supplement the

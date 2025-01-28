@@ -319,7 +319,6 @@
   #     path = /etc/per-user/lnl/gitconfig
   # environment.etc."per-user/lnl/gitconfig".text = builtins.readFile "${inputs.dotfiles}/git/gitconfig";
 
-  nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
 
   system.stateVersion = 6;

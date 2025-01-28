@@ -31,29 +31,13 @@ let
     fi
   '';
 
-  oldBuildUsers = ''
-    if dscl . -list /Users | grep -q '^nixbld'; then
-        echo "[1;31merror: Detected old style nixbld users, aborting activation[0m" >&2
-        echo "These can cause migration problems when upgrading to certain macOS versions" >&2
-        echo "You can enable the following option to migrate to new style nixbld users" >&2
-        echo >&2
-        echo "    nix.configureBuildUsers = true;" >&2
-        echo >&2
-        echo "or disable this check with" >&2
-        echo >&2
-        echo "    system.checks.verifyBuildUsers = false;" >&2
-        echo >&2
-        exit 2
-     fi
-   '';
-
   preSequoiaBuildUsers = ''
-    ${lib.optionalString config.nix.configureBuildUsers ''
-      # Don’t complain when we’re about to migrate old‐style build users…
-      if ! dscl . -list /Users | grep -q '^nixbld'; then
-    ''}
     firstBuildUserID=$(dscl . -read /Users/_nixbld1 UniqueID | awk '{print $2}')
-    if [[ $firstBuildUserID != ${toString (config.ids.uids.nixbld + 1)} ]]; then
+    if
+      # Don’t complain when we’re about to migrate old‐style build users…
+      [[ $firstBuildUserID != ${toString (config.ids.uids.nixbld + 1)} ]] \
+      && ! dscl . -list /Users | grep -q '^nixbld'
+    then
         printf >&2 '\e[1;31merror: Build users have unexpected UIDs, aborting activation\e[0m\n'
         printf >&2 'The default Nix build user ID range has been adjusted for\n'
         printf >&2 'compatibility with macOS Sequoia 15. Your _nixbld1 user currently has\n'
@@ -84,22 +68,6 @@ let
         printf >&2 '\n'
         printf >&2 '    ids.uids.nixbld = %d;\n' "$((firstBuildUserID - 1))"
         printf >&2 '\n'
-        exit 2
-    fi
-    ${lib.optionalString config.nix.configureBuildUsers "fi"}
-  '';
-
-  buildUsers = ''
-    buildUser=$(dscl . -read /Groups/nixbld GroupMembership 2>&1 | awk '/^GroupMembership: / {print $2}') || true
-    if [[ -z "$buildUser" ]]; then
-        echo "[1;31merror: Using the nix-daemon requires build users, aborting activation[0m" >&2
-        echo "Create the build users or disable the daemon:" >&2
-        echo "$ darwin-install" >&2
-        echo >&2
-        echo "or set (this requires some manual intervention to restore permissions)" >&2
-        echo >&2
-        echo "    services.nix-daemon.enable = false;" >&2
-        echo >&2
         exit 2
     fi
   '';
@@ -268,9 +236,7 @@ in
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
       default =
-        config.nix.enable &&
-        ((!(config.nix.settings.auto-allocate-uids or false))
-          || config.nix.configureBuildUsers);
+        config.nix.enable && !(config.nix.settings.auto-allocate-uids or false);
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -291,10 +257,8 @@ in
 
     system.checks.text = mkMerge [
       (mkIf cfg.verifyMacOSVersion macOSVersion)
-      (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
-      (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
-      (mkIf config.nix.configureBuildUsers buildGroupID)
+      (mkIf cfg.verifyBuildUsers buildGroupID)
       (mkIf config.nix.enable nixDaemon)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
