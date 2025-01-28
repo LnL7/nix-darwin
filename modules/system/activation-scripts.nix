@@ -37,32 +37,15 @@ in
   config = {
 
     system.activationScripts.script.text = ''
-      #!/usr/bin/env -i ${stdenv.shell}
-      # shellcheck shell=bash
-      # shellcheck disable=SC2096
-
+      #! ${stdenv.shell}
       set -e
       set -o pipefail
-
       export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-      export USER=root
-      export LOGNAME=root
-      export HOME=~root
-      export SHELL=$BASH
-      export LANG=C
-      export LC_CTYPE=UTF-8
 
       systemConfig=@out@
 
       # Ensure a consistent umask.
       umask 0022
-
-      cd /
-
-      if [[ $(id -u) -ne 0 ]]; then
-        printf >&2 '\e[1;31merror: `activate` must be run as root\e[0m\n'
-        exit 2
-      fi
 
       ${cfg.activationScripts.preActivation.text}
 
