@@ -13,6 +13,32 @@ let
     mkTextDerivation = name: text: pkgs.writeScript "activate-${name}" text;
   };
 
+  activationPath =
+    lib.makeBinPath [
+      pkgs.gnugrep
+      pkgs.coreutils
+    ]
+    + lib.optionalString (!config.nix.enable) ''
+      $(
+        # If `nix.enable` is off, there might be an unmanaged Nix
+        # installation (say in `/nix/var/nix/profiles/default`) that
+        # activation scripts (such as Home Manager) want to find on the
+        # `$PATH`. Search for it directly to avoid polluting the
+        # activation script environment with everything on the
+        # `environment.systemPath`.
+        if nixEnvPath=$(
+          PATH="${config.environment.systemPath}" command -v nix-env
+        ); then
+          printf ':'
+          ${lib.getExe' pkgs.coreutils "dirname"} -- "$(
+            ${lib.getExe' pkgs.coreutils "readlink"} \
+              --canonicalize-missing \
+              -- "$nixEnvPath"
+          )"
+        fi
+      )''
+    + ":@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+
 in
 
 {
@@ -40,7 +66,9 @@ in
       #! ${stdenv.shell}
       set -e
       set -o pipefail
-      export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+      PATH="${activationPath}"
+      export PATH
 
       systemConfig=@out@
 
@@ -86,7 +114,9 @@ in
       #! ${stdenv.shell}
       set -e
       set -o pipefail
-      export PATH="${pkgs.gnugrep}/bin:${pkgs.coreutils}/bin:@out@/sw/bin:/usr/bin:/bin"
+
+      PATH="${activationPath}"
+      export PATH
 
       systemConfig=@out@
 
