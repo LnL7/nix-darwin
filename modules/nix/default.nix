@@ -785,21 +785,11 @@ in
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
-    environment.extraInit = mkMerge [
-      (mkIf cfg.channel.enable ''
-        if [ -e "$HOME/.nix-defexpr/channels" ]; then
-          export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
-        fi
-      '')
-      # Not in NixOS module
-      ''
-        # Set up secure multi-user builds: non-root users build through the
-        # Nix daemon.
-        if [ ! -w /nix/var/nix/db ]; then
-            export NIX_REMOTE=daemon
-        fi
-      ''
-    ];
+    environment.extraInit = mkIf cfg.channel.enable ''
+      if [ -e "$HOME/.nix-defexpr/channels" ]; then
+        export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
+      fi
+    '';
 
     environment.extraSetup = mkIf (!cfg.channel.enable) ''
       rm --force $out/bin/nix-channel

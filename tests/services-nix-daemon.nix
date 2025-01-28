@@ -27,8 +27,5 @@ in
 
     echo checking nix-daemon reload in /activate >&2
     grep "launchctl kill HUP system/org.nixos.nix-daemon" ${config.out}/activate
-
-    echo checking NIX_REMOTE=daemon in setEnvironment >&2
-    grep "NIX_REMOTE=daemon" ${config.system.build.setEnvironment}
   '';
 }
