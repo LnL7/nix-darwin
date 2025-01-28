@@ -3,17 +3,18 @@
 let
   cfg = config.services.nix-daemon;
 
-  inherit (lib) mkDefault mkIf mkMerge mkOption types;
+  inherit (lib) mkRemovedOptionModule mkDefault mkIf mkMerge mkOption types;
 in
 
 {
-  options = {
-    services.nix-daemon.enable = mkOption {
-      type = types.bool;
-      default = config.nix.enable;
-      description = "Whether to enable the nix-daemon service.";
-    };
+  imports = [
+    (mkRemovedOptionModule [ "services" "nix-daemon" "enable" ] ''
+      nix-darwin now manages nix-daemon unconditionally when
+      `nix.enable` is on.
+    '')
+  ];
 
+  options = {
     services.nix-daemon.enableSocketListener = mkOption {
       type = types.bool;
       default = false;
@@ -39,7 +40,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf config.nix.enable {
 
     launchd.daemons.nix-daemon = {
       command = lib.getExe' config.nix.package "nix-daemon";
