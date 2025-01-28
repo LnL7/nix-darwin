@@ -41,8 +41,6 @@ in
 
   config = mkIf cfg.enable {
 
-    nix.useDaemon = true;
-
     launchd.daemons.nix-daemon = {
       command = lib.getExe' config.nix.package "nix-daemon";
       serviceConfig.ProcessType = config.nix.daemonProcessType;

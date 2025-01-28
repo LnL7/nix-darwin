@@ -74,7 +74,7 @@ in
       darwin.label = config.system.darwinLabel;
       darwin.revision = config.system.darwinRevision;
       darwin.version = config.system.darwinVersion;
-      darwin.nix.daemon = config.nix.useDaemon;
+      darwin.nix.daemon = true;
       darwin.nix.sandbox = config.nix.settings.sandbox;
     };
   };

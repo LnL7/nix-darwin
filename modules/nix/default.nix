@@ -176,6 +176,10 @@ in
       (mkRenamedOptionModule [ "users" "nix" "nrBuildUsers" ] [ "nix" "nrBuildUsers" ])
       (mkRenamedOptionModule [ "nix" "daemonIONice" ] [ "nix" "daemonIOLowPriority" ])
       (mkRemovedOptionModule [ "nix" "daemonNiceLevel" ] (consider "nix.daemonProcessType"))
+      (mkRemovedOptionModule [ "nix" "useDaemon" ] ''
+        nix-darwin now only supports managing multi‐user daemon
+        installations of Nix.
+      '')
     ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
   ###### interface
@@ -217,17 +221,6 @@ in
         defaultText = literalExpression "pkgs.nix";
         description = ''
           This option specifies the Nix package instance to use throughout the system.
-        '';
-      };
-
-      # Not in NixOS module
-      useDaemon = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          If set, Nix will use the daemon to perform operations.
-          Use this instead of services.nix-daemon.enable if you don't want the
-          daemon service to be managed for you.
         '';
       };
 
@@ -909,7 +902,7 @@ in
       if [[ -e /etc/nix/nix.custom.conf ]]; then
         mv /etc/nix/nix.custom.conf{,.before-nix-darwin}
       fi
-    '' + optionalString cfg.useDaemon ''
+
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
@@ -926,6 +919,9 @@ in
         trusted-users = [ "root" ];
         substituters = mkAfter [ "https://cache.nixos.org/" ];
 
+        # Not in NixOS module
+        build-users-group = "nixbld";
+
         # Not implemented yet
         # system-features = mkDefault (
         #   [ "nixos-test" "benchmark" "big-parallel" "kvm" ] ++
@@ -941,8 +937,6 @@ in
 
       (mkIf (isNixAtLeast "2.3pre") { sandbox-fallback = false; })
 
-      # Not in NixOS module
-      (mkIf cfg.useDaemon { build-users-group = "nixbld"; })
     ];
 
   };

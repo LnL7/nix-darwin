@@ -130,24 +130,19 @@ let
     fi
   '';
 
-  nixDaemon = if config.nix.useDaemon then ''
-    if ! dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
-      printf >&2 '[1;31merror: The daemon should not be enabled for single-user installs, aborting activation[0m\n'
-      printf >&2 'Disable the nix-daemon service:\n'
+  nixDaemon = ''
+    if [[ "$(stat --format='%u' /nix)" != 0 ]]; then
+      printf >&2 '[1;31merror: single‐user install detected, aborting activation[0m\n'
+      printf >&2 'nix-darwin now only supports managing multi‐user daemon installations\n'
+      printf >&2 'of Nix. You can uninstall nix-darwin and Nix and then reinstall both to\n'
+      printf >&2 'fix this.\n'
       printf >&2 '\n'
-      printf >&2 '    services.nix-daemon.enable = false;\n'
+      printf >&2 'If you don’t want to do that, you can disable management of the Nix\n'
+      printf >&2 'installation with:\n'
       printf >&2 '\n'
-      printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
+      printf >&2 '    nix.enable = false;\n'
       printf >&2 '\n'
-      exit 2
-    fi
-  '' else ''
-    if dscl . -read /Groups/nixbld PrimaryGroupID &> /dev/null; then
-      printf >&2 '[1;31merror: The daemon should be enabled for multi-user installs, aborting activation[0m\n'
-      printf >&2 'Enable the nix-daemon service:\n'
-      printf >&2 '\n'
-      printf >&2 '    services.nix-daemon.enable = true;\n'
-      printf >&2 '\n'
+      printf >&2 'See the `nix.enable` option documentation for caveats.\n'
       exit 2
     fi
   '';
@@ -214,43 +209,6 @@ let
     fi
   '';
 
-  nixStore = ''
-    if test -w /nix/var/nix/db -a ! -O /nix/store; then
-        echo >&2 "[1;31merror: the store is not owned by this user, but /nix/var/nix/db is writable[0m"
-        echo >&2 "If you are using the daemon:"
-        echo >&2
-        echo >&2 "    sudo chown -R root:wheel /nix/var/nix/db"
-        echo >&2
-        echo >&2 "Otherwise:"
-        echo >&2
-        echo >&2 "    sudo chown -R $USER:staff /nix/store"
-        echo >&2
-        exit 2
-    fi
-  '';
-
-  nixGarbageCollector = ''
-    if test -O /nix/store; then
-        echo "[1;31merror: A single-user install can't run gc as root, aborting activation[0m" >&2
-        echo "Configure the garbage collector to run as the current user:" >&2
-        echo >&2
-        echo "    nix.gc.user = \"$USER\";" >&2
-        echo >&2
-        exit 2
-    fi
-  '';
-
-  nixStoreOptimiser = ''
-    if test -O /nix/store; then
-        echo "[1;31merror: A single-user install can't run optimiser as root, aborting activation[0m" >&2
-        echo "Configure the optimiser to run as the current user:" >&2
-        echo >&2
-        echo "    nix.optimise.user = \"$USER\";" >&2
-        echo >&2
-        exit 2
-    fi
-  '';
-
   # TODO: Remove this a couple years down the line when we can assume
   # that anyone who cares about security has upgraded.
   oldSshAuthorizedKeysDirectory = ''
@@ -311,7 +269,7 @@ in
       type = types.bool;
       default =
         config.nix.enable &&
-        ((config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+        ((!(config.nix.settings.auto-allocate-uids or false))
           || config.nix.configureBuildUsers);
       description = "Whether to run the Nix build users validation checks.";
     };
@@ -338,9 +296,6 @@ in
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf config.nix.configureBuildUsers buildGroupID)
       (mkIf config.nix.enable nixDaemon)
-      nixStore
-      (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
-      (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
