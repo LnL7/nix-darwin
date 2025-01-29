@@ -152,25 +152,6 @@ let
     fi
   '';
 
-  nixChannels = ''
-    channelsLink=$(readlink "$HOME/.nix-defexpr/channels") || true
-    case "$channelsLink" in
-      *"$USER"*)
-        ;;
-      "")
-        ;;
-      *)
-        echo "[1;31merror: The ~/.nix-defexpr/channels symlink does not point your users channels, aborting activation[0m" >&2
-        echo "Running nix-channel will regenerate it" >&2
-        echo >&2
-        echo "    rm ~/.nix-defexpr/channels" >&2
-        echo "    nix-channel --update" >&2
-        echo >&2
-        exit 2
-        ;;
-    esac
-  '';
-
   nixInstaller = ''
     if grep -q 'etc/profile.d/nix-daemon.sh' /etc/profile; then
         echo "[1;31merror: Found nix-daemon.sh reference in /etc/profile, aborting activation[0m" >&2
@@ -315,17 +296,15 @@ let
 in
 
 {
+  imports = [
+    (mkRemovedOptionModule [ "system" "checks" "verifyNixChannels" ] "This check has been removed.")
+  ];
+
   options = {
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
       default = true;
       description = "Whether to run the NIX_PATH validation checks.";
-    };
-
-    system.checks.verifyNixChannels = mkOption {
-      type = types.bool;
-      default = config.nix.channel.enable;
-      description = "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
@@ -361,7 +340,6 @@ in
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)
-      (mkIf cfg.verifyNixChannels nixChannels)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
