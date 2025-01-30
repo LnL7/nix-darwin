@@ -9,7 +9,7 @@ let
   cfg = config.system.checks;
 
   macOSVersion = ''
-    IFS=. read -ra osVersion <<<"$(sw_vers --productVersion)"
+    IFS=. read -ra osVersion <<<"$(sw_vers -productVersion)"
     if (( osVersion[0] < 11 || (osVersion[0] == 11 && osVersion[1] < 3) )); then
       printf >&2 '\e[1;31merror: macOS version is less than 11.3, aborting activation\e[0m\n'
       printf >&2 'Nixpkgs 25.05 requires macOS Big Sur 11.3 or newer, and 25.11 will\n'
