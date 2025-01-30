@@ -14,10 +14,12 @@ let
   };
 
   activationPath =
-    lib.makeBinPath [
-      pkgs.gnugrep
-      pkgs.coreutils
-    ]
+    lib.makeBinPath (
+      [
+        pkgs.gnugrep
+        pkgs.coreutils
+      ] ++ lib.optionals config.nix.enable [ config.nix.package ]
+    )
     + lib.optionalString (!config.nix.enable) ''
       $(
         # If `nix.enable` is off, there might be an unmanaged Nix
@@ -37,8 +39,7 @@ let
           )"
         fi
       )''
-    + ":@out@/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-
+    + ":/usr/bin:/bin:/usr/sbin:/sbin";
 in
 
 {
@@ -80,17 +81,35 @@ in
         ];
 
     system.activationScripts.script.text = ''
-      #! ${stdenv.shell}
+      #!/usr/bin/env -i ${stdenv.shell}
+      # shellcheck shell=bash
+      # shellcheck disable=SC2096
+
       set -e
       set -o pipefail
 
       PATH="${activationPath}"
+
       export PATH
+      export USER=root
+      export LOGNAME=root
+      export HOME=~root
+      export MAIL=/var/mail/root
+      export SHELL=$BASH
+      export LANG=C
+      export LC_CTYPE=UTF-8
 
       systemConfig=@out@
 
       # Ensure a consistent umask.
       umask 0022
+
+      cd /
+
+      if [[ $(id -u) -ne 0 ]]; then
+        printf >&2 '\e[1;31merror: `activate` must be run as root\e[0m\n'
+        exit 2
+      fi
 
       ${cfg.activationScripts.preActivation.text}
 
