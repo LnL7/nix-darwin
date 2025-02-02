@@ -9,7 +9,16 @@ let
 
   darwin-uninstaller = pkgs.callPackage ../../pkgs/darwin-uninstaller { };
 
-  inherit (nix-tools) darwin-option darwin-rebuild darwin-version;
+  mkToolModule = { name, package ? nix-tools.${name} }: { config, ... }: {
+    options.system.tools.${name}.enable = lib.mkEnableOption "${name} script" // {
+      default = ! config.system.disableInstallerTools;
+      defaultText = "!config.system.disableInstallerTools";
+    };
+
+    config = lib.mkIf config.system.tools.${name}.enable {
+      environment.systemPackages = [ package ];
+    };
+  };
 in
 
 {
@@ -19,29 +28,25 @@ in
       internal = true;
       default = false;
       description = ''
-        Disable darwin-rebuild and darwin-option. This is useful to shrink
-        systems which are not expected to rebuild or reconfigure themselves.
-        Use at your own risk!
+        Disable installer tools, such as darwin-rebuild and darwin-option. This
+        is useful to shrink systems which are not expected to rebuild or
+        reconfigure themselves. Use at your own risk!
     '';
-    };
-
-    includeUninstaller = lib.mkOption {
-      type = lib.types.bool;
-      internal = true;
-      default = true;
     };
   };
 
-  config = {
-    environment.systemPackages =
-      [ darwin-version ]
-      ++ lib.optionals (!config.system.disableInstallerTools) [
-        darwin-option
-        darwin-rebuild
-      ] ++ lib.optional config.system.includeUninstaller darwin-uninstaller;
+  imports = [
+    (lib.mkRenamedOptionModule [ "system" "includeUninstaller" ] [ "system" "tools" "darwin-uninstaller" "enable" ])
 
+    (mkToolModule { name = "darwin-option"; })
+    (mkToolModule { name = "darwin-rebuild"; })
+    (mkToolModule { name = "darwin-version"; })
+    (mkToolModule { name = "darwin-uninstaller"; package = darwin-uninstaller; })
+  ];
+
+  config = {
     system.build = {
-      inherit darwin-option darwin-rebuild darwin-version;
+      inherit (nix-tools) darwin-option darwin-rebuild darwin-version;
     };
   };
 }
