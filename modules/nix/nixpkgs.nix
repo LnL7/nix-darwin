@@ -306,6 +306,9 @@ see https://github.com/NixOS/nixpkgs/issues/278001
 
           Current value:
           ${lib.generators.toPretty { multiline = true; } cfg.config}
+
+          Defined in:
+          ${lib.concatMapStringsSep "\n" (file: "  - ${file}") opt.config.files}
         '';
       }
     ];
