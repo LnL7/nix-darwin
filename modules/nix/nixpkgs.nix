@@ -305,7 +305,7 @@ see https://github.com/NixOS/nixpkgs/issues/278001
           `nixpkgs.config` options should be passed when creating the instance instead.
 
           Current value:
-          ${lib.generators.toPretty { multiline = true; } opt.config}
+          ${lib.generators.toPretty { multiline = true; } cfg.config}
         '';
       }
     ];
