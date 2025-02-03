@@ -181,7 +181,12 @@ in
       example = { system = "x86_64-darwin"; };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this.
-      apply = lib.systems.elaborate;
+      apply = inputBuildPlatform:
+        let elaborated = lib.systems.elaborate inputBuildPlatform;
+        in if lib.systems.equals elaborated cfg.hostPlatform
+          then cfg.hostPlatform  # make identical, so that `==` equality works;
+see https://github.com/NixOS/nixpkgs/issues/278001
+          else elaborated;
       defaultText = literalExpression
         ''config.nixpkgs.hostPlatform'';
       description = ''
