@@ -667,45 +667,48 @@ in
       environment = { #config.networking.proxy.envVars // {
         HOME = "${config.users.users.gitlab-runner.home}";
         NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-      } // (if config.nix.useDaemon then { NIX_REMOTE = "daemon"; } else {});
-      path = with pkgs; [
-        bash
-        gawk
-        jq
-        moreutils
-        remarshal
-        # util-linux
-        cfg.package
-        coreutils
-        gnugrep
-        gnused
-      ] ++ cfg.extraPackages;
+      } // (if config.nix.useDaemon then { NIX_REMOTE = "daemon"; } else { });
 
-        script = ''
-            ${configureScript}/bin/gitlab-runner-configure && ${startScript}/bin/gitlab-runner-start
-        '';
+      path =
+        (with pkgs; [
+          bash
+          gawk
+          jq
+          moreutils
+          remarshal
+          # util-linux
+          coreutils
+          gnugrep
+          gnused
+        ])
+        ++ [ cfg.package ]
+        ++ cfg.extraPackages;
 
-        serviceConfig = {
-            ProcessType = "Interactive";
-            ThrottleInterval = 30;
+      script = ''
+        ${configureScript}/bin/gitlab-runner-configure && ${startScript}/bin/gitlab-runner-start
+      '';
 
-          # StandardOutPath = "/var/lib/gitlab-runner/out.log";
-          # StandardErrorPath = "/var/lib/gitlab-runner/err.log";
-          # The combination of KeepAlive.NetworkState and WatchPaths
-          # will ensure that buildkite-agent is started on boot, but
-          # after networking is available (so the hostname is
-          # correct).
-          RunAtLoad = true;
+      serviceConfig = {
+        ProcessType = "Interactive";
+        ThrottleInterval = 30;
+
+        # StandardOutPath = "/var/lib/gitlab-runner/out.log";
+        # StandardErrorPath = "/var/lib/gitlab-runner/err.log";
+        # The combination of KeepAlive.NetworkState and WatchPaths
+        # will ensure that buildkite-agent is started on boot, but
+        # after networking is available (so the hostname is
+        # correct).
+        RunAtLoad = true;
         #   KeepAlive.NetworkState = true;
-          WatchPaths = [
-            "/etc/resolv.conf"
-            "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
-          ];
+        WatchPaths = [
+          "/etc/resolv.conf"
+          "/Library/Preferences/SystemConfiguration/NetworkInterfaces.plist"
+        ];
 
-          GroupName = "gitlab-runner";
-          UserName  = "gitlab-runner";
-          WorkingDirectory = config.users.users.gitlab-runner.home;
-        };
+        GroupName = "gitlab-runner";
+        UserName = "gitlab-runner";
+        WorkingDirectory = config.users.users.gitlab-runner.home;
+      };
 
     };
     # systemd.services.gitlab-runner = {
