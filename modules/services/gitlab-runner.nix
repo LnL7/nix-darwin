@@ -1,7 +1,43 @@
 { config, lib, pkgs, ... }:
-with builtins;
-with lib;
 let
+  inherit (builtins)
+    hashString
+    map
+    substring
+    toJSON
+    toString
+    unsafeDiscardStringContext
+    ;
+
+  inherit (lib)
+    any
+    assertMsg
+    attrNames
+    attrValues
+    concatStringsSep
+    escapeShellArg
+    filterAttrs
+    hasPrefix
+    isStorePath
+    literalExpression
+    mapAttrs'
+    mapAttrsToList
+    mkDefault
+    mkEnableOption
+    mkIf
+    mkOption
+    mkPackageOption
+    mkRemovedOptionModule
+    mkRenamedOptionModule
+    nameValuePair
+    optional
+    optionalAttrs
+    optionals
+    teams
+    toShellVar
+    types
+    ;
+
   cfg = config.services.gitlab-runner;
   hasDocker = config.virtualisation.docker.enable;
   hashedServices = mapAttrs'
