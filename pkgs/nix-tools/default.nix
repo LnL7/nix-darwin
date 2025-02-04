@@ -21,6 +21,7 @@
   "/usr/sbin"
   "/sbin"
 ]
+, nixPackage ? null
 , # This should be kept in sync with the default `nix.nixPath`.
   nixPath ? lib.concatStringsSep ":" [
   "darwin-config=/etc/nix-darwin/configuration.nix"
@@ -29,7 +30,7 @@
 }:
 
 let
-  extraPath = lib.makeBinPath [ coreutils jq git ];
+  extraPath = lib.makeBinPath [ coreutils jq git nixPackage ];
 
   writeProgram = name: env: src:
     substituteAll ({
