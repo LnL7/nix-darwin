@@ -5,6 +5,7 @@ let
     inherit (config.system) profile;
     inherit (config.environment) systemPath;
     nixPath = lib.optionalString config.nix.enable (lib.concatStringsSep ":" config.nix.nixPath);
+    nixPackage = if config.nix.enable then config.nix.package else null;
   };
 
   darwin-uninstaller = pkgs.callPackage ../../pkgs/darwin-uninstaller { };
