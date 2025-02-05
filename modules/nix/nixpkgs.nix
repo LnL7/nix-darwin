@@ -1,89 +1,99 @@
-{ config, options, lib, pkgs, ... }:
-
-with lib;
+{
+  config,
+  options,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.nixpkgs;
   opt = options.nixpkgs;
 
-  isConfig = x:
-    builtins.isAttrs x || lib.isFunction x;
+  isConfig = x: builtins.isAttrs x || lib.isFunction x;
 
-  optCall = f: x:
-    if lib.isFunction f
-    then f x
-    else f;
+  optCall = f: x: if lib.isFunction f then f x else f;
 
-  mergeConfig = lhs_: rhs_:
+  mergeConfig =
+    lhs_: rhs_:
     let
       lhs = optCall lhs_ { inherit pkgs; };
       rhs = optCall rhs_ { inherit pkgs; };
     in
-    recursiveUpdate lhs rhs //
-    optionalAttrs (lhs ? packageOverrides) {
-      packageOverrides = pkgs:
-        optCall lhs.packageOverrides pkgs //
-        optCall (attrByPath [ "packageOverrides" ] { } rhs) pkgs;
-    } //
-    optionalAttrs (lhs ? perlPackageOverrides) {
-      perlPackageOverrides = pkgs:
-        optCall lhs.perlPackageOverrides pkgs //
-        optCall (attrByPath [ "perlPackageOverrides" ] { } rhs) pkgs;
+    lib.recursiveUpdate lhs rhs
+    // lib.optionalAttrs (lhs ? packageOverrides) {
+      packageOverrides =
+        pkgs:
+        optCall lhs.packageOverrides pkgs // optCall (lib.attrByPath [ "packageOverrides" ] { } rhs) pkgs;
+    }
+    // lib.optionalAttrs (lhs ? perlPackageOverrides) {
+      perlPackageOverrides =
+        pkgs:
+        optCall lhs.perlPackageOverrides pkgs
+        // optCall (lib.attrByPath [ "perlPackageOverrides" ] { } rhs) pkgs;
     };
 
-  configType = mkOptionType {
+  configType = lib.mkOptionType {
     name = "nixpkgs-config";
     description = "nixpkgs config";
-    check = x:
-      let traceXIfNot = c:
-            if c x then true
-            else lib.traceSeqN 1 x false;
-      in traceXIfNot isConfig;
-    merge = args: foldr (def: mergeConfig def.value) {};
+    check =
+      x:
+      let
+        traceXIfNot = c: if c x then true else lib.traceSeqN 1 x false;
+      in
+      traceXIfNot isConfig;
+    merge = args: lib.foldr (def: mergeConfig def.value) { };
   };
 
-  overlayType = mkOptionType {
+  overlayType = lib.mkOptionType {
     name = "nixpkgs-overlay";
     description = "nixpkgs overlay";
     check = lib.isFunction;
     merge = lib.mergeOneOption;
   };
 
-  pkgsType = types.pkgs // {
+  pkgsType = lib.types.pkgs // {
     # This type is only used by itself, so let's elaborate the description a bit
     # for the purpose of documentation.
     description = "An evaluation of Nixpkgs; the top level attribute set of packages";
   };
 
-  hasBuildPlatform = opt.buildPlatform.highestPrio < (mkOptionDefault {}).priority;
+  hasBuildPlatform = opt.buildPlatform.highestPrio < (lib.mkOptionDefault { }).priority;
   hasHostPlatform = opt.hostPlatform.isDefined;
   hasPlatform = hasHostPlatform || hasBuildPlatform;
 
   # Context for messages
-  hostPlatformLine = optionalString hasHostPlatform "${showOptionWithDefLocs opt.hostPlatform}";
-  buildPlatformLine = optionalString hasBuildPlatform "${showOptionWithDefLocs opt.buildPlatform}";
+  hostPlatformLine = lib.optionalString hasHostPlatform "${lib.showOptionWithDefLocs opt.hostPlatform}";
+  buildPlatformLine = lib.optionalString hasBuildPlatform "${lib.showOptionWithDefLocs opt.buildPlatform}";
 
-  legacyOptionsDefined =
-    optional (opt.system.highestPrio < (mkDefault {}).priority) opt.system
-    ;
+  legacyOptionsDefined = lib.optional (
+    opt.system.highestPrio < (lib.mkDefault { }).priority
+  ) opt.system;
 
   defaultPkgs =
-    if opt.hostPlatform.isDefined
-    then
-      let isCross = cfg.buildPlatform != cfg.hostPlatform;
-          systemArgs =
-            if isCross
-            then {
+    if opt.hostPlatform.isDefined then
+      let
+        isCross =
+          !(lib.systems.equals (lib.systems.elaborate cfg.buildPlatform) (
+            lib.systems.elaborate cfg.hostPlatform
+          ));
+        systemArgs =
+          if isCross then
+            {
               localSystem = cfg.buildPlatform;
               crossSystem = cfg.hostPlatform;
             }
-            else {
+          else
+            {
               localSystem = cfg.hostPlatform;
             };
       in
-      import cfg.source ({
-        inherit (cfg) config overlays;
-      } // systemArgs)
+      import cfg.source (
+        {
+          inherit (cfg) config overlays;
+        }
+        // systemArgs
+      )
     else
       import cfg.source {
         inherit (cfg) config overlays;
@@ -96,9 +106,9 @@ in
 
 {
   options.nixpkgs = {
-    pkgs = mkOption {
+    pkgs = lib.mkOption {
       type = pkgsType;
-      example = literalExpression "import <nixpkgs> {}";
+      example = lib.literalExpression "import <nixpkgs> {}";
       description = ''
         If set, the pkgs argument to all nix-darwin modules is the value of
         this option, extended with `nixpkgs.overlays`, if
@@ -120,56 +130,48 @@ in
       '';
     };
 
-    config = mkOption {
-      default = {};
-      example = literalExpression
-        ''
-          { allowBroken = true; allowUnfree = true; }
-        '';
+    config = lib.mkOption {
+      default = { };
+      example = lib.literalExpression ''
+        { allowBroken = true; allowUnfree = true; }
+      '';
       type = configType;
       description = ''
-        The configuration of the Nix Packages collection.  (For
-        details, see the Nixpkgs documentation.)  It allows you to set
-        package configuration options.
+        Global configuration for Nixpkgs.
+        The complete list of [Nixpkgs configuration options](https://nixos.org/manual/nixpkgs/unstable/#sec-config-options-reference) is in the [Nixpkgs manual section on global configuration](https://nixos.org/manual/nixpkgs/unstable/#chap-packageconfig).
 
-        Ignored when `nixpkgs.pkgs` is set.
+        Ignored when {option}`nixpkgs.pkgs` is set.
       '';
     };
 
-    overlays = mkOption {
-      default = [];
-      example = literalExpression
-        ''
-          [
-            (self: super: {
-              openssh = super.openssh.override {
-                hpnSupport = true;
-                kerberos = self.libkrb5;
-              };
-            })
-          ]
-        '';
-      type = types.listOf overlayType;
+    overlays = lib.mkOption {
+      default = [ ];
+      example = lib.literalExpression ''
+        [
+          (self: super: {
+            openssh = super.openssh.override {
+              hpnSupport = true;
+              kerberos = self.libkrb5;
+            };
+          })
+        ]
+      '';
+      type = lib.types.listOf overlayType;
       description = ''
-        List of overlays to use with the Nix Packages collection.
-        (For details, see the Nixpkgs documentation.)  It allows
-        you to override packages globally. Each function in the list
-        takes as an argument the *original* Nixpkgs.
-        The first argument should be used for finding dependencies, and
-        the second should be used for overriding recipes.
+        List of overlays to apply to Nixpkgs.
+        This option allows modifying the Nixpkgs package set accessed through the `pkgs` module argument.
 
-        If `nixpkgs.pkgs` is set, overlays specified here
-        will be applied after the overlays that were already present
-        in `nixpkgs.pkgs`.
+        For details, see the [Overlays chapter in the Nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#chap-overlays).
+
+        If the {option}`nixpkgs.pkgs` option is set, overlays specified using `nixpkgs.overlays` will be applied after the overlays that were already included in `nixpkgs.pkgs`.
       '';
     };
 
-    hostPlatform = mkOption {
-      type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
-      example = { system = "aarch64-darwin"; config = "aarch64-apple-darwin"; };
-      # Make sure that the final value has all fields for sake of other modules
-      # referring to this. TODO make `lib.systems` itself use the module system.
-      apply = lib.systems.elaborate;
+    hostPlatform = lib.mkOption {
+      type = lib.types.either lib.types.str lib.types.attrs;
+      example = {
+        system = "aarch64-darwin";
+      };
       description = ''
         Specifies the platform where the nix-darwin configuration will run.
 
@@ -179,15 +181,15 @@ in
       '';
     };
 
-    buildPlatform = mkOption {
-      type = types.either types.str types.attrs; # TODO utilize lib.systems.parsedPlatform
+    buildPlatform = lib.mkOption {
+      type = lib.types.either lib.types.str lib.types.attrs;
       default = cfg.hostPlatform;
-      example = { system = "x86_64-darwin"; config = "x86_64-apple-darwin"; };
+      example = {
+        system = "x86_64-darwin";
+      };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this.
-      apply = lib.systems.elaborate;
-      defaultText = literalExpression
-        ''config.nixpkgs.hostPlatform'';
+      defaultText = lib.literalExpression ''config.nixpkgs.hostPlatform'';
       description = ''
         Specifies the platform on which nix-darwin should be built.
         By default, nix-darwin is built on the system where it runs, but you can
@@ -202,12 +204,11 @@ in
       '';
     };
 
-    system = mkOption {
-      type = types.str;
+    system = lib.mkOption {
+      type = lib.types.str;
       example = "x86_64-darwin";
       default =
-        if opt.hostPlatform.isDefined
-        then
+        if opt.hostPlatform.isDefined then
           throw ''
             Neither ${opt.system} nor any other option in nixpkgs.* is meant
             to be read by modules and configurations.
@@ -232,9 +233,9 @@ in
 
     # nix-darwin only
 
-    source = mkOption {
-      type = types.path;
-      defaultText = literalMD ''
+    source = lib.mkOption {
+      type = lib.types.path;
+      defaultText = lib.literalMD ''
         `<nixpkgs>` or nix-darwin's `nixpkgs` flake input
       '';
       description = ''
@@ -247,8 +248,8 @@ in
       '';
     };
 
-    constructedByUs = mkOption {
-      type = types.bool;
+    constructedByUs = lib.mkOption {
+      type = lib.types.bool;
       internal = true;
       description = ''
         Whether `pkgs` was constructed by this module. This is false when any of
@@ -266,38 +267,59 @@ in
         # which is somewhat costly for Nixpkgs. With an explicit priority, we only
         # evaluate the wrapper to find out that the priority is lower, and then we
         # don't need to evaluate `finalPkgs`.
-        lib.mkOverride lib.modules.defaultOverridePriority
-          finalPkgs.__splicedPackages;
+        lib.mkOverride lib.modules.defaultOverridePriority finalPkgs.__splicedPackages;
     };
 
     nixpkgs.constructedByUs =
       # We set it with default priority and it can not be merged, so if the
       # pkgs module argument has that priority, it's from us.
       (lib.modules.mergeAttrDefinitionsWithPrio options._module.args).pkgs.highestPrio
-        == lib.modules.defaultOverridePriority
+      == lib.modules.defaultOverridePriority
       # Although, if nixpkgs.pkgs is set, we did forward it, but we did not construct it.
-        && !opt.pkgs.isDefined;
+      && !opt.pkgs.isDefined;
 
     assertions = [
       (
         let
           pkgsSystem = finalPkgs.stdenv.targetPlatform.system;
-        in {
+        in
+        {
           assertion = cfg.constructedByUs -> !hasPlatform -> cfg.system == pkgsSystem;
-          message = "The nix-darwin nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but nix-darwin was configured for system ${darwinExpectedSystem} via nix-darwin option nixpkgs.system. The nix-darwin system settings must match the Nixpkgs target system.";
+          message = "The nix-darwin nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but nix-darwin was configured for system ${config.nixpkgs.system} via nix-darwin option nixpkgs.system. The nix-darwin system settings must match the Nixpkgs target system.";
         }
       )
       {
-        assertion = cfg.constructedByUs -> hasPlatform -> legacyOptionsDefined == [];
+        assertion = cfg.constructedByUs -> hasPlatform -> legacyOptionsDefined == [ ];
         message = ''
-          Your system configures nixpkgs with the platform parameter${optionalString hasBuildPlatform "s"}:
-          ${hostPlatformLine
-          }${buildPlatformLine
-          }
+          Your system configures nixpkgs with the platform parameter${lib.optionalString hasBuildPlatform "s"}:
+          ${hostPlatformLine}${buildPlatformLine}
           However, it also defines the legacy options:
-          ${concatMapStrings showOptionWithDefLocs legacyOptionsDefined}
+          ${lib.concatMapStrings lib.showOptionWithDefLocs legacyOptionsDefined}
           For a future proof system configuration, we recommend to remove
           the legacy definitions.
+        '';
+      }
+      {
+        assertion = opt.pkgs.isDefined -> cfg.config == { };
+        message = ''
+          Your system configures nixpkgs with an externally created instance.
+          `nixpkgs.config` options should be passed when creating the instance instead.
+
+          Current value:
+          ${lib.generators.toPretty { multiline = true; } cfg.config}
+
+          Defined in:
+          ${lib.concatMapStringsSep "\n" (file: "  - ${file}") opt.config.files}
+        '';
+      }
+      {
+        assertion =
+          (opt.hostPlatform.isDefined -> builtins.isAttrs cfg.buildPlatform -> !(cfg.buildPlatform ? parsed))
+          && (opt.hostPlatform.isDefined -> builtins.isAttrs cfg.hostPlatform -> !(cfg.hostPlatform ? parsed));
+        message = ''
+          Passing fully elaborated systems to `nixpkgs.localSystem`, `nixpkgs.crossSystem`, `nixpkgs.buildPlatform`
+          or `nixpkgs.hostPlatform` will break composability of package sets in nixpkgs. For example, pkgs.pkgsStatic
+          would not work in modules anymore.
         '';
       }
     ];
