@@ -613,13 +613,14 @@ in
       });
     };
   };
-  config = mkIf cfg.enable {
 
+  config = mkIf cfg.enable {
     users.users.gitlab-runner =
       { name = "gitlab-runner";
         uid = mkDefault 532;
         # gid = mkDefault config.users.groups.gitlab-runner.gid;
         home = mkDefault "/var/lib/gitlab-runner";
+        createHome = true;
         shell = "/bin/bash";
         description = "Gitlab agent user";
       };
