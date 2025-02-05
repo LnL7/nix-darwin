@@ -133,7 +133,7 @@ let
       done
 
       # update global options
-      remarshal --if toml --of json ${configPath} \
+      remarshal --if toml --of json --stringify ${configPath} \
         | jq -cM ${escapeShellArg (concatStringsSep " | " [
             ".check_interval = ${toJSON cfg.checkInterval}"
             ".concurrent = ${toJSON cfg.concurrent}"
