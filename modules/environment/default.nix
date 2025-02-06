@@ -67,8 +67,24 @@ in
     };
 
     environment.darwinConfig = mkOption {
-      type = types.either types.path types.str;
-      default = "$HOME/.nixpkgs/darwin-configuration.nix";
+      type = types.nullOr (types.either types.path types.str);
+      default =
+        if config.nixpkgs.flake.setNixPath then
+          # Don’t set this for flake‐based systems.
+          null
+        else if config.system.stateVersion >= 6 then
+          "/etc/nix-darwin/configuration.nix"
+        else
+          "$HOME/.nixpkgs/darwin-configuration.nix";
+      defaultText = literalExpression ''
+        if config.nixpkgs.flake.setNixPath then
+          # Don’t set this for flake‐based systems.
+          null
+        else if config.system.stateVersion >= 6 then
+          "/etc/nix-darwin/configuration.nix"
+        else
+          "$HOME/.nixpkgs/darwin-configuration.nix"
+      '';
       description = ''
         The path of the darwin configuration.nix used to configure the system,
         this updates the default darwin-config entry in NIX_PATH. Since this
@@ -161,7 +177,7 @@ in
 
     environment.systemPath = mkMerge [
       [ (makeBinPath cfg.profiles) ]
-      (mkOrder 1200 [ "/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin" ])
+      (mkOrder 1200 [ "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin" ])
     ];
 
     # Use user, default and system profiles.

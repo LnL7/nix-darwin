@@ -199,7 +199,7 @@
   programs.zsh.enableFzfGit = true;
   programs.zsh.enableFzfHistory = true;
 
-  programs.zsh.variables.cfg = "$HOME/.config/nixpkgs/darwin/configuration.nix";
+  programs.zsh.variables.cfg = "/etc/nix-darwin/configuration.nix";
   programs.zsh.variables.darwin = "$HOME/.nix-defexpr/darwin";
   programs.zsh.variables.nixpkgs = "$HOME/.nix-defexpr/nixpkgs";
 
@@ -322,5 +322,5 @@
   nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
 
-  system.stateVersion = 5;
+  system.stateVersion = 6;
 }

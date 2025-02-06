@@ -8,29 +8,28 @@ let
 
   cfg = config.system.checks;
 
-  darwinChanges = ''
-    darwinChanges=/dev/null
-    if test -e /run/current-system/darwin-changes; then
-      darwinChanges=/run/current-system/darwin-changes
-    fi
-
-    darwinChanges=$(diff --changed-group-format='%>' --unchanged-group-format= /run/current-system/darwin-changes $systemConfig/darwin-changes 2> /dev/null) || true
-    if test -n "$darwinChanges"; then
-      echo >&2
-      echo "[1;1mCHANGELOG[0m" >&2
-      echo >&2
-      echo "$darwinChanges" >&2
-      echo >&2
-    fi
-  '';
-
-  runLink = ''
-    if [[ ! -e /run ]]; then
-      printf >&2 '[1;31merror: directory /run does not exist, aborting activation[0m\n'
+  macOSVersion = ''
+    IFS=. read -ra osVersion <<<"$(sw_vers -productVersion)"
+    if (( osVersion[0] < 11 || (osVersion[0] == 11 && osVersion[1] < 3) )); then
+      printf >&2 '\e[1;31merror: macOS version is less than 11.3, aborting activation\e[0m\n'
+      printf >&2 'Nixpkgs 25.05 requires macOS Big Sur 11.3 or newer, and 25.11 will\n'
+      printf >&2 'require macOS Sonoma 14.\n'
+      printf >&2 '\n'
+      printf >&2 'For more information on your options going forward, see the 25.05\n'
+      printf >&2 'release notes:\n'
+      printf >&2 '<https://nixos.org/manual/nixos/unstable/release-notes#sec-release-25.05>\n'
+      printf >&2 '\n'
+      printf >&2 'Nixpkgs 24.11 and nix-darwin 24.11 continue to support down to macOS\n'
+      printf >&2 'Sierra 10.12, and will be supported through June 2025.\n'
+      printf >&2 '\n'
+      printf >&2 'You can override this check by setting:\n'
+      printf >&2 '\n'
+      printf >&2 '    system.checks.verifyMacOSVersion = false;\n'
+      printf >&2 '\n'
+      printf >&2 'However, we are unable to provide support if you do so.\n'
       exit 1
     fi
   '';
-
 
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
@@ -118,7 +117,6 @@ let
         printf >&2 'Possible causes include setting up a new Nix installation with an\n'
         printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
         printf >&2 'installation with an existing Nix installation, or manually increasing\n'
-        # shellcheck disable=SC2016
         printf >&2 'your `system.stateVersion` setting.\n'
         printf >&2 '\n'
         printf >&2 'You can set the configured group ID to match the actual value:\n'
@@ -139,7 +137,6 @@ let
       printf >&2 '\n'
       printf >&2 '    services.nix-daemon.enable = false;\n'
       printf >&2 '\n'
-      # shellcheck disable=SC2016
       printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
       printf >&2 '\n'
       exit 2
@@ -196,7 +193,7 @@ let
     darwinConfig=$(NIX_PATH=$nixPath nix-instantiate --find-file darwin-config) || true
     if ! test -e "$darwinConfig"; then
         echo "[1;31merror: Changed <darwin-config> but target does not exist, aborting activation[0m" >&2
-        echo "Create ''${darwinConfig:-~/.nixpkgs/darwin-configuration.nix} or set environment.darwinConfig:" >&2
+        echo "Create ''${darwinConfig:-/etc/nix-darwin/configuration.nix} or set environment.darwinConfig:" >&2
         echo >&2
         echo "    environment.darwinConfig = \"$(nix-instantiate --find-file darwin-config 2> /dev/null || echo '***')\";" >&2
         echo >&2
@@ -211,8 +208,8 @@ let
     if ! test -e "$darwinPath"; then
         echo "[1;31merror: Changed <darwin> but target does not exist, aborting activation[0m" >&2
         echo "Add the darwin repo as a channel or set nix.nixPath:" >&2
-        echo "$ nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin" >&2
-        echo "$ nix-channel --update" >&2
+        echo "$ sudo nix-channel --add https://github.com/LnL7/nix-darwin/archive/master.tar.gz darwin" >&2
+        echo "$ sudo nix-channel --update" >&2
         echo >&2
         echo "or set" >&2
         echo >&2
@@ -225,8 +222,8 @@ let
     if ! test -e "$nixpkgsPath"; then
         echo "[1;31merror: Changed <nixpkgs> but target does not exist, aborting activation[0m" >&2
         echo "Add a nixpkgs channel or set nix.nixPath:" >&2
-        echo "$ nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs" >&2
-        echo "$ nix-channel --update" >&2
+        echo "$ sudo nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs" >&2
+        echo "$ sudo nix-channel --update" >&2
         echo >&2
         echo "or set" >&2
         echo >&2
@@ -279,7 +276,6 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
-        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -302,10 +298,18 @@ let
         echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
         echo "You can install homebrew using the following command:" >&2
         echo >&2
-        # shellcheck disable=SC2016
         echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
         echo >&2
         exit 2
+    fi
+  '';
+
+  # some mac devices, notably notebook do not support restartAfterPowerFailure option
+  restartAfterPowerFailureIsSupported = ''
+    if sudo /usr/sbin/systemsetup -getRestartPowerFailure | grep -q "Not supported"; then
+       printf >&2 "\e[1;31merror: restarting after power failure is not supported on your machine\e[0m\n" >&2
+       printf >&2 "Please ensure that \`power.restartAfterPowerFailure\` is not set.\n" >&2
+       exit 2
     fi
   '';
 in
@@ -332,6 +336,12 @@ in
       description = "Whether to run the Nix build users validation checks.";
     };
 
+    system.checks.verifyMacOSVersion = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Whether to run the macOS version check.";
+    };
+
     system.checks.text = mkOption {
       internal = true;
       type = types.lines;
@@ -342,8 +352,7 @@ in
   config = {
 
     system.checks.text = mkMerge [
-      darwinChanges
-      runLink
+      (mkIf cfg.verifyMacOSVersion macOSVersion)
       (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
@@ -357,6 +366,7 @@ in
       (mkIf cfg.verifyNixPath nixPath)
       oldSshAuthorizedKeysDirectory
       (mkIf config.homebrew.enable homebrewInstalled)
+      (mkIf (config.power.restartAfterPowerFailure != null) restartAfterPowerFailureIsSupported)
     ];
 
     system.activationScripts.checks.text = ''

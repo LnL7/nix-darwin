@@ -56,7 +56,6 @@ in writeShellApplication {
     if [[ -L /run ]]; then
       if [[ -e /etc/synthetic.conf ]]; then
         sudo sed -i -E '/^run[[:space:]]/d' /etc/synthetic.conf
-        sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -B &>/dev/null || true
         sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t &>/dev/null || true
         echo >&2 "NOTE: the /run symlink will be removed on reboot"
       else
@@ -78,7 +77,7 @@ in writeShellApplication {
       echo >&2
 
       echo >&2 "checking darwin channel"
-      test -e ~/.nix-defexpr/channels/darwin && exit 1
+      nix-instantiate --find-file darwin && exit 1
       echo >&2 "checking /etc"
       test -e /etc/static && exit 1
       echo >&2 "checking /run/current-system"

@@ -57,6 +57,8 @@ in
         type = types.bool;
       };
 
+      package = lib.mkPackageOption pkgs "fish" { };
+
       useBabelfish = mkOption {
         type = types.bool;
         default = false;
@@ -238,7 +240,7 @@ in
           ++ optional cfg.vendor.functions.enable "/share/fish/vendor_functions.d";
       }
 
-      { systemPackages = [ pkgs.fish ]; }
+      { systemPackages = [ cfg.package ]; }
     ];
   };
 

@@ -7,13 +7,10 @@
     [ pkgs.vim
     ];
 
-  # Use custom location for configuration.nix.
-  environment.darwinConfig = "$HOME/.config/nix-darwin/configuration.nix";
-
   # Enable alternative shell support in nix-darwin.
   # programs.fish.enable = true;
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
-  system.stateVersion = 5;
+  system.stateVersion = 6;
 }
