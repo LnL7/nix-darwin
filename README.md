@@ -90,9 +90,9 @@ Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-
 
 ```bash
 # To use Nixpkgs unstable:
-nix run nix-darwin/master#darwin-rebuild -- switch
+nix --extra-experimental-features "nix-command flakes" run nix-darwin/master#darwin-rebuild -- switch
 # To use Nixpkgs 24.11:
-nix run nix-darwin/nix-darwin-24.11#darwin-rebuild -- switch
+nix --extra-experimental-features "nix-command flakes" run nix-darwin/nix-darwin-24.11#darwin-rebuild -- switch
 ```
 
 ### Step 3. Using `nix-darwin`
