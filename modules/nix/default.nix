@@ -223,7 +223,16 @@ in
       # Not in NixOS module
       useDaemon = mkOption {
         type = types.bool;
-        default = false;
+        # We assume that unmanaged Nix installations use the daemon by
+        # default, to match the logic in nix-darwin 25.05. This is
+        # weird, but it matches the default behaviour in practice
+        # (since `services.nix-daemon.enable` is on by default and sets
+        # `nix.useDaemon` to true), and since `nix.enable` didn’t
+        # previously exist, it’s not a backwards‐compatibility concern;
+        # we can consequently avoid bifurcating the user experience
+        # across the release branches.
+        default = !config.nix.enable;
+        defaultText = literalExpression "!config.nix.enable";
         description = ''
           If set, Nix will use the daemon to perform operations.
           Use this instead of services.nix-daemon.enable if you don't want the
