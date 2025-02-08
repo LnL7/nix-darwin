@@ -27,7 +27,7 @@ let
       printf >&2 '    system.checks.verifyMacOSVersion = false;\n'
       printf >&2 '\n'
       printf >&2 'However, we are unable to provide support if you do so.\n'
-      exit 1
+      exit 2
     fi
   '';
 
