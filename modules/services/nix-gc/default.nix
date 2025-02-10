@@ -56,13 +56,18 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.automatic {
+  config = {
+    assertions = [
+      {
+        assertion = cfg.automatic -> config.nix.enable;
+        message = ''nix.gc.automatic requires nix.enable'';
+      }
+    ];
 
-    launchd.daemons.nix-gc = {
+    launchd.daemons.nix-gc = mkIf cfg.automatic {
       command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
       serviceConfig.RunAtLoad = false;
       serviceConfig.StartCalendarInterval = cfg.interval;
     };
-
   };
 }
