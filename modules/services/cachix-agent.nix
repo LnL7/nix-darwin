@@ -51,6 +51,14 @@ in {
   };
 
   config = mkIf cfg.enable {
+    # TODO: Upstream this to NixOS.
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`services.cachix-agent.enable` requires `nix.enable`'';
+      }
+    ];
+
     launchd.daemons.cachix-agent = {
       script = ''
         . ${cfg.credentialsFile}
