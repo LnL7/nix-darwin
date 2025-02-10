@@ -37,8 +37,8 @@ in
     setNixPath = mkOption {
       type = types.bool;
 
-      default = cfg.source != null;
-      defaultText = "config.nixpkgs.flake.source != null";
+      default = config.nix.enable && cfg.source != null;
+      defaultText = literalExpression ''config.nix.enable && nixpkgs.flake.source != null'';
 
       description = ''
         Whether to set {env}`NIX_PATH` to include `nixpkgs=flake:nixpkgs` such that `<nixpkgs>`
@@ -57,8 +57,8 @@ in
     setFlakeRegistry = mkOption {
       type = types.bool;
 
-      default = cfg.source != null;
-      defaultText = "config.nixpkgs.flake.source != null";
+      default = config.nix.enable && cfg.source != null;
+      defaultText = literalExpression ''config.nix.enable && config.nixpkgs.flake.source != null'';
 
       description = ''
         Whether to pin nixpkgs in the system-wide flake registry (`/etc/nix/registry.json`) to the
@@ -84,6 +84,18 @@ in
             Setting `nixpkgs.flake.setNixPath` requires that `nixpkgs.flake.setFlakeRegistry` also
             be set, since it is implemented in terms of indirection through the flake registry.
           '';
+        }
+
+        # TODO: Upstream these to NixOS.
+
+        {
+          assertion = cfg.setNixPath -> config.nix.enable;
+          message = ''`nixpkgs.flake.setNixPath` requires `nix.enable`'';
+        }
+
+        {
+          assertion = cfg.setFlakeRegistry -> config.nix.enable;
+          message = ''`nixpkgs.flake.setFlakeRegistry` requires `nix.enable`'';
         }
       ];
     }
