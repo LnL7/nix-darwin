@@ -11,11 +11,19 @@ nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite
 
 ## Prerequisites
 
-The only prerequisite is a Nix implementation, both Nix and Lix are supported.
+The only prerequisite is a Nix implementation; both Nix and Lix are supported.
 
 As the official Nix installer does not include an automated uninstaller, and manual uninstallation on macOS is a complex process, we recommend using one of the following installers instead:
 
-- The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
+* The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups.
+  It can install one of two distributions of Nix:
+
+  * By default, it will install vanilla upstream [Nix](https://nixos.org/) with flakes enabled.
+
+  * When run with the `--determinate` flag, it will install the [Determinate](https://docs.determinate.systems/) distribution.
+    As Determinate manages the Nix installation itself, you will need to set `nix.enable = false;` in your configuration to disable nix-darwin’s own Nix management.
+    Some nix-darwin functionality that relies on managing the Nix installation, like the `nix.*` options to adjust Nix settings or configure a Linux builder, will be unavailable.
+
 * The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
 
 
