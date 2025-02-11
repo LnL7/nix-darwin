@@ -135,7 +135,10 @@ in
         chmod u+x $out/activate-user
         unset activationUserScript
 
-        shellcheck $out/activate $out/activate-user
+        # We exclude the warnings for `…` in single‐quote strings and
+        # non‐ASCII quotation marks as they are noisy and lead to a lot
+        # of false positives in our user‐facing output:
+        shellcheck --exclude=SC2016,SC1112 $out/activate $out/activate-user
 
         echo -n "$systemConfig" > $out/systemConfig
 

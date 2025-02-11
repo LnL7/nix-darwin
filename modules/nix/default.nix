@@ -134,6 +134,26 @@ let
         namedPaths ++ searchPaths;
   };
 
+  handleUnmanaged = managedConfig: mkMerge [
+    (mkIf cfg.enable managedConfig)
+    (mkIf (!cfg.enable) {
+      system.activationScripts.nix-daemon.text = ''
+        # Restore unmanaged Nix daemon if present
+        unmanagedNixProfile=/nix/var/nix/profiles/default
+        if [[
+          -e /run/current-system/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+          && -e $unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        ]]; then
+          printf >&2 'restoring unmanaged Nix daemon...\n'
+          cp \
+            "$unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist" \
+            /Library/LaunchDaemons
+          launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        fi
+      '';
+    })
+  ];
+
 in
 
 {
@@ -144,7 +164,6 @@ in
     in
     [
       # Only ever in NixOS
-      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivalent to this NixOS option.")
       (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
@@ -165,9 +184,36 @@ in
 
     nix = {
 
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Whether to enable Nix.
+
+          Disabling this will stop nix-darwin from managing the
+          installed version of Nix, the nix-daemon launchd daemon, and
+          the settings in {file}`/etc/nix/nix.conf`.
+
+          This allows you to use nix-darwin without it taking over your
+          system installation of Nix. Some nix-darwin functionality
+          that relies on managing the Nix installation, like the
+          `nix.*` options to adjust Nix settings or configure a Linux
+          builder, will be unavailable. You will also have to upgrade
+          Nix yourself, as nix-darwin will no longer do so.
+
+          ::: {.warning}
+          If you have already removed your global system installation
+          of Nix, this will break nix-darwin and you will have to
+          reinstall Nix to fix it.
+          :::
+        '';
+      };
+
       package = mkOption {
         type = types.package;
-        default = pkgs.nix;
+        default = warnIf (!cfg.enable)
+          "nix.package: accessed when `nix.enable` is off; this is a bug"
+          pkgs.nix;
         defaultText = literalExpression "pkgs.nix";
         description = ''
           This option specifies the Nix package instance to use throughout the system.
@@ -177,7 +223,16 @@ in
       # Not in NixOS module
       useDaemon = mkOption {
         type = types.bool;
-        default = false;
+        # We assume that unmanaged Nix installations use the daemon by
+        # default, to match the logic in nix-darwin 25.05. This is
+        # weird, but it matches the default behaviour in practice
+        # (since `services.nix-daemon.enable` is on by default and sets
+        # `nix.useDaemon` to true), and since `nix.enable` didn’t
+        # previously exist, it’s not a backwards‐compatibility concern;
+        # we can consequently avoid bifurcating the user experience
+        # across the release branches.
+        default = !config.nix.enable;
+        defaultText = literalExpression "!config.nix.enable";
         description = ''
           If set, Nix will use the daemon to perform operations.
           Use this instead of services.nix-daemon.enable if you don't want the
@@ -678,7 +733,7 @@ in
 
   ###### implementation
 
-  config = {
+  config = handleUnmanaged {
     environment.systemPackages =
       [
         nixPackage
@@ -759,7 +814,7 @@ in
 
         # Not in NixOS module
         { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
-        { assertion = elem "_nixbld1" config.users.knownGroups -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
+        { assertion = elem "_nixbld1" config.users.knownUsers -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
         { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
 
         {
@@ -853,9 +908,7 @@ in
           fi
         done
         if [[ ! $nixCustomConfIsKnown ]]; then
-          # shellcheck disable=SC2016
           printf >&2 '\e[1;31merror: custom settings in `/etc/nix/nix.custom.conf`, aborting activation\e[0m\n'
-          # shellcheck disable=SC2016
           printf >&2 'You will need to migrate these to nix-darwin `nix.*` settings if you\n'
           printf >&2 'wish to keep them. Check the manual for the appropriate settings and\n'
           printf >&2 'add them to your system configuration, then run:\n'

@@ -31,6 +31,23 @@ let
     fi
   '';
 
+  determinate = ''
+    if [[ -e /usr/local/bin/determinate-nixd ]]; then
+      printf >&2 '\e[1;31merror: Determinate detected, aborting activation\e[0m\n'
+      printf >&2 'Determinate uses its own daemon to manage the Nix installation that\n'
+      printf >&2 'conflicts with nix-darwin’s native Nix management.\n'
+      printf >&2 '\n'
+      printf >&2 'To turn off nix-darwin’s management of the Nix installation, set:\n'
+      printf >&2 '\n'
+      printf >&2 '    nix.enable = false;\n'
+      printf >&2 '\n'
+      printf >&2 'This will allow you to use nix-darwin with Determinate. Some nix-darwin\n'
+      printf >&2 'functionality that relies on managing the Nix installation, like the\n'
+      printf >&2 '`nix.*` options to adjust Nix settings or configure a Linux builder,\n'
+      printf >&2 'will be unavailable.\n'
+      exit 2
+    fi
+  '';
 
   oldBuildUsers = ''
     if dscl . -list /Users | grep -q '^nixbld'; then
@@ -118,7 +135,6 @@ let
         printf >&2 'Possible causes include setting up a new Nix installation with an\n'
         printf >&2 'existing nix-darwin configuration, setting up a new nix-darwin\n'
         printf >&2 'installation with an existing Nix installation, or manually increasing\n'
-        # shellcheck disable=SC2016
         printf >&2 'your `system.stateVersion` setting.\n'
         printf >&2 '\n'
         printf >&2 'You can set the configured group ID to match the actual value:\n'
@@ -139,7 +155,6 @@ let
       printf >&2 '\n'
       printf >&2 '    services.nix-daemon.enable = false;\n'
       printf >&2 '\n'
-      # shellcheck disable=SC2016
       printf >&2 'and remove `nix.useDaemon` from your configuration if it is present.\n'
       printf >&2 '\n'
       exit 2
@@ -279,7 +294,6 @@ let
     if [[ -d /etc/ssh/authorized_keys.d ]]; then
         printf >&2 '\e[1;31merror: /etc/ssh/authorized_keys.d exists, aborting activation\e[0m\n'
         printf >&2 'SECURITY NOTICE: The previous implementation of the\n'
-        # shellcheck disable=SC2016
         printf >&2 '`users.users.<name>.openssh.authorizedKeys.*` options would not delete\n'
         printf >&2 'authorized keys files when the setting for a given user was removed.\n'
         printf >&2 '\n'
@@ -302,7 +316,6 @@ let
         echo "Homebrew doesn't seem to be installed. Please install homebrew separately." >&2
         echo "You can install homebrew using the following command:" >&2
         echo >&2
-        # shellcheck disable=SC2016
         echo '    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' >&2
         echo >&2
         exit 2
@@ -323,21 +336,22 @@ in
   options = {
     system.checks.verifyNixPath = mkOption {
       type = types.bool;
-      default = true;
+      default = config.nix.enable;
       description = "Whether to run the NIX_PATH validation checks.";
     };
 
     system.checks.verifyNixChannels = mkOption {
       type = types.bool;
-      default = config.nix.channel.enable;
+      default = config.nix.enable && config.nix.channel.enable;
       description = "Whether to run the nix-channels validation checks.";
     };
 
     system.checks.verifyBuildUsers = mkOption {
       type = types.bool;
       default =
-        (config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
-        || config.nix.configureBuildUsers;
+        config.nix.enable &&
+        ((config.nix.useDaemon && !(config.nix.settings.auto-allocate-uids or false))
+          || config.nix.configureBuildUsers);
       description = "Whether to run the Nix build users validation checks.";
     };
 
@@ -353,11 +367,12 @@ in
     system.checks.text = mkMerge [
       darwinChanges
       runLink
+      (mkIf config.nix.enable determinate)
       (mkIf (cfg.verifyBuildUsers && !config.nix.configureBuildUsers) oldBuildUsers)
       (mkIf cfg.verifyBuildUsers buildUsers)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
       (mkIf config.nix.configureBuildUsers buildGroupID)
-      nixDaemon
+      (mkIf config.nix.enable nixDaemon)
       nixStore
       (mkIf (config.nix.gc.automatic && config.nix.gc.user == null) nixGarbageCollector)
       (mkIf (config.nix.optimise.automatic && config.nix.optimise.user == null) nixStoreOptimiser)

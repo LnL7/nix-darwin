@@ -10,7 +10,7 @@ in
   options = {
     services.nix-daemon.enable = mkOption {
       type = types.bool;
-      default = true;
+      default = config.nix.enable;
       description = "Whether to enable the nix-daemon service.";
     };
 
