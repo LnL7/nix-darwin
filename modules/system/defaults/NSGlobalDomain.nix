@@ -7,6 +7,21 @@ let
   inherit (config.lib.defaults.types) floatWithDeprecationError;
 in {
   options = {
+    system.defaults.NSGlobalDomain.AppleActionOnDoubleClick = mkOption {
+      type = types.nullOr (
+        types.enum [
+          "Minimize"
+          "Zoom"
+          "Fill"
+          "None"
+        ]
+      );
+      default = null;
+      description = ''
+        Behaviour of double clicking a windows title bar.
+      '';
+    };
+
     system.defaults.NSGlobalDomain.AppleShowAllFiles = mkOption {
       type = types.nullOr types.bool;
       default = null;
