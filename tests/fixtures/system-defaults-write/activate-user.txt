@@ -307,6 +307,26 @@ defaults write com.apple.dock 'persistent-others' $'<?xml version="1.0" encoding
 		<key>tile-type</key>
 		<string>file-tile</string>
 	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file://~/Applications</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+			<key>displayas</key>
+			<integer>1</integer>
+			<key>showas</key>
+			<integer>2</integer>
+			<key>arrangement</key>
+			<integer>3</integer>
+		</dict>
+		<key>tile-type</key>
+		<string>directory-tile</string>
+	</dict>
 </array>
 </plist>'
 defaults write com.apple.dock 'scroll-to-open' $'<?xml version="1.0" encoding="UTF-8"?>
