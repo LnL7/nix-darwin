@@ -46,6 +46,13 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`services.ofborg.enable` requires `nix.enable`'';
+      }
+    ];
+
     warnings = mkIf (isDerivation cfg.configFile) [
       "services.ofborg.configFile is a derivation, credentials will be world readable"
     ];

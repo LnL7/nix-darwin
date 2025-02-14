@@ -58,9 +58,15 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.automatic {
+  config = {
+    assertions = [
+      {
+        assertion = cfg.automatic -> config.nix.enable;
+        message = ''nix.optimise.automatic requires nix.enable'';
+      }
+    ];
 
-    launchd.daemons.nix-optimise = {
+    launchd.daemons.nix-optimise = mkIf cfg.automatic {
       environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       command = "${lib.getExe' config.nix.package "nix-store"} --optimise";
       serviceConfig = {
@@ -69,6 +75,5 @@ in
         UserName = cfg.user;
       };
     };
-
   };
 }
