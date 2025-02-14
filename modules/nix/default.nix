@@ -49,13 +49,16 @@ let
 
       mkKeyValuePairs = attrs: concatStringsSep "\n" (mapAttrsToList mkKeyValue attrs);
 
+      isExtra = key: hasPrefix "extra-" key;
+
     in
     pkgs.writeTextFile {
       name = "nix.conf";
       text = ''
         # WARNING: this file is generated from the nix.* options in
         # your nix-darwin configuration. Do not edit it!
-        ${mkKeyValuePairs cfg.settings}
+        ${mkKeyValuePairs (filterAttrs (key: value: !(isExtra key)) cfg.settings)}
+        ${mkKeyValuePairs (filterAttrs (key: value: isExtra key) cfg.settings)}
         ${cfg.extraOptions}
       '';
       checkPhase =
