@@ -50,10 +50,11 @@ let
   '';
 
   preSequoiaBuildUsers = ''
-    firstBuildUserID=$(dscl . -read /Users/_nixbld1 UniqueID | awk '{print $2}')
+    firstBuildUserID=$(dscl . -read /Users/_nixbld1 UniqueID 2>/dev/null | awk '{print $2}' || echo 0)
     if
       # Don’t complain when we’re about to migrate old‐style build users…
       [[ $firstBuildUserID != ${toString (config.ids.uids.nixbld + 1)} ]] \
+      && [[ $firstBuildUserID != 0 ]] \
       && ! dscl . -list /Users | grep -q '^nixbld'
     then
         printf >&2 '\e[1;31merror: Build users have unexpected UIDs, aborting activation\e[0m\n'
@@ -258,6 +259,12 @@ in
       description = "Whether to run the Nix build users validation checks.";
     };
 
+    system.checks.verifyBuildGroup = mkOption {
+      type = types.bool;
+      default = config.nix.enable;
+      description = "Whether to run the Nix build group validation checks.";
+    };
+
     system.checks.verifyMacOSVersion = mkOption {
       type = types.bool;
       default = true;
@@ -277,7 +284,7 @@ in
       (mkIf cfg.verifyMacOSVersion macOSVersion)
       (mkIf config.nix.enable determinate)
       (mkIf cfg.verifyBuildUsers preSequoiaBuildUsers)
-      (mkIf cfg.verifyBuildUsers buildGroupID)
+      (mkIf cfg.verifyBuildGroup buildGroupID)
       (mkIf config.nix.enable nixDaemon)
       nixInstaller
       (mkIf cfg.verifyNixPath nixPath)
