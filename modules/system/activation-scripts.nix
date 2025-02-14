@@ -106,7 +106,9 @@ in
       ln -sfn "$(readlink -f "$systemConfig")" /run/current-system
 
       # Prevent the current configuration from being garbage-collected.
-      ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
+      if [[ -d /nix/var/nix/gcroots ]]; then
+        ln -sfn /run/current-system /nix/var/nix/gcroots/current-system
+      fi
     '';
 
     # FIXME: activationScripts.checks should be system level

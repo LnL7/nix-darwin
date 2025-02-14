@@ -159,6 +159,14 @@ let
     })
   ];
 
+  managedDefault = name: default: {
+    default = if cfg.enable then default else throw ''
+      ${name}: accessed when `nix.enable` is off; this is a bug in
+      nix-darwin or a third‐party module
+    '';
+    defaultText = default;
+  };
+
 in
 
 {
@@ -224,9 +232,7 @@ in
 
       package = mkOption {
         type = types.package;
-        default = warnIf (!cfg.enable)
-          "nix.package: accessed when `nix.enable` is off; this is a bug"
-          pkgs.nix;
+        inherit (managedDefault "nix.package" pkgs.nix) default;
         defaultText = literalExpression "pkgs.nix";
         description = ''
           This option specifies the Nix package instance to use throughout the system.
@@ -235,7 +241,7 @@ in
 
       distributedBuilds = mkOption {
         type = types.bool;
-        default = false;
+        inherit (managedDefault "nix.distributedBuilds" false) default defaultText;
         description = ''
           Whether to distribute builds to the machines listed in
           {option}`nix.buildMachines`.
@@ -245,7 +251,7 @@ in
       # Not in NixOS module
       daemonProcessType = mkOption {
         type = types.enum [ "Background" "Standard" "Adaptive" "Interactive" ];
-        default = "Standard";
+        inherit (managedDefault "nix.daemonProcessType" "Standard") default defaultText;
         description = ''
           Nix daemon process resource limits class. These limits propagate to
           build processes. `Standard` is the default process type
@@ -260,7 +266,7 @@ in
       # Not in NixOS module
       daemonIOLowPriority = mkOption {
         type = types.bool;
-        default = false;
+        inherit (managedDefault "nix.daemonIOLowPriority" false) default defaultText;
         description = ''
           Whether the Nix daemon process should considered to be low priority when
           doing file system I/O.
@@ -388,7 +394,7 @@ in
             };
           };
         });
-        default = [ ];
+        inherit (managedDefault "nix.buildMachines" [ ]) default defaultText;
         description = ''
           This option lists the machines to be used if distributed builds are
           enabled (see {option}`nix.distributedBuilds`).
@@ -402,12 +408,13 @@ in
       envVars = mkOption {
         type = types.attrs;
         internal = true;
-        default = { };
+        inherit (managedDefault "nix.envVars" { }) default defaultText;
         description = "Environment variables used by Nix.";
       };
 
       nrBuildUsers = mkOption {
         type = types.int;
+        inherit (managedDefault "nix.nrBuildUsers" 0) default defaultText;
         description = ''
           Number of `nixbld` user accounts created to
           perform secure concurrent builds.  If you receive an error
@@ -435,11 +442,13 @@ in
       # Definition differs substantially from NixOS module
       nixPath = mkOption {
         type = nixPathType;
-        default = lib.optionals cfg.channel.enable [
-          # Include default path <darwin-config>.
-          { darwin-config = "${config.environment.darwinConfig}"; }
-          "/nix/var/nix/profiles/per-user/root/channels"
-        ];
+        inherit (managedDefault "nix.nixPath" (
+          lib.optionals cfg.channel.enable [
+            # Include default path <darwin-config>.
+            { darwin-config = "${config.environment.darwinConfig}"; }
+            "/nix/var/nix/profiles/per-user/root/channels"
+          ]
+        )) default;
 
         defaultText = lib.literalExpression ''
           lib.optionals cfg.channel.enable [
@@ -461,7 +470,7 @@ in
 
       checkConfig = mkOption {
         type = types.bool;
-        default = true;
+        inherit (managedDefault "nix.checkConfig" true) default defaultText;
         description = ''
           If enabled (the default), checks for data type mismatches and that Nix
           can parse the generated nix.conf.
@@ -522,7 +531,7 @@ in
             };
           }
         ));
-        default = { };
+        inherit (managedDefault "nix.registry" { }) default defaultText;
         description = ''
           A system-wide flake registry.
         '';
@@ -530,7 +539,7 @@ in
 
       extraOptions = mkOption {
         type = types.lines;
-        default = "";
+        inherit (managedDefault "nix.extraOptions" "") default defaultText;
         example = ''
           keep-outputs = true
           keep-derivations = true
@@ -699,7 +708,7 @@ in
             };
           };
         };
-        default = { };
+        inherit (managedDefault "nix.settings" { }) default defaultText;
         description = ''
           Configuration for Nix, see
           <https://nixos.org/manual/nix/stable/#sec-conf-file>

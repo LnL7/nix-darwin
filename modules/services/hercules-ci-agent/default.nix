@@ -22,6 +22,14 @@ in
   };
 
   config = mkIf cfg.enable {
+    # TODO: Upstream this to NixOS.
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`services.hercules-ci-agent.enable` requires `nix.enable`'';
+      }
+    ];
+
     launchd.daemons.hercules-ci-agent = {
       script = "exec ${cfg.package}/bin/hercules-ci-agent --config ${cfg.tomlFile}";
 

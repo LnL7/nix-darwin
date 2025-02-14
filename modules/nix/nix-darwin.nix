@@ -4,7 +4,7 @@ let
   nix-tools = pkgs.callPackage ../../pkgs/nix-tools {
     inherit (config.system) profile;
     inherit (config.environment) systemPath;
-    nixPath = lib.concatStringsSep ":" config.nix.nixPath;
+    nixPath = lib.optionalString config.nix.enable (lib.concatStringsSep ":" config.nix.nixPath);
   };
 
   darwin-uninstaller = pkgs.callPackage ../../pkgs/darwin-uninstaller { };

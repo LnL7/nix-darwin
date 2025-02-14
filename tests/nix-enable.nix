@@ -2,7 +2,6 @@
 
 {
   nix.enable = false;
-  nix.package = throw "`nix.package` used when `nix.enable` is turned off";
 
   test = ''
     printf >&2 'checking for unexpected Nix binary in /sw/bin\n'
