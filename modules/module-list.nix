@@ -62,6 +62,7 @@
   ./services/chunkwm.nix
   ./services/cachix-agent.nix
   ./services/dnsmasq.nix
+  ./services/dnscrypt-proxy.nix
   ./services/emacs.nix
   ./services/eternal-terminal.nix
   ./services/github-runner
