@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
+  system.defaults.NSGlobalDomain.AppleActionOnDoubleClick = "Minimize";
   system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
