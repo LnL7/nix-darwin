@@ -807,8 +807,8 @@ in
 
         # Not in NixOS module
         { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
-        { assertion = elem "_nixbld1" config.users.knownUsers -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
-        { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
+        { assertion = configureBuildUsers -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
+        { assertion = configureBuildUsers -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
 
         {
           # Should be fixed in Lix by https://gerrit.lix.systems/c/lix/+/2100
@@ -848,7 +848,7 @@ in
     users.users = mkIf configureBuildUsers nixbldUsers;
 
     # Not in NixOS module
-    users.groups.nixbld = mkIf configureBuildUsers {
+    users.groups.nixbld = {
       description = "Nix build group for nix-daemon";
       gid = config.ids.gids.nixbld;
       members = attrNames nixbldUsers;

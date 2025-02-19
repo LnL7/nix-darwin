@@ -317,12 +317,8 @@ in
       ${concatMapStringsSep "\n" (name: ''
         u=$(id -u ${escapeShellArg name} 2> /dev/null) || true
         if [ -n "$u" ]; then
-          if [ "$u" -gt 501 ]; then
-            echo "deleting user ${name}..." >&2
-            dscl . -delete ${escapeShellArg "/Users/${name}"}
-          else
-            echo "[1;31mwarning: existing user '${name}' has unexpected uid $u, skipping...[0m" >&2
-          fi
+          echo "deleting user ${name}..." >&2
+          dscl . -delete ${escapeShellArg "/Users/${name}"}
         fi
       '') deletedUsers}
     '';
