@@ -20,13 +20,30 @@ in
           your Apple Watch.
         '';
       };
+
+      enableSudoPamReattach = lib.mkEnableOption "" // {
+        description = ''
+          Whether to enable reattaching a program to the user's bootstrap session.
+
+          This fixes Touch ID for sudo not working inside tmux and screen.
+
+          This allows programs like tmux and screen that run in the background to
+          survive across user sessions to work with PAM services that are tied to the
+          bootstrap session.
+        '';
+        default = cfg.enableSudoTouchIdAuth;
+        example = false;
+      };
     };
   };
 
   config = {
     environment.etc."pam.d/sudo_local" = {
       inherit (cfg) enable;
-      text = lib.optionalString cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so";
+      text = lib.concatLines (
+        (lib.optional cfg.enableSudoPamReattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
+        ++ (lib.optional cfg.enableSudoTouchIdAuth "auth       sufficient     pam_tid.so")
+      );
     };
 
     system.activationScripts.pam.text =
