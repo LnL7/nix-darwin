@@ -13,6 +13,11 @@ in
 {
   config.assertions = flatten (
     flip mapAttrsToList config.services.github-runners (name: cfg: map (mkIf cfg.enable) [
+      # TODO: Upstream this to NixOS.
+      {
+        assertion = config.nix.enable;
+        message = ''`services.github-runners.${name}.enable` requires `nix.enable`'';
+      }
       {
         assertion = (cfg.user == null && cfg.group == null) || (cfg.user != null);
         message = "`services.github-runners.${name}`: Either set `user` and `group` to `null` to have nix-darwin manage them or set at least `user` explicitly";

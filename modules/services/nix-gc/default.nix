@@ -14,6 +14,7 @@ in
     (mkRemovedOptionModule [ "nix" "gc" "dates" ] "Use `nix.gc.interval` instead.")
     (mkRemovedOptionModule [ "nix" "gc" "randomizedDelaySec" ] "No `nix-darwin` equivalent to this NixOS option.")
     (mkRemovedOptionModule [ "nix" "gc" "persistent" ] "No `nix-darwin` equivalent to this NixOS option.")
+    (mkRemovedOptionModule [ "nix" "gc" "user" ] "The garbage collection service now always runs as `root`.")
   ];
 
   ###### interface
@@ -26,13 +27,6 @@ in
         default = false;
         type = types.bool;
         description = "Automatically run the garbage collector at a specific time.";
-      };
-
-      # Not in NixOS module
-      user = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "User that runs the garbage collector.";
       };
 
       interval = mkOption {
@@ -62,15 +56,18 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.automatic {
+  config = {
+    assertions = [
+      {
+        assertion = cfg.automatic -> config.nix.enable;
+        message = ''nix.gc.automatic requires nix.enable'';
+      }
+    ];
 
-    launchd.daemons.nix-gc = {
+    launchd.daemons.nix-gc = mkIf cfg.automatic {
       command = "${config.nix.package}/bin/nix-collect-garbage ${cfg.options}";
-      environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
       serviceConfig.RunAtLoad = false;
       serviceConfig.StartCalendarInterval = cfg.interval;
-      serviceConfig.UserName = cfg.user;
     };
-
   };
 }

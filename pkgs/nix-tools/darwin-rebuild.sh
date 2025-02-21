@@ -1,8 +1,9 @@
 #! @shell@
 set -e
 set -o pipefail
-export PATH=@path@:$PATH
 
+export PATH=@path@
+export NIX_PATH=${NIX_PATH:-@nixPath@}
 
 showSyntax() {
   echo "darwin-rebuild [--help] {edit | switch | activate | build | check | changelog}" >&2
@@ -21,17 +22,10 @@ showSyntax() {
   exit 1
 }
 
-# REMOVEME when support for macOS 10.13 is dropped
-# macOS 10.13 does not support sudo --preserve-env so we make this conditional
-if command sudo --help | grep -- --preserve-env= >/dev/null; then
-  # We use `env` before our command to ensure the preserved PATH gets checked
-  # when trying to resolve the command to execute
-  sudo_base="command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
-  sudo="$sudo_base env"
-else
-  sudo_base="command sudo -H"
-  sudo="$sudo_base"
-fi
+# We use `env` before our command to ensure the preserved PATH gets checked
+# when trying to resolve the command to execute
+sudo_base="command sudo -H --preserve-env=PATH --preserve-env=SSH_CONNECTION"
+sudo="$sudo_base env"
 sudo() { $sudo "$@"; }
 
 # Parse the command line.
@@ -178,8 +172,8 @@ if [ "$action" != build ]; then
 fi
 
 if [ "$action" = edit ]; then
-  darwinConfig=$(nix-instantiate --find-file darwin-config)
   if [ -z "$flake" ]; then
+    darwinConfig=$(nix-instantiate "${extraBuildFlags[@]}" --find-file darwin-config)
     exec "${EDITOR:-vi}" "$darwinConfig"
   else
     exec nix "${flakeFlags[@]}" edit "${extraLockFlags[@]}" -- "$flake#$flakeAttr"

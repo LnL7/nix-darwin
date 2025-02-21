@@ -12,30 +12,22 @@ with lib;
   launchd.daemons = mkForce {};
   launchd.user.agents = mkForce {};
 
-  # Don't try to reload `nix-daemon`
-  nix.useDaemon = mkForce false;
+  # Restore any unmanaged `nix-daemon`.
+  nix.enable = false;
 
   system.activationScripts.postUserActivation.text = mkAfter ''
-    if [[ -L ~/.nix-defexpr/channels/darwin ]]; then
-        nix-channel --remove darwin || true
-    fi
+    nix-channel --remove darwin || true
   '';
 
   system.activationScripts.postActivation.text = mkAfter ''
+    nix-channel --remove darwin || true
+
     if [[ -L /Applications/Nix\ Apps ]]; then
         rm /Applications/Nix\ Apps
     fi
 
     if [[ -L /etc/static ]]; then
         rm /etc/static
-    fi
-
-    # If the Nix Store is owned by root then we're on a multi-user system
-    if [[ -O /nix/store ]]; then
-        if [[ -e /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist ]]; then
-            sudo cp /nix/var/nix/profiles/default/Library/LaunchDaemons/org.nixos.nix-daemon.plist /Library/LaunchDaemons/org.nixos.nix-daemon.plist
-            sudo launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
-        fi
     fi
 
     # grep will return 1 when no lines matched which makes this line fail with `set -eo pipefail`

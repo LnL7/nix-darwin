@@ -53,7 +53,7 @@ in rec {
       substitute \
         ${optionsDoc.optionsJSON}/nix-support/hydra-build-products \
         $out/nix-support/hydra-build-products \
-        --replace \
+        --replace-fail \
           '${optionsDoc.optionsJSON}/share/doc/nixos' \
           "$out/share/doc/darwin"
     '';
@@ -74,8 +74,8 @@ in rec {
       cp -r ${pkgs.documentation-highlighter} $dst/highlightjs
 
       substitute ${./manual.md} manual.md \
-        --replace '@DARWIN_VERSION@' "${version}" \
-        --replace \
+        --replace-fail '@DARWIN_VERSION@' "${version}" \
+        --replace-fail \
           '@DARWIN_OPTIONS_JSON@' \
           ${optionsJSON}/share/doc/darwin/options.json
 
