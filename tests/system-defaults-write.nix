@@ -130,6 +130,7 @@
   system.defaults.controlcenter.NowPlaying = "always";
   system.defaults.controlcenter.ScreenMirroring = "whenActive";
   system.defaults.controlcenter.Sound = "hide";
+  system.defaults.controlcenter.Spotlight = true;
   system.defaults.controlcenter.StageManager = true;
   system.defaults.controlcenter.UserSwitcher = "both";
   system.defaults.controlcenter.WiFi = true;
