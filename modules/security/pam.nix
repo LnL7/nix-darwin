@@ -2,42 +2,9 @@
 
 with lib;
 
-let
-  cfg = config.security.pam;
+let cfg = config.security.pam;
 
-  # Implementation Notes
-  #
-  # We don't use `environment.etc` because this would require that the user manually delete
-  # `/etc/pam.d/sudo` which seems unwise given that applying the nix-darwin configuration requires
-  # sudo. We also can't use `system.patchs` since it only runs once, and so won't patch in the
-  # changes again after OS updates (which remove modifications to this file).
-  #
-  # As such, we resort to line addition/deletion in place using `sed`. We add a comment to the
-  # added line that includes the name of the option, to make it easier to identify the line that
-  # should be deleted when the option is disabled.
-  mkSudoTouchIdAuthScript = isEnabled:
-  let
-    file   = "/etc/pam.d/sudo";
-    option = "security.pam.enableSudoTouchIdAuth";
-    sed = "${pkgs.gnused}/bin/sed";
-  in ''
-    ${if isEnabled then ''
-      # Enable sudo Touch ID authentication, if not already enabled
-      if ! grep 'pam_tid.so' ${file} > /dev/null; then
-        ${sed} -i '2i\
-      auth       sufficient     pam_tid.so # nix-darwin: ${option}
-        ' ${file}
-      fi
-    '' else ''
-      # Disable sudo Touch ID authentication, if added by nix-darwin
-      if grep '${option}' ${file} > /dev/null; then
-        ${sed} -i '/${option}/d' ${file}
-      fi
-    ''}
-  '';
-in
-
-{
+in {
   options = {
     security.pam.enableSudoTouchIdAuth = mkEnableOption "" // {
       description = ''
@@ -59,11 +26,30 @@ in
     };
   };
 
-  config = {
-    system.activationScripts.pam.text = ''
-      # PAM settings
-      echo >&2 "setting up pam..."
-      ${mkSudoTouchIdAuthScript cfg.enableSudoTouchIdAuth}
-    '';
-  };
+  config = lib.mkMerge [
+    (lib.mkIf cfg.enableSudoTouchIdAuth {
+      # This is the example given in `/etc/pam.d/sudo_local.template`.
+      # This file is sourced by `/etc/pam.d/sudo`, and will not be overwritten after Darwin upgrades.
+      environment.etc."pam.d/sudo_local".text = ''
+        auth       sufficient     pam_tid.so
+      '';
+    })
+    # Clean up for old versions of `nix-darwin` that didn't use `/etc/pam.d/sudo_local`.
+    (lib.mkIf (!cfg.enableSudoTouchIdAuth) {
+      system.activationScripts.pam.text = let
+        file = "/etc/pam.d/sudo";
+        option = "security.pam.enableSudoTouchIdAuth";
+        sed = "${pkgs.gnused}/bin/sed";
+      in ''
+        # Old versions of `nix-darwin` modified `/etc/pam.d/sudo` with `sed` to
+        # control this behavior, but since then MacOS has seen an update that
+        # adds a template `sudo_local` file that can be modified by machine administrators.
+        # This option will cause Nix to take ownership of the `sudo_local` file.
+        # Disable sudo Touch ID authentication, if added by nix-darwin
+        if grep '${option}' ${file} > /dev/null; then
+          ${sed} -i '/${option}/d' ${file}
+        fi
+      '';
+    })
+  ];
 }
