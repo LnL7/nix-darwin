@@ -116,13 +116,23 @@
         true;
     };
   };
-  system.defaults.controlcenter.BatteryShowPercentage = true;
-  system.defaults.controlcenter.Sound = false;
-  system.defaults.controlcenter.Bluetooth = true;
+  system.defaults.controlcenter.AccessibilityShortcuts = "both";
   system.defaults.controlcenter.AirDrop = true;
-  system.defaults.controlcenter.Display = false;
-  system.defaults.controlcenter.FocusModes = false;
-  system.defaults.controlcenter.NowPlaying = true;
+  system.defaults.controlcenter.Battery = "menuBar";
+  system.defaults.controlcenter.BatteryShowEnergyMode = false;
+  system.defaults.controlcenter.BatteryShowPercentage = true;
+  system.defaults.controlcenter.Bluetooth = true;
+  system.defaults.controlcenter.Display = "hide";
+  system.defaults.controlcenter.FocusModes = "hide";
+  system.defaults.controlcenter.Hearing = "both";
+  system.defaults.controlcenter.KeyboardBrightness = "menuBar";
+  system.defaults.controlcenter.MusicRecognition = "menuBar";
+  system.defaults.controlcenter.NowPlaying = "always";
+  system.defaults.controlcenter.ScreenMirroring = "whenActive";
+  system.defaults.controlcenter.Sound = "hide";
+  system.defaults.controlcenter.StageManager = true;
+  system.defaults.controlcenter.UserSwitcher = "both";
+  system.defaults.controlcenter.WiFi = true;
   test = lib.strings.concatMapStringsSep "\n"
     (x: ''
       echo >&2 "checking defaults write in /${x}"
