@@ -19,7 +19,7 @@
       evalConfig = import ./eval-config.nix;
 
       darwinSystem = args@{ modules, ... }: self.lib.evalConfig (
-        { inherit (nixpkgs) lib; }
+        { lib = args.lib or nixpkgs.lib; }
         // nixpkgs.lib.optionalAttrs (args ? pkgs) { inherit (args.pkgs) lib; }
         // builtins.removeAttrs args [ "system" "pkgs" "inputs" ]
         // {
