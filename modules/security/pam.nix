@@ -35,6 +35,17 @@ in
         '';
       };
 
+      watchIdAuth = lib.mkEnableOption "" // {
+        description = ''
+          Use Apple Watch for sudo authentication, for devices without Touch ID or 
+          laptops with lids closed, consider using this.
+
+          When enabled, you can use your Apple Watch to authenticate sudo commands.
+          If this doesn't work, you can go into `System Settings > Touch ID & Password`
+          and toggle the switch for your Apple Watch.
+        '';
+      };
+
       reattach = lib.mkEnableOption "" // {
         description = ''
           Whether to enable reattaching a program to the user's bootstrap session.
@@ -53,6 +64,7 @@ in
     security.pam.services.sudo_local.text = lib.concatLines (
       (lib.optional cfg.reattach "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so")
       ++ (lib.optional cfg.touchIdAuth "auth       sufficient     pam_tid.so")
+      ++ (lib.optional cfg.watchIdAuth "auth       sufficient     ${pkgs.pam-watchid}/lib/pam_watchid.so")
     );
 
     environment.etc."pam.d/sudo_local" = {
