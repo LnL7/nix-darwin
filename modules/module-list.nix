@@ -61,6 +61,7 @@
   ./services/buildkite-agents.nix
   ./services/chunkwm.nix
   ./services/cachix-agent.nix
+  ./services/consul.nix
   ./services/dnsmasq.nix
   ./services/emacs.nix
   ./services/eternal-terminal.nix
