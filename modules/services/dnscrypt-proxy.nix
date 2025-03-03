@@ -20,12 +20,12 @@ in
 
     enable = lib.mkEnableOption "the dnscrypt-proxy service.";
 
-    package = lib.mkPackageOption pkgs "dnscrypt-proxy2" { };
+    package = lib.mkPackageOption pkgs "dnscrypt-proxy" { };
 
     settings = lib.mkOption {
       description = ''
         Attrset that is converted and passed as TOML config file.
-        For available params, see: <https://github.com/DNSCrypt/dnscrypt-proxy/blob/${pkgs.dnscrypt-proxy2.version}/dnscrypt-proxy/example-dnscrypt-proxy.toml>
+        For available params, see: <https://github.com/DNSCrypt/dnscrypt-proxy/blob/${pkgs.dnscrypt-proxy.version}/dnscrypt-proxy/example-dnscrypt-proxy.toml>
       '';
       example = lib.literalExpression ''
         {
