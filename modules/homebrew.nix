@@ -137,7 +137,7 @@ let
     config = {
       brewBundleCmd = concatStringsSep " " (
         optional (!config.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1"
-        ++ [ "brew bundle --file='${brewfileFile}' --no-lock" ]
+        ++ [ "brew bundle --file='${brewfileFile}'" ]
         ++ optional (!config.upgrade) "--no-upgrade"
         ++ optional (config.cleanup == "uninstall") "--cleanup"
         ++ optional (config.cleanup == "zap") "--cleanup --zap"
