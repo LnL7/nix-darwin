@@ -8,7 +8,7 @@ let
       {
         nixpkgs.source = path;
         nixpkgs.hostPlatform = stdenv.hostPlatform.system;
-        system.includeUninstaller = false;
+        system.tools.darwin-uninstaller.enable = false;
       }
     ];
   };
