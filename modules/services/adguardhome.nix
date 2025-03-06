@@ -117,6 +117,7 @@ in
   config = mkIf cfg.enable {
     launchd.daemons.adguardhome = {
       serviceConfig = {
+        Label = "AdGuardHome";
         ProgramArguments = [
           "${lib.getExe cfg.package}"
           "-c"
