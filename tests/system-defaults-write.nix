@@ -50,7 +50,14 @@
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
-  system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
+  system.defaults.dock.persistent-apps = [
+    "/Applications/MyApp.app"
+    { app = "/Applications/Cool.app"; }
+    { spacer = { small = true; }; }
+    { spacer = { small = false; }; }
+    { folder = "/Applications/Utilities"; }
+    { file = "/Users/example/Downloads/test.csv"; }
+  ];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
   system.defaults.dock.scroll-to-open = false;
   system.defaults.finder.AppleShowAllFiles = true;

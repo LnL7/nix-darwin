@@ -147,7 +147,7 @@ in
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
 
         if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
-          if [[ -n "$SSH_CONNECTION" ]]; then
+          if [[ "$(launchctl managername)" != Aqua ]]; then
             printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
             printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
             printf >&2 'You can either:\n'
@@ -172,7 +172,7 @@ in
               printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n'
               printf >&2 'please accept the dialog that pops up.\n'
               printf >&2 '\n'
-              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
+              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild` updates your users,\n'
               printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
               printf >&2 '\n'
               printf >&2 'This can be found in System Settings > Privacy & Security > Full Disk Access.\n'
