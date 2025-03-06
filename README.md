@@ -18,7 +18,7 @@ As the official Nix installer does not include an automated uninstaller, and man
 * The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups.
   It can install one of two distributions of Nix:
 
-  * By default, it will install vanilla upstream [Nix](https://nixos.org/) with flakes enabled.
+  * To install the **recommended** vanilla upstream [Nix](https://nixos.org), you will need to explicitly say `no` when prompted to install `Determinate Nix`.
 
   * When run with the `--determinate` flag, it will install the [Determinate](https://docs.determinate.systems/) distribution.
     As Determinate manages the Nix installation itself, you will need to set `nix.enable = false;` in your configuration to disable nix-darwin’s own Nix management.
