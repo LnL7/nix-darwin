@@ -1,3 +1,5 @@
+# Taken from NixOS/nixpkgs and adapted to use of nix-darwin:
+# https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/monitoring/apcupsd.nix
 { config, lib, pkgs, ... }:
 let
   cfg = config.services.apcupsd;
@@ -45,7 +47,7 @@ let
   scriptDir = pkgs.runCommand "apcupsd-scriptdir" { preferLocalBuild = true; } (''
     mkdir "$out"
     # Copy SCRIPTDIR from apcupsd package
-    cp -r ${pkgs.apcupsd}/etc/apcupsd/* "$out"/
+    cp -r ${cfg.package}/etc/apcupsd/* "$out"/
     # Make the files writeable (nix will unset the write bits afterwards)
     chmod u+w "$out"/*
     # Remove the sample event notification scripts, because they don't work
@@ -64,7 +66,7 @@ let
     preferLocalBuild = true;
     nativeBuildInputs = [ pkgs.makeWrapper ];
   } ''
-      for p in "${lib.getBin pkgs.apcupsd}/bin/"*; do
+      for p in "${lib.getBin cfg.package}/bin/"*; do
           bname=$(basename "$p")
           makeWrapper "$p" "$out/bin/$bname" --add-flags "-f ${configFile}"
       done
@@ -73,7 +75,7 @@ let
   apcupsdWrapped = pkgs.symlinkJoin {
     name = "apcupsd-wrapped";
     # Put wrappers first so they "win"
-    paths = [ wrappedBinaries pkgs.apcupsd ];
+    paths = [ wrappedBinaries cfg.package ];
   };
 in
 
@@ -97,12 +99,22 @@ in
         '';
       };
 
+      package = lib.mkOption {
+        default = pkgs.apcupsd;
+        type = lib.types.package;
+        description = ''
+          The apcupsd package to use.
+        '';
+      };
+
       configText = lib.mkOption {
         default = ''
           UPSTYPE usb
           NISIP 127.0.0.1
           BATTERYLEVEL 50
           MINUTES 5
+          # Required on darwin
+          LOCKFILE /run
         '';
         type = lib.types.lines;
         description = ''
@@ -160,42 +172,19 @@ in
     # not connected to a tty (it is connected to the journal):
     #   wall: cannot get tty name: Inappropriate ioctl for device
     # The message still gets through.
-    systemd.services.apcupsd = {
-      description = "APC UPS Daemon";
-      wantedBy = [ "multi-user.target" ];
-      preStart = "mkdir -p /run/apcupsd/";
+    # TODO: Maybe create /run/apcupsd before running, would need to generate
+    #       some kind of wrapper script then.
+    launchd.daemons.apcupsd = {
       serviceConfig = {
-        ExecStart = "${pkgs.apcupsd}/bin/apcupsd -b -f ${configFile} -d1";
-        # TODO: When apcupsd has initiated a shutdown, systemd always ends up
-        # waiting for it to stop ("A stop job is running for UPS daemon"). This
-        # is weird, because in the journal one can clearly see that apcupsd has
-        # received the SIGTERM signal and has already quit (or so it seems).
-        # This reduces the wait time from 90 seconds (default) to just 5. Then
-        # systemd kills it with SIGKILL.
-        TimeoutStopSec = 5;
-      };
-      unitConfig.Documentation = "man:apcupsd(8)";
-    };
-
-    # A special service to tell the UPS to power down/hibernate just before the
-    # computer shuts down. (The UPS has a built in delay before it actually
-    # shuts off power.) Copied from here:
-    # http://forums.opensuse.org/english/get-technical-help-here/applications/479499-apcupsd-systemd-killpower-issues.html
-    systemd.services.apcupsd-killpower = {
-      description = "APC UPS Kill Power";
-      after = [ "shutdown.target" ]; # append umount.target?
-      before = [ "final.target" ];
-      wantedBy = [ "shutdown.target" ];
-      unitConfig = {
-        ConditionPathExists = "/run/apcupsd/powerfail";
-        DefaultDependencies = "no";
-      };
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.apcupsd}/bin/apcupsd --killpower -f ${configFile}";
-        TimeoutSec = "infinity";
-        StandardOutput = "tty";
-        RemainAfterExit = "yes";
+        ProgramArguments = [
+          "${cfg.package}/bin/apcupsd"
+          "-b"
+          "-f"
+          "${configFile}"
+          "-d1"
+        ];
+        KeepAlive = true;
+        RunAtLoad = true;
       };
     };
 
