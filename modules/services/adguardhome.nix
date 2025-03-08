@@ -116,13 +116,7 @@ in
 
   config = mkIf cfg.enable {
     launchd.daemons.adguardhome = {
-      script = ''
-        # Wait for /nix/store to be mounted
-        while [ ! -x "${lib.getExe cfg.package}" ]; do
-          sleep 1
-        done
-        exec ${lib.getExe cfg.package} -c ${configFile} --no-check-update ${builtins.concatStringsSep " " cfg.extraArgs}
-      '';
+      command = "${lib.getExe cfg.package} -c ${configFile} --no-check-update ${builtins.concatStringsSep " " cfg.extraArgs}";
       serviceConfig = {
         KeepAlive = true;
         RunAtLoad = true;
