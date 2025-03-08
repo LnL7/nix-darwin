@@ -1,6 +1,25 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    {
+      system.defaults.CustomUserPreferences = {
+        "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
+        "com.apple.Safari" = {
+          "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
+            true;
+        };
+      };
+    }
+    {
+      system.defaults.CustomUserPreferences = {
+        "com.apple.Safari" = {
+          "NSUserKeyEquivalents"."Quit Safari" = "@^q"; # Option-Cmd-Q
+        };
+      };
+    }
+  ];
+
   system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
@@ -109,13 +128,6 @@
   system.defaults.WindowManager.EnableTiledWindowMargins = true;
   system.defaults.WindowManager.StandardHideWidgets = true;
   system.defaults.WindowManager.StageManagerHideWidgets = true;
-  system.defaults.CustomUserPreferences = {
-    "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
-    "com.apple.Safari" = {
-      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
-        true;
-    };
-  };
   system.defaults.controlcenter.BatteryShowPercentage = true;
   system.defaults.controlcenter.Sound = false;
   system.defaults.controlcenter.Bluetooth = true;
