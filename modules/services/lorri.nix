@@ -29,6 +29,14 @@ in
   };
 
   config = mkIf cfg.enable {
+    # TODO: Upstream this to NixOS.
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`services.lorri.enable` requires `nix.enable`'';
+      }
+    ];
+
     environment.systemPackages = [ pkgs.lorri ];
     launchd.user.agents.lorri = {
       command = with pkgs; "${lorri}/bin/lorri daemon";

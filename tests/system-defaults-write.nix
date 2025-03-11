@@ -46,10 +46,18 @@
   system.defaults.menuExtraClock.Show24Hour = false;
   system.defaults.menuExtraClock.ShowDayOfWeek = true;
   system.defaults.menuExtraClock.ShowDate = 2;
+  system.defaults.dock.expose-group-apps = true;
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
-  system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
+  system.defaults.dock.persistent-apps = [
+    "/Applications/MyApp.app"
+    { app = "/Applications/Cool.app"; }
+    { spacer = { small = true; }; }
+    { spacer = { small = false; }; }
+    { folder = "/Applications/Utilities"; }
+    { file = "/Users/example/Downloads/test.csv"; }
+  ];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
   system.defaults.dock.scroll-to-open = false;
   system.defaults.finder.AppleShowAllFiles = true;
@@ -73,6 +81,7 @@
   system.defaults.finder.ShowRemovableMediaOnDesktop = false;
   system.defaults.hitoolbox.AppleFnUsageType = "Show Emoji & Symbols";
   system.defaults.screencapture.location = "/tmp";
+  system.defaults.screencapture.target = "file";
   system.defaults.screencapture.include-date = true;
   system.defaults.screensaver.askForPassword = true;
   system.defaults.screensaver.askForPasswordDelay = 5;
@@ -94,6 +103,10 @@
   system.defaults.WindowManager.AppWindowGroupingBehavior = true;
   system.defaults.WindowManager.StandardHideDesktopIcons = false;
   system.defaults.WindowManager.HideDesktop = false;
+  system.defaults.WindowManager.EnableTilingByEdgeDrag = true;
+  system.defaults.WindowManager.EnableTopTilingByEdgeDrag = true;
+  system.defaults.WindowManager.EnableTilingOptionAccelerator = true;
+  system.defaults.WindowManager.EnableTiledWindowMargins = true;
   system.defaults.WindowManager.StandardHideWidgets = true;
   system.defaults.WindowManager.StageManagerHideWidgets = true;
   system.defaults.CustomUserPreferences = {

@@ -118,7 +118,6 @@ in
       echo "configuring networking..." >&2
 
       ${optionalString (cfg.computerName != null) ''
-        # shellcheck disable=SC1112
         scutil --set ComputerName ${escapeShellArg cfg.computerName}
       ''}
       ${optionalString (cfg.hostName != null) ''
@@ -133,6 +132,11 @@ in
       ${optionalString (cfg.wakeOnLan.enable != null) ''
         systemsetup -setWakeOnNetworkAccess '${onOff cfg.wakeOnLan.enable}' &> /dev/null
       ''}
+
+      if [ -e /etc/hosts.before-nix-darwin ]; then
+        echo "restoring /etc/hosts..." >&2
+        sudo mv /etc/hosts{.before-nix-darwin,}
+      fi
     '';
 
   };

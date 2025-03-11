@@ -62,6 +62,7 @@
   ./services/chunkwm.nix
   ./services/cachix-agent.nix
   ./services/dnsmasq.nix
+  ./services/dnscrypt-proxy.nix
   ./services/emacs.nix
   ./services/eternal-terminal.nix
   ./services/github-runner
@@ -82,6 +83,7 @@
   ./services/nix-gc
   ./services/nix-optimise
   ./services/ofborg
+  ./services/openssh.nix
   ./services/postgresql
   ./services/privoxy
   ./services/redis

@@ -1,3 +1,23 @@
+2025-01-29
+- There is now a `nix.enable` toggle to disable management of the Nix
+  installation. Nix installation management has been made more
+  opinionated as a consequence; nix-darwin now only supports managing a
+  multi‐user daemon installation of Nix, and unconditionally takes
+  ownership of the nix-daemon launchd daemon and the `_nixbld*` build
+  users when Nix installation management is enabled.
+
+  If the new constraints do not work with your setup, you can disable
+  the `nix.enable` option to opt out of Nix installation management
+  entirely; see the option documentation for caveats.
+
+2025-01-18
+- The default configuration path for all new installations
+  is `/etc/nix-darwin`. This was already the undocumented
+  default for `darwin-rebuild switch` when using flakes. This
+  is implemented by setting `environment.darwinConfig` to
+  `"/etc/nix-darwin/configuration.nix"` by default when
+  `system.stateVersion` ≥ 6.
+
 2024-09-10
 - The default Nix build user group ID is now set to 350 when
   `system.stateVersion` ≥ 5, to reflect the default for new Nix

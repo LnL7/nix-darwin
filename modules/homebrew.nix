@@ -137,7 +137,7 @@ let
     config = {
       brewBundleCmd = concatStringsSep " " (
         optional (!config.autoUpdate) "HOMEBREW_NO_AUTO_UPDATE=1"
-        ++ [ "brew bundle --file='${brewfileFile}' --no-lock" ]
+        ++ [ "brew bundle --file='${brewfileFile}'" ]
         ++ optional (!config.upgrade) "--no-upgrade"
         ++ optional (config.cleanup == "uninstall") "--cleanup"
         ++ optional (config.cleanup == "zap") "--cleanup --zap"
@@ -395,6 +395,9 @@ let
       };
       no_binaries = mkNullOrBoolOption {
         description = "Whether to disable linking of helper executables.";
+      };
+      ignore_dependencies = mkNullOrBoolOption {
+        description = "Ignore casks dependencies in case you manage them extrenally";
       };
 
       brewfileLine = mkInternalOption { type = types.nullOr types.str; };
@@ -705,9 +708,6 @@ in
       description = ''
         Applications to install from Mac App Store using {command}`mas`.
 
-        When this option is used, `"mas"` is automatically added to
-        [](#opt-homebrew.brews).
-
         Note that you need to be signed into the Mac App Store for {command}`mas` to
         successfully install and upgrade applications, and that unfortunately apps removed from this
         option will not be uninstalled automatically even if
@@ -765,8 +765,7 @@ in
     ];
 
     homebrew.brews =
-      optional (cfg.masApps != { }) "mas"
-      ++ optional (cfg.whalebrews != [ ]) "whalebrew";
+      optional (cfg.whalebrews != [ ]) "whalebrew";
 
     homebrew.brewfile =
       "# Created by `nix-darwin`'s `homebrew` module\n\n"
@@ -786,7 +785,8 @@ in
       # Homebrew Bundle
       echo >&2 "Homebrew bundle..."
       if [ -f "${cfg.brewPrefix}/brew" ]; then
-        PATH="${cfg.brewPrefix}":$PATH ${cfg.onActivation.brewBundleCmd}
+        PATH="${cfg.brewPrefix}:${lib.makeBinPath [ pkgs.mas ]}:$PATH" \
+          ${cfg.onActivation.brewBundleCmd}
       else
         echo -e "\e[1;31merror: Homebrew is not installed, skipping...\e[0m" >&2
       fi

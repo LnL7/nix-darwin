@@ -61,9 +61,16 @@ in
 
     maxJobs = mkOption {
       type = types.ints.positive;
-      default = 1;
-      example = 4;
+      default = cfg.package.nixosConfig.virtualisation.cores;
+      defaultText = ''
+        The `virtualisation.cores` of the build machine's final NixOS configuration.
+      '';
+      example = 2;
       description = ''
+        Instead of setting this directly, you should set
+        {option}`nix.linux-builder.config.virtualisation.cores` to configure
+        the amount of cores the Linux builder should have.
+
         The number of concurrent jobs the Linux builder machine supports. The
         build machine will enforce its own limits, but this allows hydra
         to schedule better since there is no work-stealing between build
@@ -153,6 +160,13 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`nix.linux-builder.enable` requires `nix.enable`'';
+      }
+    ];
+
     system.activationScripts.preActivation.text = ''
       mkdir -p ${cfg.workingDirectory}
     '';

@@ -20,6 +20,7 @@ in
 {
   imports = [
     (mkRemovedOptionModule [ "nix" "optimise" "dates" ] "Use `nix.optimise.interval` instead.")
+    (mkRemovedOptionModule [ "nix" "optimise" "user" ] "The store optimisation service now always runs as `root`.")
   ];
 
   ###### interface
@@ -32,13 +33,6 @@ in
         type = types.bool;
         default = false;
         description = "Automatically run the nix store optimiser at a specific time.";
-      };
-
-      # Not in NixOS module
-      user = mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = "User that runs the store optimisation.";
       };
 
       interval = mkOption {
@@ -58,17 +52,20 @@ in
 
   ###### implementation
 
-  config = mkIf cfg.automatic {
+  config = {
+    assertions = [
+      {
+        assertion = cfg.automatic -> config.nix.enable;
+        message = ''nix.optimise.automatic requires nix.enable'';
+      }
+    ];
 
-    launchd.daemons.nix-optimise = {
-      environment.NIX_REMOTE = optionalString config.nix.useDaemon "daemon";
+    launchd.daemons.nix-optimise = mkIf cfg.automatic {
       command = "${lib.getExe' config.nix.package "nix-store"} --optimise";
       serviceConfig = {
         RunAtLoad = false;
         StartCalendarInterval = cfg.interval;
-        UserName = cfg.user;
       };
     };
-
   };
 }

@@ -57,6 +57,38 @@ with lib;
       '';
     };
 
+    system.defaults.WindowManager.EnableTilingByEdgeDrag = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable dragging windows to screen edges to tile them. The default is true.
+      '';
+    };
+
+    system.defaults.WindowManager.EnableTopTilingByEdgeDrag = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable dragging windows to the menu bar to fill the screen. The default is true.
+      '';
+    };
+
+    system.defaults.WindowManager.EnableTilingOptionAccelerator = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable holding alt to tile windows. The default is true.
+      '';
+    };
+
+    system.defaults.WindowManager.EnableTiledWindowMargins = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = ''
+        Enable window margins when tiling windows. The default is true.
+      '';
+    };
+
     system.defaults.WindowManager.StandardHideWidgets = mkOption {
       type = types.nullOr types.bool;
       default = null;

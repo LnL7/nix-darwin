@@ -1,6 +1,10 @@
 {
   description = "A collection of darwin modules";
 
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  };
+
   outputs = { self, nixpkgs }: let
     forAllSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
     forDarwinSystems = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ];
