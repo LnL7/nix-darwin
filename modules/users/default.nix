@@ -11,14 +11,14 @@ let
   group = import ./group.nix;
   user = import ./user.nix;
 
-  toGID = v: { "${toString v.gid}" = v.name; };
-  toUID = v: { "${toString v.uid}" = v.name; };
+  toGID = n: v: { "${toString v.gid}" = n; };
+  toUID = n: v: { "${toString v.uid}" = n; };
 
   isCreated = list: name: elem name list;
   isDeleted = attrs: name: ! elem name (mapAttrsToList (n: v: v.name) attrs);
 
-  gids = mapAttrsToList (n: toGID) (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
-  uids = mapAttrsToList (n: toUID) (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
+  gids = mapAttrsToList toGID (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
+  uids = mapAttrsToList toUID (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
 
   createdGroups = mapAttrsToList (n: v: cfg.groups."${v}") cfg.gids;
   createdUsers = mapAttrsToList (n: v: cfg.users."${v}") cfg.uids;
@@ -112,14 +112,14 @@ in
         in
           !user.ignoreShellProgramCheck -> (s == shell || (shell == "bash" && s == "bash-interactive")) -> (config.programs.${shell}.enable == true);
         message = ''
-          users.users.${user.name}.shell is set to ${shell}, but
+          users.users.${name}.shell is set to ${shell}, but
           programs.${shell}.enable is not true. This will cause the ${shell}
           shell to lack the basic Nix directories in its PATH and might make
           logging in as that user impossible. You can fix it with:
           programs.${shell}.enable = true;
 
           If you know what you're doing and you are fine with the behavior,
-          set users.users.${user.name}.ignoreShellProgramCheck = true;
+          set users.users.${name}.ignoreShellProgramCheck = true;
           instead.
         '';
       }) [
@@ -331,7 +331,7 @@ in
     environment.systemPackages = systemShells;
 
     environment.etc = mapAttrs' (name: { packages, ... }: {
-      name = "profiles/per-user/${name}";
+      name = "profiles/per-user/${cfg.users.${name}.name}";
       value.source = pkgs.buildEnv {
         name = "user-environment";
         paths = packages;
