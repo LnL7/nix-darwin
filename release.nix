@@ -86,7 +86,6 @@ in {
   tests.launchd-daemons = makeTest ./tests/launchd-daemons.nix;
   tests.launchd-setenv = makeTest ./tests/launchd-setenv.nix;
   tests.networking-hostname = makeTest ./tests/networking-hostname.nix;
-  tests.networking-hosts = makeTest ./tests/networking-hosts.nix;
   tests.networking-networkservices = makeTest ./tests/networking-networkservices.nix;
   tests.nix-enable = makeTest ./tests/nix-enable.nix;
   tests.nixpkgs-overlays = makeTest ./tests/nixpkgs-overlays.nix;
@@ -104,6 +103,7 @@ in {
   tests.sockets-nix-daemon = makeTest ./tests/sockets-nix-daemon.nix;
   tests.services-aerospace = makeTest ./tests/services-aerospace.nix;
   tests.services-dnsmasq = makeTest ./tests/services-dnsmasq.nix;
+  tests.services-dnscrypt-proxy = makeTest ./tests/services-dnscrypt-proxy.nix;
   tests.services-eternal-terminal = makeTest ./tests/services-eternal-terminal.nix;
   tests.services-nix-gc = makeTest ./tests/services-nix-gc.nix;
   tests.services-nix-optimise = makeTest ./tests/services-nix-optimise.nix;
