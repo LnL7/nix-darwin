@@ -12,6 +12,8 @@ let
 
   isNixAtLeast = versionAtLeast (getVersion nixPackage);
 
+  configureBuildUsers = !(config.nix.settings.auto-allocate-uids or false);
+
   makeNixBuildUser = nr: {
     name = "_nixbld${toString nr}";
     value = {
@@ -49,13 +51,16 @@ let
 
       mkKeyValuePairs = attrs: concatStringsSep "\n" (mapAttrsToList mkKeyValue attrs);
 
+      isExtra = key: hasPrefix "extra-" key;
+
     in
     pkgs.writeTextFile {
       name = "nix.conf";
       text = ''
         # WARNING: this file is generated from the nix.* options in
         # your nix-darwin configuration. Do not edit it!
-        ${mkKeyValuePairs cfg.settings}
+        ${mkKeyValuePairs (filterAttrs (key: value: !(isExtra key)) cfg.settings)}
+        ${mkKeyValuePairs (filterAttrs (key: value: isExtra key) cfg.settings)}
         ${cfg.extraOptions}
       '';
       checkPhase =
@@ -134,6 +139,34 @@ let
         namedPaths ++ searchPaths;
   };
 
+  handleUnmanaged = managedConfig: mkMerge [
+    (mkIf cfg.enable managedConfig)
+    (mkIf (!cfg.enable) {
+      system.activationScripts.nix-daemon.text = ''
+        # Restore unmanaged Nix daemon if present
+        unmanagedNixProfile=/nix/var/nix/profiles/default
+        if [[
+          -e /run/current-system/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+          && -e $unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        ]]; then
+          printf >&2 'restoring unmanaged Nix daemon...\n'
+          cp \
+            "$unmanagedNixProfile/Library/LaunchDaemons/org.nixos.nix-daemon.plist" \
+            /Library/LaunchDaemons
+          launchctl load -w /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        fi
+      '';
+    })
+  ];
+
+  managedDefault = name: default: {
+    default = if cfg.enable then default else throw ''
+      ${name}: accessed when `nix.enable` is off; this is a bug in
+      nix-darwin or a third‐party module
+    '';
+    defaultText = default;
+  };
+
 in
 
 {
@@ -144,7 +177,6 @@ in
     in
     [
       # Only ever in NixOS
-      (mkRemovedOptionModule [ "nix" "enable" ] "No `nix-darwin` equivalent to this NixOS option.")
       (mkRemovedOptionModule [ "nix" "daemonCPUSchedPolicy" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedClass" ] (altOption "nix.daemonProcessType"))
       (mkRemovedOptionModule [ "nix" "daemonIOSchedPriority" ] (altOption "nix.daemonIOLowPriority"))
@@ -157,6 +189,14 @@ in
       (mkRenamedOptionModule [ "users" "nix" "nrBuildUsers" ] [ "nix" "nrBuildUsers" ])
       (mkRenamedOptionModule [ "nix" "daemonIONice" ] [ "nix" "daemonIOLowPriority" ])
       (mkRemovedOptionModule [ "nix" "daemonNiceLevel" ] (consider "nix.daemonProcessType"))
+      (mkRemovedOptionModule [ "nix" "useDaemon" ] ''
+        nix-darwin now only supports managing multi‐user daemon
+        installations of Nix.
+      '')
+      (mkRemovedOptionModule [ "nix" "configureBuildUsers" ] ''
+        nix-darwin now manages build users unconditionally when
+        `nix.enable` is on.
+      '')
     ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
 
   ###### interface
@@ -165,29 +205,43 @@ in
 
     nix = {
 
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Whether to enable Nix.
+
+          Disabling this will stop nix-darwin from managing the
+          installed version of Nix, the nix-daemon launchd daemon, and
+          the settings in {file}`/etc/nix/nix.conf`.
+
+          This allows you to use nix-darwin without it taking over your
+          system installation of Nix. Some nix-darwin functionality
+          that relies on managing the Nix installation, like the
+          `nix.*` options to adjust Nix settings or configure a Linux
+          builder, will be unavailable. You will also have to upgrade
+          Nix yourself, as nix-darwin will no longer do so.
+
+          ::: {.warning}
+          If you have already removed your global system installation
+          of Nix, this will break nix-darwin and you will have to
+          reinstall Nix to fix it.
+          :::
+        '';
+      };
+
       package = mkOption {
         type = types.package;
-        default = pkgs.nix;
+        inherit (managedDefault "nix.package" pkgs.nix) default;
         defaultText = literalExpression "pkgs.nix";
         description = ''
           This option specifies the Nix package instance to use throughout the system.
         '';
       };
 
-      # Not in NixOS module
-      useDaemon = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          If set, Nix will use the daemon to perform operations.
-          Use this instead of services.nix-daemon.enable if you don't want the
-          daemon service to be managed for you.
-        '';
-      };
-
       distributedBuilds = mkOption {
         type = types.bool;
-        default = false;
+        inherit (managedDefault "nix.distributedBuilds" false) default defaultText;
         description = ''
           Whether to distribute builds to the machines listed in
           {option}`nix.buildMachines`.
@@ -197,7 +251,7 @@ in
       # Not in NixOS module
       daemonProcessType = mkOption {
         type = types.enum [ "Background" "Standard" "Adaptive" "Interactive" ];
-        default = "Standard";
+        inherit (managedDefault "nix.daemonProcessType" "Standard") default defaultText;
         description = ''
           Nix daemon process resource limits class. These limits propagate to
           build processes. `Standard` is the default process type
@@ -212,7 +266,7 @@ in
       # Not in NixOS module
       daemonIOLowPriority = mkOption {
         type = types.bool;
-        default = false;
+        inherit (managedDefault "nix.daemonIOLowPriority" false) default defaultText;
         description = ''
           Whether the Nix daemon process should considered to be low priority when
           doing file system I/O.
@@ -340,7 +394,7 @@ in
             };
           };
         });
-        default = [ ];
+        inherit (managedDefault "nix.buildMachines" [ ]) default defaultText;
         description = ''
           This option lists the machines to be used if distributed builds are
           enabled (see {option}`nix.distributedBuilds`).
@@ -354,21 +408,13 @@ in
       envVars = mkOption {
         type = types.attrs;
         internal = true;
-        default = { };
+        inherit (managedDefault "nix.envVars" { }) default defaultText;
         description = "Environment variables used by Nix.";
-      };
-
-      # Not in NixOS module
-      configureBuildUsers = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Enable configuration for nixbld group and users.
-        '';
       };
 
       nrBuildUsers = mkOption {
         type = types.int;
+        inherit (managedDefault "nix.nrBuildUsers" 0) default defaultText;
         description = ''
           Number of `nixbld` user accounts created to
           perform secure concurrent builds.  If you receive an error
@@ -396,11 +442,13 @@ in
       # Definition differs substantially from NixOS module
       nixPath = mkOption {
         type = nixPathType;
-        default = lib.optionals cfg.channel.enable [
-          # Include default path <darwin-config>.
-          { darwin-config = "${config.environment.darwinConfig}"; }
-          "/nix/var/nix/profiles/per-user/root/channels"
-        ];
+        inherit (managedDefault "nix.nixPath" (
+          lib.optionals cfg.channel.enable [
+            # Include default path <darwin-config>.
+            { darwin-config = "${config.environment.darwinConfig}"; }
+            "/nix/var/nix/profiles/per-user/root/channels"
+          ]
+        )) default;
 
         defaultText = lib.literalExpression ''
           lib.optionals cfg.channel.enable [
@@ -422,7 +470,7 @@ in
 
       checkConfig = mkOption {
         type = types.bool;
-        default = true;
+        inherit (managedDefault "nix.checkConfig" true) default defaultText;
         description = ''
           If enabled (the default), checks for data type mismatches and that Nix
           can parse the generated nix.conf.
@@ -483,7 +531,7 @@ in
             };
           }
         ));
-        default = { };
+        inherit (managedDefault "nix.registry" { }) default defaultText;
         description = ''
           A system-wide flake registry.
         '';
@@ -491,7 +539,7 @@ in
 
       extraOptions = mkOption {
         type = types.lines;
-        default = "";
+        inherit (managedDefault "nix.extraOptions" "") default defaultText;
         example = ''
           keep-outputs = true
           keep-derivations = true
@@ -660,7 +708,7 @@ in
             };
           };
         };
-        default = { };
+        inherit (managedDefault "nix.settings" { }) default defaultText;
         description = ''
           Configuration for Nix, see
           <https://nixos.org/manual/nix/stable/#sec-conf-file>
@@ -678,7 +726,7 @@ in
 
   ###### implementation
 
-  config = {
+  config = handleUnmanaged {
     environment.systemPackages =
       [
         nixPackage
@@ -759,7 +807,7 @@ in
 
         # Not in NixOS module
         { assertion = elem "nixbld" config.users.knownGroups -> elem "nixbld" createdGroups; message = "refusing to delete group nixbld in users.knownGroups, this would break nix"; }
-        { assertion = elem "_nixbld1" config.users.knownGroups -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
+        { assertion = elem "_nixbld1" config.users.knownUsers -> elem "_nixbld1" createdUsers; message = "refusing to delete user _nixbld1 in users.knownUsers, this would break nix"; }
         { assertion = config.users.groups ? "nixbld" -> config.users.groups.nixbld.members != []; message = "refusing to remove all members from nixbld group, this would break nix"; }
 
         {
@@ -785,21 +833,11 @@ in
     # Set up the environment variables for running Nix.
     environment.variables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
 
-    environment.extraInit = mkMerge [
-      (mkIf cfg.channel.enable ''
-        if [ -e "$HOME/.nix-defexpr/channels" ]; then
-          export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
-        fi
-      '')
-      # Not in NixOS module
-      ''
-        # Set up secure multi-user builds: non-root users build through the
-        # Nix daemon.
-        if [ ! -w /nix/var/nix/db ]; then
-            export NIX_REMOTE=daemon
-        fi
-      ''
-    ];
+    environment.extraInit = mkIf cfg.channel.enable ''
+      if [ -e "$HOME/.nix-defexpr/channels" ]; then
+        export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
+      fi
+    '';
 
     environment.extraSetup = mkIf (!cfg.channel.enable) ''
       rm --force $out/bin/nix-channel
@@ -807,10 +845,10 @@ in
 
     nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
 
-    users.users = mkIf cfg.configureBuildUsers nixbldUsers;
+    users.users = mkIf configureBuildUsers nixbldUsers;
 
     # Not in NixOS module
-    users.groups.nixbld = mkIf cfg.configureBuildUsers {
+    users.groups.nixbld = mkIf configureBuildUsers {
       description = "Nix build group for nix-daemon";
       gid = config.ids.gids.nixbld;
       members = attrNames nixbldUsers;
@@ -818,11 +856,11 @@ in
     users.knownUsers =
       let nixbldUserNames = attrNames nixbldUsers;
       in
-      mkIf cfg.configureBuildUsers (mkMerge [
+      mkMerge [
         nixbldUserNames
         (map (removePrefix "_") nixbldUserNames) # delete old style nixbld users
-      ]);
-    users.knownGroups = mkIf cfg.configureBuildUsers [ "nixbld" ];
+      ];
+    users.knownGroups = [ "nixbld" ];
 
     # The Determinate Systems installer puts user‐specified settings in
     # `/etc/nix/nix.custom.conf` since v0.33.0. Supplement the
@@ -873,7 +911,7 @@ in
       if [[ -e /etc/nix/nix.custom.conf ]]; then
         mv /etc/nix/nix.custom.conf{,.before-nix-darwin}
       fi
-    '' + optionalString cfg.useDaemon ''
+
       if ! diff /etc/nix/nix.conf /run/current-system/etc/nix/nix.conf &> /dev/null || ! diff /etc/nix/machines /run/current-system/etc/nix/machines &> /dev/null; then
           echo "reloading nix-daemon..." >&2
           launchctl kill HUP system/org.nixos.nix-daemon
@@ -890,6 +928,9 @@ in
         trusted-users = [ "root" ];
         substituters = mkAfter [ "https://cache.nixos.org/" ];
 
+        # Not in NixOS module
+        build-users-group = "nixbld";
+
         # Not implemented yet
         # system-features = mkDefault (
         #   [ "nixos-test" "benchmark" "big-parallel" "kvm" ] ++
@@ -905,8 +946,6 @@ in
 
       (mkIf (isNixAtLeast "2.3pre") { sandbox-fallback = false; })
 
-      # Not in NixOS module
-      (mkIf cfg.useDaemon { build-users-group = "nixbld"; })
     ];
 
   };

@@ -132,6 +132,11 @@ in
       ${optionalString (cfg.wakeOnLan.enable != null) ''
         systemsetup -setWakeOnNetworkAccess '${onOff cfg.wakeOnLan.enable}' &> /dev/null
       ''}
+
+      if [ -e /etc/hosts.before-nix-darwin ]; then
+        echo "restoring /etc/hosts..." >&2
+        sudo mv /etc/hosts{.before-nix-darwin,}
+      fi
     '';
 
   };

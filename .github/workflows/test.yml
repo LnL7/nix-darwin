@@ -7,7 +7,6 @@ on:
 
 env:
   NIXPKGS_BRANCH: nixpkgs-unstable
-  NIX_DARWIN_BRANCH: master
   NIX_VERSION: 2.24.11
 
 jobs:
@@ -40,33 +39,40 @@ jobs:
         nix_path: nixpkgs=channel:${{ env.NIXPKGS_BRANCH }}
     - name: Install channels
       run: |
-        nix-channel --add https://github.com/LnL7/nix-darwin/archive/${{ env.NIX_DARWIN_BRANCH }}.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.NIXPKGS_BRANCH }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin
       run: |
-        export NIX_PATH=$HOME/.nix-defexpr/channels
-
-        mkdir -p ~/.config/nix-darwin
-        cp modules/examples/simple.nix ~/.config/nix-darwin/configuration.nix
+        sudo mkdir -p /etc/nix-darwin
+        sudo cp modules/examples/simple.nix /etc/nix-darwin/configuration.nix
 
         nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
-        /usr/bin/sed -i.bak \
-          "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
-          ~/.config/nix-darwin/configuration.nix
+        sudo /usr/bin/sed -i.bak \
+          "s/# programs.fish.enable = true;/ \
+            imports = [ \
+              ({ options, ... }: { \
+                nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; \
+                environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ]; \
+                nix.nixPath = \
+                  [ { darwin = \"${PWD////\/}\"; } ] \
+                  ++ options.nix.nixPath.default; \
+              }) \
+            ]; \
+          /" \
+          /etc/nix-darwin/configuration.nix
 
-        nix run .#darwin-rebuild \
-          -- switch \
-          -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+        nix run .#darwin-rebuild -- switch \
+          -I darwin=. \
+          -I darwin-config=/etc/nix-darwin/configuration.nix
     - name: Switch to new configuration
       run: |
         . /etc/bashrc
 
-        /usr/bin/sed -i.bak \
+        sudo /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
-          ~/.config/nix-darwin/configuration.nix
+          /etc/nix-darwin/configuration.nix
 
-        darwin-rebuild switch -I darwin=.
+        darwin-rebuild switch
 
         hello
     - name: Test uninstallation of nix-darwin
@@ -91,31 +97,33 @@ jobs:
         install_url: https://releases.nixos.org/nix/nix-${{ env.NIX_VERSION }}/install
     - name: Install nix-darwin
       run: |
-        mkdir -p ~/.config/nix-darwin
+        sudo mkdir -p /etc/nix-darwin
         darwin=$(pwd)
-        pushd ~/.config/nix-darwin
-          nix flake init -t $darwin
+        pushd /etc/nix-darwin
+          sudo nix flake init -t $darwin
           nixConfHash=$(shasum -a 256 /etc/nix/nix.conf | cut -d ' ' -f 1)
-          /usr/bin/sed -i.bak \
+          sudo /usr/bin/sed -i.bak \
             "s/# programs.fish.enable = true;/nix.settings.access-tokens = [ \"github.com=\${{ secrets.GITHUB_TOKEN }}\" ]; environment.etc.\"nix\/nix.conf\".knownSha256Hashes = [ \"$nixConfHash\" ];/" \
             flake.nix
-          /usr/bin/sed -i.bak \
+          sudo /usr/bin/sed -i.bak \
+            's/darwinConfigurations."simple"/darwinConfigurations."'$(scutil --get LocalHostName)'"/g' \
+            flake.nix
+          sudo /usr/bin/sed -i.bak \
             's/nixpkgs.hostPlatform = "aarch64-darwin";/nixpkgs.hostPlatform = "'$(nix eval --expr builtins.currentSystem --impure --raw)'";/' \
             flake.nix
         popd
-        nix run .#darwin-rebuild -- \
-          switch --flake ~/.config/nix-darwin#simple \
+        nix run .#darwin-rebuild -- switch \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
     - name: Switch to new configuration
       run: |
         . /etc/bashrc
 
-        /usr/bin/sed -i.bak \
+        sudo /usr/bin/sed -i.bak \
           "s/pkgs.vim/pkgs.hello/" \
-          ~/.config/nix-darwin/flake.nix
+          /etc/nix-darwin/flake.nix
 
-        darwin-rebuild switch --flake ~/.config/nix-darwin#simple \
+        darwin-rebuild switch \
           --override-input nix-darwin . \
           --override-input nixpkgs nixpkgs/${{ env.NIXPKGS_BRANCH }}
 

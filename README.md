@@ -11,11 +11,19 @@ nix-darwin is built up around [Nixpkgs](https://github.com/NixOS/nixpkgs), quite
 
 ## Prerequisites
 
-The only prerequisite is a Nix implementation, both Nix and Lix are supported.
+The only prerequisite is a Nix implementation; both Nix and Lix are supported.
 
 As the official Nix installer does not include an automated uninstaller, and manual uninstallation on macOS is a complex process, we recommend using one of the following installers instead:
 
-- The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups. **Make sure you use it without the `--determinate` flag**. The `--determinate` flag installs the Determinate Nix distribution which does not work out of the box with nix-darwin.
+* The [Nix installer from Determinate Systems](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) is only recommended for use with flake-based setups.
+  It can install one of two distributions of Nix:
+
+  * To install the **recommended** vanilla upstream [Nix](https://nixos.org), you will need to explicitly say `no` when prompted to install `Determinate Nix`.
+
+  * When run with the `--determinate` flag, it will install the [Determinate](https://docs.determinate.systems/) distribution.
+    As Determinate manages the Nix installation itself, you will need to set `nix.enable = false;` in your configuration to disable nix-darwin’s own Nix management.
+    Some nix-darwin functionality that relies on managing the Nix installation, like the `nix.*` options to adjust Nix settings or configure a Linux builder, will be unavailable.
+
 * The [Lix installer](https://lix.systems/install/#on-any-other-linuxmacos-system) supports both flake-based and channel-based setups.
 
 
@@ -33,11 +41,12 @@ Despite being an experimental feature in Nix currently, nix-darwin recommends th
 <summary>Getting started from scratch</summary>
 <p></p>
 
-If you don't have an existing `configuration.nix`, you can run the following commands to generate a basic `flake.nix` inside `~/.config/nix-darwin`:
+If you don't have an existing `configuration.nix`, you can run the following commands to generate a basic `flake.nix` inside `/etc/nix-darwin`:
 
 ```bash
-mkdir -p ~/.config/nix-darwin
-cd ~/.config/nix-darwin
+sudo mkdir -p /etc/nix-darwin
+sudo chown $(id -nu):$(id -ng) /etc/nix-darwin
+cd /etc/nix-darwin
 
 # To use Nixpkgs unstable:
 nix flake init -t nix-darwin/master
@@ -88,7 +97,10 @@ Make sure to set `nixpkgs.hostPlatform` in your `configuration.nix` to either `x
 Unlike NixOS, `nix-darwin` does not have an installer, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-nix run nix-darwin -- switch --flake ~/.config/nix-darwin
+# To use Nixpkgs unstable:
+nix run nix-darwin/master#darwin-rebuild -- switch
+# To use Nixpkgs 24.11:
+nix run nix-darwin/nix-darwin-24.11#darwin-rebuild -- switch
 ```
 
 ### Step 3. Using `nix-darwin`
@@ -96,7 +108,7 @@ nix run nix-darwin -- switch --flake ~/.config/nix-darwin
 After installing, you can run `darwin-rebuild` to apply changes to your system:
 
 ```bash
-darwin-rebuild switch --flake ~/.config/nix-darwin
+darwin-rebuild switch
 ```
 
 #### Using flake inputs
@@ -124,7 +136,7 @@ nix-darwin.lib.darwinSystem {
 
 ### Step 1. Creating `configuration.nix`
 
-Copy the [simple](./modules/examples/simple.nix) example to `~/.config/nix-darwin/configuration.nix`.
+Copy the [simple](./modules/examples/simple.nix) example to `/etc/nix-darwin/configuration.nix`.
 
 ### Step 2. Adding `nix-darwin` channel
 
@@ -142,12 +154,8 @@ sudo nix-channel --update
 To install `nix-darwin`, you can just run `darwin-rebuild switch` to install nix-darwin. As `darwin-rebuild` won't be installed in your `PATH` yet, you can use the following command:
 
 ```bash
-# If you use Nixpkgs unstable (the default):
-nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A darwin-rebuild
-# If you use Nixpkgs 24.11:
-nix-build https://github.com/LnL7/nix-darwin/archive/nix-darwin-24.11.tar.gz -A darwin-rebuild
-
-./result/bin/darwin-rebuild switch -I darwin-config=$HOME/.config/nix-darwin/configuration.nix
+nix-build '<darwin>' -A darwin-rebuild
+./result/bin/darwin-rebuild switch -I darwin-config=/etc/nix-darwin/configuration.nix
 ```
 
 ### Step 4. Using `nix-darwin`

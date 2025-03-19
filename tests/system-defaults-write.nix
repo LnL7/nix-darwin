@@ -1,6 +1,25 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    {
+      system.defaults.CustomUserPreferences = {
+        "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
+        "com.apple.Safari" = {
+          "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
+            true;
+        };
+      };
+    }
+    {
+      system.defaults.CustomUserPreferences = {
+        "com.apple.Safari" = {
+          "NSUserKeyEquivalents"."Quit Safari" = "@^q"; # Option-Cmd-Q
+        };
+      };
+    }
+  ];
+
   system.defaults.NSGlobalDomain.AppleShowAllFiles = true;
   system.defaults.NSGlobalDomain.AppleEnableMouseSwipeNavigateWithScrolls = false;
   system.defaults.NSGlobalDomain.AppleEnableSwipeNavigateWithScrolls = false;
@@ -50,7 +69,14 @@
   system.defaults.dock.appswitcher-all-displays = false;
   system.defaults.dock.autohide-delay = 0.24;
   system.defaults.dock.orientation = "left";
-  system.defaults.dock.persistent-apps = ["MyApp.app" "Cool.app"];
+  system.defaults.dock.persistent-apps = [
+    "/Applications/MyApp.app"
+    { app = "/Applications/Cool.app"; }
+    { spacer = { small = true; }; }
+    { spacer = { small = false; }; }
+    { folder = "/Applications/Utilities"; }
+    { file = "/Users/example/Downloads/test.csv"; }
+  ];
   system.defaults.dock.persistent-others = ["~/Documents" "~/Downloads/file.txt"];
   system.defaults.dock.scroll-to-open = false;
   system.defaults.finder.AppleShowAllFiles = true;
@@ -102,13 +128,6 @@
   system.defaults.WindowManager.EnableTiledWindowMargins = true;
   system.defaults.WindowManager.StandardHideWidgets = true;
   system.defaults.WindowManager.StageManagerHideWidgets = true;
-  system.defaults.CustomUserPreferences = {
-    "NSGlobalDomain" = { "TISRomanSwitchState" = 1; };
-    "com.apple.Safari" = {
-      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" =
-        true;
-    };
-  };
   system.defaults.controlcenter.BatteryShowPercentage = true;
   system.defaults.controlcenter.Sound = false;
   system.defaults.controlcenter.Bluetooth = true;

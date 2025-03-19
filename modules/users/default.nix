@@ -11,14 +11,14 @@ let
   group = import ./group.nix;
   user = import ./user.nix;
 
-  toGID = v: { "${toString v.gid}" = v.name; };
-  toUID = v: { "${toString v.uid}" = v.name; };
+  toGID = n: v: { "${toString v.gid}" = n; };
+  toUID = n: v: { "${toString v.uid}" = n; };
 
   isCreated = list: name: elem name list;
   isDeleted = attrs: name: ! elem name (mapAttrsToList (n: v: v.name) attrs);
 
-  gids = mapAttrsToList (n: toGID) (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
-  uids = mapAttrsToList (n: toUID) (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
+  gids = mapAttrsToList toGID (filterAttrs (n: v: isCreated cfg.knownGroups v.name) cfg.groups);
+  uids = mapAttrsToList toUID (filterAttrs (n: v: isCreated cfg.knownUsers v.name) cfg.users);
 
   createdGroups = mapAttrsToList (n: v: cfg.groups."${v}") cfg.gids;
   createdUsers = mapAttrsToList (n: v: cfg.users."${v}") cfg.uids;
@@ -112,14 +112,14 @@ in
         in
           !user.ignoreShellProgramCheck -> (s == shell || (shell == "bash" && s == "bash-interactive")) -> (config.programs.${shell}.enable == true);
         message = ''
-          users.users.${user.name}.shell is set to ${shell}, but
+          users.users.${name}.shell is set to ${shell}, but
           programs.${shell}.enable is not true. This will cause the ${shell}
           shell to lack the basic Nix directories in its PATH and might make
           logging in as that user impossible. You can fix it with:
           programs.${shell}.enable = true;
 
           If you know what you're doing and you are fine with the behavior,
-          set users.users.${user.name}.ignoreShellProgramCheck = true;
+          set users.users.${name}.ignoreShellProgramCheck = true;
           instead.
         '';
       }) [
@@ -147,7 +147,7 @@ in
         homeDirectory=''${homeDirectory#NFSHomeDirectory: }
 
         if ! sudo dscl . -change /Users/nobody NFSHomeDirectory "$homeDirectory" "$homeDirectory" &> /dev/null; then
-          if [[ -n "$SSH_CONNECTION" ]]; then
+          if [[ "$(launchctl managername)" != Aqua ]]; then
             printf >&2 '\e[1;31merror: users cannot be %s over SSH without Full Disk Access, aborting activation\e[0m\n' "$2"
             printf >&2 'The user %s could not be %s as `darwin-rebuild` was not executed with Full Disk Access over SSH.\n' "$1" "$2"
             printf >&2 'You can either:\n'
@@ -172,7 +172,7 @@ in
               printf >&2 '`darwin-rebuild` requires permissions to administrate your computer,\n'
               printf >&2 'please accept the dialog that pops up.\n'
               printf >&2 '\n'
-              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild updates your users,\n'
+              printf >&2 'If you do not wish to be prompted every time `darwin-rebuild` updates your users,\n'
               printf >&2 'you can grant Full Disk Access to your terminal emulator in System Settings.\n'
               printf >&2 '\n'
               printf >&2 'This can be found in System Settings > Privacy & Security > Full Disk Access.\n'
@@ -331,7 +331,7 @@ in
     environment.systemPackages = systemShells;
 
     environment.etc = mapAttrs' (name: { packages, ... }: {
-      name = "profiles/per-user/${name}";
+      name = "profiles/per-user/${cfg.users.${name}.name}";
       value.source = pkgs.buildEnv {
         name = "user-environment";
         paths = packages;

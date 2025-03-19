@@ -13,6 +13,11 @@ in
 {
   config.assertions = flatten (
     flip mapAttrsToList config.services.github-runners (name: cfg: map (mkIf cfg.enable) [
+      # TODO: Upstream this to NixOS.
+      {
+        assertion = config.nix.enable;
+        message = ''`services.github-runners.${name}.enable` requires `nix.enable`'';
+      }
       {
         assertion = (cfg.user == null && cfg.group == null) || (cfg.user != null);
         message = "`services.github-runners.${name}`: Either set `user` and `group` to `null` to have nix-darwin manage them or set at least `user` explicitly";
@@ -52,22 +57,19 @@ in
         text = mkBefore (''
           echo >&2 "setting up GitHub Runner '${cfg.name}'..."
 
-          (
-            umask -S u=rwx,g=rx,o= > /dev/null
+          # shellcheck disable=SC2174
+          ${getExe' pkgs.coreutils "mkdir"} -p -m u=rwx,g=rx,o= ${escapeShellArg (mkStateDir cfg)}
+          ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
 
-            ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkStateDir cfg)}
-            ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkStateDir cfg)}
+          # shellcheck disable=SC2174
+          ${getExe' pkgs.coreutils "mkdir"} -p -m u=rwx,g=rx,o= ${escapeShellArg (mkLogDir cfg)}
+          ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
 
-            ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkLogDir cfg)}
-            # launchd will fail to start the service if the outer direction doesn't have sufficient permissions
-            ${getExe' pkgs.coreutils "chmod"} o+rx ${escapeShellArg (mkLogDir { name = ""; })}
-            ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkLogDir cfg)}
-
-            ${optionalString (cfg.workDir == null) ''
-              ${getExe' pkgs.coreutils "mkdir"} -p ${escapeShellArg (mkWorkDir cfg)}
-              ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
-            ''}
-          )
+          ${optionalString (cfg.workDir == null) ''
+            # shellcheck disable=SC2174
+            ${getExe' pkgs.coreutils "mkdir"} -p -m u=rwx,g=rx,o= ${escapeShellArg (mkWorkDir cfg)}
+            ${getExe' pkgs.coreutils "chown"} ${user}:${group} ${escapeShellArg (mkWorkDir cfg)}
+          ''}
         '');
       };
     }));

@@ -160,6 +160,13 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.nix.enable;
+        message = ''`nix.linux-builder.enable` requires `nix.enable`'';
+      }
+    ];
+
     system.activationScripts.preActivation.text = ''
       mkdir -p ${cfg.workingDirectory}
     '';

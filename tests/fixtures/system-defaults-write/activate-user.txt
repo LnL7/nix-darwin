@@ -255,7 +255,7 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>MyApp.app</string>
+				<string>/Applications/MyApp.app</string>
 				<key>_CFURLStringType</key>
 				<integer>0</integer>
 			</dict>
@@ -267,11 +267,55 @@ defaults write com.apple.dock 'persistent-apps' $'<?xml version="1.0" encoding="
 			<key>file-data</key>
 			<dict>
 				<key>_CFURLString</key>
-				<string>Cool.app</string>
+				<string>/Applications/Cool.app</string>
 				<key>_CFURLStringType</key>
 				<integer>0</integer>
 			</dict>
 		</dict>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+
+		</dict>
+		<key>tile-type</key>
+		<string>small-spacer-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+
+		</dict>
+		<key>tile-type</key>
+		<string>spacer-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file:///Applications/Utilities</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>directory-tile</string>
+	</dict>
+	<dict>
+		<key>tile-data</key>
+		<dict>
+			<key>file-data</key>
+			<dict>
+				<key>_CFURLString</key>
+				<string>file:///Users/example/Downloads/test.csv</string>
+				<key>_CFURLStringType</key>
+				<integer>15</integer>
+			</dict>
+		</dict>
+		<key>tile-type</key>
+		<string>file-tile</string>
 	</dict>
 </array>
 </plist>'
@@ -498,6 +542,14 @@ defaults write NSGlobalDomain 'TISRomanSwitchState' $'<?xml version="1.0" encodi
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <integer>1</integer>
+</plist>'
+defaults write com.apple.Safari 'NSUserKeyEquivalents' $'<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Quit Safari</key>
+	<string>@^q</string>
+</dict>
 </plist>'
 defaults write com.apple.Safari 'com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled' $'<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

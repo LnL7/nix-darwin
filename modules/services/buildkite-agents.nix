@@ -227,8 +227,9 @@ in
       { path = cfg.runtimePackages ++ [ cfg.package pkgs.coreutils pkgs.darwin.DarwinTools ];
         environment = {
           HOME = cfg.dataDir;
+          NIX_REMOTE = "daemon";
           inherit (config.environment.variables) NIX_SSL_CERT_FILE;
-        } // (if config.nix.useDaemon then { NIX_REMOTE = "daemon"; } else {});
+        };
 
         ## NB: maximum care is taken so that secrets (ssh keys and the CI token)
         ##     don't end up in the Nix store.
