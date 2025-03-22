@@ -40,7 +40,7 @@ jobs:
         nix_path: nixpkgs=channel:${{ env.NIXPKGS_BRANCH }}
     - name: Install channels
       run: |
-        nix-channel --add https://github.com/LnL7/nix-darwin/archive/${{ env.NIX_DARWIN_BRANCH }}.tar.gz darwin
+        nix-channel --add https://github.com/nix-darwin/nix-darwin/archive/${{ env.NIX_DARWIN_BRANCH }}.tar.gz darwin
         nix-channel --add https://nixos.org/channels/${{ env.NIXPKGS_BRANCH }} nixpkgs
         nix-channel --update
     - name: Install nix-darwin
