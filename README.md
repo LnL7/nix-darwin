@@ -234,6 +234,6 @@ If you're adding a module, please add yourself to `meta.maintainers`, for exampl
 The `or` operator takes care of graceful degradation when `lib` from Nixpkgs
 goes out of sync.
 
-Also feel free to contact me if you have questions,
-- Matrix - @daiderd:matrix.org, you can find me in [#macos:nixos.org](https://matrix.to/#/#macos:nixos.org)
-- @LnL7 on twitter
+Feel free to contact us on Matrix if you have questions:
+* **User support:** [#macos:nixos.org](https://matrix.to/#/#macos:nixos.org)
+* **Development discussion:** [#nix-darwin-dev:nixos.org](https://matrix.to/#/#nix-darwin-dev:nixos.org)
