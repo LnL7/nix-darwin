@@ -38,11 +38,40 @@ in
         rm ~/Applications/'Nix Apps'
       fi
 
-      if [ ! -e '/Applications/Nix Apps' ] \
-         || ourLink '/Applications/Nix Apps'; then
-        ln -sfn ${cfg.build.applications}/Applications '/Applications/Nix Apps'
+      ourfolder () {
+        local marker
+        marker=$(xattr -p org.nix-darwin "$1" 2>/dev/null)
+        [ "$marker" = 'generated' ]
+      }
+
+      targetFolder='/Applications/Nix Apps'
+
+      # Clean up for links created at the old location in /Applications
+      if [ -e "$targetFolder" ] && ourLink "$targetFolder"; then
+        rm "$targetFolder"
+      fi
+
+      if [ -e "$targetFolder" ] && ! ourFolder "$targetFolder"; then
+        echo "warning: $targetFolder is not owned by nix-darwin, skipping App linking..." >&2
       else
-        echo "warning: /Applications/Nix Apps is not owned by nix-darwin, skipping App linking..." >&2
+        # create and mark folder
+        mkdir -p "$targetFolder"
+        xattr -w org.nix-darwin generated "$targetFolder"
+
+        rsyncFlags=(
+          --archive
+          --checksum
+          --chmod=-w
+          --copy-unsafe-links
+          --delete
+          --no-group
+          --no-owner
+        )
+
+        # sync applications
+        ${lib.getBin pkgs.rsync}/bin/rsync \
+            -v "''${rsyncFlags[@]}" \
+            ${cfg.build.applications}/Applications/ "$targetFolder"
       fi
     '';
 
