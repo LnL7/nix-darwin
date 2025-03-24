@@ -144,7 +144,7 @@ in
 
     workingDirectory = mkOption {
       type = types.str;
-      default = "/var/lib/darwin-builder";
+      default = "/var/lib/linux-builder";
       description = ''
         The working directory of the Linux builder daemon process.
       '';
@@ -168,6 +168,11 @@ in
     ];
 
     system.activationScripts.preActivation.text = ''
+      # upgrade old path
+      if [ -e /var/lib/darwin-builder ] && [ ! -e ${cfg.workingDirectory} ]; then
+        mv /var/lib/darwin-builder ${cfg.workingDirectory}
+      fi
+
       mkdir -p ${cfg.workingDirectory}
     '';
 
