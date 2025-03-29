@@ -1,4 +1,4 @@
-[<img src="https://nix-darwin.github.io/nix-darwin/images/nix-darwin.png" width="200px" alt="logo" />](https://github.com/nix-darwin/nix-darwin)
+[<img src="https://github.com/user-attachments/assets/0e1a77ac-6739-4153-bd24-abd3a5e143f5" width="200px" alt="logo" />](https://github.com/nix-darwin/nix-darwin)
 
 # nix-darwin
 
