@@ -83,7 +83,7 @@
       # (This may involve moving it to a separate repository.)
       website = pkgs.linkFarm "nix-darwin-website" {
         "index.html" = ./doc/website/index.html;
-        manual = self.packages.${system}.manualHTML;
+        manual = "${self.packages.${system}.manualHTML}/share/doc/darwin";
       };
     })));
   };
